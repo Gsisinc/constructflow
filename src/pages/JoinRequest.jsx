@@ -28,11 +28,15 @@ export default function JoinRequest() {
     e.preventDefault();
     setLoading(true);
     try {
-      await base44.entities.PendingUser.create(formData);
-      setSubmitted(true);
-      toast.success('Application submitted! We\'ll review it soon.');
+      const response = await base44.functions.invoke('submitSignupRequest', formData);
+      if (response.data.success) {
+        setSubmitted(true);
+        toast.success('Application submitted! We\'ll review it soon.');
+      } else {
+        toast.error('Failed to submit application');
+      }
     } catch (error) {
-      toast.error('Failed to submit application');
+      toast.error('Failed to submit application: ' + error.message);
       console.error(error);
     } finally {
       setLoading(false);
