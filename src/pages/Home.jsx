@@ -16,8 +16,13 @@ export default function Home() {
     setLoading(false);
   }, []);
 
-  const handleLogin = () => {
-    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+  const handleLogin = async () => {
+    const isAuth = await base44.auth.isAuthenticated();
+    if (isAuth) {
+      navigate(createPageUrl('Dashboard'));
+    } else {
+      base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+    }
   };
 
   const handleSignup = () => {
