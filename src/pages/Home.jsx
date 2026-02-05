@@ -13,10 +13,17 @@ export default function Home() {
 
   useEffect(() => {
     const checkAuth = async () => {
+      setLoading(true);
       try {
         const authenticated = await base44.auth.isAuthenticated();
+        console.log('Home: isAuthenticated =', authenticated);
         setIsAuthenticated(authenticated);
+        if (authenticated) {
+          console.log('Home: Redirecting to Dashboard');
+          navigate(createPageUrl('Dashboard'), { replace: true });
+        }
       } catch (e) {
+        console.log('Home: Auth check error', e);
         setIsAuthenticated(false);
       } finally {
         setLoading(false);
@@ -37,20 +44,7 @@ export default function Home() {
     );
   }
 
-  // If authenticated, show a simple message with link to dashboard
-  if (isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <Building2 className="h-16 w-16 mx-auto mb-4 text-slate-900" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">You're already logged in!</h1>
-          <Button onClick={() => navigate(createPageUrl('Dashboard'))} className="bg-slate-900 hover:bg-slate-800">
-            Go to Dashboard
-          </Button>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-white">
