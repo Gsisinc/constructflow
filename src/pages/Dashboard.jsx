@@ -62,7 +62,10 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Getting Started</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">
+          {isProjectManager ? 'Project Manager Dashboard' : isAdmin ? 'Admin Dashboard' : 'Team Member Dashboard'}
+        </h1>
+        <p className="text-sm text-slate-600 mt-1">Welcome back, {user?.full_name || 'User'}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
