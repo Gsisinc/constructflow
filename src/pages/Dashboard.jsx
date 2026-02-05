@@ -24,6 +24,9 @@ export default function Dashboard() {
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me()
   });
+  
+  const isAdmin = user?.role === 'admin';
+  const isProjectManager = isAdmin;
 
   const { data: projects = [], isLoading: loadingProjects } = useQuery({
     queryKey: ['projects'],
