@@ -27,7 +27,72 @@ const PHASES = [
 
 export default function PhaseManager({ projectId, currentPhase }) {
   const [selectedPhase, setSelectedPhase] = useState(currentPhase || 'preconstruction');
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const queryClient = useQueryClient();
+
+  const { data: customPhases = [] } = useQuery({
+    queryKey: ['customPhases', projectId],
+    queryFn: () => base44.entities.CustomPhase.filter({ project_id: projectId }, 'order'),
+    enabled: !!projectId
+  });
+
+  const { data: phaseData } = useQuery({
+    queryKey: ['customPhase', projectId, selectedPhase],
+    queryFn: async () => {
+      const phases = await base44.entities.CustomPhase.filter({ project_id: projectId, phase_name: selectedPhase });
+      return phases[0];
+    },
+    enabled: !!projectId
+  });
+
+  const allPhases = [...PHASES, ...customPhases.map(p => ({ value: p.phase_name, label: p.display_name }))];
+
+  const createPhaseMutation = useMutation({
+    mutationFn: (data) => base44.entities.CustomPhase.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhases'] });
+      setShowCreateDialog(false);
+      toast.success('Phase created');
+    }
+  });
+
+  const updatePhaseMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.CustomPhase.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhase'] });
+      queryClient.invalidateQueries({ queryKey: ['customPhases'] });
+    }
+  });
+
+  const togglePhaseLock = () => {
+    if (phaseData) {
+      updatePhaseMutation.mutate({
+        id: phaseData.id,
+        data: {
+          is_locked: !phaseData.is_locked,
+          locked_date: !phaseData.is_locked ? new Date().toISOString().split('T')[0] : null
+        }
+      });
+      toast.success(phaseData.is_locked ? 'Phase unlocked' : 'Phase locked');
+    }
+  };
+
+  const closePhase = () => {
+    if (phaseData) {
+      updatePhaseMutation.mutate({
+        id: phaseData.id,
+        data: {
+          status: 'completed',
+          progress_percent: 100,
+          completed_date: new Date().toISOString().split('T')[0],
+          is_locked: true
+        }
+      });
+      toast.success('Phase completed and locked');
+    }
+  };
+
+  const [createForm, setCreateForm] = useState({ phase_name: '', display_name: '', order: customPhases.length });
 
   const { data: requirements = [] } = useQuery({
     queryKey: ['phaseRequirements', projectId, selectedPhase],
@@ -84,13 +149,15 @@ export default function PhaseManager({ projectId, currentPhase }) {
   });
 
   const completedReqs = requirements.filter(r => r.status === 'completed').length;
-  const progressPercent = requirements.length > 0 ? (completedReqs / requirements.length) * 100 : 0;
+  const progressPercent = requirements.length > 0 ? (completedReqs / requirements.length) * 100 : phaseData?.progress_percent || 0;
+  const currentPhaseLabel = allPhases.find(p => p.value === selectedPhase)?.label;
+  const isLocked = phaseData?.is_locked || false;
 
   return (
     <div className="space-y-6">
       {/* Phase Selector */}
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {PHASES.map(phase => (
+        {allPhases.map(phase => (
           <Button
             key={phase.value}
             variant={selectedPhase === phase.value ? 'default' : 'outline'}
@@ -103,52 +170,125 @@ export default function PhaseManager({ projectId, currentPhase }) {
             )}
           </Button>
         ))}
+        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="whitespace-nowrap">
+              <Plus className="h-4 w-4 mr-2" />
+              New Phase
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create Custom Phase</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Phase ID (lowercase, no spaces)</Label>
+                <Input
+                  value={createForm.phase_name}
+                  onChange={(e) => setCreateForm({ ...createForm, phase_name: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
+                  placeholder="e.g., electrical_rough_in"
+                />
+              </div>
+              <div>
+                <Label>Display Name</Label>
+                <Input
+                  value={createForm.display_name}
+                  onChange={(e) => setCreateForm({ ...createForm, display_name: e.target.value })}
+                  placeholder="e.g., Electrical Rough-In"
+                />
+              </div>
+              <div>
+                <Label>Order</Label>
+                <Input
+                  type="number"
+                  value={createForm.order}
+                  onChange={(e) => setCreateForm({ ...createForm, order: parseInt(e.target.value) })}
+                />
+              </div>
+              <Button
+                onClick={() => createPhaseMutation.mutate({ project_id: projectId, ...createForm })}
+                className="w-full"
+              >
+                Create Phase
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Phase Overview */}
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>{PHASES.find(p => p.value === selectedPhase)?.label} Phase</CardTitle>
             <div className="flex items-center gap-2">
+              <CardTitle>{currentPhaseLabel} Phase</CardTitle>
+              {phaseData?.status && (
+                <Badge variant={phaseData.status === 'completed' ? 'default' : 'secondary'}>
+                  {phaseData.status.replace('_', ' ')}
+                </Badge>
+              )}
+              {isLocked && <Lock className="h-4 w-4 text-slate-400" />}
+            </div>
+            <div className="flex items-center gap-3">
               <span className="text-sm text-slate-500">{completedReqs}/{requirements.length} complete</span>
               <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div className="h-full bg-green-600" style={{ width: `${progressPercent}%` }} />
               </div>
+              {!isLocked && phaseData && phaseData.status !== 'completed' && (
+                <Button size="sm" variant="outline" onClick={closePhase}>
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Close Phase
+                </Button>
+              )}
+              {phaseData && (
+                <Button size="sm" variant="outline" onClick={togglePhaseLock}>
+                  {isLocked ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="requirements" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="requirements">Requirements</TabsTrigger>
-          <TabsTrigger value="files">Files</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-          <TabsTrigger value="budget">Budget</TabsTrigger>
-        </TabsList>
+      {isLocked ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <Lock className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-500">This phase is locked. Unlock it to make changes.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Tabs defaultValue="requirements" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="requirements">Requirements</TabsTrigger>
+            <TabsTrigger value="files">Files</TabsTrigger>
+            <TabsTrigger value="notes">Notes</TabsTrigger>
+            <TabsTrigger value="budget">Budget</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="requirements" className="mt-6">
-          <RequirementsTab projectId={projectId} phaseName={selectedPhase} requirements={requirements} onToggle={toggleRequirement} />
-        </TabsContent>
+          <TabsContent value="requirements" className="mt-6">
+            <RequirementsTab projectId={projectId} phaseName={selectedPhase} requirements={requirements} onToggle={toggleRequirement} />
+          </TabsContent>
 
-        <TabsContent value="files" className="mt-6">
-          <FilesTab projectId={projectId} phaseName={selectedPhase} files={files} />
-        </TabsContent>
+          <TabsContent value="files" className="mt-6">
+            <FilesTab projectId={projectId} phaseName={selectedPhase} files={files} />
+          </TabsContent>
 
-        <TabsContent value="notes" className="mt-6">
-          <NotesTab projectId={projectId} phaseName={selectedPhase} notes={notes} />
-        </TabsContent>
+          <TabsContent value="notes" className="mt-6">
+            <NotesTab projectId={projectId} phaseName={selectedPhase} notes={notes} />
+          </TabsContent>
 
-        <TabsContent value="budget" className="mt-6">
-          <BudgetTab 
-            projectId={projectId} 
-            phaseName={selectedPhase} 
-            budget={budget} 
-            onToggleLock={toggleBudgetLock}
-          />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="budget" className="mt-6">
+            <BudgetTab 
+              projectId={projectId} 
+              phaseName={selectedPhase} 
+              budget={budget} 
+              onToggleLock={toggleBudgetLock}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }

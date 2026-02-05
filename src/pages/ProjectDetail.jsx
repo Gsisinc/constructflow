@@ -386,18 +386,10 @@ export default function ProjectDetail() {
         </TabsList>
 
         <TabsContent value="phases" className="mt-6">
-          <div className="space-y-6">
-            <CustomPhaseManager
-              projectId={projectId}
-              onSelectPhase={(phaseName) => {
-                // Handle phase selection
-              }}
-            />
-            <PhaseManager
-              projectId={projectId}
-              currentPhase={project.current_phase || 'preconstruction'}
-            />
-          </div>
+          <PhaseManager
+            projectId={projectId}
+            currentPhase={project.current_phase || 'preconstruction'}
+          />
         </TabsContent>
 
         <TabsContent value="changeorders" className="mt-6">
