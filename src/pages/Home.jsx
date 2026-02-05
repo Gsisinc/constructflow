@@ -21,7 +21,7 @@ export default function Home() {
   };
 
   const handleSignup = () => {
-    navigate(createPageUrl('Signup'));
+    navigate(createPageUrl('SignupRequest'));
   };
 
   if (loading) {
