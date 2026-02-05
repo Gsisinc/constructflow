@@ -9,6 +9,10 @@ import PhaseGateChecklist from '../components/phases/PhaseGateChecklist';
 import ProjectCalendar from '../components/calendar/ProjectCalendar';
 import PermitDashboard from '../components/permits/PermitDashboard';
 import ClientPortal from '../components/client/ClientPortal';
+import ChangeOrderManager from '../components/changeorders/ChangeOrderManager';
+import SafetyManager from '../components/safety/SafetyManager';
+import DecisionManager from '../components/decisions/DecisionManager';
+import TeamRoleManager from '../components/team/TeamRoleManager';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -121,6 +125,18 @@ export default function ProjectDetail() {
   const { data: changeOrders = [] } = useQuery({
     queryKey: ['changeOrders', projectId],
     queryFn: () => base44.entities.ChangeOrder.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
+
+  const { data: safetyIncidents = [] } = useQuery({
+    queryKey: ['safetyIncidents', projectId],
+    queryFn: () => base44.entities.SafetyIncident.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
+
+  const { data: decisions = [] } = useQuery({
+    queryKey: ['decisions', projectId],
+    queryFn: () => base44.entities.ProjectDecision.filter({ project_id: projectId }),
     enabled: !!projectId,
   });
 
@@ -355,8 +371,12 @@ export default function ProjectDetail() {
 
       {/* Tabs for detailed views */}
       <Tabs defaultValue="phases" className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto">
+        <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto">
           <TabsTrigger value="phases">Phases</TabsTrigger>
+          <TabsTrigger value="changeorders">Change Orders</TabsTrigger>
+          <TabsTrigger value="safety">Safety</TabsTrigger>
+          <TabsTrigger value="decisions">Decisions</TabsTrigger>
+          <TabsTrigger value="team">Team & Roles</TabsTrigger>
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="permits">Permits</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
@@ -372,6 +392,22 @@ export default function ProjectDetail() {
               setShowGateChecklist(true);
             }}
           />
+        </TabsContent>
+
+        <TabsContent value="changeorders" className="mt-6">
+          <ChangeOrderManager projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="safety" className="mt-6">
+          <SafetyManager projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="decisions" className="mt-6">
+          <DecisionManager projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="team" className="mt-6">
+          <TeamRoleManager projectId={projectId} />
         </TabsContent>
 
         <TabsContent value="calendar" className="mt-6">

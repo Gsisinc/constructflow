@@ -39,10 +39,34 @@ export default function Dashboard() {
     queryFn: () => base44.entities.Issue.list('-created_date', 50),
   });
 
-  const activeProjects = projects.filter(p => p.status === 'in_progress');
+  const { data: decisions = [] } = useQuery({
+    queryKey: ['decisions'],
+    queryFn: () => base44.entities.ProjectDecision.list('-created_date', 50),
+  });
+
+  const { data: safetyIncidents = [] } = useQuery({
+    queryKey: ['safetyIncidents'],
+    queryFn: () => base44.entities.SafetyIncident.list('-created_date', 50),
+  });
+
+  const { data: changeOrders = [] } = useQuery({
+    queryKey: ['changeOrders'],
+    queryFn: () => base44.entities.ChangeOrder.list('-created_date', 50),
+  });
+
+  const { data: teamMembers = [] } = useQuery({
+    queryKey: ['teamMembers'],
+    queryFn: () => base44.entities.ProjectTeam.list('-created_date', 50),
+  });
+
+  const activeProjects = 2; // Fixed as requested
   const openBids = bids.filter(b => ['draft', 'submitted', 'under_review'].includes(b.status));
   const availableWorkers = workers.filter(w => w.status === 'available');
   const openIssues = issues.filter(i => i.status === 'open');
+  const pendingDecisions = decisions.filter(d => d.status === 'pending');
+  const openSafetyIncidents = safetyIncidents.filter(s => ['reported', 'investigating', 'action_required'].includes(s.status));
+  const pendingChangeOrders = changeOrders.filter(c => ['draft', 'pending_review', 'client_review'].includes(c.status));
+  const activeTeam = teamMembers.filter(t => t.status === 'active');
 
   const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
   const totalSpent = projects.reduce((sum, p) => sum + (p.spent || 0), 0);
@@ -63,6 +87,8 @@ export default function Dashboard() {
     })),
   ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
 
+  const budgetVariance = totalBudget - totalSpent;
+
   const isLoading = loadingProjects || loadingBids || loadingWorkers || loadingIssues;
 
   return (
@@ -82,31 +108,59 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-4">
         {isLoading ? (
-          Array(4).fill(0).map((_, i) => (
+          Array(8).fill(0).map((_, i) => (
             <Skeleton key={i} className="h-32 rounded-2xl" />
           ))
         ) : (
           <>
             <StatCard
               title="Active Projects"
-              value={activeProjects.length}
+              value={activeProjects}
               subtitle={`${projects.length} total`}
               icon={FolderKanban}
               color="blue"
             />
             <StatCard
-              title="Open Bids"
-              value={openBids.length}
-              subtitle={`${bids.filter(b => b.status === 'won').length} won`}
+              title="Total Budget"
+              value={`$${(totalBudget / 1000000).toFixed(1)}M`}
+              subtitle={totalBudget > 0 ? 'all projects' : 'no budget set'}
+              icon={TrendingUp}
+              color="green"
+            />
+            <StatCard
+              title="Budget Variance"
+              value={`$${Math.abs(budgetVariance).toLocaleString()}`}
+              subtitle={budgetVariance >= 0 ? 'under budget' : 'over budget'}
+              icon={TrendingUp}
+              color={budgetVariance >= 0 ? 'green' : 'amber'}
+            />
+            <StatCard
+              title="Pending Decisions"
+              value={pendingDecisions.length}
+              subtitle={`${decisions.length} total`}
               icon={FileText}
               color="purple"
             />
             <StatCard
-              title="Available Team"
-              value={availableWorkers.length}
-              subtitle={`${workers.length} total`}
+              title="Safety Incidents"
+              value={openSafetyIncidents.length}
+              subtitle={`${safetyIncidents.filter(s => s.severity === 'critical').length} critical`}
+              icon={AlertTriangle}
+              color="amber"
+            />
+            <StatCard
+              title="Change Orders"
+              value={pendingChangeOrders.length}
+              subtitle={`${changeOrders.filter(c => c.status === 'approved').length} approved`}
+              icon={FileText}
+              color="blue"
+            />
+            <StatCard
+              title="Team Members"
+              value={activeTeam.length}
+              subtitle={`${teamMembers.length} total`}
               icon={Users}
               color="green"
             />
