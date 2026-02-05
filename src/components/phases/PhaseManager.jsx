@@ -10,7 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Upload, Lock, Unlock, FileText, Image as ImageIcon, CheckCircle, Circle } from 'lucide-react';
+import { Plus, Upload, Lock, Unlock, FileText, Image as ImageIcon, CheckCircle, Circle, MoreVertical, Trash2, Edit } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -28,6 +34,7 @@ const PHASES = [
 export default function PhaseManager({ projectId, currentPhase }) {
   const [selectedPhase, setSelectedPhase] = useState(currentPhase || 'preconstruction');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [editingPhase, setEditingPhase] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: customPhases = [] } = useQuery({
@@ -52,7 +59,16 @@ export default function PhaseManager({ projectId, currentPhase }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases'] });
       setShowCreateDialog(false);
+      setEditingPhase(null);
       toast.success('Phase created');
+    }
+  });
+
+  const deletePhaseMutation = useMutation({
+    mutationFn: (id) => base44.entities.CustomPhase.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhases'] });
+      toast.success('Phase deleted');
     }
   });
 
@@ -93,6 +109,36 @@ export default function PhaseManager({ projectId, currentPhase }) {
   };
 
   const [createForm, setCreateForm] = useState({ phase_name: '', display_name: '', order: customPhases.length });
+
+  const handleEditPhase = (phase) => {
+    setEditingPhase(phase);
+    setCreateForm({
+      phase_name: phase.phase_name,
+      display_name: phase.display_name,
+      order: phase.order
+    });
+    setShowCreateDialog(true);
+  };
+
+  const handleSavePhase = () => {
+    if (editingPhase) {
+      updatePhaseMutation.mutate({
+        id: editingPhase.id,
+        data: createForm
+      });
+    } else {
+      createPhaseMutation.mutate({ project_id: projectId, ...createForm });
+    }
+  };
+
+  const handleDeletePhase = (phase) => {
+    if (confirm(`Delete phase "${phase.display_name}"? This will also delete all associated requirements, files, notes, and budget data.`)) {
+      deletePhaseMutation.mutate(phase.id);
+      if (selectedPhase === phase.phase_name) {
+        setSelectedPhase('preconstruction');
+      }
+    }
+  };
 
   const { data: requirements = [] } = useQuery({
     queryKey: ['phaseRequirements', projectId, selectedPhase],
@@ -157,20 +203,52 @@ export default function PhaseManager({ projectId, currentPhase }) {
     <div className="space-y-6">
       {/* Phase Selector */}
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {allPhases.map(phase => (
-          <Button
-            key={phase.value}
-            variant={selectedPhase === phase.value ? 'default' : 'outline'}
-            onClick={() => setSelectedPhase(phase.value)}
-            className="whitespace-nowrap"
-          >
-            {phase.label}
-            {phase.value === currentPhase && (
-              <Badge variant="secondary" className="ml-2">Current</Badge>
-            )}
-          </Button>
-        ))}
-        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        {allPhases.map(phase => {
+          const customPhase = customPhases.find(p => p.phase_name === phase.value);
+          return (
+            <div key={phase.value} className="flex items-center gap-1">
+              <Button
+                variant={selectedPhase === phase.value ? 'default' : 'outline'}
+                onClick={() => setSelectedPhase(phase.value)}
+                className="whitespace-nowrap"
+              >
+                {phase.label}
+                {phase.value === currentPhase && (
+                  <Badge variant="secondary" className="ml-2">Current</Badge>
+                )}
+              </Button>
+              {customPhase && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="icon" variant="ghost" className="h-8 w-8">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleEditPhase(customPhase)}>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleDeletePhase(customPhase)}
+                      className="text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+          );
+        })}
+        <Dialog open={showCreateDialog} onOpenChange={(open) => {
+          setShowCreateDialog(open);
+          if (!open) {
+            setEditingPhase(null);
+            setCreateForm({ phase_name: '', display_name: '', order: customPhases.length });
+          }
+        }}>
           <DialogTrigger asChild>
             <Button variant="outline" className="whitespace-nowrap">
               <Plus className="h-4 w-4 mr-2" />
@@ -179,7 +257,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Custom Phase</DialogTitle>
+              <DialogTitle>{editingPhase ? 'Edit Phase' : 'Create Custom Phase'}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -188,6 +266,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
                   value={createForm.phase_name}
                   onChange={(e) => setCreateForm({ ...createForm, phase_name: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
                   placeholder="e.g., electrical_rough_in"
+                  disabled={!!editingPhase}
                 />
               </div>
               <div>
@@ -206,11 +285,8 @@ export default function PhaseManager({ projectId, currentPhase }) {
                   onChange={(e) => setCreateForm({ ...createForm, order: parseInt(e.target.value) })}
                 />
               </div>
-              <Button
-                onClick={() => createPhaseMutation.mutate({ project_id: projectId, ...createForm })}
-                className="w-full"
-              >
-                Create Phase
+              <Button onClick={handleSavePhase} className="w-full">
+                {editingPhase ? 'Update Phase' : 'Create Phase'}
               </Button>
             </div>
           </DialogContent>
@@ -235,17 +311,27 @@ export default function PhaseManager({ projectId, currentPhase }) {
               <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div className="h-full bg-green-600" style={{ width: `${progressPercent}%` }} />
               </div>
-              {!isLocked && phaseData && phaseData.status !== 'completed' && (
-                <Button size="sm" variant="outline" onClick={closePhase}>
-                  <CheckCircle className="h-4 w-4 mr-1" />
-                  Close Phase
-                </Button>
-              )}
-              {phaseData && (
-                <Button size="sm" variant="outline" onClick={togglePhaseLock}>
-                  {isLocked ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-                </Button>
-              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="outline">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {!isLocked && phaseData && phaseData.status !== 'completed' && (
+                    <DropdownMenuItem onClick={closePhase}>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Close Phase
+                    </DropdownMenuItem>
+                  )}
+                  {phaseData && (
+                    <DropdownMenuItem onClick={togglePhaseLock}>
+                      {isLocked ? <Unlock className="h-4 w-4 mr-2" /> : <Lock className="h-4 w-4 mr-2" />}
+                      {isLocked ? 'Unlock' : 'Lock'} Phase
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardHeader>
