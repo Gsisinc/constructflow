@@ -40,6 +40,10 @@ const navItems = [
   { name: 'Settings', icon: Settings, page: 'Settings' },
 ];
 
+const adminNavItems = [
+  { name: 'User Approvals', icon: User, page: 'UserApprovals' },
+];
+
 function ProjectSelector() {
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
@@ -267,6 +271,33 @@ export default function Layout({ children, currentPageName }) {
                 </Link>
               );
             })}
+
+            {user?.role === 'admin' && (
+              <>
+                <div className="h-px bg-slate-200 my-2" />
+                <div className="text-xs font-semibold text-slate-400 px-3 py-2">ADMIN</div>
+                {adminNavItems.map((item) => {
+                  const isActive = currentPageName === item.page;
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.page}
+                      to={createPageUrl(item.page)}
+                      onClick={() => setSidebarOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+                        isActive
+                          ? "bg-slate-900 text-white shadow-sm"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      )}
+                    >
+                      <Icon className={cn("h-4.5 w-4.5", isActive ? "text-white" : "text-slate-400")} />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </>
+            )}
           </nav>
 
           {/* Footer */}

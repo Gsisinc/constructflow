@@ -66,6 +66,7 @@ import TimeCards from './pages/TimeCards';
 import Directory from './pages/Directory';
 import Estimates from './pages/Estimates';
 import Home from './pages/Home';
+import UserApprovals from './pages/UserApprovals';
 import __Layout from './Layout.jsx';
 
 
@@ -89,6 +90,7 @@ export const PAGES = {
     "Directory": Directory,
     "Estimates": Estimates,
     "Home": Home,
+    "UserApprovals": UserApprovals,
 }
 
 export const pagesConfig = {

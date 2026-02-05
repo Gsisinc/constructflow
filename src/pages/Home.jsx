@@ -16,8 +16,12 @@ export default function Home() {
     setLoading(false);
   }, []);
 
-  const handleGetStarted = () => {
-    navigate(createPageUrl('Dashboard'));
+  const handleLogin = () => {
+    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+  };
+
+  const handleSignup = () => {
+    navigate(createPageUrl('Signup'));
   };
 
   if (loading) {
@@ -55,11 +59,11 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-slate-600 hidden sm:inline">(866) 477-6267</span>
-            <Button onClick={handleGetStarted} variant="ghost" className="text-sm">
+            <Button onClick={handleLogin} variant="ghost" className="text-sm">
               Log in
             </Button>
-            <Button onClick={handleGetStarted} className="bg-orange-600 hover:bg-orange-700 text-white">
-              Request a demo
+            <Button onClick={handleSignup} className="bg-orange-600 hover:bg-orange-700 text-white">
+              Sign up
             </Button>
           </div>
         </div>
@@ -82,11 +86,11 @@ export default function Home() {
                 Manage your construction projects from preconstruction to closeout with the insights you need to maximize safety, efficiency, and ROI.
               </p>
               <div className="flex gap-4">
-                <Button onClick={handleGetStarted} size="lg" className="bg-orange-600 hover:bg-orange-700 text-white text-base px-8">
-                  See pricing
+                <Button onClick={handleSignup} size="lg" className="bg-orange-600 hover:bg-orange-700 text-white text-base px-8">
+                  Get Started
                 </Button>
-                <Button onClick={handleGetStarted} size="lg" variant="outline" className="text-base px-8">
-                  See it in action <ArrowRight className="ml-2 h-4 w-4" />
+                <Button onClick={handleLogin} size="lg" variant="outline" className="text-base px-8">
+                  Log in <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -267,7 +271,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-orange-500 text-sm uppercase tracking-wide mb-4">PICK YOUR PATH</p>
           <h2 className="text-4xl font-bold mb-12">Let's find the right tools for you</h2>
-          <Button onClick={handleGetStarted} size="lg" className="bg-orange-600 hover:bg-orange-700 text-white text-base px-12">
+          <Button onClick={handleSignup} size="lg" className="bg-orange-600 hover:bg-orange-700 text-white text-base px-12">
             Get Started
           </Button>
         </div>
