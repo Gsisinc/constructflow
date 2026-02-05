@@ -7,8 +7,10 @@ import ProjectForm from '../components/projects/ProjectForm';
 import PhaseNavigator from '../components/phases/PhaseNavigator';
 import PhaseGateChecklist from '../components/phases/PhaseGateChecklist';
 import PhaseManager from '../components/phases/PhaseManager';
-import ProjectCalendar from '../components/calendar/ProjectCalendar';
+import CustomPhaseManager from '../components/phases/CustomPhaseManager';
+import OutlookCalendar from '../components/calendar/OutlookCalendar';
 import PermitDashboard from '../components/permits/PermitDashboard';
+import PermitUploader from '../components/permits/PermitUploader';
 import ClientPortal from '../components/client/ClientPortal';
 import ChangeOrderManager from '../components/changeorders/ChangeOrderManager';
 import SafetyManager from '../components/safety/SafetyManager';
@@ -384,10 +386,18 @@ export default function ProjectDetail() {
         </TabsList>
 
         <TabsContent value="phases" className="mt-6">
-          <PhaseManager
-            projectId={projectId}
-            currentPhase={project.current_phase || 'preconstruction'}
-          />
+          <div className="space-y-6">
+            <CustomPhaseManager
+              projectId={projectId}
+              onSelectPhase={(phaseName) => {
+                // Handle phase selection
+              }}
+            />
+            <PhaseManager
+              projectId={projectId}
+              currentPhase={project.current_phase || 'preconstruction'}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="changeorders" className="mt-6">
@@ -407,15 +417,16 @@ export default function ProjectDetail() {
         </TabsContent>
 
         <TabsContent value="calendar" className="mt-6">
-          <ProjectCalendar
-            events={calendarEvents}
-            locations={locations}
-            onEventClick={(event) => console.log('Event clicked', event)}
-          />
+          <OutlookCalendar projectId={projectId} />
         </TabsContent>
 
         <TabsContent value="permits" className="mt-6">
-          <PermitDashboard permits={permits} />
+          <div className="space-y-6">
+            <div className="flex justify-end">
+              <PermitUploader projectId={projectId} />
+            </div>
+            <PermitDashboard permits={permits} />
+          </div>
         </TabsContent>
 
         <TabsContent value="client" className="mt-6">
