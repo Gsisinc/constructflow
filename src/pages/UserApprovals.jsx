@@ -14,7 +14,13 @@ export default function UserApprovals() {
 
   const { data: pendingUsers = [], isLoading } = useQuery({
     queryKey: ['pendingUsers'],
-    queryFn: () => base44.entities.PendingUser.filter({ status: 'pending' }, '-created_date')
+    queryFn: async () => {
+      const userData = await base44.auth.me();
+      if (userData?.role === 'admin') {
+        return base44.asServiceRole.entities.PendingUser.filter({ status: 'pending' }, '-created_date');
+      }
+      return [];
+    }
   });
 
   React.useEffect(() => {
