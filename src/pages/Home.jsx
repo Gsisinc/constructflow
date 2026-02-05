@@ -12,28 +12,12 @@ export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      setLoading(true);
-      try {
-        const authenticated = await base44.auth.isAuthenticated();
-        console.log('Home: isAuthenticated =', authenticated);
-        setIsAuthenticated(authenticated);
-        if (authenticated) {
-          console.log('Home: Redirecting to Dashboard');
-          navigate(createPageUrl('Dashboard'), { replace: true });
-        }
-      } catch (e) {
-        console.log('Home: Auth check error', e);
-        setIsAuthenticated(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuth();
-  }, [navigate]);
+    // Skip auth check - just show landing page
+    setLoading(false);
+  }, []);
 
   const handleGetStarted = () => {
-    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+    navigate(createPageUrl('Dashboard'));
   };
 
   if (loading) {
