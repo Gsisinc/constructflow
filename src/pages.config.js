@@ -47,36 +47,36 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import BidDetail from './pages/BidDetail';
+import BidOpportunities from './pages/BidOpportunities';
 import Bids from './pages/Bids';
 import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
 import Dashboard from './pages/Dashboard';
 import Issues from './pages/Issues';
 import Materials from './pages/Materials';
+import Onboarding from './pages/Onboarding';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
-import Onboarding from './pages/Onboarding';
-import BidOpportunities from './pages/BidOpportunities';
-import BidDetail from './pages/BidDetail';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "BidDetail": BidDetail,
+    "BidOpportunities": BidOpportunities,
     "Bids": Bids,
     "Budget": Budget,
     "Calendar": Calendar,
     "Dashboard": Dashboard,
     "Issues": Issues,
     "Materials": Materials,
+    "Onboarding": Onboarding,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
     "Tasks": Tasks,
     "Team": Team,
-    "Onboarding": Onboarding,
-    "BidOpportunities": BidOpportunities,
-    "BidDetail": BidDetail,
 }
 
 export const pagesConfig = {

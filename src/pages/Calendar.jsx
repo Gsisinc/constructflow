@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import ProjectCalendar from '../components/calendar/ProjectCalendar';
+import ProjectDeadlines from '../components/calendar/ProjectDeadlines';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -56,6 +57,7 @@ export default function Calendar() {
   const [editingEvent, setEditingEvent] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [projectFilter, setProjectFilter] = useState('all');
+  const [viewMode, setViewMode] = useState('month');
   const queryClient = useQueryClient();
 
   const { data: events = [], isLoading } = useQuery({
@@ -113,7 +115,41 @@ export default function Calendar() {
           <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Project Calendar</h1>
           <p className="text-slate-500 mt-1">Multi-layer scheduling with conflict detection</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
+          <div className="flex gap-2 border border-slate-200 rounded-lg p-1">
+            <Button 
+              size="sm" 
+              variant={viewMode === 'day' ? 'default' : 'ghost'}
+              onClick={() => setViewMode('day')}
+              className="h-8"
+            >
+              Day
+            </Button>
+            <Button 
+              size="sm" 
+              variant={viewMode === 'week' ? 'default' : 'ghost'}
+              onClick={() => setViewMode('week')}
+              className="h-8"
+            >
+              Week
+            </Button>
+            <Button 
+              size="sm" 
+              variant={viewMode === 'month' ? 'default' : 'ghost'}
+              onClick={() => setViewMode('month')}
+              className="h-8"
+            >
+              Month
+            </Button>
+            <Button 
+              size="sm" 
+              variant={viewMode === 'year' ? 'default' : 'ghost'}
+              onClick={() => setViewMode('year')}
+              className="h-8"
+            >
+              Year
+            </Button>
+          </div>
           <Select value={projectFilter} onValueChange={setProjectFilter}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="All Projects" />
@@ -175,6 +211,11 @@ export default function Calendar() {
         </div>
       </div>
 
+      {/* Deadlines */}
+      {projectFilter !== 'all' && (
+        <ProjectDeadlines projectId={projectFilter} />
+      )}
+
       {/* Calendar */}
       {isLoading ? (
         <Skeleton className="h-[600px] rounded-2xl" />
@@ -184,6 +225,7 @@ export default function Calendar() {
           locations={locations}
           onEventClick={handleEventClick}
           onDateClick={handleDateClick}
+          viewMode={viewMode}
         />
       )}
 
