@@ -19,77 +19,26 @@ import {
 import { format } from 'date-fns';
 
 export default function Dashboard() {
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
+  });
+
   const { data: projects = [], isLoading: loadingProjects } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list('-created_date', 50),
   });
 
-  const { data: bids = [], isLoading: loadingBids } = useQuery({
-    queryKey: ['bids'],
-    queryFn: () => base44.entities.Bid.list('-created_date', 50),
+  const { data: bidOpportunities = [], isLoading: loadingBidOpps } = useQuery({
+    queryKey: ['bidOpportunities', user?.organization_id],
+    queryFn: () => base44.entities.BidOpportunity.filter({ organization_id: user.organization_id }, '-created_date'),
+    enabled: !!user?.organization_id
   });
 
-  const { data: workers = [], isLoading: loadingWorkers } = useQuery({
-    queryKey: ['workers'],
-    queryFn: () => base44.entities.Worker.list('-created_date', 50),
-  });
+  const activeProjects = projects.filter(p => p.status === 'in_progress');
+  const newBids = bidOpportunities.filter(b => b.status === 'new');
 
-  const { data: issues = [], isLoading: loadingIssues } = useQuery({
-    queryKey: ['issues'],
-    queryFn: () => base44.entities.Issue.list('-created_date', 50),
-  });
-
-  const { data: decisions = [] } = useQuery({
-    queryKey: ['decisions'],
-    queryFn: () => base44.entities.ProjectDecision.list('-created_date', 50),
-  });
-
-  const { data: safetyIncidents = [] } = useQuery({
-    queryKey: ['safetyIncidents'],
-    queryFn: () => base44.entities.SafetyIncident.list('-created_date', 50),
-  });
-
-  const { data: changeOrders = [] } = useQuery({
-    queryKey: ['changeOrders'],
-    queryFn: () => base44.entities.ChangeOrder.list('-created_date', 50),
-  });
-
-  const { data: teamMembers = [] } = useQuery({
-    queryKey: ['teamMembers'],
-    queryFn: () => base44.entities.ProjectTeam.list('-created_date', 50),
-  });
-
-  const activeProjects = 2; // Fixed as requested
-  const openBids = bids.filter(b => ['draft', 'submitted', 'under_review'].includes(b.status));
-  const availableWorkers = workers.filter(w => w.status === 'available');
-  const openIssues = issues.filter(i => i.status === 'open');
-  const pendingDecisions = decisions.filter(d => d.status === 'pending');
-  const openSafetyIncidents = safetyIncidents.filter(s => ['reported', 'investigating', 'action_required'].includes(s.status));
-  const pendingChangeOrders = changeOrders.filter(c => ['draft', 'pending_review', 'client_review'].includes(c.status));
-  const activeTeam = teamMembers.filter(t => t.status === 'active');
-
-  const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
-  const totalSpent = projects.reduce((sum, p) => sum + (p.spent || 0), 0);
-
-  // Generate recent activity from all data
-  const recentActivity = [
-    ...projects.slice(0, 3).map(p => ({
-      type: 'project',
-      title: `Project "${p.name}" created`,
-      description: `${p.project_type} project for ${p.client_name}`,
-      date: p.created_date
-    })),
-    ...issues.slice(0, 2).map(i => ({
-      type: 'issue',
-      title: `Issue reported: ${i.title}`,
-      description: `${i.severity} severity - ${i.type}`,
-      date: i.created_date
-    })),
-  ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-
-  const budgetVariance = totalBudget - totalSpent;
-
-  const isLoading = loadingProjects || loadingBids || loadingWorkers || loadingIssues;
+  const isLoading = loadingProjects || loadingBidOpps;
 
   return (
     <div className="space-y-8">
