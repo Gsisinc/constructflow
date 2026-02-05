@@ -17,7 +17,9 @@ import {
   LogOut,
   ChevronDown,
   Building2,
-  Calendar
+  Calendar,
+  Clock,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,14 +31,18 @@ import {
 
 const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
-  { name: 'Bid Opportunities', icon: FileText, page: 'BidOpportunities' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
-  { name: 'Client Portal', icon: Building2, page: 'ClientPortal' },
+  { name: 'Opportunities', icon: FileText, page: 'BidOpportunities' },
+  { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
+  { name: 'Directory', icon: Users, page: 'Directory' },
+  { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
+  { name: 'Settings', icon: Building2, page: 'Settings' },
 ];
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [organization, setOrganization] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -44,12 +50,47 @@ export default function Layout({ children, currentPageName }) {
       try {
         const userData = await base44.auth.me();
         setUser(userData);
+        
+        const orgs = await base44.entities.Organization.filter({ owner_email: userData.email });
+        if (orgs.length > 0) {
+          setOrganization(orgs[0]);
+          
+          document.documentElement.style.setProperty('--primary', hexToHSL(orgs[0].primary_color || '#1e40af'));
+          document.documentElement.style.setProperty('--secondary', hexToHSL(orgs[0].secondary_color || '#3b82f6'));
+        }
       } catch (e) {
         console.log('User not logged in');
       }
     };
     loadUser();
   }, []);
+
+  const hexToHSL = (hex) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!result) return '222.2 47.4% 11.2%';
+    
+    let r = parseInt(result[1], 16) / 255;
+    let g = parseInt(result[2], 16) / 255;
+    let b = parseInt(result[3], 16) / 255;
+    
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+    
+    return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+  };
 
   const handleLogout = () => {
     base44.auth.logout();
@@ -76,10 +117,16 @@ export default function Layout({ children, currentPageName }) {
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center">
-              <Building2 className="h-4 w-4 text-white" />
-            </div>
-            <span className="font-semibold text-slate-900">BuildFlow</span>
+            {organization?.logo_url ? (
+              <img src={organization.logo_url} alt={organization.name} className="h-8 w-auto" />
+            ) : (
+              <>
+                <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center">
+                  <Building2 className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-semibold text-slate-900">{organization?.name || 'BuildFlow'}</span>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -102,10 +149,16 @@ export default function Layout({ children, currentPageName }) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="h-16 flex items-center gap-3 px-6 border-b border-slate-100">
-            <div className="h-9 w-9 rounded-lg bg-slate-900 flex items-center justify-center">
-              <Building2 className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-semibold text-lg text-slate-900 tracking-tight">BuildFlow</span>
+            {organization?.logo_url ? (
+              <img src={organization.logo_url} alt={organization.name} className="h-10 w-auto" />
+            ) : (
+              <>
+                <div className="h-9 w-9 rounded-lg bg-slate-900 flex items-center justify-center">
+                  <Building2 className="h-5 w-5 text-white" />
+                </div>
+                <span className="font-semibold text-lg text-slate-900 tracking-tight">{organization?.name || 'BuildFlow'}</span>
+              </>
+            )}
           </div>
 
           {/* Navigation */}

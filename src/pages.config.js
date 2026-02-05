@@ -52,6 +52,7 @@ import BidOpportunities from './pages/BidOpportunities';
 import Bids from './pages/Bids';
 import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
+import ClientPortal from './pages/ClientPortal';
 import Dashboard from './pages/Dashboard';
 import Issues from './pages/Issues';
 import Materials from './pages/Materials';
@@ -60,7 +61,7 @@ import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
-import ClientPortal from './pages/ClientPortal';
+import Settings from './pages/Settings';
 import __Layout from './Layout.jsx';
 
 
@@ -70,6 +71,7 @@ export const PAGES = {
     "Bids": Bids,
     "Budget": Budget,
     "Calendar": Calendar,
+    "ClientPortal": ClientPortal,
     "Dashboard": Dashboard,
     "Issues": Issues,
     "Materials": Materials,
@@ -78,7 +80,7 @@ export const PAGES = {
     "Projects": Projects,
     "Tasks": Tasks,
     "Team": Team,
-    "ClientPortal": ClientPortal,
+    "Settings": Settings,
 }
 
 export const pagesConfig = {
