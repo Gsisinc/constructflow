@@ -29,14 +29,8 @@ import {
 
 const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
+  { name: 'Bid Opportunities', icon: FileText, page: 'BidOpportunities' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
-  { name: 'Bids', icon: FileText, page: 'Bids' },
-  { name: 'Tasks', icon: FileStack, page: 'Tasks' },
-  { name: 'Team', icon: Users, page: 'Team' },
-  { name: 'Materials', icon: Package, page: 'Materials' },
-  { name: 'Issues', icon: AlertTriangle, page: 'Issues' },
-  { name: 'Budget', icon: DollarSign, page: 'Budget' },
-  { name: 'Calendar', icon: Calendar, page: 'Calendar' },
 ];
 
 export default function Layout({ children, currentPageName }) {

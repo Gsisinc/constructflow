@@ -6,6 +6,7 @@ import { createPageUrl } from '../utils';
 import ProjectForm from '../components/projects/ProjectForm';
 import PhaseNavigator from '../components/phases/PhaseNavigator';
 import PhaseGateChecklist from '../components/phases/PhaseGateChecklist';
+import PhaseManager from '../components/phases/PhaseManager';
 import ProjectCalendar from '../components/calendar/ProjectCalendar';
 import PermitDashboard from '../components/permits/PermitDashboard';
 import ClientPortal from '../components/client/ClientPortal';
@@ -383,14 +384,9 @@ export default function ProjectDetail() {
         </TabsList>
 
         <TabsContent value="phases" className="mt-6">
-          <PhaseNavigator
+          <PhaseManager
+            projectId={projectId}
             currentPhase={project.current_phase || 'preconstruction'}
-            phaseGates={phaseGates}
-            onInitiateGate={handleInitiateGate}
-            onViewGate={(gate) => {
-              setSelectedGate(gate);
-              setShowGateChecklist(true);
-            }}
           />
         </TabsContent>
 
