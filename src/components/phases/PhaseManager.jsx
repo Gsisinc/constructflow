@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import PhaseBudgetManager from '../budget/PhaseBudgetManager';
 
 const PHASES = [
   { value: 'preconstruction', label: 'Preconstruction' },
@@ -318,7 +319,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {!isLocked && phaseData && phaseData.status !== 'completed' && (
+                  {phaseData && !isLocked && phaseData.status !== 'completed' && (
                     <DropdownMenuItem onClick={closePhase}>
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Close Phase
@@ -327,8 +328,32 @@ export default function PhaseManager({ projectId, currentPhase }) {
                   {phaseData && (
                     <DropdownMenuItem onClick={togglePhaseLock}>
                       {isLocked ? <Unlock className="h-4 w-4 mr-2" /> : <Lock className="h-4 w-4 mr-2" />}
-                      {isLocked ? 'Unlock' : 'Lock'} Phase
+                      {isLocked ? 'Unlock Phase' : 'Lock Phase'}
                     </DropdownMenuItem>
+                  )}
+                  {!phaseData && (
+                    <>
+                      <DropdownMenuItem onClick={() => {
+                        const defaultPhase = { project_id: projectId, phase_name: selectedPhase, display_name: currentPhaseLabel, order: 0, status: 'in_progress', progress_percent: progressPercent, is_locked: false };
+                        base44.entities.CustomPhase.create(defaultPhase).then(() => {
+                          queryClient.invalidateQueries({ queryKey: ['customPhase'] });
+                          toast.success('Phase initialized');
+                        });
+                      }}>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Close Phase
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => {
+                        const defaultPhase = { project_id: projectId, phase_name: selectedPhase, display_name: currentPhaseLabel, order: 0, status: 'in_progress', progress_percent: progressPercent, is_locked: true };
+                        base44.entities.CustomPhase.create(defaultPhase).then(() => {
+                          queryClient.invalidateQueries({ queryKey: ['customPhase'] });
+                          toast.success('Phase locked');
+                        });
+                      }}>
+                        <Lock className="h-4 w-4 mr-2" />
+                        Lock Phase
+                      </DropdownMenuItem>
+                    </>
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -366,12 +391,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
           </TabsContent>
 
           <TabsContent value="budget" className="mt-6">
-            <BudgetTab 
-              projectId={projectId} 
-              phaseName={selectedPhase} 
-              budget={budget} 
-              onToggleLock={toggleBudgetLock}
-            />
+            <PhaseBudgetManager projectId={projectId} phaseName={selectedPhase} />
           </TabsContent>
         </Tabs>
       )}
