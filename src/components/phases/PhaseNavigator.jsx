@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Circle, Lock, ChevronRight, AlertTriangle } from 'lucide-react';
 
-const PHASES = [
+const DEFAULT_PHASES = [
   { id: 'preconstruction', label: 'Pre-Construction', icon: '📋' },
   { id: 'foundation', label: 'Foundation', icon: '🏗️' },
   { id: 'superstructure', label: 'Superstructure', icon: '🏢' },
@@ -19,9 +19,17 @@ const PHASES = [
 export default function PhaseNavigator({ 
   currentPhase, 
   phaseGates = [], 
+  customPhases = [],
   onInitiateGate,
   onViewGate 
 }) {
+  // Merge default phases with custom phases, sorted by order
+  const PHASES = [...DEFAULT_PHASES, ...customPhases.map(cp => ({
+    id: cp.phase_name,
+    label: cp.display_name,
+    icon: cp.icon || '📌'
+  }))];
+  
   const currentPhaseIndex = PHASES.findIndex(p => p.id === currentPhase);
 
   const getPhaseStatus = (phaseId) => {

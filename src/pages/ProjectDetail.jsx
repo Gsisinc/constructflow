@@ -144,6 +144,12 @@ export default function ProjectDetail() {
     enabled: !!projectId,
   });
 
+  const { data: customPhases = [] } = useQuery({
+    queryKey: ['customPhases', projectId],
+    queryFn: () => base44.entities.CustomPhase.filter({ project_id: projectId }, 'order'),
+    enabled: !!projectId,
+  });
+
   const updateMutation = useMutation({
     mutationFn: (data) => base44.entities.Project.update(projectId, data),
     onSuccess: () => {
@@ -392,10 +398,28 @@ export default function ProjectDetail() {
         </TabsList>
 
         <TabsContent value="phases" className="mt-6">
-          <PhaseManager
-            projectId={projectId}
-            currentPhase={project.current_phase || 'preconstruction'}
-          />
+          <div className="space-y-6">
+            <PhaseNavigator
+              currentPhase={project.current_phase || 'preconstruction'}
+              phaseGates={phaseGates}
+              customPhases={customPhases}
+              onInitiateGate={handleInitiateGate}
+              onViewGate={(gate) => {
+                setSelectedGate(gate);
+                setShowGateChecklist(true);
+              }}
+            />
+            <PhaseManager
+              projectId={projectId}
+              currentPhase={project.current_phase || 'preconstruction'}
+            />
+            <CustomPhaseManager
+              projectId={projectId}
+              onSelectPhase={(phaseName) => {
+                // Could navigate to phase detail or open edit dialog
+              }}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="changeorders" className="mt-6">

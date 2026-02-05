@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Plus, Lock, Unlock, CheckCircle, ArrowUpDown } from 'lucide-react';
+import { Plus, Lock, Unlock, CheckCircle, ArrowUpDown, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function CustomPhaseManager({ projectId, onSelectPhase }) {
@@ -25,8 +25,19 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
     mutationFn: (data) => base44.entities.CustomPhase.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases'] });
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] });
       setShowCreateDialog(false);
+      setFormData({ phase_name: '', display_name: '', order: phases.length + 1 });
       toast.success('Phase created');
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.CustomPhase.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhases'] });
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+      toast.success('Phase deleted');
     }
   });
 
@@ -62,7 +73,7 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
     toast.success('Phase completed and locked');
   };
 
-  const [formData, setFormData] = useState({ phase_name: '', display_name: '', order: phases.length });
+  const [formData, setFormData] = useState({ phase_name: '', display_name: '', icon: '', order: phases.length });
 
   return (
     <div className="space-y-4">
@@ -94,6 +105,15 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
                   value={formData.display_name}
                   onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
                   placeholder="e.g., Electrical Rough-In"
+                />
+              </div>
+              <div>
+                <Label>Icon (emoji)</Label>
+                <Input
+                  value={formData.icon || ''}
+                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                  placeholder="e.g., ⚡ 🔧 🎯"
+                  maxLength={2}
                 />
               </div>
               <div>
@@ -159,6 +179,18 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
                       Edit
                     </Button>
                   )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-red-600 hover:text-red-700"
+                    onClick={() => {
+                      if (confirm('Delete this phase? This cannot be undone.')) {
+                        deleteMutation.mutate(phase.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardHeader>
