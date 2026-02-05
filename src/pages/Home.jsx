@@ -16,17 +16,8 @@ export default function Home() {
     setLoading(false);
   }, []);
 
-  const handleLogin = async () => {
-    try {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (isAuth) {
-        navigate(createPageUrl('Dashboard'));
-      } else {
-        window.location.href = '/login?next=' + encodeURIComponent(createPageUrl('Dashboard'));
-      }
-    } catch (error) {
-      window.location.href = '/login?next=' + encodeURIComponent(createPageUrl('Dashboard'));
-    }
+  const handleLogin = () => {
+    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
   };
 
   const handleSignup = () => {
