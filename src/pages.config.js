@@ -67,6 +67,7 @@ import Directory from './pages/Directory';
 import Estimates from './pages/Estimates';
 import Home from './pages/Home';
 import UserApprovals from './pages/UserApprovals';
+import JoinRequest from './pages/JoinRequest';
 import __Layout from './Layout.jsx';
 
 
@@ -91,6 +92,7 @@ export const PAGES = {
     "Estimates": Estimates,
     "Home": Home,
     "UserApprovals": UserApprovals,
+    "JoinRequest": JoinRequest,
 }
 
 export const pagesConfig = {
