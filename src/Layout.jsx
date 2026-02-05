@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -19,7 +20,8 @@ import {
   Building2,
   Calendar,
   Clock,
-  Settings
+  Settings,
+  User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,6 +39,69 @@ const navItems = [
   { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
   { name: 'Settings', icon: Settings, page: 'Settings' },
 ];
+
+function ProjectSelector() {
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects'],
+    queryFn: () => base44.entities.Project.list('-created_date', 10)
+  });
+
+  const [selectedProject, setSelectedProject] = useState(null);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="min-w-[200px] justify-between">
+          {selectedProject?.name || 'Select a Project'}
+          <ChevronDown className="h-4 w-4 ml-2" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[250px]">
+        {projects.map((project) => (
+          <DropdownMenuItem key={project.id} onClick={() => setSelectedProject(project)}>
+            {project.name}
+          </DropdownMenuItem>
+        ))}
+        {projects.length === 0 && (
+          <DropdownMenuItem disabled>No projects available</DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function UserMenu({ user, onLogout }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 transition-colors">
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-sm font-medium">
+            {user.full_name?.[0] || user.email?.[0]?.toUpperCase()}
+          </div>
+          <div className="text-left hidden lg:block">
+            <p className="text-sm font-medium text-slate-900 truncate">
+              {user.full_name || 'User'}
+            </p>
+            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+          </div>
+          <ChevronDown className="h-4 w-4 text-slate-400 hidden lg:block" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuItem asChild>
+          <Link to={createPageUrl('Settings')} className="flex items-center">
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={onLogout} className="text-red-600">
+          <LogOut className="h-4 w-4 mr-2" />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -112,27 +177,36 @@ export default function Layout({ children, currentPageName }) {
         }
       `}</style>
 
-      {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-40 flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-          <div className="flex items-center gap-2">
-            {organization?.logo_url ? (
-              <img src={organization.logo_url} alt={organization.name} className="h-8 w-auto" />
-            ) : (
-              <>
-                <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center">
-                  <Building2 className="h-4 w-4 text-white" />
-                </div>
-                <span className="font-semibold text-slate-900">{organization?.name || 'BuildFlow'}</span>
-              </>
-            )}
+      {/* Top Header */}
+      <div className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-40 lg:pl-64">
+        <div className="h-full flex items-center justify-between px-4">
+          {/* Mobile menu button */}
+          <div className="lg:hidden flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+            <div className="flex items-center gap-2">
+              {organization?.logo_url ? (
+                <img src={organization.logo_url} alt={organization.name} className="h-8 w-auto" />
+              ) : (
+                <>
+                  <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center">
+                    <Building2 className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="font-semibold text-slate-900">{organization?.name || 'BuildFlow'}</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Project Selector & User Menu */}
+          <div className="flex items-center gap-3 ml-auto">
+            <ProjectSelector />
+            {user && <UserMenu user={user} onLogout={handleLogout} />}
           </div>
         </div>
       </div>
@@ -191,44 +265,17 @@ export default function Layout({ children, currentPageName }) {
             })}
           </nav>
 
-          {/* User Menu */}
-          {user && (
-            <div className="p-4 border-t border-slate-100">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white text-sm font-medium">
-                      {user.full_name?.[0] || user.email?.[0]?.toUpperCase()}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="text-sm font-medium text-slate-900 truncate">
-                        {user.full_name || 'User'}
-                      </p>
-                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
-                    </div>
-                    <ChevronDown className="h-4 w-4 text-slate-400" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem asChild>
-                    <Link to={createPageUrl('Settings')} className="flex items-center">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+          {/* Footer */}
+          <div className="p-4 border-t border-slate-100">
+            <div className="text-xs text-slate-500 text-center">
+              {organization?.name || 'BuildFlow'}
             </div>
-          )}
+          </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="lg:pl-64 pt-16 lg:pt-0 min-h-screen">
+      <main className="lg:pl-64 pt-16 min-h-screen">
         <div className="p-4 md:p-6 lg:p-8">
           {children}
         </div>

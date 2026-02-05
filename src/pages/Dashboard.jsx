@@ -58,10 +58,8 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Getting Started</h1>
-        </div>
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900">Getting Started</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
