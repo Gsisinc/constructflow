@@ -62,6 +62,10 @@ import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
 import Settings from './pages/Settings';
+import Landing from './pages/Landing';
+import TimeCards from './pages/TimeCards';
+import Directory from './pages/Directory';
+import Estimates from './pages/Estimates';
 import __Layout from './Layout.jsx';
 
 
@@ -81,6 +85,10 @@ export const PAGES = {
     "Tasks": Tasks,
     "Team": Team,
     "Settings": Settings,
+    "Landing": Landing,
+    "TimeCards": TimeCards,
+    "Directory": Directory,
+    "Estimates": Estimates,
 }
 
 export const pagesConfig = {

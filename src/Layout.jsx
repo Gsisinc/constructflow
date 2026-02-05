@@ -32,11 +32,10 @@ import {
 const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
-  { name: 'Opportunities', icon: FileText, page: 'BidOpportunities' },
   { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
   { name: 'Directory', icon: Users, page: 'Directory' },
   { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
-  { name: 'Settings', icon: Building2, page: 'Settings' },
+  { name: 'Settings', icon: Settings, page: 'Settings' },
 ];
 
 export default function Layout({ children, currentPageName }) {
@@ -204,6 +203,12 @@ export default function Layout({ children, currentPageName }) {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem asChild>
+                    <Link to={createPageUrl('Settings')} className="flex items-center">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                     <LogOut className="h-4 w-4 mr-2" />
                     Sign out
