@@ -24,7 +24,12 @@ import {
   addMonths,
   isSameMonth,
   isSameDay,
-  isToday
+  isToday,
+  startOfDay,
+  endOfDay,
+  startOfYear,
+  endOfYear,
+  eachMonthOfInterval
 } from 'date-fns';
 
 const eventTypeColors = {
@@ -58,6 +63,18 @@ export default function ProjectCalendar({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedLocation, setSelectedLocation] = useState(locationFilter);
 
+  const navigateCalendar = (direction) => {
+    if (viewMode === 'day') {
+      setCurrentDate(addDays(currentDate, direction));
+    } else if (viewMode === 'week') {
+      setCurrentDate(addDays(currentDate, direction * 7));
+    } else if (viewMode === 'month') {
+      setCurrentDate(addMonths(currentDate, direction));
+    } else if (viewMode === 'year') {
+      setCurrentDate(addMonths(currentDate, direction * 12));
+    }
+  };
+
   const filteredEvents = events.filter(event => 
     selectedLocation === 'all' || event.location === selectedLocation
   );
@@ -68,7 +85,88 @@ export default function ProjectCalendar({
     );
   };
 
-  const renderCalendarDays = () => {
+  const renderDayView = () => {
+    const dayEvents = getEventsForDate(currentDate);
+    return (
+      <div className="p-4 min-h-[500px]">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold">{format(currentDate, 'EEEE, MMMM d, yyyy')}</h3>
+        </div>
+        {dayEvents.length === 0 ? (
+          <p className="text-slate-500 text-center py-12">No events scheduled</p>
+        ) : (
+          <div className="space-y-2">
+            {dayEvents.map(event => {
+              const Icon = eventTypeIcons[event.event_type] || Clock;
+              return (
+                <div
+                  key={event.id}
+                  onClick={() => onEventClick?.(event)}
+                  className={cn("p-4 rounded-lg border cursor-pointer hover:shadow-md transition-all", eventTypeColors[event.event_type])}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className="h-5 w-5" />
+                    <div className="flex-1">
+                      <p className="font-semibold">{event.title}</p>
+                      {event.start_time && <p className="text-sm">{event.start_time} - {event.end_time}</p>}
+                      {event.location && <p className="text-sm flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" />{event.location}</p>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderWeekView = () => {
+    const weekStart = startOfWeek(currentDate);
+    const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+    
+    return (
+      <div className="grid grid-cols-7">
+        {days.map(day => {
+          const dayEvents = getEventsForDate(day);
+          return (
+            <div
+              key={day.toString()}
+              onClick={() => onDateClick?.(day)}
+              className={cn(
+                "min-h-[400px] p-2 border-r border-slate-100 cursor-pointer hover:bg-slate-50",
+                isToday(day) && "bg-blue-50"
+              )}
+            >
+              <div className={cn("text-center mb-2 pb-2 border-b", isToday(day) && "border-blue-300")}>
+                <div className="text-xs text-slate-500">{format(day, 'EEE')}</div>
+                <div className={cn("text-lg font-semibold", isToday(day) && "text-blue-600")}>{format(day, 'd')}</div>
+              </div>
+              <div className="space-y-1">
+                {dayEvents.map(event => {
+                  const Icon = eventTypeIcons[event.event_type] || Clock;
+                  return (
+                    <div
+                      key={event.id}
+                      onClick={(e) => { e.stopPropagation(); onEventClick?.(event); }}
+                      className={cn("text-xs p-1.5 rounded border", eventTypeColors[event.event_type])}
+                    >
+                      <div className="flex items-center gap-1">
+                        <Icon className="h-3 w-3" />
+                        <span className="truncate">{event.title}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderMonthView = () => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
     const startDate = startOfWeek(monthStart);
@@ -141,6 +239,56 @@ export default function ProjectCalendar({
     return rows;
   };
 
+  const renderYearView = () => {
+    const yearStart = startOfYear(currentDate);
+    const yearEnd = endOfYear(currentDate);
+    const months = eachMonthOfInterval({ start: yearStart, end: yearEnd });
+
+    return (
+      <div className="grid grid-cols-3 gap-4 p-4">
+        {months.map(month => {
+          const monthEvents = filteredEvents.filter(event => {
+            const eventDate = new Date(event.start_date);
+            return eventDate.getMonth() === month.getMonth() && eventDate.getFullYear() === month.getFullYear();
+          });
+
+          return (
+            <div
+              key={month.toString()}
+              onClick={() => { setCurrentDate(month); }}
+              className="border border-slate-200 rounded-lg p-3 hover:bg-slate-50 cursor-pointer"
+            >
+              <h4 className="font-semibold text-center mb-2">{format(month, 'MMMM')}</h4>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-blue-600">{monthEvents.length}</p>
+                <p className="text-xs text-slate-500">events</p>
+              </div>
+              <div className="mt-2 space-y-1">
+                {Object.entries(eventTypeColors).map(([type]) => {
+                  const count = monthEvents.filter(e => e.event_type === type).length;
+                  if (count === 0) return null;
+                  return (
+                    <div key={type} className="flex justify-between text-xs">
+                      <span className="capitalize text-slate-600">{type.replace('_', ' ')}</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const getHeaderTitle = () => {
+    if (viewMode === 'day') return format(currentDate, 'MMMM d, yyyy');
+    if (viewMode === 'week') return `Week of ${format(startOfWeek(currentDate), 'MMM d, yyyy')}`;
+    if (viewMode === 'month') return format(currentDate, 'MMMM yyyy');
+    if (viewMode === 'year') return format(currentDate, 'yyyy');
+  };
+
   const hasConflicts = filteredEvents.some(e => e.conflicts?.length > 0);
 
   return (
@@ -153,17 +301,17 @@ export default function ProjectCalendar({
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setCurrentDate(addMonths(currentDate, -1))}
+                onClick={() => navigateCalendar(-1)}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h3 className="text-lg font-semibold text-slate-900 min-w-[160px] text-center">
-                {format(currentDate, 'MMMM yyyy')}
+              <h3 className="text-lg font-semibold text-slate-900 min-w-[200px] text-center">
+                {getHeaderTitle()}
               </h3>
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+                onClick={() => navigateCalendar(1)}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -200,19 +348,33 @@ export default function ProjectCalendar({
         </div>
       </div>
 
-      {/* Day Headers */}
-      <div className="grid grid-cols-7 border-b border-slate-200">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="p-2 text-center text-sm font-medium text-slate-500 bg-slate-50">
-            {day}
+      {/* Calendar Content */}
+      {viewMode === 'day' && renderDayView()}
+      {viewMode === 'week' && (
+        <>
+          <div className="grid grid-cols-7 border-b border-slate-200">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="p-2 text-center text-sm font-medium text-slate-500 bg-slate-50">
+                {day}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-
-      {/* Calendar Grid */}
-      <div>
-        {renderCalendarDays()}
-      </div>
+          {renderWeekView()}
+        </>
+      )}
+      {viewMode === 'month' && (
+        <>
+          <div className="grid grid-cols-7 border-b border-slate-200">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="p-2 text-center text-sm font-medium text-slate-500 bg-slate-50">
+                {day}
+              </div>
+            ))}
+          </div>
+          <div>{renderMonthView()}</div>
+        </>
+      )}
+      {viewMode === 'year' && renderYearView()}
 
       {/* Legend */}
       <div className="p-4 border-t border-slate-200 bg-slate-50">
