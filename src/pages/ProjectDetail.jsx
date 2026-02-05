@@ -373,6 +373,11 @@ export default function ProjectDetail() {
         </div>
       </div>
 
+      {/* Countdown Timers */}
+      {project.end_date && (
+        <ProjectDeadlines projectId={projectId} />
+      )}
+
       {/* Tabs for detailed views */}
       <Tabs defaultValue="phases" className="w-full">
         <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto">
@@ -423,11 +428,7 @@ export default function ProjectDetail() {
         </TabsContent>
 
         <TabsContent value="client" className="mt-6">
-          <ClientPortal
-            project={project}
-            updates={clientUpdates}
-            changeOrders={changeOrders}
-          />
+          <AdminClientManager projectId={projectId} />
         </TabsContent>
       </Tabs>
 
