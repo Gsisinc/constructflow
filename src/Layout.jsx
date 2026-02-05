@@ -44,6 +44,9 @@ export default function Layout({ children, currentPageName }) {
   const [organization, setOrganization] = useState(null);
   const location = useLocation();
 
+  // Don't show layout on Home page
+  const isHomePage = currentPageName === 'Home';
+
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -94,6 +97,10 @@ export default function Layout({ children, currentPageName }) {
   const handleLogout = () => {
     base44.auth.logout();
   };
+
+  if (isHomePage) {
+    return children;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
