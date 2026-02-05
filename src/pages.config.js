@@ -49,12 +49,24 @@
  */
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
+import Bids from './pages/Bids';
+import Tasks from './pages/Tasks';
+import Team from './pages/Team';
+import Materials from './pages/Materials';
+import Issues from './pages/Issues';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Dashboard": Dashboard,
     "Projects": Projects,
+    "ProjectDetail": ProjectDetail,
+    "Bids": Bids,
+    "Tasks": Tasks,
+    "Team": Team,
+    "Materials": Materials,
+    "Issues": Issues,
 }
 
 export const pagesConfig = {
