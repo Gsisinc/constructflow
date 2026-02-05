@@ -119,6 +119,12 @@ export default function Layout({ children, currentPageName }) {
   useEffect(() => {
     const loadUser = async () => {
       try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth && !isHomePage) {
+          navigate(createPageUrl('Home'));
+          return;
+        }
+        
         const userData = await base44.auth.me();
         setUser(userData);
         
