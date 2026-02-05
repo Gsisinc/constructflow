@@ -106,6 +106,12 @@ export default function PhaseManager({ projectId, currentPhase }) {
         }
       });
       toast.success('Phase completed and locked');
+      
+      // Auto-select next phase
+      const currentIndex = allPhases.findIndex(p => p.value === selectedPhase);
+      if (currentIndex !== -1 && currentIndex < allPhases.length - 1) {
+        setSelectedPhase(allPhases[currentIndex + 1].value);
+      }
     }
   };
 
@@ -334,10 +340,16 @@ export default function PhaseManager({ projectId, currentPhase }) {
                   {!phaseData && (
                     <>
                       <DropdownMenuItem onClick={() => {
-                        const defaultPhase = { project_id: projectId, phase_name: selectedPhase, display_name: currentPhaseLabel, order: 0, status: 'in_progress', progress_percent: progressPercent, is_locked: false };
+                        const defaultPhase = { project_id: projectId, phase_name: selectedPhase, display_name: currentPhaseLabel, order: 0, status: 'completed', progress_percent: 100, is_locked: true, completed_date: new Date().toISOString().split('T')[0] };
                         base44.entities.CustomPhase.create(defaultPhase).then(() => {
                           queryClient.invalidateQueries({ queryKey: ['customPhase'] });
-                          toast.success('Phase initialized');
+                          toast.success('Phase completed and locked');
+                          
+                          // Auto-select next phase
+                          const currentIndex = allPhases.findIndex(p => p.value === selectedPhase);
+                          if (currentIndex !== -1 && currentIndex < allPhases.length - 1) {
+                            setSelectedPhase(allPhases[currentIndex + 1].value);
+                          }
                         });
                       }}>
                         <CheckCircle className="h-4 w-4 mr-2" />
