@@ -57,6 +57,9 @@ import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
+import Onboarding from './pages/Onboarding';
+import BidOpportunities from './pages/BidOpportunities';
+import BidDetail from './pages/BidDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -71,6 +74,9 @@ export const PAGES = {
     "Projects": Projects,
     "Tasks": Tasks,
     "Team": Team,
+    "Onboarding": Onboarding,
+    "BidOpportunities": BidOpportunities,
+    "BidDetail": BidDetail,
 }
 
 export const pagesConfig = {
