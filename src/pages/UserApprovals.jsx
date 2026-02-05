@@ -33,7 +33,9 @@ export default function UserApprovals() {
 
   const approveMutation = useMutation({
     mutationFn: async (pendingUser) => {
-      await base44.users.inviteUser(pendingUser.email, 'user');
+      // Map requested role to system role (admin or user)
+      const systemRole = pendingUser.requested_role === 'project_manager' ? 'admin' : 'user';
+      await base44.users.inviteUser(pendingUser.email, systemRole);
       await base44.entities.PendingUser.update(pendingUser.id, {
         status: 'approved',
         reviewed_by: user?.email,

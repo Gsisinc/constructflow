@@ -54,20 +54,20 @@ import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
 import ClientPortal from './pages/ClientPortal';
 import Dashboard from './pages/Dashboard';
+import Directory from './pages/Directory';
+import Estimates from './pages/Estimates';
+import Home from './pages/Home';
 import Issues from './pages/Issues';
+import JoinRequest from './pages/JoinRequest';
 import Materials from './pages/Materials';
 import Onboarding from './pages/Onboarding';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
+import Settings from './pages/Settings';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
-import Settings from './pages/Settings';
 import TimeCards from './pages/TimeCards';
-import Directory from './pages/Directory';
-import Estimates from './pages/Estimates';
-import Home from './pages/Home';
 import UserApprovals from './pages/UserApprovals';
-import JoinRequest from './pages/JoinRequest';
 import __Layout from './Layout.jsx';
 
 
@@ -79,20 +79,20 @@ export const PAGES = {
     "Calendar": Calendar,
     "ClientPortal": ClientPortal,
     "Dashboard": Dashboard,
+    "Directory": Directory,
+    "Estimates": Estimates,
+    "Home": Home,
     "Issues": Issues,
+    "JoinRequest": JoinRequest,
     "Materials": Materials,
     "Onboarding": Onboarding,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
+    "Settings": Settings,
     "Tasks": Tasks,
     "Team": Team,
-    "Settings": Settings,
     "TimeCards": TimeCards,
-    "Directory": Directory,
-    "Estimates": Estimates,
-    "Home": Home,
     "UserApprovals": UserApprovals,
-    "JoinRequest": JoinRequest,
 }
 
 export const pagesConfig = {
