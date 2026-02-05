@@ -15,11 +15,7 @@ export default function Home() {
     const checkAuth = async () => {
       try {
         const authenticated = await base44.auth.isAuthenticated();
-        if (authenticated) {
-          navigate(createPageUrl('Dashboard'));
-        } else {
-          setIsAuthenticated(false);
-        }
+        setIsAuthenticated(authenticated);
       } catch (e) {
         setIsAuthenticated(false);
       } finally {
@@ -37,6 +33,21 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Skeleton className="h-12 w-12 rounded-full" />
+      </div>
+    );
+  }
+
+  // If authenticated, show a simple message with link to dashboard
+  if (isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <Building2 className="h-16 w-16 mx-auto mb-4 text-slate-900" />
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">You're already logged in!</h1>
+          <Button onClick={() => navigate(createPageUrl('Dashboard'))} className="bg-slate-900 hover:bg-slate-800">
+            Go to Dashboard
+          </Button>
+        </div>
       </div>
     );
   }
