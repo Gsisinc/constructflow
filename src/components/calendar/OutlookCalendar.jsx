@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Plus, Eye, EyeOff } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Eye, EyeOff, Pencil, Trash2 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -20,6 +20,7 @@ export default function OutlookCalendar({ projectId }) {
   const [showCalendarDialog, setShowCalendarDialog] = useState(false);
   const [showEventDialog, setShowEventDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [editingCalendar, setEditingCalendar] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: calendars = [] } = useQuery({
@@ -39,7 +40,27 @@ export default function OutlookCalendar({ projectId }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectCalendars'] });
       setShowCalendarDialog(false);
+      setEditingCalendar(null);
       toast.success('Calendar created');
+    }
+  });
+
+  const updateCalendarMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.ProjectCalendar.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projectCalendars'] });
+      setShowCalendarDialog(false);
+      setEditingCalendar(null);
+      toast.success('Calendar updated');
+    }
+  });
+
+  const deleteCalendarMutation = useMutation({
+    mutationFn: (id) => base44.entities.ProjectCalendar.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projectCalendars'] });
+      queryClient.invalidateQueries({ queryKey: ['calendarEvents'] });
+      toast.success('Calendar deleted');
     }
   });
 
@@ -71,7 +92,25 @@ export default function OutlookCalendar({ projectId }) {
     return visibleEvents.filter(e => isSameDay(new Date(e.start_date), day));
   };
 
-  const [calendarForm, setCalendarForm] = useState({ calendar_name: '', color: COLORS[0] });
+  const [calendarForm, setCalendarForm] = useState({ calendar_name: '', color: COLORS[0], description: '' });
+  
+  const handleEditCalendar = (calendar) => {
+    setEditingCalendar(calendar);
+    setCalendarForm({
+      calendar_name: calendar.calendar_name,
+      color: calendar.color,
+      description: calendar.description || ''
+    });
+    setShowCalendarDialog(true);
+  };
+
+  const handleSaveCalendar = () => {
+    if (editingCalendar) {
+      updateCalendarMutation.mutate({ id: editingCalendar.id, data: calendarForm });
+    } else {
+      createCalendarMutation.mutate({ project_id: projectId, ...calendarForm });
+    }
+  };
   const [eventForm, setEventForm] = useState({
     calendar_id: '',
     title: '',
@@ -105,7 +144,13 @@ export default function OutlookCalendar({ projectId }) {
           </div>
         </div>
         <div className="flex gap-2">
-          <Dialog open={showCalendarDialog} onOpenChange={setShowCalendarDialog}>
+          <Dialog open={showCalendarDialog} onOpenChange={(open) => {
+            setShowCalendarDialog(open);
+            if (!open) {
+              setEditingCalendar(null);
+              setCalendarForm({ calendar_name: '', color: COLORS[0], description: '' });
+            }
+          }}>
             <DialogTrigger asChild>
               <Button variant="outline">
                 <Plus className="h-4 w-4 mr-2" />
@@ -114,7 +159,7 @@ export default function OutlookCalendar({ projectId }) {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create Calendar</DialogTitle>
+                <DialogTitle>{editingCalendar ? 'Edit Calendar' : 'Create Calendar'}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
@@ -123,6 +168,14 @@ export default function OutlookCalendar({ projectId }) {
                     value={calendarForm.calendar_name}
                     onChange={(e) => setCalendarForm({ ...calendarForm, calendar_name: e.target.value })}
                     placeholder="e.g., Inspections, Deliveries"
+                  />
+                </div>
+                <div>
+                  <Label>Description (Optional)</Label>
+                  <Input
+                    value={calendarForm.description}
+                    onChange={(e) => setCalendarForm({ ...calendarForm, description: e.target.value })}
+                    placeholder="Calendar description"
                   />
                 </div>
                 <div>
@@ -141,11 +194,8 @@ export default function OutlookCalendar({ projectId }) {
                     ))}
                   </div>
                 </div>
-                <Button
-                  onClick={() => createCalendarMutation.mutate({ project_id: projectId, ...calendarForm })}
-                  className="w-full"
-                >
-                  Create
+                <Button onClick={handleSaveCalendar} className="w-full">
+                  {editingCalendar ? 'Update' : 'Create'}
                 </Button>
               </div>
             </DialogContent>
@@ -162,15 +212,38 @@ export default function OutlookCalendar({ projectId }) {
           <CardContent>
             <div className="flex flex-wrap gap-3">
               {calendars.map(cal => (
-                <button
-                  key={cal.id}
-                  onClick={() => toggleCalendarVisibility.mutate({ id: cal.id, isVisible: !cal.is_visible })}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg border hover:bg-slate-50 transition-colors"
-                >
-                  {cal.is_visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                  <div className="w-3 h-3 rounded" style={{ backgroundColor: cal.color }} />
-                  <span className="text-sm">{cal.calendar_name}</span>
-                </button>
+                <div key={cal.id} className="flex items-center gap-1 px-3 py-2 rounded-lg border bg-white">
+                  <button
+                    onClick={() => toggleCalendarVisibility.mutate({ id: cal.id, isVisible: !cal.is_visible })}
+                    className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+                  >
+                    {cal.is_visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    <div className="w-3 h-3 rounded" style={{ backgroundColor: cal.color }} />
+                    <span className="text-sm">{cal.calendar_name}</span>
+                  </button>
+                  <div className="flex items-center gap-1 ml-2 border-l pl-2">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={() => handleEditCalendar(cal)}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => {
+                        if (confirm('Delete this calendar and all its events?')) {
+                          deleteCalendarMutation.mutate(cal.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
               ))}
             </div>
           </CardContent>
