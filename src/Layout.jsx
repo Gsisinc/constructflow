@@ -16,7 +16,8 @@ import {
   X,
   LogOut,
   ChevronDown,
-  Building2
+  Building2,
+  Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,6 +36,7 @@ const navItems = [
   { name: 'Materials', icon: Package, page: 'Materials' },
   { name: 'Issues', icon: AlertTriangle, page: 'Issues' },
   { name: 'Budget', icon: DollarSign, page: 'Budget' },
+  { name: 'Calendar', icon: Calendar, page: 'Calendar' },
 ];
 
 export default function Layout({ children, currentPageName }) {
