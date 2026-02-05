@@ -37,10 +37,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-slate-900 flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-slate-900">CONTRACTOR FOREMAN</span>
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
+                alt="GSIS Manager" 
+                className="h-16 w-auto"
+              />
+              <span className="text-2xl font-bold text-slate-900">GSIS MANAGER</span>
             </div>
             <nav className="hidden md:flex gap-6">
               <button className="text-sm text-slate-600 hover:text-slate-900">Solutions</button>
@@ -276,7 +278,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-white border-t py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-600">
-          <p>&copy; 2026 Contractor Foreman. All rights reserved.</p>
+          <p>&copy; 2026 GSIS Manager. All rights reserved.</p>
         </div>
       </footer>
     </div>

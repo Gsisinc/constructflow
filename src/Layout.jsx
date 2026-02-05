@@ -191,13 +191,15 @@ export default function Layout({ children, currentPageName }) {
             </Button>
             <div className="flex items-center gap-2">
               {organization?.logo_url ? (
-                <img src={organization.logo_url} alt={organization.name} className="h-8 w-auto" />
+                <img src={organization.logo_url} alt={organization.name} className="h-12 w-auto" />
               ) : (
                 <>
-                  <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center">
-                    <Building2 className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="font-semibold text-slate-900">{organization?.name || 'BuildFlow'}</span>
+                  <img 
+                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
+                    alt="GSIS Manager" 
+                    className="h-12 w-auto"
+                  />
+                  <span className="font-semibold text-slate-900">{organization?.name || 'GSIS Manager'}</span>
                 </>
               )}
             </div>
@@ -230,13 +232,15 @@ export default function Layout({ children, currentPageName }) {
           {/* Logo */}
           <div className="h-16 flex items-center gap-3 px-6 border-b border-slate-100">
             {organization?.logo_url ? (
-              <img src={organization.logo_url} alt={organization.name} className="h-10 w-auto" />
+              <img src={organization.logo_url} alt={organization.name} className="h-14 w-auto" />
             ) : (
               <>
-                <div className="h-9 w-9 rounded-lg bg-slate-900 flex items-center justify-center">
-                  <Building2 className="h-5 w-5 text-white" />
-                </div>
-                <span className="font-semibold text-lg text-slate-900 tracking-tight">{organization?.name || 'BuildFlow'}</span>
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
+                  alt="GSIS Manager" 
+                  className="h-14 w-auto"
+                />
+                <span className="font-semibold text-lg text-slate-900 tracking-tight">{organization?.name || 'GSIS Manager'}</span>
               </>
             )}
           </div>
@@ -268,7 +272,7 @@ export default function Layout({ children, currentPageName }) {
           {/* Footer */}
           <div className="p-4 border-t border-slate-100">
             <div className="text-xs text-slate-500 text-center">
-              {organization?.name || 'BuildFlow'}
+              {organization?.name || 'GSIS Manager'}
             </div>
           </div>
         </div>
