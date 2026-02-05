@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import LiveBudgetTracker from '../components/budget/LiveBudgetTracker';
+import CashFlowForecast from '../components/budget/CashFlowForecast';
+import ChangeOrderImpact from '../components/budget/ChangeOrderImpact';
 import EmptyState from '../components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -33,25 +37,12 @@ import {
   Plus,
   Search,
   DollarSign,
-  TrendingUp,
-  TrendingDown,
   Loader2,
-  Calendar
+  Calendar,
+  FileText
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend
-} from 'recharts';
 
 const CATEGORIES = [
   { value: 'labor', label: 'Labor', color: '#3B82F6' },
@@ -75,7 +66,6 @@ export default function Budget() {
   const [editingExpense, setEditingExpense] = useState(null);
   const [search, setSearch] = useState('');
   const [projectFilter, setProjectFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
   const queryClient = useQueryClient();
 
   const { data: expenses = [], isLoading } = useQuery({
@@ -86,6 +76,11 @@ export default function Budget() {
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list(),
+  });
+
+  const { data: changeOrders = [] } = useQuery({
+    queryKey: ['changeOrders'],
+    queryFn: () => base44.entities.ChangeOrder.list('-created_date'),
   });
 
   const createMutation = useMutation({
@@ -110,251 +105,191 @@ export default function Budget() {
       expense.description?.toLowerCase().includes(search.toLowerCase()) ||
       expense.vendor?.toLowerCase().includes(search.toLowerCase());
     const matchesProject = projectFilter === 'all' || expense.project_id === projectFilter;
-    const matchesCategory = categoryFilter === 'all' || expense.category === categoryFilter;
-    return matchesSearch && matchesProject && matchesCategory;
+    return matchesSearch && matchesProject;
   });
+
+  const selectedProject = projectFilter !== 'all' ? projects.find(p => p.id === projectFilter) : null;
+  const projectExpenses = projectFilter !== 'all' ? expenses.filter(e => e.project_id === projectFilter) : expenses;
+  const projectChangeOrders = projectFilter !== 'all' ? changeOrders.filter(co => co.project_id === projectFilter) : changeOrders;
 
   const getProjectName = (projectId) => {
     const project = projects.find(p => p.id === projectId);
     return project?.name || 'Unknown Project';
   };
 
-  // Calculate totals
-  const totalExpenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
-  const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
-  const paidExpenses = expenses.filter(e => e.status === 'paid').reduce((sum, e) => sum + (e.amount || 0), 0);
-  const pendingExpenses = expenses.filter(e => e.status === 'pending').reduce((sum, e) => sum + (e.amount || 0), 0);
-
-  // Category breakdown for chart
-  const categoryData = CATEGORIES.map(cat => ({
-    name: cat.label,
-    value: expenses.filter(e => e.category === cat.value).reduce((sum, e) => sum + (e.amount || 0), 0),
-    color: cat.color
-  })).filter(c => c.value > 0);
-
-  // Monthly expenses for bar chart
-  const monthlyData = expenses.reduce((acc, expense) => {
-    if (expense.date) {
-      const month = format(new Date(expense.date), 'MMM');
-      acc[month] = (acc[month] || 0) + (expense.amount || 0);
-    }
-    return acc;
-  }, {});
-
-  const barChartData = Object.entries(monthlyData).map(([month, amount]) => ({
-    month,
-    amount
-  }));
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Budget</h1>
-          <p className="text-slate-500 mt-1">Track expenses and budget allocation</p>
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Budget Control Tower</h1>
+          <p className="text-slate-500 mt-1">Dynamic budgeting with predictive analytics</p>
         </div>
-        <Button onClick={() => { setEditingExpense(null); setShowForm(true); }} className="bg-slate-900 hover:bg-slate-800">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Expense
-        </Button>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-500">Total Budget</p>
-              <p className="text-2xl font-semibold mt-1">${totalBudget.toLocaleString()}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-blue-100">
-              <DollarSign className="h-5 w-5 text-blue-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-500">Total Expenses</p>
-              <p className="text-2xl font-semibold mt-1">${totalExpenses.toLocaleString()}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-purple-100">
-              <TrendingDown className="h-5 w-5 text-purple-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-500">Paid</p>
-              <p className="text-2xl font-semibold mt-1 text-green-600">${paidExpenses.toLocaleString()}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-green-100">
-              <TrendingUp className="h-5 w-5 text-green-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-500">Pending</p>
-              <p className="text-2xl font-semibold mt-1 text-amber-600">${pendingExpenses.toLocaleString()}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-amber-100">
-              <DollarSign className="h-5 w-5 text-amber-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Charts */}
-      {!isLoading && expenses.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h3 className="font-semibold text-slate-900 mb-4">Expenses by Category</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={categoryData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h3 className="font-semibold text-slate-900 mb-4">Monthly Expenses</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barChartData}>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-                  <Bar dataKey="amount" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Search expenses..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <Select value={projectFilter} onValueChange={setProjectFilter}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Project" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Projects</SelectItem>
-            {projects.map(p => (
-              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-40">
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {CATEGORIES.map(c => (
-              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Expenses Table */}
-      {isLoading ? (
-        <div className="space-y-4">
-          {Array(5).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-16 rounded-xl" />
-          ))}
-        </div>
-      ) : filteredExpenses.length === 0 ? (
-        <EmptyState
-          icon={DollarSign}
-          title={search || projectFilter !== 'all' || categoryFilter !== 'all' ? 'No expenses found' : 'No expenses yet'}
-          description="Start tracking your project expenses"
-          actionLabel={!search && projectFilter === 'all' && categoryFilter === 'all' ? 'Add Expense' : null}
-          onAction={() => setShowForm(true)}
-        />
-      ) : (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Description</TableHead>
-                <TableHead>Project</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredExpenses.map((expense) => (
-                <TableRow
-                  key={expense.id}
-                  className="cursor-pointer hover:bg-slate-50"
-                  onClick={() => { setEditingExpense(expense); setShowForm(true); }}
-                >
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{expense.description || 'No description'}</p>
-                      {expense.vendor && <p className="text-xs text-slate-500">{expense.vendor}</p>}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-slate-500">{getProjectName(expense.project_id)}</TableCell>
-                  <TableCell>
-                    <Badge
-                      style={{ backgroundColor: CATEGORIES.find(c => c.value === expense.category)?.color + '20', color: CATEGORIES.find(c => c.value === expense.category)?.color }}
-                    >
-                      {expense.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {expense.date && (
-                      <div className="flex items-center gap-1.5 text-sm text-slate-500">
-                        <Calendar className="h-3.5 w-3.5" />
-                        {format(new Date(expense.date), 'MMM d, yyyy')}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">${(expense.amount || 0).toLocaleString()}</TableCell>
-                  <TableCell>
-                    <Badge className={cn("border", STATUSES.find(s => s.value === expense.status)?.color)}>
-                      {expense.status}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
+        <div className="flex gap-3">
+          <Select value={projectFilter} onValueChange={setProjectFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Select project" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Projects</SelectItem>
+              {projects.map(p => (
+                <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
               ))}
-            </TableBody>
-          </Table>
+            </SelectContent>
+          </Select>
+          <Button onClick={() => { setEditingExpense(null); setShowForm(true); }} className="bg-slate-900 hover:bg-slate-800">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Expense
+          </Button>
         </div>
+      </div>
+
+      {/* Living Budget Tracker */}
+      {isLoading ? (
+        <Skeleton className="h-64 rounded-2xl" />
+      ) : (
+        <LiveBudgetTracker 
+          project={selectedProject || {
+            budget: projects.reduce((sum, p) => sum + (p.budget || 0), 0),
+            spent: projects.reduce((sum, p) => sum + (p.spent || 0), 0),
+            committed_costs: projects.reduce((sum, p) => sum + (p.committed_costs || 0), 0),
+            contingency_percent: 10
+          }}
+          expenses={projectExpenses}
+          changeOrders={projectChangeOrders}
+        />
       )}
+
+      {/* Cash Flow & Change Orders */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CashFlowForecast project={selectedProject} expenses={projectExpenses} />
+        <ChangeOrderImpact changeOrders={projectChangeOrders} />
+      </div>
+
+      {/* Expense Table */}
+      <Tabs defaultValue="expenses" className="w-full">
+        <TabsList>
+          <TabsTrigger value="expenses">Expenses</TabsTrigger>
+          <TabsTrigger value="change_orders">Change Orders</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="expenses" className="mt-4">
+          {/* Filters */}
+          <div className="flex gap-4 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search expenses..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {filteredExpenses.length === 0 ? (
+            <EmptyState
+              icon={DollarSign}
+              title="No expenses yet"
+              description="Start tracking your project expenses"
+              actionLabel="Add Expense"
+              onAction={() => setShowForm(true)}
+            />
+          ) : (
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Project</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredExpenses.map((expense) => (
+                    <TableRow
+                      key={expense.id}
+                      className="cursor-pointer hover:bg-slate-50"
+                      onClick={() => { setEditingExpense(expense); setShowForm(true); }}
+                    >
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{expense.description || 'No description'}</p>
+                          {expense.vendor && <p className="text-xs text-slate-500">{expense.vendor}</p>}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-slate-500">{getProjectName(expense.project_id)}</TableCell>
+                      <TableCell>
+                        <Badge
+                          style={{ 
+                            backgroundColor: CATEGORIES.find(c => c.value === expense.category)?.color + '20', 
+                            color: CATEGORIES.find(c => c.value === expense.category)?.color 
+                          }}
+                        >
+                          {expense.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {expense.date && (
+                          <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                            <Calendar className="h-3.5 w-3.5" />
+                            {format(new Date(expense.date), 'MMM d, yyyy')}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium">${(expense.amount || 0).toLocaleString()}</TableCell>
+                      <TableCell>
+                        <Badge className={cn("border", STATUSES.find(s => s.value === expense.status)?.color)}>
+                          {expense.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="change_orders" className="mt-4">
+          <div className="space-y-3">
+            {projectChangeOrders.map((co) => (
+              <div key={co.id} className="bg-white rounded-xl border border-slate-200 p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-slate-900">{co.title}</h3>
+                      <Badge variant="outline">{co.change_order_number}</Badge>
+                    </div>
+                    <p className="text-sm text-slate-500 mt-1">{co.description}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className={cn(
+                      "text-lg font-semibold",
+                      co.cost_impact > 0 ? "text-red-600" : "text-green-600"
+                    )}>
+                      {co.cost_impact > 0 ? '+' : ''}${Math.abs(co.cost_impact || 0).toLocaleString()}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {co.schedule_impact_days ? `${co.schedule_impact_days > 0 ? '+' : ''}${co.schedule_impact_days} days` : 'No schedule impact'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {projectChangeOrders.length === 0 && (
+              <EmptyState
+                icon={FileText}
+                title="No change orders"
+                description="Change orders will appear here when created"
+              />
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Expense Form Dialog */}
       <ExpenseFormDialog
@@ -376,7 +311,7 @@ export default function Budget() {
 }
 
 function ExpenseFormDialog({ open, onOpenChange, expense, projects, onSubmit, loading }) {
-  const [formData, setFormData] = useState(expense || {
+  const [formData, setFormData] = React.useState(expense || {
     project_id: '',
     category: 'other',
     description: '',

@@ -4,6 +4,11 @@ import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import ProjectForm from '../components/projects/ProjectForm';
+import PhaseNavigator from '../components/phases/PhaseNavigator';
+import PhaseGateChecklist from '../components/phases/PhaseGateChecklist';
+import ProjectCalendar from '../components/calendar/ProjectCalendar';
+import PermitDashboard from '../components/permits/PermitDashboard';
+import ClientPortal from '../components/client/ClientPortal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -20,7 +25,8 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
-  Trash2
+  Trash2,
+  Eye
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -45,6 +51,12 @@ const statusColors = {
   cancelled: 'bg-red-50 text-red-700 border-red-200',
 };
 
+const healthColors = {
+  green: 'bg-green-500',
+  yellow: 'bg-amber-500',
+  red: 'bg-red-500',
+};
+
 export default function ProjectDetail() {
   const urlParams = new URLSearchParams(window.location.search);
   const projectId = urlParams.get('id');
@@ -52,6 +64,8 @@ export default function ProjectDetail() {
 
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showGateChecklist, setShowGateChecklist] = useState(false);
+  const [selectedGate, setSelectedGate] = useState(null);
 
   const { data: project, isLoading } = useQuery({
     queryKey: ['project', projectId],
@@ -80,6 +94,36 @@ export default function ProjectDetail() {
     enabled: !!projectId,
   });
 
+  const { data: phaseGates = [] } = useQuery({
+    queryKey: ['phaseGates', projectId],
+    queryFn: () => base44.entities.PhaseGate.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
+
+  const { data: permits = [] } = useQuery({
+    queryKey: ['permits', projectId],
+    queryFn: () => base44.entities.Permit.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
+
+  const { data: calendarEvents = [] } = useQuery({
+    queryKey: ['calendarEvents', projectId],
+    queryFn: () => base44.entities.CalendarEvent.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
+
+  const { data: clientUpdates = [] } = useQuery({
+    queryKey: ['clientUpdates', projectId],
+    queryFn: () => base44.entities.ClientUpdate.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
+
+  const { data: changeOrders = [] } = useQuery({
+    queryKey: ['changeOrders', projectId],
+    queryFn: () => base44.entities.ChangeOrder.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
+
   const updateMutation = useMutation({
     mutationFn: (data) => base44.entities.Project.update(projectId, data),
     onSuccess: () => {
@@ -92,6 +136,13 @@ export default function ProjectDetail() {
     mutationFn: () => base44.entities.Project.delete(projectId),
     onSuccess: () => {
       window.location.href = createPageUrl('Projects');
+    },
+  });
+
+  const createGateMutation = useMutation({
+    mutationFn: (data) => base44.entities.PhaseGate.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['phaseGates', projectId] });
     },
   });
 
@@ -125,6 +176,31 @@ export default function ProjectDetail() {
   const openIssues = issues.filter(i => i.status === 'open').length;
   const totalExpenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
 
+  const handleInitiateGate = (fromPhase, toPhase) => {
+    const newGate = {
+      project_id: projectId,
+      from_phase: fromPhase,
+      to_phase: toPhase,
+      status: 'pending',
+      checklist_items: [
+        { item: 'All required inspections passed', required: true, completed: false },
+        { item: 'Documentation complete and approved', required: true, completed: false },
+        { item: 'Budget reconciliation complete', required: true, completed: false },
+        { item: 'Safety audit passed', required: true, completed: false },
+        { item: 'Quality control sign-off', required: false, completed: false },
+      ],
+      required_signoffs: [
+        { role: 'Superintendent', name: '', signed: false },
+        { role: 'Project Manager', name: project.project_manager || '', signed: false },
+        { role: 'Owner Representative', name: '', signed: false },
+      ],
+      initiated_date: new Date().toISOString().split('T')[0],
+    };
+    createGateMutation.mutate(newGate);
+  };
+
+  const locations = [...new Set(calendarEvents.map(e => e.location).filter(Boolean))];
+
   return (
     <div className="space-y-6">
       {/* Back Button */}
@@ -148,6 +224,10 @@ export default function ProjectDetail() {
                 <Badge className={cn("border", statusColors[project.status])}>
                   {project.status?.replace('_', ' ')}
                 </Badge>
+                <div className={cn(
+                  "w-3 h-3 rounded-full",
+                  healthColors[project.health_status || 'green']
+                )} title={`Health: ${project.health_status || 'green'}`} />
               </div>
               <p className="text-slate-500">{project.client_name}</p>
               {project.address && (
@@ -273,6 +353,48 @@ export default function ProjectDetail() {
         </div>
       </div>
 
+      {/* Tabs for detailed views */}
+      <Tabs defaultValue="phases" className="w-full">
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="phases">Phases</TabsTrigger>
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          <TabsTrigger value="permits">Permits</TabsTrigger>
+          <TabsTrigger value="client">Client Portal</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="phases" className="mt-6">
+          <PhaseNavigator
+            currentPhase={project.current_phase || 'preconstruction'}
+            phaseGates={phaseGates}
+            onInitiateGate={handleInitiateGate}
+            onViewGate={(gate) => {
+              setSelectedGate(gate);
+              setShowGateChecklist(true);
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="calendar" className="mt-6">
+          <ProjectCalendar
+            events={calendarEvents}
+            locations={locations}
+            onEventClick={(event) => console.log('Event clicked', event)}
+          />
+        </TabsContent>
+
+        <TabsContent value="permits" className="mt-6">
+          <PermitDashboard permits={permits} />
+        </TabsContent>
+
+        <TabsContent value="client" className="mt-6">
+          <ClientPortal
+            project={project}
+            updates={clientUpdates}
+            changeOrders={changeOrders}
+          />
+        </TabsContent>
+      </Tabs>
+
       {/* Description */}
       {project.description && (
         <div className="bg-white rounded-xl border border-slate-200 p-6">
@@ -287,6 +409,13 @@ export default function ProjectDetail() {
         onOpenChange={setShowEditForm}
         project={project}
         onSubmit={(data) => updateMutation.mutate(data)}
+      />
+
+      {/* Phase Gate Checklist */}
+      <PhaseGateChecklist
+        gate={selectedGate}
+        open={showGateChecklist}
+        onOpenChange={setShowGateChecklist}
       />
 
       {/* Delete Dialog */}
