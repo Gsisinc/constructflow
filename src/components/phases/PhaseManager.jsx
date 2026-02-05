@@ -202,7 +202,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
   });
 
   const completedReqs = requirements.filter(r => r.status === 'completed').length;
-  const progressPercent = requirements.length > 0 ? (completedReqs / requirements.length) * 100 : phaseData?.progress_percent || 0;
+  const progressPercent = requirements.length > 0 ? (completedReqs / requirements.length) * 100 : 0;
   const currentPhaseLabel = allPhases.find(p => p.value === selectedPhase)?.label;
   const isLocked = phaseData?.is_locked || false;
 

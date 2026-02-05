@@ -31,6 +31,7 @@ const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Bid Opportunities', icon: FileText, page: 'BidOpportunities' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+  { name: 'Client Portal', icon: Building2, page: 'ClientPortal' },
 ];
 
 export default function Layout({ children, currentPageName }) {

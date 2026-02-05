@@ -60,6 +60,7 @@ import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
+import ClientPortal from './pages/ClientPortal';
 import __Layout from './Layout.jsx';
 
 
@@ -77,6 +78,7 @@ export const PAGES = {
     "Projects": Projects,
     "Tasks": Tasks,
     "Team": Team,
+    "ClientPortal": ClientPortal,
 }
 
 export const pagesConfig = {
