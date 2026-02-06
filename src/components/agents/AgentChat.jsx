@@ -379,9 +379,9 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden min-h-0">
         {/* Messages */}
-        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6">
+        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 min-h-0">
           {/* History Toggle - Only show if there are messages */}
           {messages.length > 2 && (
             <Collapsible open={showHistory} onOpenChange={setShowHistory} className="mb-4">
