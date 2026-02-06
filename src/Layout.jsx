@@ -21,7 +21,8 @@ import {
   Calendar,
   Clock,
   Settings,
-  User
+  User,
+  Bot
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,6 +35,7 @@ import {
 const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+  { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
   { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
   { name: 'Directory', icon: Users, page: 'Directory' },
   { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
