@@ -159,12 +159,7 @@ export default function BidDiscovery() {
     queryFn: () => base44.entities.Bid.list('-created_date', 20)
   });
 
-  // Auto-search on mount and when filters change
-  useEffect(() => {
-    if (autoSearchEnabled && workType && state) {
-      performAutoSearch();
-    }
-  }, [workType, state, cityCounty]);
+  // Removed auto-search - just display filtered results from database
 
   const performAutoSearch = async () => {
     if (!workType || workType === 'all') return;
