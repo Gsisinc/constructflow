@@ -43,14 +43,14 @@ export default function BidDiscovery() {
   const [selectedBid, setSelectedBid] = useState(null);
   const [showAgentChat, setShowAgentChat] = useState(false);
   const [searching, setSearching] = useState(false);
-  const [city, setCity] = useState('');
-  const [workType, setWorkType] = useState('all');
-  const [autoSearchEnabled, setAutoSearchEnabled] = useState(false);
+  const [city, setCity] = useState('California');
+  const [workType, setWorkType] = useState('low_voltage');
+  const [autoSearchEnabled, setAutoSearchEnabled] = useState(true);
   const queryClient = useQueryClient();
 
   const { data: opportunities = [] } = useQuery({
     queryKey: ['bidOpportunities'],
-    queryFn: () => base44.entities.BidOpportunity.list('-created_date', 50)
+    queryFn: () => base44.entities.BidOpportunity.list('-created_date', 150)
   });
 
   const { data: bids = [] } = useQuery({
