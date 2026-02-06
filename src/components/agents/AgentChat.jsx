@@ -359,7 +359,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   };
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col overflow-hidden">
       <CardHeader className={`bg-gradient-to-r ${agent.color} text-white flex-shrink-0`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -375,9 +375,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden min-h-0">
-        {/* Messages */}
-        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 min-h-0">
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6" style={{maxHeight: 'calc(100% - 140px)'}}
           {/* History Toggle - Only show if there are messages */}
           {messages.length > 2 && (
             <Collapsible open={showHistory} onOpenChange={setShowHistory} className="mb-4">
@@ -446,10 +444,10 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
               </div>
             )}
           </div>
-        </div>
+      </div>
 
-        {/* Input */}
-        <div className="border-t p-4 flex-shrink-0">
+      {/* Input */}
+      <div className="border-t p-4 flex-shrink-0">
           <div className="flex gap-2">
             <input
               ref={fileInputRef}
@@ -486,7 +484,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
             </Button>
           </div>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 }
