@@ -136,6 +136,8 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   };
 
   const handleAnalyze = async (opportunity) => {
+    if (!conversation || loading) return;
+    
     const analysisPrompt = `Please provide a comprehensive analysis of the bid opportunity you already researched and stored:
 
 **BID ID:** ${opportunity.id}
@@ -156,8 +158,17 @@ Using the detailed information you already extracted and stored for this bid, pl
 
 Please reference the complete details you stored when you first found this opportunity.`;
 
-    setInput(analysisPrompt);
-    setTimeout(() => handleSend(), 100);
+    setLoading(true);
+    try {
+      await base44.agents.addMessage(conversation, {
+        role: 'user',
+        content: analysisPrompt
+      });
+    } catch (error) {
+      toast.error('Failed to send analysis request');
+      console.error(error);
+      setLoading(false);
+    }
   };
 
   const handleFileUpload = async (e) => {
@@ -355,9 +366,9 @@ Please reference the complete details you stored when you first found this oppor
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+      <CardContent className="flex-1 flex flex-col p-0 min-h-0">
         {/* Messages */}
-        <ScrollArea className="flex-1 p-6">
+        <div className="flex-1 overflow-y-auto p-6 min-h-0">
           <div>
             {messages.length === 0 && opportunities.length === 0 && (
               <div className="text-center py-12">
@@ -408,7 +419,7 @@ Please reference the complete details you stored when you first found this oppor
             
             <div ref={messagesEndRef} />
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Input */}
         <div className="border-t p-4 flex-shrink-0">
