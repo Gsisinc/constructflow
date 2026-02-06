@@ -107,15 +107,17 @@ Deno.serve(async (req) => {
 
       // Determine realistic number based on search parameters
       // Popular work types and states typically have more opportunities
-      const baseCount = city ? 2000 : 5000; // City-specific has fewer, state-wide has more
+      const baseCount = city ? 500 : 1500; // City-specific has fewer, state-wide has more
       const popularWorkTypes = ['low_voltage', 'electrical', 'hvac', 'plumbing', 'general_contractor'];
       const popularStates = ['California', 'Texas', 'Florida', 'New York'];
 
       let numToGenerate = baseCount;
-      if (popularWorkTypes.includes(workType)) numToGenerate *= 1.5;
-      if (popularStates.includes(state)) numToGenerate *= 1.3;
+      if (popularWorkTypes.includes(workType)) numToGenerate *= 1.3;
+      if (popularStates.includes(state)) numToGenerate *= 1.2;
 
       numToGenerate = Math.floor(numToGenerate);
+      // Cap at 3000 to avoid timeouts
+      numToGenerate = Math.min(numToGenerate, 3000);
 
       for (let i = 0; i < numToGenerate; i++) {
         const agency = agencies[i % agencies.length];
