@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import * as cheerio from 'npm:cheerio@1.0.0';
+import { parseFeed } from 'npm:htmlparser2@9.1.0';
 
 Deno.serve(async (req) => {
   try {
@@ -13,9 +14,52 @@ Deno.serve(async (req) => {
 
     const opportunities = [];
     const sitesScraped = [];
+    const errors = [];
 
-    // Real nationwide bid sites to scrape
-    const realBidSites = [
+    // 1. SAM.gov API - Federal government bids
+    try {
+      console.log('🔍 Fetching from SAM.gov API...');
+      const samResponse = await fetch(
+        `https://api.sam.gov/opportunities/v2/search?api_key=${Deno.env.get('SAM_GOV_API_KEY') || 'DEMO_KEY'}&postedFrom=${new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0]}&limit=100`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+
+      if (samResponse.ok) {
+        const samData = await samResponse.json();
+        if (samData.opportunitiesData) {
+          samData.opportunitiesData.forEach(opp => {
+            const oppType = opp.type?.toLowerCase() || '';
+            const oppTitle = (opp.title || '').toLowerCase();
+            const oppDesc = (opp.description || '').toLowerCase();
+            const searchTerms = workType.toLowerCase().replace('_', ' ');
+
+            if (oppTitle.includes(searchTerms) || oppDesc.includes(searchTerms) || oppType.includes(searchTerms)) {
+              opportunities.push({
+                title: opp.title,
+                project_name: opp.title,
+                agency: opp.department || opp.organizationName,
+                location: `${opp.placeOfPerformance?.city?.name || ''}, ${opp.placeOfPerformance?.state?.name || state}`.trim(),
+                estimated_value: parseFloat(opp.award?.amount || 0),
+                due_date: opp.responseDeadLine?.split('T')[0],
+                description: opp.description?.substring(0, 500),
+                url: `https://sam.gov/opp/${opp.noticeId}/view`,
+                source: 'SAM.gov (Federal)',
+                project_type: workType,
+                status: 'active'
+              });
+            }
+          });
+          sitesScraped.push('SAM.gov API');
+          console.log(`✓ SAM.gov: Found ${opportunities.length} federal opportunities`);
+        }
+      }
+    } catch (err) {
+      errors.push(`SAM.gov API: ${err.message}`);
+      console.error('SAM.gov API error:', err.message);
+    }
+
+    // 2. RSS Feeds from government sites
+    const rssFeeds = [
       // State-specific agencies and cities
       const stateData = {
         'California': {
@@ -147,8 +191,55 @@ Deno.serve(async (req) => {
         });
       }
       
-      // SAM.gov - Federal bids
-      { name: 'SAM.gov', url: `https://sam.gov/search/?index=opp&page=1&sort=-modifiedDate&sfm%5Bstatus%5D%5Bis_active%5D=true&sfm%5BsimpleSearch%5D%5BkeywordRadio%5D=ANY`, selector: '.opportunity-row' },
+      `https://www.bidnet.com/bneattach/RSS/RssBids.aspx`,
+      `https://www.publicpurchase.com/gems/rss/`,
+      ];
+
+      for (const feedUrl of rssFeeds) {
+      try {
+        const response = await fetch(feedUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BidBot/1.0)' }
+        });
+
+        if (response.ok) {
+          const xml = await response.text();
+          const $ = cheerio.load(xml, { xmlMode: true });
+
+          $('item').each((i, elem) => {
+            const title = $(elem).find('title').text();
+            const link = $(elem).find('link').text();
+            const description = $(elem).find('description').text();
+            const pubDate = $(elem).find('pubDate').text();
+
+            if (title && link && (title.toLowerCase().includes(workType.toLowerCase().replace('_', ' ')) || 
+                                 description.toLowerCase().includes(workType.toLowerCase().replace('_', ' ')))) {
+              opportunities.push({
+                title,
+                project_name: title,
+                agency: 'Various Agencies',
+                location: `${city || ''} ${state}`.trim(),
+                estimated_value: extractValue(description),
+                due_date: extractDate(description) || new Date(pubDate).toISOString().split('T')[0],
+                description: description.substring(0, 500),
+                url: link,
+                source: new URL(feedUrl).hostname,
+                project_type: workType,
+                status: 'active'
+              });
+            }
+          });
+
+          sitesScraped.push(new URL(feedUrl).hostname);
+          console.log(`✓ RSS ${new URL(feedUrl).hostname}: Found opportunities`);
+        }
+      } catch (err) {
+        errors.push(`RSS ${feedUrl}: ${err.message}`);
+        console.error(`RSS error ${feedUrl}:`, err.message);
+      }
+      }
+
+      // 3. Web scraping - improved with better selectors
+      const webScrapeSites = [
       // BidNet
       { name: 'BidNet', url: `https://www.bidnet.com/bneattach/find-bids?keywords=${workType}`, selector: '.bid-item' },
       // DemandStar
@@ -165,8 +256,8 @@ Deno.serve(async (req) => {
       { name: `${state} Procurement`, url: `https://procurement.${state.toLowerCase().replace(' ', '')}.gov`, selector: 'table tr, .bid-item' },
       ];
 
-    // Scrape each site
-    for (const site of realBidSites) {
+    // Scrape websites
+    for (const site of webScrapeSites) {
       try {
         const response = await fetch(site.url, {
           headers: {
@@ -225,9 +316,12 @@ Deno.serve(async (req) => {
 
         sitesScraped.push(site.name);
         } catch (err) {
+        errors.push(`${site.name}: ${err.message}`);
         console.error(`Failed to scrape ${site.name}:`, err.message);
         }
         }
+
+        console.log(`📊 Total opportunities found: ${opportunities.length}`);
 
         // Pagination logic
         const startIndex = (page - 1) * pageSize;
@@ -237,11 +331,13 @@ Deno.serve(async (req) => {
       success: true,
       opportunities: paginatedOpportunities,
       sitesScraped,
+      errors: errors.length > 0 ? errors : undefined,
       totalFound: paginatedOpportunities.length,
       totalAvailable: opportunities.length,
       currentPage: page,
       totalPages: Math.ceil(opportunities.length / pageSize),
-      hasMore: page < Math.ceil(opportunities.length / pageSize)
+      hasMore: page < Math.ceil(opportunities.length / pageSize),
+      message: opportunities.length === 0 ? 'No opportunities found. Try different search criteria or check back later.' : undefined
     });
 
   } catch (error) {
