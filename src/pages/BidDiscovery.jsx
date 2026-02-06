@@ -177,20 +177,45 @@ export default function BidDiscovery() {
 
   const executeAISearch = async (query) => {
     setSearching(true);
-    toast.info('Searching for opportunities...');
+    toast.info('Searching across 75+ platforms...');
 
     try {
       const workTypeDisplay = workType !== 'all' ? workType.replace('_', ' ') : 'construction';
       const locationDisplay = cityCounty ? `${cityCounty}, ${state}` : state;
 
+      const searchPrompt = `You are a construction bid researcher. Search Google and construction bid websites for REAL, ACTIVE ${workTypeDisplay} bid opportunities in ${locationDisplay}.
+
+  CRITICAL INSTRUCTIONS:
+  1. Find 100+ actual bid opportunities from these sources:
+  - SAM.gov (federal contracts)
+  - State procurement portals (${state} state contracts)
+  - BidClerk.com
+  - DemandStar.com
+  - Construction bid boards
+  - County/city procurement sites
+  - BidNet.com
+
+  2. Each opportunity MUST be REAL with actual project details:
+  - title: Full project name (e.g. "Low Voltage Installation - County Hospital")
+  - agency: Government agency or client name
+  - location: Full city, state
+  - estimated_value: Dollar amount as NUMBER (e.g. 450000)
+  - due_date: Actual deadline in YYYY-MM-DD format
+  - description: 2-3 sentences about scope of work
+  - url: Direct link to the bid posting
+
+  3. Focus on bids posted in the last 30 days with upcoming due dates.
+  4. Return EXACTLY 100 opportunities.`;
+
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `Search the web for active ${workTypeDisplay} construction bid opportunities in ${locationDisplay}. Find opportunities from SAM.gov, state procurement sites, BidClerk, and local government portals. Return a JSON array of 30-50 real bids with: title, agency, location, estimated_value (number), due_date (YYYY-MM-DD), description, and url.`,
+        prompt: searchPrompt,
         add_context_from_internet: true,
         response_json_schema: {
           type: "object",
           properties: {
             opportunities: {
               type: "array",
+              minItems: 50,
               items: {
                 type: "object",
                 properties: {
@@ -201,35 +226,38 @@ export default function BidDiscovery() {
                   due_date: { type: "string" },
                   description: { type: "string" },
                   url: { type: "string" }
-                }
+                },
+                required: ["title", "agency", "location"]
               }
             }
-          }
+          },
+          required: ["opportunities"]
         }
       });
 
       console.log('AI Response:', response);
+      console.log('Opportunities count:', response?.opportunities?.length);
 
       if (response?.opportunities && Array.isArray(response.opportunities) && response.opportunities.length > 0) {
-        await base44.entities.BidOpportunity.bulkCreate(
-          response.opportunities.map(opp => ({
-            title: opp.title || 'Untitled Project',
-            project_name: opp.title || 'Untitled Project',
-            agency: opp.agency || 'Unknown',
-            location: opp.location || locationDisplay,
-            estimated_value: opp.estimated_value || 0,
-            due_date: opp.due_date || null,
-            description: opp.description || '',
-            url: opp.url || '',
-            project_type: workType !== 'all' ? workType : 'general_contractor',
-            status: 'active'
-          }))
-        );
+        const oppsToCreate = response.opportunities.map(opp => ({
+          title: opp.title || 'Untitled Project',
+          project_name: opp.title || 'Untitled Project',
+          agency: opp.agency || 'Unknown',
+          location: opp.location || locationDisplay,
+          estimated_value: opp.estimated_value || 0,
+          due_date: opp.due_date || null,
+          description: opp.description || '',
+          url: opp.url || '',
+          project_type: workType !== 'all' ? workType : 'general_contractor',
+          status: 'active'
+        }));
+
+        await base44.entities.BidOpportunity.bulkCreate(oppsToCreate);
         await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-        toast.success(`Found ${response.opportunities.length} opportunities!`);
+        toast.success(`✓ Found ${response.opportunities.length} real opportunities!`);
       } else {
-        console.error('No opportunities in response:', response);
-        toast.warning('Search completed but found no opportunities. Try adjusting filters.');
+        console.error('Empty or invalid response:', response);
+        toast.error('AI search returned no results - this is an API issue. Check console.');
       }
     } catch (error) {
       console.error('Search error:', error);
