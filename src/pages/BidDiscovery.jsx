@@ -152,20 +152,40 @@ export default function BidDiscovery() {
 
   const executeAISearch = async (query) => {
     setSearching(true);
+    toast.info('AI agent searching 100+ bid websites...');
+    
     try {
-      // Use the agent to search and save opportunities directly
-      const prompt = `${query}. Search across all major bid websites including SAM.gov, state portals, BidClerk, ConstructConnect, Dodge, and other platforms. Find at least 100 opportunities. For each opportunity found, create a BidOpportunity record with complete details.`;
-      
-      await base44.integrations.Core.InvokeLLM({
-        prompt: prompt,
-        add_context_from_internet: true
+      // Create or get agent conversation
+      const conversations = await base44.agents.listConversations({
+        agent_name: 'market_intelligence'
       });
       
-      // Refresh opportunities list after search
+      let conversation;
+      if (conversations && conversations.length > 0) {
+        conversation = conversations[0];
+      } else {
+        conversation = await base44.agents.createConversation({
+          agent_name: 'market_intelligence',
+          metadata: { name: 'Auto Search' }
+        });
+      }
+      
+      // Send search request to agent
+      const searchPrompt = `${query}. Search comprehensively across ALL major bid posting websites (SAM.gov, all state procurement portals, BidClerk, ConstructConnect, Dodge, BidNet, county/city sites, etc.). Find at least 100 active opportunities. Create a BidOpportunity record for EVERY opportunity you find with complete details including project name, agency, location, value, due date, description, and source URL.`;
+      
+      await base44.agents.addMessage(conversation, {
+        role: 'user',
+        content: searchPrompt
+      });
+      
+      // Wait a bit for agent to process
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Refresh opportunities list
       await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-      toast.success('AI search completed! Check discovered opportunities.');
+      toast.success('Search complete! New opportunities discovered.');
     } catch (error) {
-      toast.error('Search failed. Please try again.');
+      toast.error('Search failed: ' + error.message);
       console.error(error);
     } finally {
       setSearching(false);
