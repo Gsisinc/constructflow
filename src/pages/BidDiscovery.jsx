@@ -133,9 +133,10 @@ export default function BidDiscovery() {
   const opportunities = allOpportunities.filter(opp => {
     // Filter by work type
     if (workType && workType !== 'all') {
-      const oppType = opp.project_type?.toLowerCase() || opp.title?.toLowerCase() || opp.project_name?.toLowerCase() || '';
-      const searchType = workType.replace('_', ' ').toLowerCase();
-      if (!oppType.includes(searchType)) return false;
+      const oppType = (opp.project_type?.toLowerCase() || opp.title?.toLowerCase() || opp.project_name?.toLowerCase() || '');
+      const searchType = workType.toLowerCase();
+      const searchTypeWithSpace = workType.replace('_', ' ').toLowerCase();
+      if (!oppType.includes(searchType) && !oppType.includes(searchTypeWithSpace)) return false;
     }
     
     // Filter by state
