@@ -47,7 +47,9 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import AIAgents from './pages/AIAgents';
 import BidDetail from './pages/BidDetail';
+import BidDiscovery from './pages/BidDiscovery';
 import BidOpportunities from './pages/BidOpportunities';
 import Bids from './pages/Bids';
 import Budget from './pages/Budget';
@@ -68,13 +70,13 @@ import Tasks from './pages/Tasks';
 import Team from './pages/Team';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
-import AIAgents from './pages/AIAgents';
-import BidDiscovery from './pages/BidDiscovery';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AIAgents": AIAgents,
     "BidDetail": BidDetail,
+    "BidDiscovery": BidDiscovery,
     "BidOpportunities": BidOpportunities,
     "Bids": Bids,
     "Budget": Budget,
@@ -95,8 +97,6 @@ export const PAGES = {
     "Team": Team,
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
-    "AIAgents": AIAgents,
-    "BidDiscovery": BidDiscovery,
 }
 
 export const pagesConfig = {

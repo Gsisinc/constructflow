@@ -21,37 +21,37 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     initializeConversation();
   }, [agent]);
 
   useEffect(() => {
-    if (initialPrompt && conversation) {
+    if (initialPrompt && conversation && !loading) {
       setInput(initialPrompt);
-      setTimeout(() => handleSend(), 500);
+      setTimeout(() => handleSend(), 100);
     }
-  }, [conversation, initialPrompt]);
+  }, [conversation]);
 
   useEffect(() => {
     // Only fetch opportunities after we have messages (agent has responded)
     if (messages.length > 0) {
       fetchOpportunities();
       
-      // Poll for new opportunities every 3 seconds while conversation is active
+      // Poll for new opportunities every 2 seconds while conversation is active
       const interval = setInterval(() => {
         fetchOpportunities();
-      }, 3000);
+      }, 2000);
       
       return () => clearInterval(interval);
     }
   }, [messages.length]);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
+    // Scroll to bottom when messages update
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, opportunities]);
 
   const initializeConversation = async () => {
     try {
@@ -406,7 +406,7 @@ Please reference the complete details you stored when you first found this oppor
               </div>
             )}
             
-            <div ref={scrollRef} />
+            <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
 

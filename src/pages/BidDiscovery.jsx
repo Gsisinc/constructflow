@@ -73,11 +73,10 @@ export default function BidDiscovery() {
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     
+    setAnalysisPrompt(searchQuery);
+    setSearchQuery('');
     setSearching(true);
     setShowAgentChat(true);
-    
-    // The agent will handle the search through the chat interface
-    toast.info('Market Intelligence Agent is searching...');
   };
 
   const handleAddToPipeline = async (opportunity) => {
@@ -431,13 +430,16 @@ Please analyze and provide:
 
       {/* Agent Chat Dialog */}
       {showAgentChat && (
-        <Dialog open={showAgentChat} onOpenChange={() => {
-          setShowAgentChat(false);
-          setSearching(false);
-          setAnalysisPrompt(null);
+        <Dialog open={showAgentChat} onOpenChange={(open) => {
+          if (!open) {
+            setShowAgentChat(false);
+            setSearching(false);
+            setAnalysisPrompt(null);
+          }
         }}>
-          <DialogContent className="max-w-4xl h-[80vh] p-0">
+          <DialogContent className="max-w-4xl h-[85vh] p-0">
             <AgentChat 
+              key={analysisPrompt || 'chat'}
               agent={marketIntelligenceAgent}
               initialPrompt={analysisPrompt}
               onClose={() => {
