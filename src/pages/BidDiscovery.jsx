@@ -156,10 +156,11 @@ export default function BidDiscovery() {
       console.log('✅ Scraper response:', response.data);
 
       if (response.data.success && response.data.opportunities?.length > 0) {
-        await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-        toast.success(`✓ Found & stored ${response.data.opportunities.length} ${workTypeDisplay} bids!`);
+        setSearchResults(response.data.opportunities);
+        toast.success(`✓ Found ${response.data.opportunities.length} ${workTypeDisplay} bids in ${state}!`);
       } else if (response.data.success) {
-        toast.info(`No new ${workTypeDisplay} opportunities found right now. Showing ${opportunities.length} from database.`);
+        setSearchResults([]);
+        toast.info(`No ${workTypeDisplay} opportunities found right now.`);
       } else {
         toast.warning('Scraper had issues accessing government sites.');
       }
