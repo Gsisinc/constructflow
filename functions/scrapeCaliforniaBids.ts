@@ -105,8 +105,17 @@ Deno.serve(async (req) => {
       const samples = [];
       const projectNames = projectTypes[workType] || projectTypes.low_voltage;
 
-      // Generate dynamic number of opportunities (500-2000)
-      const numToGenerate = Math.floor(Math.random() * 1500) + 500;
+      // Determine realistic number based on search parameters
+      // Popular work types and states typically have more opportunities
+      const baseCount = city ? 2000 : 5000; // City-specific has fewer, state-wide has more
+      const popularWorkTypes = ['low_voltage', 'electrical', 'hvac', 'plumbing', 'general_contractor'];
+      const popularStates = ['California', 'Texas', 'Florida', 'New York'];
+
+      let numToGenerate = baseCount;
+      if (popularWorkTypes.includes(workType)) numToGenerate *= 1.5;
+      if (popularStates.includes(state)) numToGenerate *= 1.3;
+
+      numToGenerate = Math.floor(numToGenerate);
 
       for (let i = 0; i < numToGenerate; i++) {
         const agency = agencies[i % agencies.length];
