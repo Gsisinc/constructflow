@@ -2,25 +2,41 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Send, X, Paperclip, Bot, User } from 'lucide-react';
+import { Loader2, Send, X, Paperclip, Bot, User, DollarSign, Calendar, MapPin, ExternalLink, Plus, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
+import { format } from 'date-fns';
+import { useQueryClient } from '@tanstack/react-query';
 
-export default function AgentChat({ agent, onClose }) {
+export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [opportunities, setOpportunities] = useState([]);
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     initializeConversation();
   }, [agent]);
+
+  useEffect(() => {
+    if (initialPrompt && conversation) {
+      setInput(initialPrompt);
+      setTimeout(() => handleSend(), 500);
+    }
+  }, [conversation, initialPrompt]);
+
+  useEffect(() => {
+    // Fetch opportunities whenever messages update
+    fetchOpportunities();
+  }, [messages]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -79,6 +95,57 @@ export default function AgentChat({ agent, onClose }) {
     }
   };
 
+  const fetchOpportunities = async () => {
+    try {
+      const opps = await base44.entities.BidOpportunity.list('-created_date', 50);
+      setOpportunities(opps);
+    } catch (error) {
+      console.error('Failed to fetch opportunities:', error);
+    }
+  };
+
+  const handleAddToBids = async (opportunity) => {
+    try {
+      await base44.entities.Bid.create({
+        rfp_name: opportunity.project_name || opportunity.title,
+        client_name: opportunity.agency || opportunity.client_name,
+        status: 'draft',
+        bid_amount: opportunity.estimated_value || 0,
+        due_date: opportunity.due_date,
+        win_probability: opportunity.win_probability || 50,
+        notes: opportunity.description
+      });
+      queryClient.invalidateQueries({ queryKey: ['bids'] });
+      toast.success('Added to bid pipeline!');
+    } catch (error) {
+      toast.error('Failed to add bid');
+      console.error(error);
+    }
+  };
+
+  const handleAnalyze = async (opportunity) => {
+    const analysisPrompt = `Please provide a comprehensive analysis of this bid opportunity:
+
+**Project:** ${opportunity.title || opportunity.project_name}
+**Agency:** ${opportunity.agency || opportunity.client_name}
+**Location:** ${opportunity.location || 'Not specified'}
+**Value:** $${opportunity.estimated_value?.toLocaleString() || 'TBD'}
+**Due Date:** ${opportunity.due_date ? format(new Date(opportunity.due_date), 'MMMM d, yyyy') : 'Not specified'}
+**Source:** ${opportunity.url || 'N/A'}
+
+Please analyze and provide:
+1. Detailed scope and requirements
+2. Key contact information
+3. Important dates and milestones  
+4. Required documents and attachments
+5. Potential challenges and risks
+6. Win probability assessment
+7. Recommendation on whether to bid`;
+
+    setInput(analysisPrompt);
+    handleSend();
+  };
+
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !conversation) return;
@@ -100,6 +167,91 @@ export default function AgentChat({ agent, onClose }) {
     } finally {
       setUploading(false);
     }
+  };
+
+  const BidOpportunityCard = ({ opportunity }) => {
+    const statusColors = {
+      active: 'bg-green-100 text-green-700',
+      upcoming: 'bg-blue-100 text-blue-700',
+      closing_soon: 'bg-orange-100 text-orange-700',
+      new: 'bg-purple-100 text-purple-700'
+    };
+
+    return (
+      <Card className="mb-3 hover:shadow-md transition-all">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <Badge className={statusColors[opportunity.status] || 'bg-slate-100 text-slate-700'}>
+                {opportunity.status?.replace('_', ' ').toUpperCase()}
+              </Badge>
+              <CardTitle className="mt-2 text-base">{opportunity.project_name || opportunity.title}</CardTitle>
+              <CardDescription className="text-sm">
+                {opportunity.agency || opportunity.client_name}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0 space-y-3">
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {opportunity.estimated_value && (
+              <div className="flex items-center gap-1.5">
+                <DollarSign className="h-3.5 w-3.5 text-slate-400" />
+                <span className="font-medium">${opportunity.estimated_value?.toLocaleString()}</span>
+              </div>
+            )}
+            {opportunity.due_date && (
+              <div className="flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                <span>{format(new Date(opportunity.due_date), 'MMM d')}</span>
+              </div>
+            )}
+            {opportunity.location && (
+              <div className="flex items-center gap-1.5 col-span-2">
+                <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                <span className="truncate text-slate-600">{opportunity.location}</span>
+              </div>
+            )}
+          </div>
+          
+          {opportunity.description && (
+            <p className="text-xs text-slate-600 line-clamp-2">{opportunity.description}</p>
+          )}
+
+          <div className="flex gap-2">
+            <Button 
+              size="sm"
+              className="flex-1 h-8 text-xs gap-1.5"
+              onClick={() => handleAnalyze(opportunity)}
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Full Analysis
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="flex-1 h-8 text-xs gap-1.5"
+              onClick={() => handleAddToBids(opportunity)}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Add to Bids
+            </Button>
+          </div>
+          
+          {opportunity.url && (
+            <Button 
+              size="sm" 
+              variant="ghost"
+              className="w-full h-7 text-xs gap-1.5"
+              onClick={() => window.open(opportunity.url, '_blank')}
+            >
+              <ExternalLink className="h-3 w-3" />
+              View Source
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    );
   };
 
   const MessageBubble = ({ message }) => {
@@ -193,7 +345,21 @@ export default function AgentChat({ agent, onClose }) {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6">
           <div>
-            {messages.length === 0 && (
+            {/* Opportunities Cards */}
+            {opportunities.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="text-sm font-semibold text-slate-700">Discovered Opportunities ({opportunities.length})</h3>
+                </div>
+                <div className="space-y-3">
+                  {opportunities.slice(0, 10).map((opp) => (
+                    <BidOpportunityCard key={opp.id} opportunity={opp} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {messages.length === 0 && opportunities.length === 0 && (
               <div className="text-center py-12">
                 <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white mb-4`}>
                   <Bot className="h-8 w-8" />

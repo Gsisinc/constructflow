@@ -97,29 +97,30 @@ export default function BidDiscovery() {
     }
   };
 
+  const [analysisPrompt, setAnalysisPrompt] = useState(null);
+
   const handleAnalyzeBid = (bid) => {
-    setSelectedBid(bid);
-    setShowAgentChat(true);
-    // Auto-send analysis request
-    setTimeout(() => {
-      const analysisPrompt = `Please provide a full analysis of this bid opportunity:
+    const prompt = `Please provide a comprehensive analysis of this bid opportunity:
 
-Title: ${bid.title || bid.project_name}
-Agency: ${bid.agency || bid.client_name}
-Location: ${bid.location}
-Estimated Value: $${bid.estimated_value?.toLocaleString() || 'N/A'}
-Due Date: ${bid.due_date ? format(new Date(bid.due_date), 'MMMM d, yyyy') : 'N/A'}
+**Project:** ${bid.title || bid.project_name}
+**Agency:** ${bid.agency || bid.client_name}
+**Location:** ${bid.location || 'Not specified'}
+**Value:** $${bid.estimated_value?.toLocaleString() || 'TBD'}
+**Due Date:** ${bid.due_date ? format(new Date(bid.due_date), 'MMMM d, yyyy') : 'Not specified'}
+**Source:** ${bid.url || 'N/A'}
 
-Please analyze:
-1. Key requirements and specifications
-2. Contact information for questions
-3. Important dates and deadlines
+Please analyze and provide:
+1. Detailed scope and requirements
+2. Key contact information
+3. Important dates and milestones
 4. Required documents and attachments
-5. Potential challenges and opportunities
-6. Recommendation on whether we should bid`;
-      
-      // This will be sent when chat is ready
-    }, 500);
+5. Potential challenges and risks
+6. Win probability assessment
+7. Recommendation on whether to bid`;
+
+    setAnalysisPrompt(prompt);
+    setSelectedBid(null);
+    setShowAgentChat(true);
   };
 
   const handleCreateProject = async (opportunity) => {
@@ -430,13 +431,19 @@ Please analyze:
 
       {/* Agent Chat Dialog */}
       {showAgentChat && (
-        <Dialog open={showAgentChat} onOpenChange={setShowAgentChat}>
+        <Dialog open={showAgentChat} onOpenChange={() => {
+          setShowAgentChat(false);
+          setSearching(false);
+          setAnalysisPrompt(null);
+        }}>
           <DialogContent className="max-w-4xl h-[80vh] p-0">
             <AgentChat 
-              agent={marketIntelligenceAgent} 
+              agent={marketIntelligenceAgent}
+              initialPrompt={analysisPrompt}
               onClose={() => {
                 setShowAgentChat(false);
                 setSearching(false);
+                setAnalysisPrompt(null);
               }} 
             />
           </DialogContent>
