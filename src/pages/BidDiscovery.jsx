@@ -128,10 +128,13 @@ export default function BidDiscovery() {
   // Auto-search when filters change - AGGRESSIVE MODE
   useEffect(() => {
     if (workType && workType !== 'all') {
+      setSearchResults([]); // Clear previous results
       const timer = setTimeout(() => {
         performAutoSearch();
       }, 500); // Debounce for 500ms
       return () => clearTimeout(timer);
+    } else {
+      setSearchResults([]);
     }
   }, [workType, state, cityCounty]);
 
