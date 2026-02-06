@@ -345,20 +345,6 @@ Please analyze and provide:
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6">
           <div>
-            {/* Opportunities Cards */}
-            {opportunities.length > 0 && (
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <h3 className="text-sm font-semibold text-slate-700">Discovered Opportunities ({opportunities.length})</h3>
-                </div>
-                <div className="space-y-3">
-                  {opportunities.slice(0, 10).map((opp) => (
-                    <BidOpportunityCard key={opp.id} opportunity={opp} />
-                  ))}
-                </div>
-              </div>
-            )}
-
             {messages.length === 0 && opportunities.length === 0 && (
               <div className="text-center py-12">
                 <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white mb-4`}>
@@ -379,6 +365,21 @@ Please analyze and provide:
             {messages.map((msg, idx) => (
               <MessageBubble key={idx} message={msg} />
             ))}
+
+            {/* Opportunities Cards - Show after messages */}
+            {opportunities.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b">
+                  <Sparkles className="h-4 w-4 text-blue-600" />
+                  <h3 className="text-sm font-semibold text-slate-700">Discovered Opportunities ({opportunities.length})</h3>
+                </div>
+                <div className="space-y-3">
+                  {opportunities.map((opp) => (
+                    <BidOpportunityCard key={opp.id} opportunity={opp} />
+                  ))}
+                </div>
+              </div>
+            )}
             
             {loading && (
               <div className="flex gap-3 justify-start mb-4">
