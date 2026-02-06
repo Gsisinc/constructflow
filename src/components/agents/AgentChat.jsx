@@ -255,7 +255,10 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
                   {(() => {
                     try {
                       const date = new Date(opportunity.due_date);
-                      return isNaN(date.getTime()) ? opportunity.due_date : format(date, 'MMM d');
+                      if (isNaN(date.getTime())) {
+                        return opportunity.due_date;
+                      }
+                      return format(date, 'MMM d');
                     } catch {
                       return opportunity.due_date;
                     }
