@@ -194,36 +194,44 @@ export default function BidDiscovery() {
         });
       }
       
+      // Build detailed search parameters
+      const workTypeDisplay = workType !== 'all' ? workType.replace('_', ' ') : 'all types';
+      const locationDisplay = cityCounty ? `${cityCounty}, ${state}` : state;
+      
       // Send comprehensive search request to agent
       const searchPrompt = `URGENT: I need you to find and save at least 100 construction bid opportunities.
 
-Search Query: ${query}
+SEARCH PARAMETERS:
+- Work Type: ${workTypeDisplay} (ONLY find ${workTypeDisplay} projects - ignore other types)
+- Location: ${locationDisplay} (ONLY find projects in this location)
+- Custom Query: ${query}
 
-INSTRUCTIONS:
-1. Use web search extensively to check ALL these sources:
-   - SAM.gov (federal contracts)
-   - State procurement websites for the specified state
-   - County and city bid boards in the specified location
-   - BidClerk.com, ConstructConnect, Dodge Data, BidNet
-   - School district procurement sites
-   - Public works department websites
-   - Local government bid boards
+CRITICAL INSTRUCTIONS:
+1. Use web search extensively with these EXACT keywords:
+   - "${workTypeDisplay} construction bids ${locationDisplay}"
+   - "${workTypeDisplay} RFP ${locationDisplay}"
+   - "${workTypeDisplay} projects ${locationDisplay}"
+   - Search SAM.gov, ${state} procurement, BidClerk, ConstructConnect, Dodge Data, BidNet
+   - Search ${cityCounty || state} city/county bid boards
 
 2. For EVERY opportunity you find, you MUST create a BidOpportunity record with:
-   - title or project_name
+   - title or project_name (the project title)
    - agency (who is posting it)
-   - location
+   - location (must include "${locationDisplay}")
    - estimated_value (if available)
    - due_date (when bids are due)
    - description
    - url (source link)
+   - project_type: "${workType}" (CRITICAL: set to exactly this value)
    - status: "active"
 
-3. MINIMUM TARGET: 100 opportunities. Do not stop until you've created at least 100 records.
+3. ONLY CREATE RECORDS FOR ${workTypeDisplay.toUpperCase()} PROJECTS IN ${locationDisplay.toUpperCase()}
 
-4. Focus on recently posted opportunities (last 30 days).
+4. MINIMUM TARGET: 100 opportunities. Search with multiple keyword variations until you find 100+.
 
-START SEARCHING NOW and create BidOpportunity records for everything you find.`;
+5. Focus on recently posted opportunities (last 30 days).
+
+START SEARCHING NOW. Use web search for every query. Create BidOpportunity records for EVERYTHING you find.`;
       
       await base44.agents.addMessage(conversation, {
         role: 'user',
