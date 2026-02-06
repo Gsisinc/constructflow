@@ -118,30 +118,7 @@ export default function BidDiscovery() {
 
   const [searchResults, setSearchResults] = useState([]);
 
-  // Filter opportunities based on selected filters
-  const opportunities = allOpportunities.filter(opp => {
-    // Filter by work type
-    if (workType && workType !== 'all') {
-      const oppType = (opp.project_type?.toLowerCase() || opp.title?.toLowerCase() || opp.project_name?.toLowerCase() || '');
-      const searchType = workType.toLowerCase();
-      const searchTypeWithSpace = workType.replace('_', ' ').toLowerCase();
-      if (!oppType.includes(searchType) && !oppType.includes(searchTypeWithSpace)) return false;
-    }
-    
-    // Filter by state
-    if (state) {
-      const oppLocation = (opp.location || '').toLowerCase();
-      if (!oppLocation.includes(state.toLowerCase())) return false;
-    }
-    
-    // Filter by city/county
-    if (cityCounty) {
-      const oppLocation = (opp.location || '').toLowerCase();
-      if (!oppLocation.includes(cityCounty.toLowerCase())) return false;
-    }
-    
-    return true;
-  });
+  const opportunities = searchResults;
 
   const { data: bids = [] } = useQuery({
     queryKey: ['bids'],
