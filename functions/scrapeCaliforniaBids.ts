@@ -37,6 +37,26 @@ Deno.serve(async (req) => {
         'New York': {
           agencies: ['NY State DOT', 'NYC Dept of Design', 'MTA', 'Port Authority NY/NJ', 'NYC Schools', 'Erie County', 'Westchester County', 'SUNY System', 'CUNY System', 'Long Island Power'],
           cities: city ? [city] : ['New York City', 'Buffalo', 'Rochester', 'Yonkers', 'Syracuse', 'Albany', 'New Rochelle', 'White Plains', 'Schenectady', 'Utica']
+        },
+        'Arizona': {
+          agencies: ['Arizona DOT', 'Phoenix Public Works', 'Maricopa County', 'Tucson Utilities', 'Mesa City Services', 'Pima County', 'Arizona State University', 'University of Arizona', 'Phoenix Sky Harbor', 'Arizona Water Authority'],
+          cities: city ? [city] : ['Phoenix', 'Tucson', 'Mesa', 'Chandler', 'Scottsdale', 'Glendale', 'Tempe', 'Flagstaff', 'Peoria', 'Gilbert']
+        },
+        'Washington': {
+          agencies: ['Washington State DOT', 'Seattle Public Utilities', 'King County', 'Spokane Public Works', 'Sound Transit', 'Pierce County', 'University of Washington', 'Washington State University', 'Port of Seattle', 'Snohomish County'],
+          cities: city ? [city] : ['Seattle', 'Spokane', 'Tacoma', 'Vancouver', 'Bellevue', 'Kent', 'Everett', 'Renton', 'Yakima', 'Federal Way']
+        },
+        'Colorado': {
+          agencies: ['Colorado DOT', 'Denver Public Works', 'Denver County', 'Colorado Springs Utilities', 'RTD', 'Boulder County', 'University of Colorado', 'Colorado State University', 'Denver Water', 'Aurora Public Works'],
+          cities: city ? [city] : ['Denver', 'Colorado Springs', 'Aurora', 'Fort Collins', 'Boulder', 'Pueblo', 'Lakewood', 'Arvada', 'Westminster', 'Centennial']
+        },
+        'Oregon': {
+          agencies: ['Oregon DOT', 'Portland Bureau of Transportation', 'Multnomah County', 'TriMet', 'Eugene Public Works', 'Lane County', 'Oregon State University', 'University of Oregon', 'Portland Water Bureau', 'Salem Public Works'],
+          cities: city ? [city] : ['Portland', 'Salem', 'Eugene', 'Gresham', 'Hillsboro', 'Beaverton', 'Bend', 'Medford', 'Springfield', 'Corvallis']
+        },
+        'Nevada': {
+          agencies: ['Nevada DOT', 'Las Vegas Public Works', 'Clark County', 'Henderson Utilities', 'RTC Southern Nevada', 'Washoe County', 'UNLV', 'University of Nevada Reno', 'Las Vegas Water Authority', 'North Las Vegas'],
+          cities: city ? [city] : ['Las Vegas', 'Henderson', 'Reno', 'North Las Vegas', 'Sparks', 'Carson City', 'Pahrump', 'Elko', 'Mesquite', 'Boulder City']
         }
       };
 
