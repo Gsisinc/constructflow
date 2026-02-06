@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       const samples = [];
       const projectNames = projectTypes[workType] || projectTypes.low_voltage;
       
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 1000; i++) {
         const agency = agencies[i % agencies.length];
         const projectName = projectNames[i % projectNames.length];
         const selectedCity = cities[i % cities.length];
