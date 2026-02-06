@@ -23,7 +23,9 @@ import {
   ExternalLink,
   Sparkles,
   Bot,
-  Loader2
+  Loader2,
+  Trash2,
+  ListChecks
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -107,6 +109,21 @@ export default function BidDiscovery() {
     }
   });
 
+  const deleteBidMutation = useMutation({
+    mutationFn: (bidId) => base44.entities.Bid.delete(bidId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bids'] });
+      toast.success('Bid removed from pipeline');
+    }
+  });
+
+  const updateBidMutation = useMutation({
+    mutationFn: ({ bidId, data }) => base44.entities.Bid.update(bidId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bids'] });
+    }
+  });
+
   const handleSearch = async () => {
     const query = searchQuery.trim() || buildSearchQuery();
     if (!query) return;
@@ -119,6 +136,9 @@ export default function BidDiscovery() {
 
   const handleAddToPipeline = async (opportunity) => {
     try {
+      // Generate checklist from requirements
+      const checklist = generateChecklist(opportunity);
+      
       await createBidMutation.mutateAsync({
         rfp_name: opportunity.project_name || opportunity.title,
         client_name: opportunity.agency || opportunity.client,
@@ -126,11 +146,73 @@ export default function BidDiscovery() {
         bid_amount: opportunity.estimated_value || 0,
         due_date: opportunity.due_date,
         win_probability: opportunity.win_probability || 50,
-        notes: opportunity.description
+        notes: opportunity.description,
+        documents: checklist
       });
       setSelectedBid(null);
     } catch (error) {
       toast.error('Failed to add bid');
+    }
+  };
+
+  const generateChecklist = (opportunity) => {
+    const checklist = [];
+    
+    // Add requirements as checklist items
+    if (opportunity.requirements && opportunity.requirements.length > 0) {
+      opportunity.requirements.forEach(req => {
+        checklist.push(`☐ ${req}`);
+      });
+    }
+    
+    // Add default checklist items
+    const defaultItems = [
+      '☐ Review project scope and requirements',
+      '☐ Gather pricing from suppliers/subcontractors',
+      '☐ Prepare technical proposal',
+      '☐ Review and verify all certifications',
+      '☐ Complete financial proposal',
+      '☐ Internal review and approval',
+      '☐ Final submission preparation'
+    ];
+    
+    defaultItems.forEach(item => {
+      if (!checklist.some(c => c.includes(item.substring(2)))) {
+        checklist.push(item);
+      }
+    });
+    
+    return checklist;
+  };
+
+  const handleDeleteBid = async (bidId) => {
+    if (!confirm('Are you sure you want to delete this bid from your pipeline?')) return;
+    
+    try {
+      await deleteBidMutation.mutateAsync(bidId);
+    } catch (error) {
+      toast.error('Failed to delete bid');
+    }
+  };
+
+  const handleToggleChecklistItem = async (bid, index) => {
+    const updatedDocuments = [...(bid.documents || [])];
+    const item = updatedDocuments[index];
+    
+    // Toggle checkbox
+    if (item.startsWith('☐')) {
+      updatedDocuments[index] = item.replace('☐', '☑');
+    } else {
+      updatedDocuments[index] = item.replace('☑', '☐');
+    }
+    
+    try {
+      await updateBidMutation.mutateAsync({
+        bidId: bid.id,
+        data: { documents: updatedDocuments }
+      });
+    } catch (error) {
+      toast.error('Failed to update checklist');
     }
   };
 
@@ -486,43 +568,88 @@ Please analyze and provide:
                         <CardTitle>{bid.rfp_name}</CardTitle>
                         <CardDescription>{bid.client_name}</CardDescription>
                       </div>
-                      <Badge>{bid.status}</Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge>{bid.status}</Badge>
+                        {bid.documents && bid.documents.length > 0 && (
+                          <Badge variant="outline" className="gap-1">
+                            <ListChecks className="h-3 w-3" />
+                            {bid.documents.filter(d => d.startsWith('☑')).length}/{bid.documents.length}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-6 text-sm">
-                        {bid.bid_amount > 0 && (
-                          <div>
-                            <span className="text-slate-500">Amount: </span>
-                            <span className="font-medium">${bid.bid_amount?.toLocaleString()}</span>
-                          </div>
-                        )}
-                        {bid.due_date && (
-                          <div>
-                            <span className="text-slate-500">Due: </span>
-                            <span className="font-medium">
-                              {(() => {
-                                try {
-                                  const date = new Date(bid.due_date);
-                                  return isNaN(date.getTime()) ? bid.due_date : format(date, 'MMM d, yyyy');
-                                } catch {
-                                  return bid.due_date;
-                                }
-                              })()}
-                            </span>
-                          </div>
-                        )}
-                        {bid.win_probability && (
-                          <div>
-                            <span className="text-slate-500">Win Rate: </span>
-                            <span className="font-medium text-green-600">{bid.win_probability}%</span>
-                          </div>
-                        )}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-6 text-sm">
+                          {bid.bid_amount > 0 && (
+                            <div>
+                              <span className="text-slate-500">Amount: </span>
+                              <span className="font-medium">${bid.bid_amount?.toLocaleString()}</span>
+                            </div>
+                          )}
+                          {bid.due_date && (
+                            <div>
+                              <span className="text-slate-500">Due: </span>
+                              <span className="font-medium">
+                                {(() => {
+                                  try {
+                                    const date = new Date(bid.due_date);
+                                    return isNaN(date.getTime()) ? bid.due_date : format(date, 'MMM d, yyyy');
+                                  } catch {
+                                    return bid.due_date;
+                                  }
+                                })()}
+                              </span>
+                            </div>
+                          )}
+                          {bid.win_probability && (
+                            <div>
+                              <span className="text-slate-500">Win Rate: </span>
+                              <span className="font-medium text-green-600">{bid.win_probability}%</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => setSelectedBid(bid)}>
+                            View Details
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => handleDeleteBid(bid.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <Button size="sm" onClick={() => setSelectedBid(bid)}>
-                        View Details
-                      </Button>
+
+                      {/* Checklist */}
+                      {bid.documents && bid.documents.length > 0 && (
+                        <div className="border-t pt-4">
+                          <p className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                            <ListChecks className="h-4 w-4" />
+                            Bid Requirements Checklist
+                          </p>
+                          <div className="space-y-1.5">
+                            {bid.documents.map((item, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => handleToggleChecklistItem(bid, idx)}
+                                className="w-full text-left px-3 py-2 rounded hover:bg-slate-50 transition-colors text-sm flex items-start gap-2"
+                              >
+                                <span className={item.startsWith('☑') ? 'text-green-600' : 'text-slate-400'}>
+                                  {item.startsWith('☑') ? '☑' : '☐'}
+                                </span>
+                                <span className={item.startsWith('☑') ? 'line-through text-slate-400' : 'text-slate-700'}>
+                                  {item.substring(2)}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
