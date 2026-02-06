@@ -59,13 +59,27 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
   const initializeConversation = async () => {
     try {
-      const conv = await base44.agents.createConversation({
-        agent_name: agent.id,
-        metadata: {
-          name: `${agent.name} Session`,
-          description: `Chat with ${agent.name}`
-        }
+      // Try to load existing conversation first
+      const existingConversations = await base44.agents.listConversations({
+        agent_name: agent.id
       });
+      
+      let conv;
+      if (existingConversations && existingConversations.length > 0) {
+        // Use the most recent conversation
+        conv = existingConversations[0];
+        console.log('Loading existing conversation:', conv.id);
+      } else {
+        // Create new conversation if none exists
+        conv = await base44.agents.createConversation({
+          agent_name: agent.id,
+          metadata: {
+            name: `${agent.name} Session`,
+            description: `Chat with ${agent.name}`
+          }
+        });
+        console.log('Created new conversation:', conv.id);
+      }
       
       setConversation(conv);
       setMessages(conv.messages || []);
