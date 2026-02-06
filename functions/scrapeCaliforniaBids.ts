@@ -14,8 +14,8 @@ Deno.serve(async (req) => {
     const opportunities = [];
     const sitesScraped = [];
 
-    // AGGRESSIVE: Generate sample opportunities if scraping fails or returns < 20 results
-    const generateSampleOpportunities = () => {
+    // Real nationwide bid sites to scrape
+    const realBidSites = [
       // State-specific agencies and cities
       const stateData = {
         'California': {
@@ -147,18 +147,26 @@ Deno.serve(async (req) => {
         });
       }
       
-      return samples;
-    };
-
-    // California state sites to scrape
-    const sites = [
-      { name: 'Cal eProcure', url: 'https://www.bidcalifornia.ca.gov/search/index', selector: '.bid-row' },
-      { name: 'LA County', url: 'https://www.lacounty.gov/business/contracting-opportunities/', selector: '.opportunity' },
-      { name: 'San Diego County', url: 'https://buynet.sdcounty.ca.gov/psp/SDPROD/SUPPLIER/ERP/h/?tab=DEFAULT', selector: '.bid-listing' },
-    ];
+      // SAM.gov - Federal bids
+      { name: 'SAM.gov', url: `https://sam.gov/search/?index=opp&page=1&sort=-modifiedDate&sfm%5Bstatus%5D%5Bis_active%5D=true&sfm%5BsimpleSearch%5D%5BkeywordRadio%5D=ANY`, selector: '.opportunity-row' },
+      // BidNet
+      { name: 'BidNet', url: `https://www.bidnet.com/bneattach/find-bids?keywords=${workType}`, selector: '.bid-item' },
+      // DemandStar
+      { name: 'DemandStar', url: `https://www.demandstar.com/supplier/bids/open`, selector: '.bid-listing' },
+      // PlanetBids
+      { name: 'PlanetBids', url: `https://www.planetbids.com/portal/portal.cfm`, selector: 'table tr' },
+      // PublicPurchase.com
+      { name: 'PublicPurchase', url: `https://www.publicpurchase.com/gems/register,search/`, selector: '.solicitation' },
+      // BidSync
+      { name: 'BidSync', url: `https://www.bidsync.com/bidsync-browse.cfm`, selector: '.bid-row' },
+      // Periscope
+      { name: 'Periscope S2G', url: `https://ws.periscopeholdings.com/PublicBids/search`, selector: '.bid-result' },
+      // State portals
+      { name: `${state} Procurement`, url: `https://procurement.${state.toLowerCase().replace(' ', '')}.gov`, selector: 'table tr, .bid-item' },
+      ];
 
     // Scrape each site
-    for (const site of sites) {
+    for (const site of realBidSites) {
       try {
         const response = await fetch(site.url, {
           headers: {
@@ -216,38 +224,24 @@ Deno.serve(async (req) => {
         });
 
         sitesScraped.push(site.name);
-      } catch (err) {
+        } catch (err) {
         console.error(`Failed to scrape ${site.name}:`, err.message);
-      }
-    }
+        }
+        }
 
-    // If scraping didn't find enough, generate samples
-    if (opportunities.length < 20) {
-      console.log('⚠️ Low scraping results, generating sample opportunities...');
-      const samples = generateSampleOpportunities();
-      opportunities.push(...samples);
-    }
-
-    // DON'T save to database - just return results
-    // Only save when user adds to bids
-    // Calculate total from generation logic
-    const baseCount = city ? 500 : 1500;
-    const popularWorkTypes = ['low_voltage', 'electrical', 'hvac', 'plumbing', 'general_contractor'];
-    const popularStates = ['California', 'Texas', 'Florida', 'New York'];
-    let totalCount = baseCount;
-    if (popularWorkTypes.includes(workType)) totalCount *= 1.3;
-    if (popularStates.includes(state)) totalCount *= 1.2;
-    totalCount = Math.floor(totalCount);
-
+        // Pagination logic
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize, opportunities.length);
+        const paginatedOpportunities = opportunities.slice(startIndex, endIndex);
     return Response.json({
       success: true,
-      opportunities,
+      opportunities: paginatedOpportunities,
       sitesScraped,
-      totalFound: opportunities.length,
-      totalAvailable: totalCount,
+      totalFound: paginatedOpportunities.length,
+      totalAvailable: opportunities.length,
       currentPage: page,
-      totalPages: Math.ceil(totalCount / pageSize),
-      hasMore: page < Math.ceil(totalCount / pageSize)
+      totalPages: Math.ceil(opportunities.length / pageSize),
+      hasMore: page < Math.ceil(opportunities.length / pageSize)
     });
 
   } catch (error) {
