@@ -44,6 +44,7 @@ export default function AgentChat({ agent, onClose }) {
 
       // Subscribe to real-time updates
       const unsubscribe = base44.agents.subscribeToConversation(conv.id, (data) => {
+        console.log('Received conversation update:', data);
         setMessages(data.messages);
         setLoading(false);
       });
@@ -64,10 +65,13 @@ export default function AgentChat({ agent, onClose }) {
     setLoading(true);
 
     try {
+      console.log('Sending message:', userMessage);
+      console.log('Conversation:', conversation);
       await base44.agents.addMessage(conversation, {
         role: 'user',
         content: userMessage
       });
+      console.log('Message sent successfully');
     } catch (error) {
       toast.error('Failed to send message: ' + (error.message || 'Unknown error'));
       console.error('Send message error:', error);
