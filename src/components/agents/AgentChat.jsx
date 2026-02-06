@@ -191,7 +191,7 @@ export default function AgentChat({ agent, onClose }) {
 
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
         {/* Messages */}
-        <ScrollArea className="flex-1 p-6">
+        <div className="flex-1 overflow-y-auto p-6">
           <div>
             {messages.length === 0 && (
               <div className="text-center py-12">
@@ -227,7 +227,7 @@ export default function AgentChat({ agent, onClose }) {
             
             <div ref={scrollRef} />
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Input */}
         <div className="border-t p-4 flex-shrink-0">
