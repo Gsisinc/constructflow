@@ -116,7 +116,7 @@ export default function BidDiscovery() {
 
   const availableCities = citiesByState[state] || [];
 
-  const { data: opportunities = [] } = useQuery({
+  const { data: allOpportunities = [] } = useQuery({
     queryKey: ['bidOpportunities'],
     queryFn: async () => {
       const opps = await base44.entities.BidOpportunity.list('-created_date', 200);
@@ -127,6 +127,30 @@ export default function BidDiscovery() {
         return new Date(a.due_date) - new Date(b.due_date);
       });
     }
+  });
+
+  // Filter opportunities based on selected filters
+  const opportunities = allOpportunities.filter(opp => {
+    // Filter by work type
+    if (workType && workType !== 'all') {
+      const oppType = opp.project_type?.toLowerCase() || opp.title?.toLowerCase() || opp.project_name?.toLowerCase() || '';
+      const searchType = workType.replace('_', ' ').toLowerCase();
+      if (!oppType.includes(searchType)) return false;
+    }
+    
+    // Filter by state
+    if (state) {
+      const oppLocation = (opp.location || '').toLowerCase();
+      if (!oppLocation.includes(state.toLowerCase())) return false;
+    }
+    
+    // Filter by city/county
+    if (cityCounty) {
+      const oppLocation = (opp.location || '').toLowerCase();
+      if (!oppLocation.includes(cityCounty.toLowerCase())) return false;
+    }
+    
+    return true;
   });
 
   const { data: bids = [] } = useQuery({
