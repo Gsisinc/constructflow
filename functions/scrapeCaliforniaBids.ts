@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { workType, state, city } = await req.json();
+    const { workType, state, city, page = 1, pageSize = 500 } = await req.json();
 
     const opportunities = [];
     const sitesScraped = [];
@@ -116,10 +116,13 @@ Deno.serve(async (req) => {
       if (popularStates.includes(state)) numToGenerate *= 1.2;
 
       numToGenerate = Math.floor(numToGenerate);
-      // Cap at 3000 to avoid timeouts
-      numToGenerate = Math.min(numToGenerate, 3000);
 
-      for (let i = 0; i < numToGenerate; i++) {
+      // Calculate total pages and slice for current page
+      const totalOpportunities = numToGenerate;
+      const startIndex = (page - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, totalOpportunities);
+
+      for (let i = startIndex; i < endIndex; i++) {
         const agency = agencies[i % agencies.length];
         const projectName = projectNames[i % projectNames.length];
         const selectedCity = stateCities[i % stateCities.length];
@@ -227,11 +230,24 @@ Deno.serve(async (req) => {
 
     // DON'T save to database - just return results
     // Only save when user adds to bids
+    // Calculate total from generation logic
+    const baseCount = city ? 500 : 1500;
+    const popularWorkTypes = ['low_voltage', 'electrical', 'hvac', 'plumbing', 'general_contractor'];
+    const popularStates = ['California', 'Texas', 'Florida', 'New York'];
+    let totalCount = baseCount;
+    if (popularWorkTypes.includes(workType)) totalCount *= 1.3;
+    if (popularStates.includes(state)) totalCount *= 1.2;
+    totalCount = Math.floor(totalCount);
+
     return Response.json({
       success: true,
       opportunities,
       sitesScraped,
-      totalFound: opportunities.length
+      totalFound: opportunities.length,
+      totalAvailable: totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / pageSize),
+      hasMore: page < Math.ceil(totalCount / pageSize)
     });
 
   } catch (error) {

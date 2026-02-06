@@ -49,6 +49,11 @@ export default function BidDiscovery() {
   const [cityCounty, setCityCounty] = useState('');
   const [workType, setWorkType] = useState('all');
   const [autoSearchEnabled, setAutoSearchEnabled] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalAvailable, setTotalAvailable] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const queryClient = useQueryClient();
 
   const states = [
@@ -129,12 +134,14 @@ export default function BidDiscovery() {
   useEffect(() => {
     if (workType && workType !== 'all') {
       setSearchResults([]); // Clear previous results
+      setCurrentPage(1); // Reset to page 1
       const timer = setTimeout(() => {
         performAutoSearch();
       }, 500); // Debounce for 500ms
       return () => clearTimeout(timer);
     } else {
       setSearchResults([]);
+      setCurrentPage(1);
     }
   }, [workType, state, cityCounty]);
 
@@ -144,25 +151,36 @@ export default function BidDiscovery() {
     await executeAISearch();
   };
 
-  const executeAISearch = async () => {
+  const executeAISearch = async (page = 1) => {
     setSearching(true);
     const workTypeDisplay = workType.replace('_', ' ');
-    toast.info(`🔍 Fetching ${workTypeDisplay} opportunities in ${state}...`);
+    toast.info(`🔍 Fetching ${workTypeDisplay} opportunities in ${state} (page ${page})...`);
 
     try {
       const response = await base44.functions.invoke('scrapeCaliforniaBids', {
         workType: workType,
         state: state,
-        city: cityCounty || null
+        city: cityCounty || null,
+        page: page,
+        pageSize: 500
       });
 
       console.log('✅ Scraper response:', response.data);
 
       if (response.data.success && response.data.opportunities?.length > 0) {
-        setSearchResults(response.data.opportunities);
-        toast.success(`✓ Found ${response.data.opportunities.length} ${workTypeDisplay} bids in ${state}!`);
+        if (page === 1) {
+          setSearchResults(response.data.opportunities);
+        } else {
+          setSearchResults(prev => [...prev, ...response.data.opportunities]);
+        }
+        setTotalPages(response.data.totalPages || 1);
+        setTotalAvailable(response.data.totalAvailable || response.data.opportunities.length);
+        setHasMore(response.data.hasMore || false);
+        setCurrentPage(page);
+        toast.success(`✓ Found ${response.data.opportunities.length} ${workTypeDisplay} bids (${response.data.totalAvailable} total available)!`);
       } else if (response.data.success) {
         setSearchResults([]);
+        setHasMore(false);
         toast.info(`No ${workTypeDisplay} opportunities found right now.`);
       } else {
         toast.warning('Scraper had issues accessing government sites.');
@@ -172,7 +190,14 @@ export default function BidDiscovery() {
       toast.error('Failed to fetch: ' + error.message);
     } finally {
       setSearching(false);
+      setLoadingMore(false);
     }
+  };
+
+  const loadMoreResults = async () => {
+    if (!hasMore || loadingMore) return;
+    setLoadingMore(true);
+    await executeAISearch(currentPage + 1);
   };
 
   const buildSearchQuery = () => {
@@ -764,10 +789,43 @@ Provide:
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {opportunities.map((opp) => (
-                <BidCard key={opp.id} bid={opp} />
-              ))}
+            <div className="space-y-6">
+              {totalAvailable > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+                  <p className="text-sm text-blue-900">
+                    Showing <span className="font-semibold">{opportunities.length}</span> of <span className="font-semibold">{totalAvailable}</span> opportunities
+                    {hasMore && ` • Page ${currentPage} of ${totalPages}`}
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {opportunities.map((opp, idx) => (
+                  <BidCard key={`${opp.id || idx}-${opp.title}`} bid={opp} />
+                ))}
+              </div>
+
+              {hasMore && (
+                <div className="flex justify-center pt-6">
+                  <Button 
+                    onClick={loadMoreResults} 
+                    disabled={loadingMore}
+                    size="lg"
+                    className="gap-2"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Loading Page {currentPage + 1}...
+                      </>
+                    ) : (
+                      <>
+                        Load More ({totalAvailable - opportunities.length} remaining)
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </TabsContent>
