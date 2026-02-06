@@ -176,39 +176,35 @@ export default function BidDiscovery() {
 
   const executeAISearch = async (query) => {
     setSearching(true);
-    toast.info('AI searching web for opportunities. This may take 30-60 seconds...');
+    toast.info('Searching the web for bid opportunities...');
     
     try {
-      // Build detailed search parameters
-      const workTypeDisplay = workType !== 'all' ? workType.replace('_', ' ') : 'all construction';
+      // Build search parameters
+      const workTypeDisplay = workType !== 'all' ? workType.replace('_', ' ') : 'construction';
       const locationDisplay = cityCounty ? `${cityCounty}, ${state}` : state;
+      const searchKeywords = query || `${workTypeDisplay} bids in ${locationDisplay}`;
       
       // Direct web search with structured output
-      const searchPrompt = `Search the web comprehensively and find at least 50 active construction bid opportunities matching these criteria:
+      const searchPrompt = `Search the web and find at least 30 active construction bid opportunities.
 
-SEARCH FOR:
-- Work Type: ${workTypeDisplay}
-- Location: ${locationDisplay}
-- Additional: ${query}
+SEARCH KEYWORDS: ${searchKeywords}
+WORK TYPE: ${workTypeDisplay} (fire alarm, HVAC, low voltage, electrical, etc.)
+LOCATION: ${locationDisplay}
 
-SEARCH THESE SOURCES (use multiple searches):
-1. SAM.gov for "${workTypeDisplay} bids ${locationDisplay}"
-2. ${state} state procurement website for "${workTypeDisplay} RFP"
-3. BidClerk.com, ConstructConnect for "${workTypeDisplay} projects ${locationDisplay}"
-4. ${cityCounty || state} city/county government bid boards
-5. School district procurement sites in ${locationDisplay}
-6. Public works departments for "${workTypeDisplay} ${locationDisplay}"
+Use web search to check:
+- SAM.gov federal contracts
+- ${state} state procurement portal
+- BidClerk, ConstructConnect, Dodge Data
+- County/city bid boards in ${locationDisplay}
 
-For each opportunity found, extract:
-- Project title/name
-- Issuing agency/organization
-- Full location (city, state)
-- Estimated project value (if available)
-- Bid due date
-- Project description
-- Original source URL
-
-Find at least 50 opportunities. Search thoroughly across multiple websites.`;
+Extract ALL opportunities found. For each, provide:
+- title: Project name
+- agency: Issuing organization
+- location: Full address or city, state
+- estimated_value: Dollar amount (number)
+- due_date: Bid due date (YYYY-MM-DD format)
+- description: Brief project details
+- url: Source website link`;
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: searchPrompt,
@@ -222,46 +218,47 @@ Find at least 50 opportunities. Search thoroughly across multiple websites.`;
                 type: "object",
                 properties: {
                   title: { type: "string" },
-                  project_name: { type: "string" },
                   agency: { type: "string" },
                   location: { type: "string" },
                   estimated_value: { type: "number" },
                   due_date: { type: "string" },
                   description: { type: "string" },
                   url: { type: "string" }
-                }
+                },
+                required: ["title"]
               }
             }
-          }
+          },
+          required: ["opportunities"]
         }
       });
 
-      // Bulk create opportunities
-      if (response.opportunities && response.opportunities.length > 0) {
+      console.log('Search response:', response);
+
+      // Create opportunities
+      if (response?.opportunities?.length > 0) {
         const records = response.opportunities.map(opp => ({
-          title: opp.title || opp.project_name,
-          project_name: opp.project_name || opp.title,
-          agency: opp.agency,
-          location: opp.location,
+          title: opp.title,
+          project_name: opp.title,
+          agency: opp.agency || 'Unknown Agency',
+          location: opp.location || locationDisplay,
           estimated_value: opp.estimated_value || 0,
-          due_date: opp.due_date,
-          description: opp.description,
-          url: opp.url,
+          due_date: opp.due_date || null,
+          description: opp.description || '',
+          url: opp.url || '',
           project_type: workType !== 'all' ? workType : 'general_contractor',
           status: 'active'
         }));
 
         await base44.entities.BidOpportunity.bulkCreate(records);
-        
-        // Refresh opportunities list
         await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-        toast.success(`Found and saved ${records.length} opportunities!`);
+        toast.success(`Found ${records.length} opportunities!`);
       } else {
-        toast.warning('No opportunities found. Try different search terms.');
+        toast.warning('No opportunities found. Try different filters.');
       }
     } catch (error) {
+      console.error('Search error:', error);
       toast.error('Search failed: ' + error.message);
-      console.error(error);
     } finally {
       setSearching(false);
     }
