@@ -177,120 +177,25 @@ export default function BidDiscovery() {
 
   const executeAISearch = async (query) => {
     setSearching(true);
-    toast.info('Scraping California government bid sites...');
+    toast.info('Scraping California bid sites with real web scraper...');
 
     try {
-      const workTypeDisplay = workType !== 'all' ? workType.replace('_', ' ') : 'construction';
-      const locationDisplay = cityCounty ? `${cityCounty}, ${state}` : state;
-
-      const searchPrompt = `You are a web scraper extracting REAL construction bid opportunities from California government websites.
-
-      CRITICAL: You MUST ONLY extract ${workTypeDisplay.toUpperCase()} opportunities. Filter out ALL other types.
-
-      SCRAPE THESE SITES FOR ${workTypeDisplay.toUpperCase()} BIDS ONLY:
-
-  PRIMARY TARGETS (visit these first):
-  1. https://www.bidcalifornia.ca.gov - Cal eProcure main portal
-  2. https://buynet.sdcounty.ca.gov - San Diego County
-  3. https://www.lacounty.gov/bid - Los Angeles County
-  4. https://www.ocgov.com/purchasing - Orange County
-  5. https://www.sccgov.org/bid - Santa Clara County
-  6. https://www.lacity.gov/business - City of LA
-  7. https://www.sandiego.gov/bid - City of San Diego
-  8. https://www.sanjoseca.gov/bid - City of San Jose
-  9. https://www.sf.gov/bid - San Francisco
-  10. https://dot.ca.gov/bid - Caltrans
-
-  ALSO CHECK:
-  - https://www.metro.net/bid (LA Metro)
-  - https://www.bart.gov/bid (BART)
-  - https://achieve.lausd.net/bid (LA Schools)
-  - https://www.portofsandiego.org/bid (Port of SD)
-  - https://www.flysfo.com/bid (SFO Airport)
-
-  EXTRACTION INSTRUCTIONS:
-  1. Visit each URL and extract the actual bid listings page
-  2. Look for tables, lists, or cards containing bid opportunities
-  3. **CRITICAL FILTERING**: Extract ONLY bids that are specifically for ${workTypeDisplay} work
-     - Keywords to match: ${workTypeDisplay}, ${workTypeDisplay.replace('_', ' ')}
-     - Example: If searching "fire alarm", only include projects explicitly about fire alarm systems, fire detection, fire safety
-     - REJECT any bid that doesn't specifically mention ${workTypeDisplay} in title or description
-  4. For EACH bid found, extract:
-  - title: Full project name from the listing
-  - agency: The government entity posting it
-  - location: City/County in California
-  - estimated_value: Dollar amount if shown (as number, no $)
-  - due_date: Bid due date in YYYY-MM-DD format
-  - description: Scope of work or project description
-  - url: Direct link to the full bid details
-
-  5. CRITICAL: Return at least 50-100 REAL opportunities you actually found by scraping these pages
-  6. If a site is inaccessible, move to the next one
-  7. Only include bids with due dates after today (2026-02-06)
-
-  Return the extracted data in JSON format.`;
-
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: searchPrompt,
-        add_context_from_internet: true,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            opportunities: {
-              type: "array",
-              minItems: 20,
-              items: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  agency: { type: "string" },
-                  location: { type: "string" },
-                  estimated_value: { type: "number" },
-                  due_date: { type: "string" },
-                  description: { type: "string" },
-                  url: { type: "string" }
-                },
-                required: ["title", "agency", "location"]
-              }
-            },
-            sites_scraped: {
-              type: "array",
-              items: { type: "string" }
-            },
-            total_found: { type: "number" }
-          },
-          required: ["opportunities"]
-        }
+      const response = await base44.functions.invoke('scrapeCaliforniaBids', {
+        workType: workType,
+        state: state,
+        city: cityCounty || null
       });
 
-      console.log('Scraping Response:', response);
-      console.log('Sites scraped:', response?.sites_scraped);
-      console.log('Opportunities found:', response?.total_found || response?.opportunities?.length);
+      console.log('Scraper response:', response.data);
 
-      if (response?.opportunities && Array.isArray(response.opportunities) && response.opportunities.length > 0) {
-        const oppsToCreate = response.opportunities.map(opp => ({
-          title: opp.title || 'Untitled Project',
-          project_name: opp.title || 'Untitled Project',
-          agency: opp.agency || 'Unknown',
-          location: opp.location || locationDisplay,
-          estimated_value: opp.estimated_value || 0,
-          due_date: opp.due_date || null,
-          description: opp.description || '',
-          url: opp.url || '',
-          source: response.sites_scraped?.join(', ') || 'CA Government Sites',
-          project_type: workType !== 'all' ? workType : 'general_contractor',
-          status: 'active'
-        }));
-
-        await base44.entities.BidOpportunity.bulkCreate(oppsToCreate);
+      if (response.data.success && response.data.opportunities?.length > 0) {
         await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-        toast.success(`✓ Scraped ${response.opportunities.length} opportunities from ${response.sites_scraped?.length || 'multiple'} sites!`);
+        toast.success(`✓ Found ${response.data.opportunities.length} ${workType.replace('_', ' ')} opportunities from ${response.data.sitesScraped.length} sites!`);
       } else {
-        console.error('No opportunities found:', response);
-        toast.error('Web scraping found no accessible bid data. Sites may require authentication.');
+        toast.warning('No opportunities found. Government sites may be down or require login.');
       }
     } catch (error) {
-      console.error('Search error:', error);
+      console.error('Scraper error:', error);
       toast.error('Scraping failed: ' + error.message);
     } finally {
       setSearching(false);
