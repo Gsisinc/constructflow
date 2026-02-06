@@ -176,95 +176,22 @@ export default function BidDiscovery() {
 
   const executeAISearch = async (query) => {
     setSearching(true);
-    toast.info('Searching the web for bid opportunities...');
-    
+    toast.info('Scraping bid sites for opportunities...');
+
     try {
-      // Build search parameters
-      const workTypeDisplay = workType !== 'all' ? workType.replace('_', ' ') : 'construction';
-      const locationDisplay = cityCounty ? `${cityCounty}, ${state}` : state;
-      const searchKeywords = query || `${workTypeDisplay} bids in ${locationDisplay}`;
-      
-      // Direct web search with structured output
-      const searchPrompt = `You are an expert at finding construction bid opportunities. Search the web THOROUGHLY and find ALL active bids for ${workTypeDisplay} projects in ${locationDisplay}.
-
-CRITICAL INSTRUCTIONS:
-1. Search multiple platforms:
-   - sam.gov (search for "${workTypeDisplay} ${state}")
-   - bidclerk.com (search location: ${state || 'nationwide'})
-   - constructconnect.com 
-   - dodgedata.com (if accessible)
-   - ${state} state procurement office website
-   - county and city government bid portals in ${locationDisplay}
-   - public works departments
-   - school district RFPs
-   - higher education RFPs
-
-2. Look for exact bid postings, not general categories
-3. Extract actual posted opportunities with real details
-4. Include bids from the last 30 days that haven't closed yet
-
-For EACH opportunity found, provide:
-{
-  "title": "exact project name",
-  "agency": "organization posting the bid",
-  "location": "city, state or full address",
-  "estimated_value": actual dollar number (required),
-  "due_date": "YYYY-MM-DD format",
-  "description": "2-3 sentences about the project",
-  "url": "direct link to the bid posting"
-}
-
-Return minimum 20 real opportunities. Focus on actual posted bids, not search results links.`;
-
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: searchPrompt,
-        add_context_from_internet: true,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            opportunities: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  agency: { type: "string" },
-                  location: { type: "string" },
-                  estimated_value: { type: "number" },
-                  due_date: { type: "string" },
-                  description: { type: "string" },
-                  url: { type: "string" }
-                },
-                required: ["title"]
-              }
-            }
-          },
-          required: ["opportunities"]
-        }
+      const response = await base44.functions.invoke('scrapeBidSites', {
+        workType: workType !== 'all' ? workType : 'low_voltage',
+        state: state,
+        city: cityCounty || null
       });
 
-      console.log('Search response:', response);
+      console.log('Scraping response:', response);
 
-      // Create opportunities
-      if (response?.opportunities?.length > 0) {
-        const records = response.opportunities.map(opp => ({
-          title: opp.title,
-          project_name: opp.title,
-          agency: opp.agency || 'Unknown Agency',
-          location: opp.location || locationDisplay,
-          estimated_value: opp.estimated_value || 0,
-          due_date: opp.due_date || null,
-          description: opp.description || '',
-          url: opp.url || '',
-          project_type: workType !== 'all' ? workType : 'general_contractor',
-          status: 'active'
-        }));
-
-        await base44.entities.BidOpportunity.bulkCreate(records);
+      if (response.data.success && response.data.count > 0) {
         await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-        toast.success(`Found ${records.length} opportunities!`);
+        toast.success(`Found ${response.data.count} opportunities!`);
       } else {
-        toast.warning('No opportunities found. Try different filters.');
+        toast.warning('No opportunities found. Try different filters or wait a moment and try again.');
       }
     } catch (error) {
       console.error('Search error:', error);
