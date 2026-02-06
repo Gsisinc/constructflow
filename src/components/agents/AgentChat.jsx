@@ -38,27 +38,22 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   }, [conversation]);
 
   useEffect(() => {
-    // Only fetch opportunities after we have messages (agent has responded)
+    // Only fetch opportunities once when we first get messages
     if (messages.length > 0) {
       fetchOpportunities();
-      
-      // Poll for new opportunities every 2 seconds while conversation is active
-      const interval = setInterval(() => {
-        fetchOpportunities();
-      }, 2000);
-      
-      return () => clearInterval(interval);
     }
   }, [messages.length]);
 
   useEffect(() => {
-    // Scroll to bottom when messages or opportunities update
+    // Scroll to bottom when messages update
     if (chatContainerRef.current) {
-      setTimeout(() => {
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-      }, 100);
+      requestAnimationFrame(() => {
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+      });
     }
-  }, [messages, opportunities]);
+  }, [messages.length]);
 
   const initializeConversation = async () => {
     try {
@@ -89,13 +84,16 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
       setLoading(false);
 
       // Subscribe to real-time updates
-      const unsubscribe = base44.agents.subscribeToConversation(conv.id, (data) => {
-        console.log('Received conversation update:', data);
-        setMessages(data.messages);
-        setLoading(false);
-      });
+      if (conv.id) {
+        const unsubscribe = base44.agents.subscribeToConversation(conv.id, (data) => {
+          setMessages(data.messages || []);
+          setLoading(false);
+        });
 
-      return () => unsubscribe();
+        return () => {
+          if (unsubscribe) unsubscribe();
+        };
+      }
     } catch (error) {
       toast.error('Failed to start conversation: ' + (error.message || 'Unknown error'));
       console.error('Init conversation error:', error);
@@ -111,16 +109,14 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     setLoading(true);
 
     try {
-      console.log('Sending message:', userMessage);
-      console.log('Conversation:', conversation);
       await base44.agents.addMessage(conversation, {
         role: 'user',
         content: userMessage
       });
-      console.log('Message sent successfully');
+      // Fetch opportunities after sending message
+      setTimeout(() => fetchOpportunities(), 2000);
     } catch (error) {
-      toast.error('Failed to send message: ' + (error.message || 'Unknown error'));
-      console.error('Send message error:', error);
+      toast.error('Failed to send message');
       setLoading(false);
     }
   };
