@@ -228,7 +228,16 @@ Please reference the complete details you stored when you first found this oppor
             {opportunity.due_date && (
               <div className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                <span>{format(new Date(opportunity.due_date), 'MMM d')}</span>
+                <span>
+                  {(() => {
+                    try {
+                      const date = new Date(opportunity.due_date);
+                      return isNaN(date.getTime()) ? opportunity.due_date : format(date, 'MMM d');
+                    } catch {
+                      return opportunity.due_date;
+                    }
+                  })()}
+                </span>
               </div>
             )}
             {opportunity.location && (
