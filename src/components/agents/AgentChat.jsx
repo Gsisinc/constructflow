@@ -34,16 +34,18 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   }, [conversation, initialPrompt]);
 
   useEffect(() => {
-    // Fetch opportunities every 3 seconds to show newly created ones
-    const interval = setInterval(() => {
+    // Only fetch opportunities after we have messages (agent has responded)
+    if (messages.length > 0) {
       fetchOpportunities();
-    }, 3000);
-    
-    // Also fetch on mount and when messages change
-    fetchOpportunities();
-    
-    return () => clearInterval(interval);
-  }, []);
+      
+      // Poll for new opportunities every 3 seconds while conversation is active
+      const interval = setInterval(() => {
+        fetchOpportunities();
+      }, 3000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [messages.length]);
 
   useEffect(() => {
     if (scrollRef.current) {
