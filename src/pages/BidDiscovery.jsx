@@ -152,7 +152,7 @@ export default function BidDiscovery() {
 
   const executeAISearch = async (query) => {
     setSearching(true);
-    toast.info('AI agent searching 100+ bid websites...');
+    toast.info('AI agent searching 100+ bid websites. This will take 30-60 seconds...');
     
     try {
       // Create or get agent conversation
@@ -170,20 +170,48 @@ export default function BidDiscovery() {
         });
       }
       
-      // Send search request to agent
-      const searchPrompt = `${query}. Search comprehensively across ALL major bid posting websites (SAM.gov, all state procurement portals, BidClerk, ConstructConnect, Dodge, BidNet, county/city sites, etc.). Find at least 100 active opportunities. Create a BidOpportunity record for EVERY opportunity you find with complete details including project name, agency, location, value, due date, description, and source URL.`;
+      // Send comprehensive search request to agent
+      const searchPrompt = `URGENT: I need you to find and save at least 100 construction bid opportunities.
+
+Search Query: ${query}
+
+INSTRUCTIONS:
+1. Use web search extensively to check ALL these sources:
+   - SAM.gov (federal contracts)
+   - State procurement websites for the specified state
+   - County and city bid boards in the specified location
+   - BidClerk.com, ConstructConnect, Dodge Data, BidNet
+   - School district procurement sites
+   - Public works department websites
+   - Local government bid boards
+
+2. For EVERY opportunity you find, you MUST create a BidOpportunity record with:
+   - title or project_name
+   - agency (who is posting it)
+   - location
+   - estimated_value (if available)
+   - due_date (when bids are due)
+   - description
+   - url (source link)
+   - status: "active"
+
+3. MINIMUM TARGET: 100 opportunities. Do not stop until you've created at least 100 records.
+
+4. Focus on recently posted opportunities (last 30 days).
+
+START SEARCHING NOW and create BidOpportunity records for everything you find.`;
       
       await base44.agents.addMessage(conversation, {
         role: 'user',
         content: searchPrompt
       });
       
-      // Wait a bit for agent to process
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Wait longer for agent to complete comprehensive search
+      await new Promise(resolve => setTimeout(resolve, 10000));
       
       // Refresh opportunities list
       await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-      toast.success('Search complete! New opportunities discovered.');
+      toast.success('Search complete! Check discovered opportunities tab.');
     } catch (error) {
       toast.error('Search failed: ' + error.message);
       console.error(error);
