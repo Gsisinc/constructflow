@@ -66,9 +66,8 @@ export default function AgentChat({ agent, onClose }) {
         content: userMessage
       });
     } catch (error) {
-      toast.error('Failed to send message');
-      console.error(error);
-    } finally {
+      toast.error('Failed to send message: ' + (error.message || 'Unknown error'));
+      console.error('Send message error:', error);
       setLoading(false);
     }
   };
