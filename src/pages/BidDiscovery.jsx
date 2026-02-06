@@ -137,13 +137,22 @@ export default function BidDiscovery() {
   const [analysisPrompt, setAnalysisPrompt] = useState(null);
 
   const handleAnalyzeBid = (bid) => {
+    const formatDate = (dateStr) => {
+      try {
+        const date = new Date(dateStr);
+        return isNaN(date.getTime()) ? dateStr : format(date, 'MMMM d, yyyy');
+      } catch {
+        return dateStr;
+      }
+    };
+
     const prompt = `Please provide a comprehensive analysis of this bid opportunity:
 
 **Project:** ${bid.title || bid.project_name}
 **Agency:** ${bid.agency || bid.client_name}
 **Location:** ${bid.location || 'Not specified'}
 **Value:** $${bid.estimated_value?.toLocaleString() || 'TBD'}
-**Due Date:** ${bid.due_date ? format(new Date(bid.due_date), 'MMMM d, yyyy') : 'Not specified'}
+**Due Date:** ${bid.due_date ? formatDate(bid.due_date) : 'Not specified'}
 **Source:** ${bid.url || 'N/A'}
 
 Please analyze and provide:
@@ -218,7 +227,16 @@ Please analyze and provide:
               {bid.due_date && (
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-slate-400" />
-                  <span>{format(new Date(bid.due_date), 'MMM d, yyyy')}</span>
+                  <span>
+                    {(() => {
+                      try {
+                        const date = new Date(bid.due_date);
+                        return isNaN(date.getTime()) ? bid.due_date : format(date, 'MMM d, yyyy');
+                      } catch {
+                        return bid.due_date;
+                      }
+                    })()}
+                  </span>
                 </div>
               )}
               {bid.location && (
@@ -483,7 +501,16 @@ Please analyze and provide:
                         {bid.due_date && (
                           <div>
                             <span className="text-slate-500">Due: </span>
-                            <span className="font-medium">{format(new Date(bid.due_date), 'MMM d, yyyy')}</span>
+                            <span className="font-medium">
+                              {(() => {
+                                try {
+                                  const date = new Date(bid.due_date);
+                                  return isNaN(date.getTime()) ? bid.due_date : format(date, 'MMM d, yyyy');
+                                } catch {
+                                  return bid.due_date;
+                                }
+                              })()}
+                            </span>
                           </div>
                         )}
                         {bid.win_probability && (
@@ -559,7 +586,16 @@ Please analyze and provide:
                 {selectedBid.due_date && (
                   <div>
                     <p className="text-sm text-slate-500">Due Date</p>
-                    <p className="font-medium">{format(new Date(selectedBid.due_date), 'MMMM d, yyyy')}</p>
+                    <p className="font-medium">
+                      {(() => {
+                        try {
+                          const date = new Date(selectedBid.due_date);
+                          return isNaN(date.getTime()) ? selectedBid.due_date : format(date, 'MMMM d, yyyy');
+                        } catch {
+                          return selectedBid.due_date;
+                        }
+                      })()}
+                    </p>
                   </div>
                 )}
               </div>
