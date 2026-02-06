@@ -50,6 +50,16 @@ export default function BidDiscovery() {
   const [autoSearchEnabled, setAutoSearchEnabled] = useState(true);
   const queryClient = useQueryClient();
 
+  const states = [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+    'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+    'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+    'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+    'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+    'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+    'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+  ];
+
   const { data: opportunities = [] } = useQuery({
     queryKey: ['bidOpportunities'],
     queryFn: () => base44.entities.BidOpportunity.list('-created_date', 150)
@@ -480,10 +490,10 @@ Provide:
         <div className="mt-6 space-y-3">
           <div className="flex gap-3">
             <Select value={workType} onValueChange={setWorkType}>
-              <SelectTrigger className="w-[200px] bg-white text-slate-900 h-12">
+              <SelectTrigger className="w-[220px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="Type of Work" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[400px]">
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="low_voltage">Low Voltage</SelectItem>
                 <SelectItem value="data_cabling">Data Cabling</SelectItem>
@@ -491,19 +501,42 @@ Provide:
                 <SelectItem value="av_systems">AV Systems</SelectItem>
                 <SelectItem value="fiber_optic">Fiber Optic</SelectItem>
                 <SelectItem value="access_control">Access Control</SelectItem>
+                <SelectItem value="fire_alarm">Fire Alarm</SelectItem>
+                <SelectItem value="telecommunications">Telecommunications</SelectItem>
                 <SelectItem value="electrical">Electrical</SelectItem>
                 <SelectItem value="hvac">HVAC</SelectItem>
                 <SelectItem value="plumbing">Plumbing</SelectItem>
+                <SelectItem value="mechanical">Mechanical</SelectItem>
+                <SelectItem value="roofing">Roofing</SelectItem>
+                <SelectItem value="concrete">Concrete</SelectItem>
+                <SelectItem value="masonry">Masonry</SelectItem>
+                <SelectItem value="carpentry">Carpentry</SelectItem>
+                <SelectItem value="framing">Framing</SelectItem>
+                <SelectItem value="drywall">Drywall</SelectItem>
+                <SelectItem value="painting">Painting</SelectItem>
+                <SelectItem value="flooring">Flooring</SelectItem>
+                <SelectItem value="landscaping">Landscaping</SelectItem>
+                <SelectItem value="excavation">Excavation</SelectItem>
+                <SelectItem value="sitework">Sitework</SelectItem>
+                <SelectItem value="demolition">Demolition</SelectItem>
+                <SelectItem value="environmental">Environmental</SelectItem>
+                <SelectItem value="asbestos_abatement">Asbestos Abatement</SelectItem>
                 <SelectItem value="general_contractor">General Contractor</SelectItem>
+                <SelectItem value="design_build">Design-Build</SelectItem>
+                <SelectItem value="construction_management">Construction Management</SelectItem>
               </SelectContent>
             </Select>
 
-            <Input
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="City or State (e.g., California, Los Angeles)"
-              className="w-[250px] bg-white text-slate-900 h-12"
-            />
+            <Select value={city} onValueChange={setCity}>
+              <SelectTrigger className="w-[200px] bg-white text-slate-900 h-12">
+                <SelectValue placeholder="State" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[400px]">
+                {states.map(state => (
+                  <SelectItem key={state} value={state}>{state}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <Button
               variant={autoSearchEnabled ? "default" : "outline"}
