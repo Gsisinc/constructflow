@@ -376,10 +376,10 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden min-h-0">
+      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 p-6 overflow-y-scroll min-h-0">
-          <div>
+        <div className="flex-1 overflow-y-scroll">
+          <div className="p-6">
             {messages.length === 0 && opportunities.length === 0 && (
               <div className="text-center py-12">
                 <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white mb-4`}>
