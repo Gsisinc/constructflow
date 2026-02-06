@@ -34,9 +34,16 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   }, [conversation, initialPrompt]);
 
   useEffect(() => {
-    // Fetch opportunities whenever messages update
+    // Fetch opportunities every 3 seconds to show newly created ones
+    const interval = setInterval(() => {
+      fetchOpportunities();
+    }, 3000);
+    
+    // Also fetch on mount and when messages change
     fetchOpportunities();
-  }, [messages]);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -124,26 +131,28 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   };
 
   const handleAnalyze = async (opportunity) => {
-    const analysisPrompt = `Please provide a comprehensive analysis of this bid opportunity:
+    const analysisPrompt = `Please provide a comprehensive analysis of the bid opportunity you already researched and stored:
 
+**BID ID:** ${opportunity.id}
 **Project:** ${opportunity.title || opportunity.project_name}
 **Agency:** ${opportunity.agency || opportunity.client_name}
-**Location:** ${opportunity.location || 'Not specified'}
-**Value:** $${opportunity.estimated_value?.toLocaleString() || 'TBD'}
-**Due Date:** ${opportunity.due_date ? format(new Date(opportunity.due_date), 'MMMM d, yyyy') : 'Not specified'}
-**Source:** ${opportunity.url || 'N/A'}
 
-Please analyze and provide:
-1. Detailed scope and requirements
-2. Key contact information
-3. Important dates and milestones  
-4. Required documents and attachments
-5. Potential challenges and risks
-6. Win probability assessment
-7. Recommendation on whether to bid`;
+Using the detailed information you already extracted and stored for this bid, please provide a full analysis organized into these sections:
+
+1. **PROJECT OVERVIEW** - Summarize the project scope and objectives
+2. **KEY REQUIREMENTS** - List all technical, bonding, licensing, and qualification requirements
+3. **CONTACT INFORMATION** - Provide all contact details for questions and submissions
+4. **IMPORTANT DATES** - List all deadlines: bid due, pre-bid meetings, site visits, question deadlines
+5. **REQUIRED DOCUMENTS** - List all attachments and documents needed for submission
+6. **SCOPE DETAILS** - Detailed breakdown of work to be performed
+7. **CHALLENGES & RISKS** - Identify potential issues or concerns
+8. **WIN PROBABILITY** - Assess our chances (0-100%) based on project fit
+9. **RECOMMENDATION** - Should we bid? Why or why not?
+
+Please reference the complete details you stored when you first found this opportunity.`;
 
     setInput(analysisPrompt);
-    handleSend();
+    setTimeout(() => handleSend(), 100);
   };
 
   const handleFileUpload = async (e) => {
