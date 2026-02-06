@@ -69,6 +69,7 @@ import Team from './pages/Team';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import AIAgents from './pages/AIAgents';
+import BidDiscovery from './pages/BidDiscovery';
 import __Layout from './Layout.jsx';
 
 
@@ -95,6 +96,7 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "AIAgents": AIAgents,
+    "BidDiscovery": BidDiscovery,
 }
 
 export const pagesConfig = {

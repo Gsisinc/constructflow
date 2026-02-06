@@ -22,7 +22,8 @@ import {
   Clock,
   Settings,
   User,
-  Bot
+  Bot,
+  Search
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,6 +37,7 @@ const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
   { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
+  { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
   { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
   { name: 'Directory', icon: Users, page: 'Directory' },
   { name: 'Estimates', icon: DollarSign, page: 'Estimates' },

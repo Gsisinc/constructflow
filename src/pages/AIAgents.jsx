@@ -17,9 +17,12 @@ import {
   Sparkles,
   MessageCircle,
   ArrowRight,
-  Bot
+  Bot,
+  X
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import AgentChat from '../components/agents/AgentChat';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 const agents = [
   {
@@ -225,13 +228,6 @@ export default function AIAgents() {
                       <MessageCircle className="h-4 w-4" />
                       Chat Now
                     </Button>
-                    <Button 
-                      variant="outline"
-                      className="gap-2"
-                      onClick={() => window.open(getWhatsAppURL(agent.id), '_blank')}
-                    >
-                      💬 WhatsApp
-                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -302,47 +298,13 @@ export default function AIAgents() {
         </CardContent>
       </Card>
 
-      {/* Agent Chat Dialog - Placeholder for future implementation */}
+      {/* Agent Chat Dialog */}
       {selectedAgent && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-2xl w-full max-h-[80vh] overflow-hidden">
-            <CardHeader className={`bg-gradient-to-r ${selectedAgent.color} text-white`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {React.createElement(selectedAgent.icon, { className: 'h-6 w-6' })}
-                  <div>
-                    <CardTitle>{selectedAgent.name}</CardTitle>
-                    <CardDescription className="text-white/80">{selectedAgent.description}</CardDescription>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setSelectedAgent(null)} className="text-white">
-                  ×
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="text-center py-12">
-                <MessageCircle className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Coming Soon</h3>
-                <p className="text-slate-600 mb-6">
-                  Direct chat interface with {selectedAgent.name} will be available in the next update.
-                </p>
-                <div className="space-y-3">
-                  <Button 
-                    className="w-full gap-2"
-                    onClick={() => window.open(getWhatsAppURL(selectedAgent.id), '_blank')}
-                  >
-                    💬 Chat via WhatsApp
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" className="w-full" onClick={() => setSelectedAgent(null)}>
-                    Close
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Dialog open={!!selectedAgent} onOpenChange={() => setSelectedAgent(null)}>
+          <DialogContent className="max-w-4xl h-[80vh] p-0">
+            <AgentChat agent={selectedAgent} onClose={() => setSelectedAgent(null)} />
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
