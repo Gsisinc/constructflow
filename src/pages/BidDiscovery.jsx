@@ -270,10 +270,59 @@ Please analyze and provide:
   };
 
   const BidCard = ({ bid }) => {
+    const [expanded, setExpanded] = useState(false);
+    const [analyzing, setAnalyzing] = useState(false);
+    const [analysis, setAnalysis] = useState(null);
+    
     const statusColors = {
       active: 'bg-green-100 text-green-700',
       upcoming: 'bg-blue-100 text-blue-700',
       closing_soon: 'bg-orange-100 text-orange-700'
+    };
+
+    const handleAnalyze = async () => {
+      if (!expanded && !analysis) {
+        setExpanded(true);
+        setAnalyzing(true);
+        
+        const formatDate = (dateStr) => {
+          try {
+            const date = new Date(dateStr);
+            return isNaN(date.getTime()) ? dateStr : format(date, 'MMMM d, yyyy');
+          } catch {
+            return dateStr;
+          }
+        };
+
+        const analysisPrompt = `Analyze this bid opportunity and provide a detailed assessment:
+
+**Project:** ${bid.title || bid.project_name}
+**Agency:** ${bid.agency || bid.client_name}
+**Location:** ${bid.location || 'Not specified'}
+**Value:** $${bid.estimated_value?.toLocaleString() || 'TBD'}
+**Due Date:** ${bid.due_date ? formatDate(bid.due_date) : 'Not specified'}
+
+Provide:
+1. Feasibility Assessment (High/Medium/Low)
+2. Key Requirements & Scope
+3. Risk Factors
+4. Win Probability & Reasoning
+5. Recommendation (Bid/No Bid)`;
+
+        try {
+          const response = await base44.integrations.Core.InvokeLLM({
+            prompt: analysisPrompt,
+            add_context_from_internet: false
+          });
+          setAnalysis(response);
+        } catch (error) {
+          setAnalysis('Failed to generate analysis. Please try again.');
+        } finally {
+          setAnalyzing(false);
+        }
+      } else {
+        setExpanded(!expanded);
+      }
     };
 
     return (
@@ -329,8 +378,34 @@ Please analyze and provide:
               )}
             </div>
             
-            {bid.description && (
+            {bid.description && !expanded && (
               <p className="text-sm text-slate-600 line-clamp-3">{bid.description}</p>
+            )}
+
+            {expanded && (
+              <div className="space-y-3 pt-2 border-t">
+                {bid.description && (
+                  <div>
+                    <p className="text-xs font-semibold text-slate-700 mb-1">Description:</p>
+                    <p className="text-sm text-slate-600">{bid.description}</p>
+                  </div>
+                )}
+                
+                {analyzing ? (
+                  <div className="flex items-center gap-2 py-4">
+                    <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                    <p className="text-sm text-slate-600">Generating AI analysis...</p>
+                  </div>
+                ) : analysis ? (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-xs font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" />
+                      AI Analysis
+                    </p>
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{analysis}</p>
+                  </div>
+                ) : null}
+              </div>
             )}
 
             <div className="grid grid-cols-2 gap-2 pt-2">
@@ -338,10 +413,15 @@ Please analyze and provide:
                 size="sm"
                 variant="outline"
                 className="gap-2"
-                onClick={() => handleAnalyzeBid(bid)}
+                onClick={handleAnalyze}
+                disabled={analyzing}
               >
-                <Bot className="h-4 w-4" />
-                AI Analysis
+                {analyzing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Bot className="h-4 w-4" />
+                )}
+                {expanded ? 'Hide Analysis' : 'AI Analysis'}
               </Button>
               <Button 
                 size="sm" 
