@@ -106,8 +106,11 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
   const fetchOpportunities = async () => {
     try {
-      const opps = await base44.entities.BidOpportunity.list('-created_date', 50);
-      setOpportunities(opps);
+      // Only fetch opportunities created in the last 5 minutes (during this conversation)
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const allOpps = await base44.entities.BidOpportunity.list('-created_date', 50);
+      const recentOpps = allOpps.filter(opp => opp.created_date >= fiveMinutesAgo);
+      setOpportunities(recentOpps);
     } catch (error) {
       console.error('Failed to fetch opportunities:', error);
     }
@@ -354,7 +357,7 @@ Please reference the complete details you stored when you first found this oppor
 
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <ScrollArea className="flex-1 p-6">
           <div>
             {messages.length === 0 && opportunities.length === 0 && (
               <div className="text-center py-12">
@@ -405,7 +408,7 @@ Please reference the complete details you stored when you first found this oppor
             
             <div ref={scrollRef} />
           </div>
-        </div>
+        </ScrollArea>
 
         {/* Input */}
         <div className="border-t p-4 flex-shrink-0">
