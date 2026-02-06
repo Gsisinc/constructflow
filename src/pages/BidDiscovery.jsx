@@ -159,25 +159,26 @@ export default function BidDiscovery() {
     queryFn: () => base44.entities.Bid.list('-created_date', 20)
   });
 
-  // Auto-search when filters change
+  // Auto-search when filters change - AGGRESSIVE MODE
   useEffect(() => {
-    if (autoSearchEnabled && workType && workType !== 'all' && state) {
-      performAutoSearch();
+    if (workType && workType !== 'all') {
+      const timer = setTimeout(() => {
+        performAutoSearch();
+      }, 500); // Debounce for 500ms
+      return () => clearTimeout(timer);
     }
   }, [workType, state, cityCounty]);
 
   const performAutoSearch = async () => {
-    if (!workType || workType === 'all') return;
-    const query = buildSearchQuery();
-    if (query) {
-      console.log('Auto-search triggered:', query);
-      await executeAISearch(query);
-    }
+    if (!workType || workType === 'all' || searching) return;
+    console.log('🔍 AUTO-FETCHING:', workType, state, cityCounty || 'All Cities');
+    await executeAISearch();
   };
 
-  const executeAISearch = async (query) => {
+  const executeAISearch = async () => {
     setSearching(true);
-    toast.info('Scraping California bid sites with real web scraper...');
+    const workTypeDisplay = workType.replace('_', ' ');
+    toast.info(`🔍 Fetching ${workTypeDisplay} opportunities in ${state}...`);
 
     try {
       const response = await base44.functions.invoke('scrapeCaliforniaBids', {
@@ -186,17 +187,19 @@ export default function BidDiscovery() {
         city: cityCounty || null
       });
 
-      console.log('Scraper response:', response.data);
+      console.log('✅ Scraper response:', response.data);
 
       if (response.data.success && response.data.opportunities?.length > 0) {
         await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-        toast.success(`✓ Found ${response.data.opportunities.length} ${workType.replace('_', ' ')} opportunities from ${response.data.sitesScraped.length} sites!`);
+        toast.success(`✓ Found & stored ${response.data.opportunities.length} ${workTypeDisplay} bids!`);
+      } else if (response.data.success) {
+        toast.info(`No new ${workTypeDisplay} opportunities found right now. Showing ${opportunities.length} from database.`);
       } else {
-        toast.warning('No opportunities found. Government sites may be down or require login.');
+        toast.warning('Scraper had issues accessing government sites.');
       }
     } catch (error) {
-      console.error('Scraper error:', error);
-      toast.error('Scraping failed: ' + error.message);
+      console.error('❌ Scraper error:', error);
+      toast.error('Failed to fetch: ' + error.message);
     } finally {
       setSearching(false);
     }
@@ -262,11 +265,9 @@ export default function BidDiscovery() {
       toast.error('Please select a specific work type first');
       return;
     }
-    const query = searchQuery.trim() || buildSearchQuery();
-    if (!query) return;
     
     setSearchQuery('');
-    await executeAISearch(query);
+    await executeAISearch();
   };
 
   const handleAddToPipeline = async (opportunity) => {
@@ -680,14 +681,7 @@ Provide:
               </SelectContent>
             </Select>
 
-            <Button
-              variant={autoSearchEnabled ? "default" : "outline"}
-              onClick={() => setAutoSearchEnabled(!autoSearchEnabled)}
-              className={`gap-2 ${autoSearchEnabled ? 'bg-green-600 hover:bg-green-700' : 'bg-white text-slate-900'}`}
-            >
-              <Sparkles className="h-4 w-4" />
-              {autoSearchEnabled ? 'Auto-Search ON' : 'Enable Auto-Search'}
-            </Button>
+
           </div>
 
           {/* Recommended Search Display */}
