@@ -47,7 +47,7 @@ export default function BidDiscovery() {
   const [searching, setSearching] = useState(false);
   const [state, setState] = useState('California');
   const [cityCounty, setCityCounty] = useState('');
-  const [workType, setWorkType] = useState('low_voltage');
+  const [workType, setWorkType] = useState('all');
   const [autoSearchEnabled, setAutoSearchEnabled] = useState(true);
   const queryClient = useQueryClient();
 
