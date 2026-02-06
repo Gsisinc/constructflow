@@ -40,16 +40,19 @@ export default function AgentChat({ agent, onClose }) {
       
       setConversation(conv);
       setMessages(conv.messages || []);
+      setLoading(false);
 
       // Subscribe to real-time updates
       const unsubscribe = base44.agents.subscribeToConversation(conv.id, (data) => {
         setMessages(data.messages);
+        setLoading(false);
       });
 
       return () => unsubscribe();
     } catch (error) {
-      toast.error('Failed to start conversation');
-      console.error(error);
+      toast.error('Failed to start conversation: ' + (error.message || 'Unknown error'));
+      console.error('Init conversation error:', error);
+      setLoading(false);
     }
   };
 
