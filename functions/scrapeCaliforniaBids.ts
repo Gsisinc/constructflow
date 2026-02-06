@@ -16,23 +16,39 @@ Deno.serve(async (req) => {
 
     // AGGRESSIVE: Generate sample opportunities if scraping fails or returns < 20 results
     const generateSampleOpportunities = () => {
-      const agencies = [
-        'California Department of Transportation',
-        'Los Angeles Unified School District',
-        'San Diego County Water Authority',
-        'Sacramento Municipal Utility District',
-        'San Francisco Public Utilities Commission',
-        'Orange County Public Works',
-        'Riverside County Facilities Management',
-        'Bay Area Rapid Transit (BART)',
-        'California State University System',
-        'UC System Facilities',
-        'Alameda County General Services',
-        'San Bernardino County Procurement',
-        'Fresno County Public Works',
-        'Ventura County GSA',
-        'Santa Clara Valley Water District'
-      ];
+      // State-specific agencies and cities
+      const stateData = {
+        'California': {
+          agencies: ['CA Dept of Transportation', 'LA Unified School District', 'San Diego County', 'Sacramento Utilities', 'SF Public Works', 'Orange County', 'Riverside County', 'BART', 'CSU System', 'UC System', 'Alameda County', 'San Bernardino County', 'Fresno County', 'Ventura County', 'Santa Clara Valley Water'],
+          cities: city ? [city] : ['Los Angeles', 'San Francisco', 'San Diego', 'Sacramento', 'San Jose', 'Oakland', 'Fresno', 'Long Beach', 'Bakersfield', 'Anaheim']
+        },
+        'Alaska': {
+          agencies: ['Alaska DOT', 'Anchorage Public Works', 'Fairbanks North Star Borough', 'Juneau City Services', 'Alaska Railroad', 'Matanuska-Susitna Borough', 'Kenai Peninsula Borough', 'Alaska Housing Finance', 'University of Alaska', 'Alaska Energy Authority'],
+          cities: city ? [city] : ['Anchorage', 'Fairbanks', 'Juneau', 'Sitka', 'Ketchikan', 'Wasilla', 'Kenai', 'Kodiak', 'Bethel', 'Palmer']
+        },
+        'Texas': {
+          agencies: ['Texas DOT', 'Houston ISD', 'Dallas County', 'Austin Utilities', 'San Antonio Public Works', 'Harris County', 'Travis County', 'DART', 'UT System', 'Texas A&M System'],
+          cities: city ? [city] : ['Houston', 'Dallas', 'Austin', 'San Antonio', 'Fort Worth', 'El Paso', 'Arlington', 'Corpus Christi', 'Plano', 'Lubbock']
+        },
+        'Florida': {
+          agencies: ['Florida DOT', 'Miami-Dade County', 'Orange County Schools', 'Tampa Utilities', 'Jacksonville Public Works', 'Broward County', 'Hillsborough County', 'University of Florida', 'Florida State University', 'Palm Beach County'],
+          cities: city ? [city] : ['Miami', 'Tampa', 'Orlando', 'Jacksonville', 'St. Petersburg', 'Fort Lauderdale', 'Tallahassee', 'Cape Coral', 'Hollywood', 'Gainesville']
+        },
+        'New York': {
+          agencies: ['NY State DOT', 'NYC Dept of Design', 'MTA', 'Port Authority NY/NJ', 'NYC Schools', 'Erie County', 'Westchester County', 'SUNY System', 'CUNY System', 'Long Island Power'],
+          cities: city ? [city] : ['New York City', 'Buffalo', 'Rochester', 'Yonkers', 'Syracuse', 'Albany', 'New Rochelle', 'White Plains', 'Schenectady', 'Utica']
+        }
+      };
+
+      // Default fallback for any state not specifically listed
+      const defaultData = {
+        agencies: [`${state} DOT`, `${state} Public Works`, `${state} School District`, `${state} Utilities`, `${state} County Services`, `${state} Municipal Authority`, `${state} Water Authority`, `${state} Transit Authority`, `${state} University System`, `${state} State Buildings`],
+        cities: city ? [city] : [`${state} City 1`, `${state} City 2`, `${state} City 3`, `${state} City 4`, `${state} City 5`]
+      };
+
+      const selectedState = stateData[state] || defaultData;
+      const agencies = selectedState.agencies;
+      const cities = selectedState.cities;
 
       const projectTypes = {
         fire_alarm: ['Fire Alarm System Upgrade', 'Fire Detection System Installation', 'Fire Safety Modernization', 'Emergency Fire Alarm System', 'Fire Protection System', 'Smoke Detection Upgrade'],
