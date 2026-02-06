@@ -5,11 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Send, X, Paperclip, Bot, User, DollarSign, Calendar, MapPin, ExternalLink, Plus, Sparkles } from 'lucide-react';
+import { Loader2, Send, X, Paperclip, Bot, User, DollarSign, Calendar, MapPin, ExternalLink, Plus, Sparkles, History, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [conversation, setConversation] = useState(null);
@@ -18,10 +19,12 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [opportunities, setOpportunities] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
   const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
   useEffect(() => {
     initializeConversation();
@@ -50,9 +53,9 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
   useEffect(() => {
     // Scroll to bottom when messages or opportunities update
-    if (messagesEndRef.current) {
+    if (chatContainerRef.current) {
       setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
       }, 100);
     }
   }, [messages, opportunities]);
@@ -378,8 +381,27 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 overflow-y-scroll">
-          <div className="p-6">
+        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6">
+          {/* History Toggle - Only show if there are messages */}
+          {messages.length > 2 && (
+            <Collapsible open={showHistory} onOpenChange={setShowHistory} className="mb-4">
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full gap-2">
+                  <History className="h-4 w-4" />
+                  {showHistory ? 'Hide' : 'Show'} Chat History ({messages.length} messages)
+                  <ChevronDown className={`h-4 w-4 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-4 space-y-4 border-l-2 border-slate-200 pl-4">
+                {messages.slice(0, -2).map((msg, idx) => (
+                  <MessageBubble key={idx} message={msg} />
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+
+          {/* Current Conversation */}
+          <div>
             {messages.length === 0 && opportunities.length === 0 && (
               <div className="text-center py-12">
                 <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white mb-4`}>
@@ -397,8 +419,9 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
               </div>
             )}
             
-            {messages.map((msg, idx) => (
-              <MessageBubble key={idx} message={msg} />
+            {/* Show only recent messages (last 2) if history is collapsed */}
+            {messages.slice(messages.length > 2 && !showHistory ? -2 : 0).map((msg, idx) => (
+              <MessageBubble key={showHistory ? idx : messages.length - 2 + idx} message={msg} />
             ))}
 
             {/* Opportunities Cards - Show after messages */}
@@ -426,8 +449,6 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
                 </div>
               </div>
             )}
-            
-            <div ref={messagesEndRef} />
           </div>
         </div>
 
