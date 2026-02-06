@@ -104,8 +104,11 @@ Deno.serve(async (req) => {
 
       const samples = [];
       const projectNames = projectTypes[workType] || projectTypes.low_voltage;
-      
-      for (let i = 0; i < 1000; i++) {
+
+      // Generate dynamic number of opportunities (500-2000)
+      const numToGenerate = Math.floor(Math.random() * 1500) + 500;
+
+      for (let i = 0; i < numToGenerate; i++) {
         const agency = agencies[i % agencies.length];
         const projectName = projectNames[i % projectNames.length];
         const selectedCity = stateCities[i % stateCities.length];
