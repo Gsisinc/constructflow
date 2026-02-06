@@ -35,40 +35,35 @@ Deno.serve(async (req) => {
       ];
 
       const projectTypes = {
-        fire_alarm: [
-          'Fire Alarm System Upgrade for Municipal Building',
-          'Fire Detection System Installation - Public Library',
-          'Fire Safety System Modernization - School District',
-          'Emergency Fire Alarm System - County Hospital',
-          'Fire Protection System - Government Complex',
-          'Smoke Detection System Upgrade - Transit Station'
-        ],
-        low_voltage: [
-          'Low Voltage Infrastructure - New Office Building',
-          'Data Cabling and Network Installation - Campus Wide',
-          'Security Camera System Installation - Public Facilities',
-          'Access Control System Upgrade - Government Buildings',
-          'Structured Cabling System - Municipal Complex',
-          'Building Automation System - County Facility'
-        ],
-        security_systems: [
-          'Integrated Security System - Public Transit',
-          'Perimeter Security System - Water Treatment Plant',
-          'Video Surveillance Upgrade - Downtown Area',
-          'Access Control and CCTV - School Campuses'
-        ],
-        electrical: [
-          'Electrical System Upgrade - Government Center',
-          'Power Distribution Modernization - Hospital',
-          'LED Lighting Retrofit - County Buildings',
-          'Solar Panel Installation - Municipal Properties'
-        ],
-        hvac: [
-          'HVAC System Replacement - Public Library',
-          'Chiller Plant Upgrade - County Courthouse',
-          'Ventilation System Modernization - Schools',
-          'Energy Efficient HVAC - Government Offices'
-        ]
+        fire_alarm: ['Fire Alarm System Upgrade', 'Fire Detection System Installation', 'Fire Safety Modernization', 'Emergency Fire Alarm System', 'Fire Protection System', 'Smoke Detection Upgrade'],
+        low_voltage: ['Low Voltage Infrastructure', 'Data Cabling Installation', 'Security Camera System', 'Access Control Upgrade', 'Structured Cabling', 'Building Automation System'],
+        data_cabling: ['Data Center Cabling', 'Fiber Backbone Installation', 'Structured Cabling System', 'Network Infrastructure Upgrade', 'Cat6 Cabling Project', 'Campus Network Cabling'],
+        security_systems: ['Integrated Security System', 'Perimeter Security System', 'Video Surveillance Upgrade', 'Access Control and CCTV', 'Intrusion Detection System', 'Security Integration Project'],
+        av_systems: ['AV System Installation', 'Conference Room AV Upgrade', 'Auditorium Sound System', 'Digital Signage Network', 'AV Control System', 'Multimedia Classroom Setup'],
+        fiber_optic: ['Fiber Optic Network Installation', 'Fiber Backbone Upgrade', 'Dark Fiber Installation', 'Fiber to the Building', 'FTTH Network Deployment', 'Fiber Optic Splice Project'],
+        access_control: ['Card Access System', 'Biometric Access Control', 'Access Control Integration', 'Keyless Entry System', 'Visitor Management System', 'Access Control Upgrade'],
+        telecommunications: ['Telecom Infrastructure Upgrade', 'Voice/Data Network Installation', 'Telephone System Replacement', 'PBX System Upgrade', 'Unified Communications', 'Telecom Room Build-Out'],
+        electrical: ['Electrical System Upgrade', 'Power Distribution Modernization', 'LED Lighting Retrofit', 'Solar Panel Installation', 'Generator Installation', 'Electrical Service Upgrade'],
+        hvac: ['HVAC System Replacement', 'Chiller Plant Upgrade', 'Ventilation System Modernization', 'Energy Efficient HVAC', 'VAV System Installation', 'Boiler Replacement'],
+        plumbing: ['Plumbing System Upgrade', 'Water Line Replacement', 'Sewer Line Repair', 'Domestic Water System', 'Backflow Preventer Installation', 'Plumbing Fixture Replacement'],
+        mechanical: ['Mechanical System Upgrade', 'Pump Replacement Project', 'Mechanical Equipment Installation', 'Building Systems Integration', 'Energy Management System', 'Mechanical Controls Upgrade'],
+        roofing: ['Roof Replacement Project', 'Roof Repair and Maintenance', 'Cool Roof Installation', 'TPO Roofing System', 'Metal Roof Installation', 'Roof Waterproofing'],
+        concrete: ['Concrete Paving Project', 'Structural Concrete Repair', 'Concrete Sidewalk Replacement', 'Concrete Foundation Work', 'Parking Lot Concrete', 'Concrete Restoration'],
+        masonry: ['Masonry Restoration', 'Brick Veneer Installation', 'CMU Wall Construction', 'Stone Facade Work', 'Masonry Repair Project', 'Tuckpointing and Restoration'],
+        carpentry: ['Rough Carpentry Work', 'Finish Carpentry Installation', 'Door and Frame Installation', 'Custom Millwork', 'Carpentry Repairs', 'Wood Framing Project'],
+        framing: ['Metal Stud Framing', 'Wood Frame Construction', 'Structural Framing', 'Interior Framing Project', 'Exterior Wall Framing', 'Commercial Framing Work'],
+        drywall: ['Drywall Installation', 'Gypsum Board Installation', 'Drywall Finishing', 'Ceiling Drywall Work', 'Drywall Repair and Patch', 'Interior Partition Drywall'],
+        painting: ['Interior Painting Project', 'Exterior Painting Work', 'Industrial Coating Application', 'Epoxy Floor Coating', 'Parking Structure Painting', 'Facility Repainting'],
+        flooring: ['Flooring Installation', 'Carpet Replacement', 'VCT Flooring Installation', 'Epoxy Floor System', 'Polished Concrete Floors', 'Flooring Renovation'],
+        landscaping: ['Landscape Installation', 'Irrigation System Upgrade', 'Grounds Maintenance', 'Tree Planting Project', 'Landscape Restoration', 'Site Landscaping Work'],
+        excavation: ['Site Excavation Work', 'Mass Grading Project', 'Underground Utility Excavation', 'Excavation and Backfill', 'Trenching and Excavation', 'Site Preparation'],
+        sitework: ['Site Development Project', 'Parking Lot Construction', 'Site Utilities Installation', 'Grading and Drainage', 'Site Improvement Work', 'Asphalt Paving'],
+        demolition: ['Building Demolition', 'Interior Demolition Work', 'Selective Demolition', 'Concrete Demolition', 'Demolition and Removal', 'Site Clearing'],
+        environmental: ['Environmental Remediation', 'Soil Remediation Project', 'Hazmat Abatement', 'Environmental Cleanup', 'UST Removal', 'Contaminated Soil Removal'],
+        asbestos_abatement: ['Asbestos Abatement', 'ACM Removal Project', 'Asbestos Floor Tile Removal', 'Pipe Insulation Abatement', 'Asbestos Survey and Removal', 'Complete Asbestos Abatement'],
+        general_contractor: ['General Construction Project', 'Building Construction', 'Renovation and Remodel', 'New Construction Project', 'Facility Upgrade', 'Multi-Trade Construction'],
+        design_build: ['Design-Build Project', 'Turn-Key Construction', 'Integrated Design-Build', 'Fast-Track Design-Build', 'Design-Build Services', 'Progressive Design-Build'],
+        construction_management: ['CM at Risk Project', 'Construction Management Services', 'Project Management Services', 'CM/GC Project Delivery', 'Construction Oversight', 'Program Management']
       };
 
       const cities = city ? [city] : [
