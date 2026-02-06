@@ -185,26 +185,36 @@ export default function BidDiscovery() {
       const searchKeywords = query || `${workTypeDisplay} bids in ${locationDisplay}`;
       
       // Direct web search with structured output
-      const searchPrompt = `Search the web and find at least 30 active construction bid opportunities.
+      const searchPrompt = `You are an expert at finding construction bid opportunities. Search the web THOROUGHLY and find ALL active bids for ${workTypeDisplay} projects in ${locationDisplay}.
 
-SEARCH KEYWORDS: ${searchKeywords}
-WORK TYPE: ${workTypeDisplay} (fire alarm, HVAC, low voltage, electrical, etc.)
-LOCATION: ${locationDisplay}
+CRITICAL INSTRUCTIONS:
+1. Search multiple platforms:
+   - sam.gov (search for "${workTypeDisplay} ${state}")
+   - bidclerk.com (search location: ${state || 'nationwide'})
+   - constructconnect.com 
+   - dodgedata.com (if accessible)
+   - ${state} state procurement office website
+   - county and city government bid portals in ${locationDisplay}
+   - public works departments
+   - school district RFPs
+   - higher education RFPs
 
-Use web search to check:
-- SAM.gov federal contracts
-- ${state} state procurement portal
-- BidClerk, ConstructConnect, Dodge Data
-- County/city bid boards in ${locationDisplay}
+2. Look for exact bid postings, not general categories
+3. Extract actual posted opportunities with real details
+4. Include bids from the last 30 days that haven't closed yet
 
-Extract ALL opportunities found. For each, provide:
-- title: Project name
-- agency: Issuing organization
-- location: Full address or city, state
-- estimated_value: Dollar amount (number)
-- due_date: Bid due date (YYYY-MM-DD format)
-- description: Brief project details
-- url: Source website link`;
+For EACH opportunity found, provide:
+{
+  "title": "exact project name",
+  "agency": "organization posting the bid",
+  "location": "city, state or full address",
+  "estimated_value": actual dollar number (required),
+  "due_date": "YYYY-MM-DD format",
+  "description": "2-3 sentences about the project",
+  "url": "direct link to the bid posting"
+}
+
+Return minimum 20 real opportunities. Focus on actual posted bids, not search results links.`;
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: searchPrompt,
