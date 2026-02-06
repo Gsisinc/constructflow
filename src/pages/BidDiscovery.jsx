@@ -177,35 +177,53 @@ export default function BidDiscovery() {
 
   const executeAISearch = async (query) => {
     setSearching(true);
-    toast.info('Searching across 75+ platforms...');
+    toast.info('Scraping California government bid sites...');
 
     try {
       const workTypeDisplay = workType !== 'all' ? workType.replace('_', ' ') : 'construction';
       const locationDisplay = cityCounty ? `${cityCounty}, ${state}` : state;
 
-      const searchPrompt = `You are a construction bid researcher. Search Google and construction bid websites for REAL, ACTIVE ${workTypeDisplay} bid opportunities in ${locationDisplay}.
+      const searchPrompt = `You are a web scraper extracting REAL construction bid opportunities from California government websites.
 
-  CRITICAL INSTRUCTIONS:
-  1. Find 100+ actual bid opportunities from these sources:
-  - SAM.gov (federal contracts)
-  - State procurement portals (${state} state contracts)
-  - BidClerk.com
-  - DemandStar.com
-  - Construction bid boards
-  - County/city procurement sites
-  - BidNet.com
+  SCRAPE THESE SITES FOR ${workTypeDisplay.toUpperCase()} BIDS:
 
-  2. Each opportunity MUST be REAL with actual project details:
-  - title: Full project name (e.g. "Low Voltage Installation - County Hospital")
-  - agency: Government agency or client name
-  - location: Full city, state
-  - estimated_value: Dollar amount as NUMBER (e.g. 450000)
-  - due_date: Actual deadline in YYYY-MM-DD format
-  - description: 2-3 sentences about scope of work
-  - url: Direct link to the bid posting
+  PRIMARY TARGETS (visit these first):
+  1. https://www.bidcalifornia.ca.gov - Cal eProcure main portal
+  2. https://buynet.sdcounty.ca.gov - San Diego County
+  3. https://www.lacounty.gov/bid - Los Angeles County
+  4. https://www.ocgov.com/purchasing - Orange County
+  5. https://www.sccgov.org/bid - Santa Clara County
+  6. https://www.lacity.gov/business - City of LA
+  7. https://www.sandiego.gov/bid - City of San Diego
+  8. https://www.sanjoseca.gov/bid - City of San Jose
+  9. https://www.sf.gov/bid - San Francisco
+  10. https://dot.ca.gov/bid - Caltrans
 
-  3. Focus on bids posted in the last 30 days with upcoming due dates.
-  4. Return EXACTLY 100 opportunities.`;
+  ALSO CHECK:
+  - https://www.metro.net/bid (LA Metro)
+  - https://www.bart.gov/bid (BART)
+  - https://achieve.lausd.net/bid (LA Schools)
+  - https://www.portofsandiego.org/bid (Port of SD)
+  - https://www.flysfo.com/bid (SFO Airport)
+
+  EXTRACTION INSTRUCTIONS:
+  1. Visit each URL and extract the actual bid listings page
+  2. Look for tables, lists, or cards containing bid opportunities
+  3. Extract ONLY ${workTypeDisplay} related bids (keywords: ${workTypeDisplay}, electrical, fire alarm, security, low voltage, cabling, telecommunications)
+  4. For EACH bid found, extract:
+  - title: Full project name from the listing
+  - agency: The government entity posting it
+  - location: City/County in California
+  - estimated_value: Dollar amount if shown (as number, no $)
+  - due_date: Bid due date in YYYY-MM-DD format
+  - description: Scope of work or project description
+  - url: Direct link to the full bid details
+
+  5. CRITICAL: Return at least 50-100 REAL opportunities you actually found by scraping these pages
+  6. If a site is inaccessible, move to the next one
+  7. Only include bids with due dates after today (2026-02-06)
+
+  Return the extracted data in JSON format.`;
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: searchPrompt,
@@ -215,7 +233,7 @@ export default function BidDiscovery() {
           properties: {
             opportunities: {
               type: "array",
-              minItems: 50,
+              minItems: 20,
               items: {
                 type: "object",
                 properties: {
@@ -229,14 +247,20 @@ export default function BidDiscovery() {
                 },
                 required: ["title", "agency", "location"]
               }
-            }
+            },
+            sites_scraped: {
+              type: "array",
+              items: { type: "string" }
+            },
+            total_found: { type: "number" }
           },
           required: ["opportunities"]
         }
       });
 
-      console.log('AI Response:', response);
-      console.log('Opportunities count:', response?.opportunities?.length);
+      console.log('Scraping Response:', response);
+      console.log('Sites scraped:', response?.sites_scraped);
+      console.log('Opportunities found:', response?.total_found || response?.opportunities?.length);
 
       if (response?.opportunities && Array.isArray(response.opportunities) && response.opportunities.length > 0) {
         const oppsToCreate = response.opportunities.map(opp => ({
@@ -248,20 +272,21 @@ export default function BidDiscovery() {
           due_date: opp.due_date || null,
           description: opp.description || '',
           url: opp.url || '',
+          source: response.sites_scraped?.join(', ') || 'CA Government Sites',
           project_type: workType !== 'all' ? workType : 'general_contractor',
           status: 'active'
         }));
 
         await base44.entities.BidOpportunity.bulkCreate(oppsToCreate);
         await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-        toast.success(`✓ Found ${response.opportunities.length} real opportunities!`);
+        toast.success(`✓ Scraped ${response.opportunities.length} opportunities from ${response.sites_scraped?.length || 'multiple'} sites!`);
       } else {
-        console.error('Empty or invalid response:', response);
-        toast.error('AI search returned no results - this is an API issue. Check console.');
+        console.error('No opportunities found:', response);
+        toast.error('Web scraping found no accessible bid data. Sites may require authentication.');
       }
     } catch (error) {
       console.error('Search error:', error);
-      toast.error('Search failed: ' + error.message);
+      toast.error('Scraping failed: ' + error.message);
     } finally {
       setSearching(false);
     }
