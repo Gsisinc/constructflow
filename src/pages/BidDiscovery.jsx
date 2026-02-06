@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import AgentChat from '../components/agents/AgentChat';
@@ -42,6 +43,9 @@ export default function BidDiscovery() {
   const [selectedBid, setSelectedBid] = useState(null);
   const [showAgentChat, setShowAgentChat] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [city, setCity] = useState('');
+  const [workType, setWorkType] = useState('all');
+  const [autoSearchEnabled, setAutoSearchEnabled] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: opportunities = [] } = useQuery({
@@ -53,6 +57,39 @@ export default function BidDiscovery() {
     queryKey: ['bids'],
     queryFn: () => base44.entities.Bid.list('-created_date', 20)
   });
+
+  // Auto-search on mount and every 5 minutes
+  useEffect(() => {
+    if (autoSearchEnabled) {
+      performAutoSearch();
+      const interval = setInterval(performAutoSearch, 5 * 60 * 1000); // 5 minutes
+      return () => clearInterval(interval);
+    }
+  }, [autoSearchEnabled, workType, city]);
+
+  const performAutoSearch = async () => {
+    const query = buildSearchQuery();
+    if (query) {
+      setAnalysisPrompt(query);
+      setShowAgentChat(true);
+    }
+  };
+
+  const buildSearchQuery = () => {
+    const parts = [];
+    
+    if (workType && workType !== 'all') {
+      parts.push(workType);
+    }
+    
+    if (city) {
+      parts.push(`in ${city}`);
+    }
+    
+    parts.push('construction bid opportunities');
+    
+    return `Find ${parts.join(' ')} posted in the last 7 days`;
+  };
 
   const createProjectMutation = useMutation({
     mutationFn: (data) => base44.entities.Project.create(data),
@@ -71,9 +108,10 @@ export default function BidDiscovery() {
   });
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+    const query = searchQuery.trim() || buildSearchQuery();
+    if (!query) return;
     
-    setAnalysisPrompt(searchQuery);
+    setAnalysisPrompt(query);
     setSearchQuery('');
     setSearching(true);
     setShowAgentChat(true);
@@ -258,33 +296,72 @@ Please analyze and provide:
           </Button>
         </div>
 
-        {/* Search Bar */}
-        <div className="mt-6 flex gap-3">
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Search for bids: 'low voltage hospital projects California' or 'HVAC commercial bids Texas'..."
-            className="flex-1 bg-white text-slate-900 h-12"
-          />
-          <Button 
-            size="lg"
-            onClick={handleSearch}
-            disabled={searching || !searchQuery.trim()}
-            className="bg-white text-blue-600 hover:bg-blue-50 gap-2 min-w-[140px]"
-          >
-            {searching ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Searching...
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4" />
-                AI Search
-              </>
-            )}
-          </Button>
+        {/* Search Filters & Bar */}
+        <div className="mt-6 space-y-3">
+          <div className="flex gap-3">
+            <Select value={workType} onValueChange={setWorkType}>
+              <SelectTrigger className="w-[200px] bg-white text-slate-900 h-12">
+                <SelectValue placeholder="Type of Work" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="low_voltage">Low Voltage</SelectItem>
+                <SelectItem value="data_cabling">Data Cabling</SelectItem>
+                <SelectItem value="security_systems">Security Systems</SelectItem>
+                <SelectItem value="av_systems">AV Systems</SelectItem>
+                <SelectItem value="fiber_optic">Fiber Optic</SelectItem>
+                <SelectItem value="access_control">Access Control</SelectItem>
+                <SelectItem value="electrical">Electrical</SelectItem>
+                <SelectItem value="hvac">HVAC</SelectItem>
+                <SelectItem value="plumbing">Plumbing</SelectItem>
+                <SelectItem value="general_contractor">General Contractor</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Input
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="City or State (e.g., California, Los Angeles)"
+              className="w-[250px] bg-white text-slate-900 h-12"
+            />
+
+            <Button
+              variant={autoSearchEnabled ? "default" : "outline"}
+              onClick={() => setAutoSearchEnabled(!autoSearchEnabled)}
+              className={`gap-2 ${autoSearchEnabled ? 'bg-green-600 hover:bg-green-700' : 'bg-white text-slate-900'}`}
+            >
+              <Sparkles className="h-4 w-4" />
+              {autoSearchEnabled ? 'Auto-Search ON' : 'Enable Auto-Search'}
+            </Button>
+          </div>
+
+          <div className="flex gap-3">
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="Or enter custom search: 'low voltage hospital projects California' or 'HVAC commercial bids Texas'..."
+              className="flex-1 bg-white text-slate-900 h-12"
+            />
+            <Button 
+              size="lg"
+              onClick={handleSearch}
+              disabled={searching}
+              className="bg-white text-blue-600 hover:bg-blue-50 gap-2 min-w-[140px]"
+            >
+              {searching ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  AI Search
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
