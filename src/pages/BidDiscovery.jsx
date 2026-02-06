@@ -146,8 +146,29 @@ export default function BidDiscovery() {
   const performAutoSearch = async () => {
     const query = buildSearchQuery();
     if (query) {
-      setAnalysisPrompt(query);
-      setShowAgentChat(true);
+      await executeAISearch(query);
+    }
+  };
+
+  const executeAISearch = async (query) => {
+    setSearching(true);
+    try {
+      // Use the agent to search and save opportunities directly
+      const prompt = `${query}. Search across all major bid websites including SAM.gov, state portals, BidClerk, ConstructConnect, Dodge, and other platforms. Find at least 100 opportunities. For each opportunity found, create a BidOpportunity record with complete details.`;
+      
+      await base44.integrations.Core.InvokeLLM({
+        prompt: prompt,
+        add_context_from_internet: true
+      });
+      
+      // Refresh opportunities list after search
+      await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
+      toast.success('AI search completed! Check discovered opportunities.');
+    } catch (error) {
+      toast.error('Search failed. Please try again.');
+      console.error(error);
+    } finally {
+      setSearching(false);
     }
   };
 
@@ -210,10 +231,8 @@ export default function BidDiscovery() {
     const query = searchQuery.trim() || buildSearchQuery();
     if (!query) return;
     
-    setAnalysisPrompt(query);
     setSearchQuery('');
-    setSearching(true);
-    setShowAgentChat(true);
+    await executeAISearch(query);
   };
 
   const handleAddToPipeline = async (opportunity) => {
@@ -548,14 +567,19 @@ Provide:
               </div>
             </div>
           </div>
-          <Button 
-            variant="secondary"
-            className="gap-2"
-            onClick={() => setShowAgentChat(true)}
-          >
-            <Bot className="h-4 w-4" />
-            Chat with Agent
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="secondary"
+              className="gap-2"
+              onClick={() => {
+                setAnalysisPrompt(null);
+                setShowAgentChat(true);
+              }}
+            >
+              <Bot className="h-4 w-4" />
+              Chat with Agent
+            </Button>
+          </div>
         </div>
 
         {/* Search Filters & Bar */}
