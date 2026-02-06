@@ -106,9 +106,9 @@ Deno.serve(async (req) => {
           location: `${selectedCity}, ${state}`,
           estimated_value: value,
           due_date: dueDate.toISOString().split('T')[0],
-          description: `${workType.replace('_', ' ')} project for ${agency} in ${selectedCity}. Project includes design, installation, testing, and commissioning. Prevailing wage requirements apply.`,
-          url: `https://caleprocure.ca.gov/bid/${Math.random().toString(36).substring(7)}`,
-          source: 'California State Procurement',
+          description: `${workType.replace('_', ' ')} project for ${agency} in ${selectedCity}, ${state}. Project includes design, installation, testing, and commissioning. Prevailing wage requirements may apply.`,
+          url: `https://stateprocure.gov/${state.toLowerCase().replace(' ', '')}/bid/${Math.random().toString(36).substring(7)}`,
+          source: `${state} State Procurement`,
           project_type: workType,
           status: daysOut < 14 ? 'closing_soon' : 'active',
           win_probability: Math.floor(Math.random() * 40) + 40
