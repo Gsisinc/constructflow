@@ -118,7 +118,15 @@ export default function BidDiscovery() {
 
   const { data: opportunities = [] } = useQuery({
     queryKey: ['bidOpportunities'],
-    queryFn: () => base44.entities.BidOpportunity.list('-created_date', 150)
+    queryFn: async () => {
+      const opps = await base44.entities.BidOpportunity.list('-created_date', 200);
+      // Sort by due_date (soonest first)
+      return opps.sort((a, b) => {
+        if (!a.due_date) return 1;
+        if (!b.due_date) return -1;
+        return new Date(a.due_date) - new Date(b.due_date);
+      });
+    }
   });
 
   const { data: bids = [] } = useQuery({
