@@ -211,11 +211,8 @@ Deno.serve(async (req) => {
       opportunities.push(...samples);
     }
 
-    // Save all opportunities to database
-    if (opportunities.length > 0) {
-      await base44.asServiceRole.entities.BidOpportunity.bulkCreate(opportunities);
-    }
-
+    // DON'T save to database - just return results
+    // Only save when user adds to bids
     return Response.json({
       success: true,
       opportunities,
