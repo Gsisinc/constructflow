@@ -624,6 +624,12 @@ Provide:
             </Button>
           </div>
 
+          {/* Recommended Search Display */}
+          <div className="bg-white/10 backdrop-blur rounded-lg px-4 py-2 mb-2">
+            <p className="text-xs text-blue-100 mb-1">Recommended Search:</p>
+            <p className="text-white text-sm font-medium">{buildSearchQuery()}</p>
+          </div>
+
           <div className="flex gap-3">
             <Input
               value={searchQuery}
