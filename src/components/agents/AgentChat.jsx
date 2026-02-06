@@ -484,7 +484,6 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
             </Button>
           </div>
         </div>
-      </div>
     </Card>
   );
 }
