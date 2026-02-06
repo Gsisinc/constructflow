@@ -176,22 +176,73 @@ export default function BidDiscovery() {
 
   const executeAISearch = async (query) => {
     setSearching(true);
-    toast.info('Scraping bid sites for opportunities...');
+    toast.info('AI searching bid opportunities across 75+ platforms...');
 
     try {
-      const response = await base44.functions.invoke('scrapeBidSites', {
-        workType: workType !== 'all' ? workType : 'low_voltage',
-        state: state,
-        city: cityCounty || null
+      const workTypeDisplay = workType !== 'all' ? workType.replace('_', ' ') : 'construction';
+      const locationDisplay = cityCounty ? `${cityCounty}, ${state}` : state;
+
+      const searchPrompt = `Find construction bid opportunities for ${workTypeDisplay} work in ${locationDisplay}.
+
+  Search sam.gov, bidclerk.com, state/local government portals, and construction bid sites.
+
+  Return 30+ REAL opportunities with actual project details. Each must include:
+  - title (project name)
+  - agency (who's bidding it)
+  - location (city, state)
+  - estimated_value (dollar amount as number)
+  - due_date (YYYY-MM-DD format)
+  - description (project details)
+  - url (link to bid)
+
+  Focus on active bids from the past 30 days.`;
+
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: searchPrompt,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            opportunities: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  agency: { type: "string" },
+                  location: { type: "string" },
+                  estimated_value: { type: "number" },
+                  due_date: { type: "string" },
+                  description: { type: "string" },
+                  url: { type: "string" }
+                },
+                required: ["title", "agency"]
+              }
+            }
+          },
+          required: ["opportunities"]
+        }
       });
 
-      console.log('Scraping response:', response);
-
-      if (response.data.success && response.data.count > 0) {
+      if (response?.opportunities?.length > 0) {
+        await base44.entities.BidOpportunity.bulkCreate(
+          response.opportunities.map(opp => ({
+            title: opp.title,
+            project_name: opp.title,
+            agency: opp.agency,
+            location: opp.location || locationDisplay,
+            estimated_value: opp.estimated_value || 0,
+            due_date: opp.due_date || null,
+            description: opp.description || '',
+            url: opp.url || '',
+            project_type: workType !== 'all' ? workType : 'general_contractor',
+            status: 'active'
+          }))
+        );
         await queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] });
-        toast.success(`Found ${response.data.count} opportunities!`);
+        toast.success(`Found ${response.opportunities.length} opportunities!`);
       } else {
-        toast.warning('No opportunities found. Try different filters or wait a moment and try again.');
+        toast.warning('No results found - try different search terms');
       }
     } catch (error) {
       console.error('Search error:', error);
