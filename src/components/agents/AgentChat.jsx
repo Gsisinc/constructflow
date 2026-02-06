@@ -49,8 +49,12 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   }, [messages.length]);
 
   useEffect(() => {
-    // Scroll to bottom when messages update
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Scroll to bottom when messages or opportunities update
+    if (messagesEndRef.current) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 100);
+    }
   }, [messages, opportunities]);
 
   const initializeConversation = async () => {
@@ -138,25 +142,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const handleAnalyze = async (opportunity) => {
     if (!conversation || loading) return;
     
-    const analysisPrompt = `Please provide a comprehensive analysis of the bid opportunity you already researched and stored:
-
-**BID ID:** ${opportunity.id}
-**Project:** ${opportunity.title || opportunity.project_name}
-**Agency:** ${opportunity.agency || opportunity.client_name}
-
-Using the detailed information you already extracted and stored for this bid, please provide a full analysis organized into these sections:
-
-1. **PROJECT OVERVIEW** - Summarize the project scope and objectives
-2. **KEY REQUIREMENTS** - List all technical, bonding, licensing, and qualification requirements
-3. **CONTACT INFORMATION** - Provide all contact details for questions and submissions
-4. **IMPORTANT DATES** - List all deadlines: bid due, pre-bid meetings, site visits, question deadlines
-5. **REQUIRED DOCUMENTS** - List all attachments and documents needed for submission
-6. **SCOPE DETAILS** - Detailed breakdown of work to be performed
-7. **CHALLENGES & RISKS** - Identify potential issues or concerns
-8. **WIN PROBABILITY** - Assess our chances (0-100%) based on project fit
-9. **RECOMMENDATION** - Should we bid? Why or why not?
-
-Please reference the complete details you stored when you first found this opportunity.`;
+    const analysisPrompt = `Analyze bid: ${opportunity.title || opportunity.project_name}`;
 
     setLoading(true);
     try {
@@ -257,6 +243,7 @@ Please reference the complete details you stored when you first found this oppor
               size="sm"
               className="flex-1 h-8 text-xs gap-1.5"
               onClick={() => handleAnalyze(opportunity)}
+              disabled={loading}
             >
               <Sparkles className="h-3.5 w-3.5" />
               Full Analysis
@@ -375,10 +362,10 @@ Please reference the complete details you stored when you first found this oppor
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+      <CardContent className="flex-1 flex flex-col p-0 min-h-0 overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 min-h-0">
-          <div>
+        <div className="flex-1 overflow-y-auto p-6" style={{ maxHeight: '100%' }}>
+          <div className="min-h-full">
             {messages.length === 0 && opportunities.length === 0 && (
               <div className="text-center py-12">
                 <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white mb-4`}>
