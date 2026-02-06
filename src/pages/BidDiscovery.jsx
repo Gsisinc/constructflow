@@ -45,7 +45,8 @@ export default function BidDiscovery() {
   const [selectedBid, setSelectedBid] = useState(null);
   const [showAgentChat, setShowAgentChat] = useState(false);
   const [searching, setSearching] = useState(false);
-  const [city, setCity] = useState('California');
+  const [state, setState] = useState('California');
+  const [cityCounty, setCityCounty] = useState('');
   const [workType, setWorkType] = useState('low_voltage');
   const [autoSearchEnabled, setAutoSearchEnabled] = useState(true);
   const queryClient = useQueryClient();
@@ -77,7 +78,7 @@ export default function BidDiscovery() {
       const interval = setInterval(performAutoSearch, 5 * 60 * 1000); // 5 minutes
       return () => clearInterval(interval);
     }
-  }, [autoSearchEnabled, workType, city]);
+  }, [autoSearchEnabled, workType, state, cityCounty]);
 
   const performAutoSearch = async () => {
     const query = buildSearchQuery();
@@ -94,8 +95,16 @@ export default function BidDiscovery() {
       parts.push(workType);
     }
     
-    if (city) {
-      parts.push(`in ${city}`);
+    const location = [];
+    if (cityCounty) {
+      location.push(cityCounty);
+    }
+    if (state) {
+      location.push(state);
+    }
+    
+    if (location.length > 0) {
+      parts.push(`in ${location.join(', ')}`);
     }
     
     parts.push('construction bid opportunities');
@@ -527,16 +536,23 @@ Provide:
               </SelectContent>
             </Select>
 
-            <Select value={city} onValueChange={setCity}>
+            <Select value={state} onValueChange={setState}>
               <SelectTrigger className="w-[200px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="State" />
               </SelectTrigger>
               <SelectContent className="max-h-[400px]">
-                {states.map(state => (
-                  <SelectItem key={state} value={state}>{state}</SelectItem>
+                {states.map(st => (
+                  <SelectItem key={st} value={st}>{st}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
+            <Input
+              value={cityCounty}
+              onChange={(e) => setCityCounty(e.target.value)}
+              placeholder={`City/County in ${state} (optional)`}
+              className="w-[250px] bg-white text-slate-900 h-12"
+            />
 
             <Button
               variant={autoSearchEnabled ? "default" : "outline"}
