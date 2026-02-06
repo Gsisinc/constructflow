@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
 
       const selectedState = stateData[state] || defaultData;
       const agencies = selectedState.agencies;
-      const cities = selectedState.cities;
+      const stateCities = selectedState.cities;
 
       const projectTypes = {
         fire_alarm: ['Fire Alarm System Upgrade', 'Fire Detection System Installation', 'Fire Safety Modernization', 'Emergency Fire Alarm System', 'Fire Protection System', 'Smoke Detection Upgrade'],
@@ -101,11 +101,6 @@ Deno.serve(async (req) => {
         design_build: ['Design-Build Project', 'Turn-Key Construction', 'Integrated Design-Build', 'Fast-Track Design-Build', 'Design-Build Services', 'Progressive Design-Build'],
         construction_management: ['CM at Risk Project', 'Construction Management Services', 'Project Management Services', 'CM/GC Project Delivery', 'Construction Oversight', 'Program Management']
       };
-
-      const cities = city ? [city] : [
-        'Los Angeles', 'San Francisco', 'San Diego', 'Sacramento', 'San Jose',
-        'Oakland', 'Fresno', 'Long Beach', 'Bakersfield', 'Anaheim', 'Riverside', 'Irvine'
-      ];
 
       const samples = [];
       const projectNames = projectTypes[workType] || projectTypes.low_voltage;
