@@ -192,12 +192,37 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
   const BidOpportunityCard = ({ opportunity }) => {
     const [expanded, setExpanded] = useState(false);
+    const [analyzing, setAnalyzing] = useState(false);
+    const [analysis, setAnalysis] = useState(null);
     
     const statusColors = {
       active: 'bg-green-100 text-green-700',
       upcoming: 'bg-blue-100 text-blue-700',
       closing_soon: 'bg-orange-100 text-orange-700',
       new: 'bg-purple-100 text-purple-700'
+    };
+
+    const toggleExpand = async () => {
+      if (!expanded && !analysis && conversation) {
+        setExpanded(true);
+        setAnalyzing(true);
+        try {
+          await base44.agents.addMessage(conversation, {
+            role: 'user',
+            content: `Analyze this bid opportunity in detail: ${opportunity.title || opportunity.project_name}. Project: ${opportunity.project_name || opportunity.title}, Agency: ${opportunity.agency || opportunity.client_name}, Value: $${opportunity.estimated_value?.toLocaleString() || 'Unknown'}, Due: ${opportunity.due_date || 'Not specified'}. Provide a comprehensive analysis including feasibility, risks, and recommendations.`
+          });
+          // The analysis will appear in the main chat, so we just mark it as done
+          setTimeout(() => {
+            setAnalyzing(false);
+            setAnalysis('Analysis complete - see chat above');
+          }, 1000);
+        } catch (error) {
+          setAnalyzing(false);
+          toast.error('Failed to analyze');
+        }
+      } else {
+        setExpanded(!expanded);
+      }
     };
 
     return (
@@ -252,44 +277,58 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
           {expanded && (
             <div className="space-y-2 pt-2 border-t">
-              {opportunity.scope_of_work && (
-                <div>
-                  <p className="text-xs font-semibold text-slate-700">Scope of Work:</p>
-                  <p className="text-xs text-slate-600">{opportunity.scope_of_work}</p>
+              {analyzing ? (
+                <div className="flex items-center gap-2 py-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                  <p className="text-xs text-slate-600">Generating detailed analysis...</p>
                 </div>
-              )}
-              {opportunity.requirements && opportunity.requirements.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-slate-700">Requirements:</p>
-                  <ul className="text-xs text-slate-600 list-disc list-inside">
-                    {opportunity.requirements.map((req, idx) => (
-                      <li key={idx}>{req}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {opportunity.ai_analysis && (
-                <div>
-                  <p className="text-xs font-semibold text-slate-700">AI Analysis:</p>
-                  <div className="text-xs text-slate-600 space-y-1">
-                    {opportunity.ai_analysis.complexity_score && (
-                      <p>Complexity Score: {opportunity.ai_analysis.complexity_score}/10</p>
-                    )}
-                    {opportunity.ai_analysis.recommended_markup && (
-                      <p>Recommended Markup: {opportunity.ai_analysis.recommended_markup}%</p>
-                    )}
-                    {opportunity.ai_analysis.risk_factors && opportunity.ai_analysis.risk_factors.length > 0 && (
-                      <div>
-                        <p className="font-medium">Risk Factors:</p>
-                        <ul className="list-disc list-inside">
-                          {opportunity.ai_analysis.risk_factors.map((risk, idx) => (
-                            <li key={idx}>{risk}</li>
-                          ))}
-                        </ul>
+              ) : (
+                <>
+                  {opportunity.scope_of_work && (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-700">Scope of Work:</p>
+                      <p className="text-xs text-slate-600">{opportunity.scope_of_work}</p>
+                    </div>
+                  )}
+                  {opportunity.requirements && opportunity.requirements.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-700">Requirements:</p>
+                      <ul className="text-xs text-slate-600 list-disc list-inside">
+                        {opportunity.requirements.map((req, idx) => (
+                          <li key={idx}>{req}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {opportunity.ai_analysis && (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-700">AI Analysis:</p>
+                      <div className="text-xs text-slate-600 space-y-1">
+                        {opportunity.ai_analysis.complexity_score && (
+                          <p>Complexity Score: {opportunity.ai_analysis.complexity_score}/10</p>
+                        )}
+                        {opportunity.ai_analysis.recommended_markup && (
+                          <p>Recommended Markup: {opportunity.ai_analysis.recommended_markup}%</p>
+                        )}
+                        {opportunity.ai_analysis.risk_factors && opportunity.ai_analysis.risk_factors.length > 0 && (
+                          <div>
+                            <p className="font-medium">Risk Factors:</p>
+                            <ul className="list-disc list-inside">
+                              {opportunity.ai_analysis.risk_factors.map((risk, idx) => (
+                                <li key={idx}>{risk}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
+                    </div>
+                  )}
+                  {analysis && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
+                      <p className="text-xs text-blue-700 font-medium">✓ Full analysis generated - check the chat above</p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -298,9 +337,14 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
             <Button 
               size="sm"
               className="flex-1 h-8 text-xs gap-1.5"
-              onClick={() => setExpanded(!expanded)}
+              onClick={toggleExpand}
+              disabled={analyzing}
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              {analyzing ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="h-3.5 w-3.5" />
+              )}
               {expanded ? 'Hide Details' : 'Full Analysis'}
             </Button>
             <Button 
