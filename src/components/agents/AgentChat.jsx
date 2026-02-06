@@ -191,6 +191,8 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   };
 
   const BidOpportunityCard = ({ opportunity }) => {
+    const [expanded, setExpanded] = useState(false);
+    
     const statusColors = {
       active: 'bg-green-100 text-green-700',
       upcoming: 'bg-blue-100 text-blue-700',
@@ -245,18 +247,61 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
           </div>
           
           {opportunity.description && (
-            <p className="text-xs text-slate-600 line-clamp-2">{opportunity.description}</p>
+            <p className={`text-xs text-slate-600 ${expanded ? '' : 'line-clamp-2'}`}>{opportunity.description}</p>
+          )}
+
+          {expanded && (
+            <div className="space-y-2 pt-2 border-t">
+              {opportunity.scope_of_work && (
+                <div>
+                  <p className="text-xs font-semibold text-slate-700">Scope of Work:</p>
+                  <p className="text-xs text-slate-600">{opportunity.scope_of_work}</p>
+                </div>
+              )}
+              {opportunity.requirements && opportunity.requirements.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-slate-700">Requirements:</p>
+                  <ul className="text-xs text-slate-600 list-disc list-inside">
+                    {opportunity.requirements.map((req, idx) => (
+                      <li key={idx}>{req}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {opportunity.ai_analysis && (
+                <div>
+                  <p className="text-xs font-semibold text-slate-700">AI Analysis:</p>
+                  <div className="text-xs text-slate-600 space-y-1">
+                    {opportunity.ai_analysis.complexity_score && (
+                      <p>Complexity Score: {opportunity.ai_analysis.complexity_score}/10</p>
+                    )}
+                    {opportunity.ai_analysis.recommended_markup && (
+                      <p>Recommended Markup: {opportunity.ai_analysis.recommended_markup}%</p>
+                    )}
+                    {opportunity.ai_analysis.risk_factors && opportunity.ai_analysis.risk_factors.length > 0 && (
+                      <div>
+                        <p className="font-medium">Risk Factors:</p>
+                        <ul className="list-disc list-inside">
+                          {opportunity.ai_analysis.risk_factors.map((risk, idx) => (
+                            <li key={idx}>{risk}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           <div className="flex gap-2">
             <Button 
               size="sm"
               className="flex-1 h-8 text-xs gap-1.5"
-              onClick={() => handleAnalyze(opportunity)}
-              disabled={loading}
+              onClick={() => setExpanded(!expanded)}
             >
               <Sparkles className="h-3.5 w-3.5" />
-              Full Analysis
+              {expanded ? 'Hide Details' : 'Full Analysis'}
             </Button>
             <Button 
               size="sm" 
