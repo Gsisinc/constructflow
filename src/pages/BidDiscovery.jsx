@@ -159,18 +159,18 @@ export default function BidDiscovery() {
     queryFn: () => base44.entities.Bid.list('-created_date', 20)
   });
 
-  // Auto-search on mount and every 5 minutes
+  // Auto-search on mount and when filters change
   useEffect(() => {
-    if (autoSearchEnabled) {
+    if (autoSearchEnabled && workType && state) {
       performAutoSearch();
-      const interval = setInterval(performAutoSearch, 5 * 60 * 1000); // 5 minutes
-      return () => clearInterval(interval);
     }
-  }, [autoSearchEnabled, workType, state, cityCounty]);
+  }, [workType, state, cityCounty]);
 
   const performAutoSearch = async () => {
+    if (!workType || workType === 'all') return;
     const query = buildSearchQuery();
     if (query) {
+      console.log('Auto-search triggered:', query);
       await executeAISearch(query);
     }
   };
@@ -185,7 +185,9 @@ export default function BidDiscovery() {
 
       const searchPrompt = `You are a web scraper extracting REAL construction bid opportunities from California government websites.
 
-  SCRAPE THESE SITES FOR ${workTypeDisplay.toUpperCase()} BIDS:
+      CRITICAL: You MUST ONLY extract ${workTypeDisplay.toUpperCase()} opportunities. Filter out ALL other types.
+
+      SCRAPE THESE SITES FOR ${workTypeDisplay.toUpperCase()} BIDS ONLY:
 
   PRIMARY TARGETS (visit these first):
   1. https://www.bidcalifornia.ca.gov - Cal eProcure main portal
@@ -209,7 +211,10 @@ export default function BidDiscovery() {
   EXTRACTION INSTRUCTIONS:
   1. Visit each URL and extract the actual bid listings page
   2. Look for tables, lists, or cards containing bid opportunities
-  3. Extract ONLY ${workTypeDisplay} related bids (keywords: ${workTypeDisplay}, electrical, fire alarm, security, low voltage, cabling, telecommunications)
+  3. **CRITICAL FILTERING**: Extract ONLY bids that are specifically for ${workTypeDisplay} work
+     - Keywords to match: ${workTypeDisplay}, ${workTypeDisplay.replace('_', ' ')}
+     - Example: If searching "fire alarm", only include projects explicitly about fire alarm systems, fire detection, fire safety
+     - REJECT any bid that doesn't specifically mention ${workTypeDisplay} in title or description
   4. For EACH bid found, extract:
   - title: Full project name from the listing
   - agency: The government entity posting it
@@ -348,6 +353,10 @@ export default function BidDiscovery() {
   });
 
   const handleSearch = async () => {
+    if (!workType || workType === 'all') {
+      toast.error('Please select a specific work type first');
+      return;
+    }
     const query = searchQuery.trim() || buildSearchQuery();
     if (!query) return;
     
