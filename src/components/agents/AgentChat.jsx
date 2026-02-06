@@ -123,11 +123,8 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
   const fetchOpportunities = async () => {
     try {
-      // Only fetch opportunities created in the last 5 minutes (during this conversation)
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-      const allOpps = await base44.entities.BidOpportunity.list('-created_date', 50);
-      const recentOpps = allOpps.filter(opp => opp.created_date >= fiveMinutesAgo);
-      setOpportunities(recentOpps);
+      const allOpps = await base44.entities.BidOpportunity.list('-created_date', 100);
+      setOpportunities(allOpps);
     } catch (error) {
       console.error('Failed to fetch opportunities:', error);
     }
