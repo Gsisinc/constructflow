@@ -1,26 +1,26 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import * as cheerio from 'npm:cheerio@1.0.0';
 
-// California county bid sources - start with top 3
+// California county bid sources - VERIFIED URLs
 const caCountySources = [
   {
     id: 'la-county',
     name: 'Los Angeles County',
-    url: 'https://www.lacounty.gov/government/purchasing-and-contract-services/bids-and-rfps/',
+    url: 'https://camisvr.co.la.ca.us/lacobids/',
     active: true,
     priority: 1
   },
   {
     id: 'san-diego',
     name: 'San Diego County',
-    url: 'https://www.sandiegocounty.gov/content/sdc/purchasing/bids.html',
+    url: 'https://www.sandiegocounty.gov/content/sdc/purchasing.html',
     active: true,
     priority: 1
   },
   {
     id: 'orange-county',
     name: 'Orange County',
-    url: 'https://www.ocprocurement.com/bids',
+    url: 'https://cpo.oc.gov/open-bids-county-contracts-portal',
     active: true,
     priority: 1
   },
