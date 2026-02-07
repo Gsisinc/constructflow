@@ -98,47 +98,125 @@ Deno.serve(async (req) => {
 
 
 
-    // 3. State APIs that actually work
-    if (state === 'California') {
-      try {
-        // CA State Contracts Register - public API
-        const caResponse = await fetch('https://www.dgs.ca.gov/PD/Resources/Page-Content/Procurement-Division-Resources-List-Folder/Open-Solicitations', {
-          headers: { 'User-Agent': 'Mozilla/5.0' }
-        });
+    // 3. BidSync Public API - Free tier access
+    try {
+      const bidSyncUrl = `https://www.bidsync.com/bidsync-xml/active.xml`;
+      const bsResponse = await fetch(bidSyncUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      
+      if (bsResponse.ok) {
+        const xml = await bsResponse.text();
+        const $ = cheerio.load(xml, { xmlMode: true });
         
-        if (caResponse.ok) {
-          const html = await caResponse.text();
-          const $ = cheerio.load(html);
+        $('bid').slice(0, 100).each((i, elem) => {
+          const title = $(elem).find('title').text().trim();
+          const agency = $(elem).find('agency').text().trim();
+          const location = $(elem).find('state').text().trim();
+          const dueDate = $(elem).find('due-date').text().trim();
+          const link = $(elem).find('link').text().trim();
+          const desc = $(elem).find('description').text().trim();
           
-          $('table tr').slice(1, 50).each((i, elem) => {
-            const cells = $(elem).find('td');
-            if (cells.length >= 3) {
-              const title = cells.eq(0).text().trim();
-              const dueDate = cells.eq(1).text().trim();
-              const link = cells.eq(0).find('a').attr('href');
-              
-              if (title && title.length > 10) {
-                opportunities.push({
-                  title,
-                  project_name: title,
-                  agency: 'California Department of General Services',
-                  location: `${city || ''}, ${state}`.trim(),
-                  estimated_value: 0,
-                  due_date: extractDate(dueDate),
-                  description: title,
-                  url: link ? `https://www.dgs.ca.gov${link}` : 'https://www.dgs.ca.gov/PD',
-                  source: 'CA DGS',
-                  project_type: workType,
-                  status: 'active'
-                });
-              }
-            }
-          });
-          sitesScraped.push('CA DGS Open Solicitations');
-        }
-      } catch (err) {
-        errors.push(`CA DGS: ${err.message}`);
+          // Filter by state and work type
+          if (location.includes(state) && title.length > 10) {
+            opportunities.push({
+              title,
+              project_name: title,
+              agency: agency || 'Various Agencies',
+              location: `${location}, ${state}`,
+              estimated_value: extractValue(desc),
+              due_date: extractDate(dueDate),
+              description: desc.substring(0, 500),
+              url: link || 'https://www.bidsync.com',
+              source: 'BidSync',
+              project_type: workType,
+              status: 'active'
+            });
+          }
+        });
+        sitesScraped.push('BidSync XML Feed');
       }
+    } catch (err) {
+      errors.push(`BidSync: ${err.message}`);
+    }
+
+    // 4. PlanetBids Open Data
+    try {
+      const planetUrl = `https://www.planetbids.com/portal/rss/activebids.xml`;
+      const pbResponse = await fetch(planetUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      
+      if (pbResponse.ok) {
+        const xml = await pbResponse.text();
+        const $ = cheerio.load(xml, { xmlMode: true });
+        
+        $('item').slice(0, 100).each((i, elem) => {
+          const title = $(elem).find('title').text().trim();
+          const link = $(elem).find('link').text().trim();
+          const desc = $(elem).find('description').text().trim();
+          const pubDate = $(elem).find('pubDate').text().trim();
+          
+          if (title && title.length > 10 && desc.includes(state)) {
+            opportunities.push({
+              title,
+              project_name: title,
+              agency: 'Various Agencies',
+              location: state,
+              estimated_value: extractValue(desc),
+              due_date: extractDate(desc) || extractDate(pubDate),
+              description: desc.substring(0, 500),
+              url: link,
+              source: 'PlanetBids',
+              project_type: workType,
+              status: 'active'
+            });
+          }
+        });
+        sitesScraped.push('PlanetBids RSS');
+      }
+    } catch (err) {
+      errors.push(`PlanetBids: ${err.message}`);
+    }
+
+    // 5. Construct Connect Public Leads
+    try {
+      const ccUrl = `https://public.construction.com/projects/search?state=${state}&type=bid`;
+      const ccResponse = await fetch(ccUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      
+      if (ccResponse.ok) {
+        const html = await ccResponse.text();
+        const $ = cheerio.load(html);
+        
+        $('.project-card, .bid-item, [data-project]').slice(0, 50).each((i, elem) => {
+          const title = $(elem).find('h3, h4, .title, .project-title').first().text().trim();
+          const location = $(elem).find('.location, .address').text().trim();
+          const dueDate = $(elem).find('.due-date, .bid-date').text().trim();
+          const link = $(elem).find('a').first().attr('href');
+          const desc = $(elem).find('.description, .summary').text().trim();
+          
+          if (title && title.length > 10) {
+            opportunities.push({
+              title,
+              project_name: title,
+              agency: 'Various Contractors',
+              location: location || state,
+              estimated_value: extractValue(desc),
+              due_date: extractDate(dueDate),
+              description: desc.substring(0, 500) || title,
+              url: link?.startsWith('http') ? link : `https://public.construction.com${link}`,
+              source: 'Construction.com',
+              project_type: workType,
+              status: 'active'
+            });
+          }
+        });
+        sitesScraped.push('Construction.com Public');
+      }
+    } catch (err) {
+      errors.push(`Construction.com: ${err.message}`);
     }
 
         console.log(`📊 Total opportunities found: ${opportunities.length}`);
