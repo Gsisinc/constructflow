@@ -74,6 +74,7 @@ import DailyLog from './pages/DailyLog';
 import Safety from './pages/Safety';
 import VehicleLogs from './pages/VehicleLogs';
 import Photos from './pages/Photos';
+import Invoices from './pages/Invoices';
 import __Layout from './Layout.jsx';
 
 
@@ -105,6 +106,7 @@ export const PAGES = {
     "Safety": Safety,
     "VehicleLogs": VehicleLogs,
     "Photos": Photos,
+    "Invoices": Invoices,
 }
 
 export const pagesConfig = {
