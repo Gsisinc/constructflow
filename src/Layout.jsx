@@ -36,15 +36,16 @@ import {
 import MegaMenu from '@/components/layout/MegaMenu';
 
 const navItems = [
-  { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
-  { name: 'Projects', icon: FolderKanban, page: 'Projects' },
-  { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
-  { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
-  { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
-  { name: 'Directory', icon: Users, page: 'Directory' },
-  { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
-  { name: 'Settings', icon: Settings, page: 'Settings' },
-];
+        { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
+        { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+        { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
+        { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
+        { name: 'Add Bid', icon: FileText, page: 'AddBid' },
+        { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
+        { name: 'Directory', icon: Users, page: 'Directory' },
+        { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
+        { name: 'Settings', icon: Settings, page: 'Settings' },
+      ];
 
 const adminNavItems = [
   { name: 'User Approvals', icon: User, page: 'UserApprovals' },
