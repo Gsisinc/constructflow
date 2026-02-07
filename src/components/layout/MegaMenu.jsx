@@ -33,49 +33,63 @@ const menuSections = [
     title: 'Project Management',
     items: [
       { icon: LayoutDashboard, label: 'Dashboard', page: 'Dashboard' },
-      { icon: Building2, label: 'Projects', page: 'Projects' },
-      { icon: CheckSquare, label: 'Tasks', page: 'Tasks' },
-      { icon: AlertTriangle, label: 'Issues', page: 'Issues' },
+      { icon: FileText, label: 'Daily Log', page: 'DailyLog' },
       { icon: Clock, label: 'Time Cards', page: 'TimeCards' },
-      { icon: Calendar, label: 'Calendar', page: 'Calendar' },
-      { icon: Users, label: 'Team', page: 'Team' },
-    ]
-  },
-  {
-    title: 'Business Development',
-    items: [
-      { icon: Search, label: 'Bid Discovery', page: 'BidDiscovery' },
-      { icon: FileText, label: 'Bid Opportunities', page: 'BidOpportunities' },
-      { icon: TrendingUp, label: 'Bids & Proposals', page: 'Bids' },
-      { icon: DollarSign, label: 'Estimates', page: 'Estimates' },
-      { icon: Bot, label: 'AI Agents', page: 'AIAgents' },
+      { icon: AlertTriangle, label: 'Issues', page: 'Issues' },
+      { icon: Shield, label: 'Safety', page: 'Safety' },
+      { icon: Smartphone, label: 'Vehicles', page: 'VehicleLogs' },
+      { icon: Package, label: 'Materials', page: 'Materials' },
+      { icon: FileStack, label: 'Documents', page: 'Documents' },
     ]
   },
   {
     title: 'Financials',
     items: [
-      { icon: DollarSign, label: 'Budget', page: 'Budget' },
-      { icon: FileStack, label: 'Change Orders', page: 'ChangeOrders' },
+      { icon: DollarSign, label: 'Overview', page: 'Budget' },
+      { icon: FileText, label: 'Estimates', page: 'Estimates' },
       { icon: Package, label: 'Purchase Orders', page: 'PurchaseOrders' },
-      { icon: Package, label: 'Materials', page: 'Materials' },
-      { icon: TrendingUp, label: 'Forecasts', page: 'Budget' },
+      { icon: FileText, label: 'Invoices', page: 'Invoices' },
+      { icon: TrendingUp, label: 'Financial Projections', page: 'Budget' },
+      { icon: FileStack, label: 'Change Orders', page: 'ChangeOrders' },
     ]
   },
   {
-    title: 'People & Resources',
+    title: 'People',
     items: [
       { icon: Users, label: 'Directory', page: 'Directory' },
-      { icon: Clock, label: 'Time Cards', page: 'TimeCards' },
-      { icon: Package, label: 'Equipment', page: 'EquipmentLogs' },
-      { icon: Users, label: 'Team Management', page: 'Team' },
+      { icon: Search, label: 'Opportunities', page: 'BidDiscovery' },
+      { icon: Users, label: 'Technicians', page: 'Directory' },
+      { icon: Calendar, label: 'Calendar', page: 'Calendar' },
+      { icon: Smartphone, label: 'Vehicles', page: 'VehicleLogs' },
+      { icon: FileStack, label: 'Documents', page: 'Documents' },
     ]
   },
   {
-    title: 'Settings',
+    title: 'Documents',
     items: [
-      { icon: Settings, label: 'Settings', page: 'Settings' },
-      { icon: Building2, label: 'Organization', page: 'Settings' },
+      { icon: Camera, label: 'Photos', page: 'Photos' },
+      { icon: FolderOpen, label: 'Files', page: 'Documents' },
+      { icon: FileImage, label: 'Plans & Drawings', page: 'Drawings' },
+      { icon: Book, label: 'Reports', page: 'Reports' },
+      { icon: FileStack, label: 'Submittals', page: 'Submittals' },
+      { icon: Package, label: 'Equipment Logs', page: 'EquipmentLogs' },
+    ]
+  },
+  {
+    title: 'Settings & Support',
+    items: [
+      { icon: HelpCircle, label: 'Help & Support', page: 'Support' },
+      { icon: Radio, label: "What's New", page: 'Changelog' },
+      { icon: MessageSquare, label: 'Make a Suggestion', page: 'Feedback' },
       { icon: Bot, label: 'AI Agents', page: 'AIAgents' },
+    ]
+  },
+  {
+    title: 'Resources',
+    items: [
+      { icon: Video, label: 'Training & Support', page: 'Training' },
+      { icon: Book, label: 'Knowledge Base', page: 'Docs' },
+      { icon: Building2, label: "Who's Behind It", page: 'About' },
     ]
   }
 ];
