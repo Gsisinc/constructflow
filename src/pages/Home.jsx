@@ -39,10 +39,10 @@ export default function Home() {
             <div className="relative">
               <div className="absolute inset-0 bg-amber-500 blur-3xl opacity-60"></div>
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/dfd5a4daa_ChatGPTImageJan20202602_32_55PM.png"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/1037cb786_ChatGPTImageJan20202602_32_55PM.png"
                 alt="Golden State Integrated Systems"
-                className="relative h-24 w-auto drop-shadow-2xl"
-                style={{ mixBlendMode: 'multiply', filter: 'brightness(0.9)' }}
+                className="relative h-32 w-auto drop-shadow-2xl"
+                style={{ mixBlendMode: 'screen' }}
               />
             </div>
             <div>
@@ -253,10 +253,10 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div>
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/dfd5a4daa_ChatGPTImageJan20202602_32_55PM.png"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/1037cb786_ChatGPTImageJan20202602_32_55PM.png"
                 alt="Golden State Integrated Systems"
-                className="h-20 w-auto mb-4"
-                style={{ mixBlendMode: 'multiply' }}
+                className="h-24 w-auto mb-4"
+                style={{ mixBlendMode: 'screen' }}
               />
               <p className="text-sm text-slate-400">
                 Empowering low voltage contractors with AI-powered construction intelligence.
