@@ -98,12 +98,41 @@ export default function AddBid() {
     }
   });
 
+  const handleAddPhase = () => {
+    setPhases([...phases, {
+      name: 'New Phase',
+      duration_days: 7,
+      description: '',
+      requirements: []
+    }]);
+  };
+
+  const handleDeletePhase = (idx) => {
+    setPhases(phases.filter((_, i) => i !== idx));
+  };
+
+  const handleAddRequirement = (phaseIdx) => {
+    const newReq = newRequirement[phaseIdx] || '';
+    if (newReq.trim()) {
+      const updatedPhases = [...phases];
+      updatedPhases[phaseIdx].requirements.push(newReq);
+      setPhases(updatedPhases);
+      setNewRequirement({ ...newRequirement, [phaseIdx]: '' });
+    }
+  };
+
+  const handleDeleteRequirement = (phaseIdx, reqIdx) => {
+    const updatedPhases = [...phases];
+    updatedPhases[phaseIdx].requirements = updatedPhases[phaseIdx].requirements.filter((_, i) => i !== reqIdx);
+    setPhases(updatedPhases);
+  };
+
   const handleAnalyze = () => {
     if (!formData.project_name || uploadedFiles.length === 0) {
       alert('Please enter a project name and upload at least one document');
       return;
     }
-    analyzeMutation.mutate(formData);
+    analyzeMutation.mutate({ ...formData, phases });
   };
 
   return (
