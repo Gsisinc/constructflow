@@ -38,14 +38,14 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="absolute inset-0 bg-blue-500 blur-xl opacity-50 rounded-full"></div>
-                <div className="relative h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                  <Zap className="h-7 w-7 text-white" />
+                <div className="absolute inset-0 bg-amber-500 blur-2xl opacity-60 rounded-full"></div>
+                <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center shadow-2xl shadow-amber-500/50">
+                  <Zap className="h-10 w-10 text-white drop-shadow-lg" />
                 </div>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">Golden State Integrated Systems</h1>
-                <p className="text-xs text-slate-400">Low Voltage • Security • AV Solutions</p>
+                <h1 className="text-2xl font-black text-white tracking-tight">Golden State Integrated Systems</h1>
+                <p className="text-sm text-amber-300/90 font-medium">Low Voltage • Security • AV Solutions</p>
               </div>
             </div>
           </div>
@@ -63,22 +63,30 @@ export default function Home() {
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-slate-950"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
-          <div className="absolute top-20 left-10 h-72 w-72 bg-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-10 h-96 w-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-600/20 via-orange-600/20 to-slate-950"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.1),transparent_50%)]"></div>
+          <div className="absolute top-20 left-10 h-72 w-72 bg-amber-500/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 h-96 w-96 bg-yellow-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          
+          {/* California Map Outline */}
+          <div className="absolute right-20 top-1/4 opacity-5 hidden lg:block">
+            <svg width="300" height="400" viewBox="0 0 300 400" fill="none" className="text-amber-400">
+              <path d="M150 20 L180 50 L190 100 L200 150 L210 200 L220 250 L230 300 L240 350 L230 380 L200 390 L170 385 L150 380 L130 370 L110 350 L90 320 L80 280 L70 240 L60 200 L50 160 L40 120 L50 80 L70 50 L100 30 L130 25 Z" 
+                    stroke="currentColor" strokeWidth="2" fill="currentColor" fillOpacity="0.1"/>
+            </svg>
+          </div>
         </div>
 
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2 mb-8">
-              <Sparkles className="h-4 w-4 text-blue-400" />
-              <span className="text-sm text-slate-300">AI-Powered Construction Intelligence Platform</span>
+            <div className="inline-flex items-center gap-2 bg-amber-500/10 backdrop-blur-sm border border-amber-500/20 rounded-full px-4 py-2 mb-8">
+              <Sparkles className="h-4 w-4 text-amber-400" />
+              <span className="text-sm text-amber-200">AI-Powered Construction Intelligence Platform</span>
             </div>
 
             <h1 className="text-6xl lg:text-8xl font-black text-white mb-6 leading-tight tracking-tight">
               Build the Future.<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400">
                 Win Every Bid.
               </span>
             </h1>
@@ -92,7 +100,7 @@ export default function Home() {
               <Button 
                 size="lg"
                 onClick={handleGetStarted}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-10 py-7 h-auto shadow-2xl shadow-blue-500/50"
+                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-lg px-10 py-7 h-auto shadow-2xl shadow-amber-500/50"
               >
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -126,11 +134,11 @@ export default function Home() {
           {/* Service Icons */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto mt-20">
             {[
-              { icon: Network, label: 'Structured Cabling', color: 'from-blue-500 to-cyan-500' },
-              { icon: Lock, label: 'Access Control', color: 'from-purple-500 to-pink-500' },
-              { icon: Video, label: 'Video Surveillance', color: 'from-orange-500 to-red-500' },
-              { icon: Radio, label: 'Fire Alarm', color: 'from-green-500 to-emerald-500' },
-              { icon: Wifi, label: 'Wireless Systems', color: 'from-indigo-500 to-blue-500' }
+              { icon: Network, label: 'Structured Cabling', color: 'from-amber-500 to-yellow-500' },
+              { icon: Lock, label: 'Access Control', color: 'from-orange-500 to-amber-600' },
+              { icon: Video, label: 'Video Surveillance', color: 'from-yellow-500 to-orange-500' },
+              { icon: Radio, label: 'Fire Alarm', color: 'from-amber-600 to-orange-600' },
+              { icon: Wifi, label: 'Wireless Systems', color: 'from-yellow-400 to-amber-500' }
             ].map((service, idx) => (
               <div key={idx} className="group relative">
                 <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all">
@@ -149,7 +157,7 @@ export default function Home() {
       <section className="py-24 px-6 bg-gradient-to-b from-slate-950 to-slate-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <Badge className="mb-4 bg-blue-500/10 text-blue-400 border-blue-500/20">Platform Features</Badge>
+            <Badge className="mb-4 bg-amber-500/10 text-amber-400 border-amber-500/20">Platform Features</Badge>
             <h2 className="text-5xl font-bold text-white mb-6">
               Everything You Need to Win
             </h2>
@@ -164,37 +172,37 @@ export default function Home() {
                 icon: Zap,
                 title: 'AI Bid Discovery',
                 description: 'Automatically find and analyze opportunities from 75+ government portals. Never miss a relevant project again.',
-                gradient: 'from-blue-500 to-cyan-500'
+                gradient: 'from-amber-500 to-yellow-500'
               },
               {
                 icon: TrendingUp,
                 title: 'Smart Estimating',
                 description: 'AI-powered cost estimation with historical data analysis and win probability scoring.',
-                gradient: 'from-purple-500 to-pink-500'
+                gradient: 'from-orange-500 to-amber-600'
               },
               {
                 icon: Users,
                 title: 'Team Collaboration',
                 description: 'Real-time updates, task management, and role-based permissions for your entire crew.',
-                gradient: 'from-green-500 to-emerald-500'
+                gradient: 'from-yellow-500 to-orange-500'
               },
               {
                 icon: Shield,
                 title: 'Compliance Tracking',
                 description: 'Manage permits, certifications, and safety documentation with automated reminders.',
-                gradient: 'from-orange-500 to-red-500'
+                gradient: 'from-amber-600 to-orange-600'
               },
               {
                 icon: Network,
                 title: 'Project Intelligence',
                 description: 'AI agents monitor budgets, schedules, and risks to keep projects on track.',
-                gradient: 'from-indigo-500 to-blue-500'
+                gradient: 'from-yellow-400 to-amber-500'
               },
               {
                 icon: Video,
                 title: 'Client Portals',
                 description: 'Branded portals give clients 24/7 access to updates, schedules, and documents.',
-                gradient: 'from-pink-500 to-rose-500'
+                gradient: 'from-orange-400 to-amber-500'
               }
             ].map((feature, idx) => (
               <div key={idx} className="group relative">
@@ -214,8 +222,8 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="py-24 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_70%)]"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-600/20 to-orange-600/20"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.1),transparent_70%)]"></div>
         
         <div className="relative max-w-4xl mx-auto text-center">
           <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6">
@@ -227,7 +235,7 @@ export default function Home() {
           <Button 
             size="lg"
             onClick={handleGetStarted}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xl px-12 py-8 h-auto shadow-2xl shadow-blue-500/50"
+            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xl px-12 py-8 h-auto shadow-2xl shadow-amber-500/50"
           >
             Start Your Free Trial
             <ArrowRight className="ml-3 h-6 w-6" />
@@ -244,7 +252,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
                   <Zap className="h-6 w-6 text-white" />
                 </div>
                 <span className="font-bold text-white">GSIS Manager</span>
