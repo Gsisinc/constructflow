@@ -76,6 +76,7 @@ import VehicleLogs from './pages/VehicleLogs';
 import Photos from './pages/Photos';
 import Invoices from './pages/Invoices';
 import Submittals from './pages/Submittals';
+import AddBid from './pages/AddBid';
 import __Layout from './Layout.jsx';
 
 
@@ -109,6 +110,7 @@ export const PAGES = {
     "Photos": Photos,
     "Invoices": Invoices,
     "Submittals": Submittals,
+    "AddBid": AddBid,
 }
 
 export const pagesConfig = {
