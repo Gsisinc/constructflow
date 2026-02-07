@@ -22,12 +22,22 @@ import {
 export default function Home() {
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+  const handleLogin = async () => {
+    const isAuth = await base44.auth.isAuthenticated();
+    if (isAuth) {
+      navigate(createPageUrl('Dashboard'));
+    } else {
+      base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+    }
   };
 
-  const handleGetStarted = () => {
-    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+  const handleGetStarted = async () => {
+    const isAuth = await base44.auth.isAuthenticated();
+    if (isAuth) {
+      navigate(createPageUrl('Dashboard'));
+    } else {
+      base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+    }
   };
 
   return (
