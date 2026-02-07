@@ -416,6 +416,7 @@ export default function ProjectDetail() {
 
         <TabsContent value="phases" className="mt-6">
           <div className="space-y-6">
+            <PhaseRequirementManager projectId={projectId} />
             <PhaseNavigator
               currentPhase={project.current_phase || 'preconstruction'}
               phaseGates={phaseGates}
