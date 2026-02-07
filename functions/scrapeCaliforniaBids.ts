@@ -37,9 +37,11 @@ Deno.serve(async (req) => {
       
       const naicsCode = naicsMap[workType] || '';
       
-      // SAM.gov API v2 - search for construction opportunities
-      const postedFrom = new Date(Date.now() - 90*24*60*60*1000).toISOString().split('T')[0];
-      const postedTo = new Date().toISOString().split('T')[0];
+      // SAM.gov API v2 - CORRECT DATE FORMAT MM/dd/yyyy
+      const fromDate = new Date(Date.now() - 90*24*60*60*1000);
+      const toDate = new Date();
+      const postedFrom = `${String(fromDate.getMonth() + 1).padStart(2, '0')}/${String(fromDate.getDate()).padStart(2, '0')}/${fromDate.getFullYear()}`;
+      const postedTo = `${String(toDate.getMonth() + 1).padStart(2, '0')}/${String(toDate.getDate()).padStart(2, '0')}/${toDate.getFullYear()}`;
       
       let samUrl = `https://api.sam.gov/opportunities/v2/search?api_key=${Deno.env.get('SAM_GOV_API_KEY')}&postedFrom=${postedFrom}&postedTo=${postedTo}&limit=1000&ptype=p,o,k`;
       
@@ -92,57 +94,9 @@ Deno.serve(async (req) => {
       console.error('SAM.gov API error:', err.message);
     }
 
-    // 2. FBO.gov/Construction.com RSS Feeds - WORKING sources
-    const rssFeeds = [
-      'https://www.fbo.gov/feeds/active',
-      'https://public.govwins.com/rss/active-opps.xml',
-      'https://www.bidsync.com/bidsync-rss.cfm',
-      'https://www.bidnet.com/bneattach/RSS/RssBids.aspx?st=CA',
-      'https://www.planetbids.com/portal/rss.cfm',
-    ];
+    // 2. Skip RSS feeds - too slow and unreliable
 
-      for (const feedUrl of rssFeeds) {
-      try {
-        const response = await fetch(feedUrl, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BidBot/1.0)' }
-        });
 
-        if (response.ok) {
-          const xml = await response.text();
-          const $ = cheerio.load(xml, { xmlMode: true });
-
-          $('item').each((i, elem) => {
-            const title = $(elem).find('title').text();
-            const link = $(elem).find('link').text();
-            const description = $(elem).find('description').text();
-            const pubDate = $(elem).find('pubDate').text();
-
-            if (title && link && (title.toLowerCase().includes(workType.toLowerCase().replace('_', ' ')) || 
-                                 description.toLowerCase().includes(workType.toLowerCase().replace('_', ' ')))) {
-              opportunities.push({
-                title,
-                project_name: title,
-                agency: 'Various Agencies',
-                location: `${city || ''} ${state}`.trim(),
-                estimated_value: extractValue(description),
-                due_date: extractDate(description) || new Date(pubDate).toISOString().split('T')[0],
-                description: description.substring(0, 500),
-                url: link,
-                source: new URL(feedUrl).hostname,
-                project_type: workType,
-                status: 'active'
-              });
-            }
-          });
-
-          sitesScraped.push(new URL(feedUrl).hostname);
-          console.log(`✓ RSS ${new URL(feedUrl).hostname}: Found opportunities`);
-        }
-      } catch (err) {
-        errors.push(`RSS ${feedUrl}: ${err.message}`);
-        console.error(`RSS error ${feedUrl}:`, err.message);
-      }
-      }
 
     // 3. State APIs that actually work
     if (state === 'California') {
