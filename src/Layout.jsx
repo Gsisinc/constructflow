@@ -119,6 +119,7 @@ export default function Layout({ children, currentPageName }) {
   const [user, setUser] = useState(null);
   const [organization, setOrganization] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Don't show layout on Home page
   const isHomePage = currentPageName === 'Home';
