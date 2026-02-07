@@ -67,6 +67,14 @@ const menuSections = [
     ]
   },
   {
+    title: 'Bid Management',
+    items: [
+      { icon: FileText, label: 'Add Bid Manually', page: 'AddBid' },
+      { icon: Search, label: 'Bid Discovery', page: 'BidDiscovery' },
+      { icon: FileStack, label: 'Active Bids', page: 'Bids' },
+    ]
+  },
+  {
     title: 'Documents',
     items: [
       { icon: Camera, label: 'Photos', page: 'Photos' },
