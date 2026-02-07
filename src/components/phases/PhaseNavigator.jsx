@@ -53,6 +53,20 @@ export default function PhaseNavigator({
     }
   });
 
+  const hideDefaultPhaseMutation = useMutation({
+    mutationFn: (phaseId) => base44.entities.CustomPhase.create({
+      project_id: projectId,
+      phase_name: phaseId,
+      display_name: `${phaseId} (hidden)`,
+      is_hidden: true,
+      order: 999
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
+      toast.success('Phase removed');
+    }
+  });
+
   const getPhaseStatus = (phaseId) => {
     const phaseIndex = PHASES.findIndex(p => p.id === phaseId);
     if (phaseIndex < currentPhaseIndex) return 'completed';
