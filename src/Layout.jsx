@@ -127,8 +127,12 @@ export default function Layout({ children, currentPageName }) {
   useEffect(() => {
     const loadUser = async () => {
       try {
+        // Don't redirect if we're potentially handling an OAuth callback
+        const urlParams = new URLSearchParams(window.location.search);
+        const isCallback = urlParams.has('code') || urlParams.has('state') || window.location.hash.includes('access_token');
+        
         const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth && !isHomePage) {
+        if (!isAuth && !isHomePage && !isCallback) {
           navigate(createPageUrl('Home'));
           return;
         }
