@@ -228,7 +228,7 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           {/* Quick Access Menu Button */}
-          <div className="hidden lg:block">
+          <div>
             <Button
               variant="ghost"
               size="sm"
@@ -236,7 +236,7 @@ export default function Layout({ children, currentPageName }) {
               className="flex items-center gap-2 text-slate-600 hover:text-amber-600"
             >
               <Grid3x3 className="h-4 w-4" />
-              Quick Access
+              <span className="hidden sm:inline">Quick Access</span>
               <ChevronDown className={cn("h-4 w-4 transition-transform", megaMenuOpen && "rotate-180")} />
             </Button>
           </div>
