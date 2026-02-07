@@ -1,284 +1,294 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '../utils';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Building2, CheckCircle2, Users, Calendar, FileText, BarChart3, ArrowRight } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Zap, 
+  Shield, 
+  TrendingUp, 
+  Users,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+  Network,
+  Lock,
+  Radio,
+  Video,
+  Wifi
+} from 'lucide-react';
 
 export default function Home() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    // Skip auth check - just show landing page
-    setLoading(false);
-  }, []);
-
-  const handleLogin = async () => {
-    const isAuth = await base44.auth.isAuthenticated();
-    if (isAuth) {
-      navigate(createPageUrl('Dashboard'));
-    } else {
-      base44.auth.redirectToLogin(createPageUrl('Dashboard'));
-    }
+  const handleLogin = () => {
+    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
   };
 
-  const handleSignup = () => {
-    navigate(createPageUrl('JoinRequest'));
+  const handleGetStarted = () => {
+    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Skeleton className="h-12 w-12 rounded-full" />
-      </div>
-    );
-  }
-
-
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-950">
       {/* Header */}
-      <header className="border-b bg-white sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
-                alt="GSIS Manager" 
-                className="h-12 sm:h-16 lg:h-20 w-auto"
-              />
-              <span className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">GSIS MANAGER</span>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Button onClick={handleLogin} variant="ghost" size="sm" className="text-xs sm:text-sm">
-                Log in
-              </Button>
-              <Button onClick={handleSignup} size="sm" className="bg-orange-600 hover:bg-orange-700 text-white text-xs sm:text-sm">
-                Sign up
-              </Button>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 bg-blue-500 blur-xl opacity-50 rounded-full"></div>
+                <div className="relative h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                  <Zap className="h-7 w-7 text-white" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Golden State Integrated Systems</h1>
+                <p className="text-xs text-slate-400">Low Voltage • Security • AV Solutions</p>
+              </div>
             </div>
           </div>
+          <Button 
+            onClick={handleLogin}
+            variant="outline"
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            Sign In
+          </Button>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-100 to-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div>
-              <div className="inline-block mb-3 sm:mb-4">
-                <span className="bg-orange-100 text-orange-800 text-xs sm:text-sm font-medium px-3 py-1.5 rounded-full">
-                  CONSTRUCTION MANAGEMENT SOFTWARE
-                </span>
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-slate-950"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
+          <div className="absolute top-20 left-10 h-72 w-72 bg-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 h-96 w-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2 mb-8">
+              <Sparkles className="h-4 w-4 text-blue-400" />
+              <span className="text-sm text-slate-300">AI-Powered Construction Intelligence Platform</span>
+            </div>
+
+            <h1 className="text-6xl lg:text-8xl font-black text-white mb-6 leading-tight tracking-tight">
+              Build the Future.<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                Win Every Bid.
+              </span>
+            </h1>
+
+            <p className="text-xl lg:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+              The all-in-one platform for low voltage contractors, integrating bid discovery, 
+              project management, and AI-powered insights to dominate your market.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <Button 
+                size="lg"
+                onClick={handleGetStarted}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-10 py-7 h-auto shadow-2xl shadow-blue-500/50"
+              >
+                Get Started Free
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={handleLogin}
+                className="border-white/20 text-white hover:bg-white/10 text-lg px-10 py-7 h-auto"
+              >
+                Watch Demo
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-8 justify-center text-slate-400 text-sm">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-green-400" />
+                <span>No credit card required</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 sm:mb-6">
-                Together, we can build it all
-              </h1>
-              <p className="text-base sm:text-lg lg:text-xl text-slate-600 mb-6 sm:mb-8">
-                Manage your construction projects from preconstruction to closeout with the insights you need to maximize safety, efficiency, and ROI.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <Button onClick={handleSignup} size="lg" className="bg-orange-600 hover:bg-orange-700 text-white text-base w-full sm:w-auto">
-                  Get Started
-                </Button>
-                <Button onClick={handleLogin} size="lg" variant="outline" className="text-base w-full sm:w-auto">
-                  Log in <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-green-400" />
+                <span>14-day free trial</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-green-400" />
+                <span>Setup in minutes</span>
               </div>
             </div>
-            <div className="relative order-first lg:order-last">
-              <div className="aspect-video bg-slate-800 rounded-lg overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&q=80" 
-                  alt="Construction worker" 
-                  className="w-full h-full object-cover"
-                />
+          </div>
+
+          {/* Service Icons */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto mt-20">
+            {[
+              { icon: Network, label: 'Structured Cabling', color: 'from-blue-500 to-cyan-500' },
+              { icon: Lock, label: 'Access Control', color: 'from-purple-500 to-pink-500' },
+              { icon: Video, label: 'Video Surveillance', color: 'from-orange-500 to-red-500' },
+              { icon: Radio, label: 'Fire Alarm', color: 'from-green-500 to-emerald-500' },
+              { icon: Wifi, label: 'Wireless Systems', color: 'from-indigo-500 to-blue-500' }
+            ].map((service, idx) => (
+              <div key={idx} className="group relative">
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all">
+                  <div className={`h-8 w-8 mx-auto mb-2 bg-gradient-to-r ${service.color} rounded-lg flex items-center justify-center`}>
+                    <service.icon className="h-5 w-5 text-white" />
+                  </div>
+                  <p className="text-xs text-slate-400 text-center">{service.label}</p>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Who We Serve */}
-      <section className="bg-white py-12 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">
-              The #1 end-to-end construction management solution
+      {/* Features Section */}
+      <section className="py-24 px-6 bg-gradient-to-b from-slate-950 to-slate-900">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-blue-500/10 text-blue-400 border-blue-500/20">Platform Features</Badge>
+            <h2 className="text-5xl font-bold text-white mb-6">
+              Everything You Need to Win
             </h2>
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+              From opportunity discovery to project completion, powered by cutting-edge AI
+            </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            <div className="relative group cursor-pointer">
-              <div className="aspect-[4/5] rounded-2xl overflow-hidden mb-4">
-                <img 
-                  src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&q=80" 
-                  alt="General Contractors" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl p-4 sm:p-6">
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">General Contractors</h3>
-                  <p className="text-slate-600 text-sm mb-3 sm:mb-4">Keep projects within budget from the palm of your hand.</p>
-                  <button className="text-orange-600 font-medium text-sm flex items-center gap-2 hover:gap-3 transition-all">
-                    Learn more <ArrowRight className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
 
-            <div className="relative group cursor-pointer">
-              <div className="aspect-[4/5] rounded-2xl overflow-hidden mb-4">
-                <img 
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80" 
-                  alt="Owners" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl p-4 sm:p-6">
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Owners</h3>
-                  <p className="text-slate-600 text-sm mb-3 sm:mb-4">Improve return with industry-leading every step of the process.</p>
-                  <button className="text-orange-600 font-medium text-sm flex items-center gap-2 hover:gap-3 transition-all">
-                    Learn more <ArrowRight className="h-4 w-4" />
-                  </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Zap,
+                title: 'AI Bid Discovery',
+                description: 'Automatically find and analyze opportunities from 75+ government portals. Never miss a relevant project again.',
+                gradient: 'from-blue-500 to-cyan-500'
+              },
+              {
+                icon: TrendingUp,
+                title: 'Smart Estimating',
+                description: 'AI-powered cost estimation with historical data analysis and win probability scoring.',
+                gradient: 'from-purple-500 to-pink-500'
+              },
+              {
+                icon: Users,
+                title: 'Team Collaboration',
+                description: 'Real-time updates, task management, and role-based permissions for your entire crew.',
+                gradient: 'from-green-500 to-emerald-500'
+              },
+              {
+                icon: Shield,
+                title: 'Compliance Tracking',
+                description: 'Manage permits, certifications, and safety documentation with automated reminders.',
+                gradient: 'from-orange-500 to-red-500'
+              },
+              {
+                icon: Network,
+                title: 'Project Intelligence',
+                description: 'AI agents monitor budgets, schedules, and risks to keep projects on track.',
+                gradient: 'from-indigo-500 to-blue-500'
+              },
+              {
+                icon: Video,
+                title: 'Client Portals',
+                description: 'Branded portals give clients 24/7 access to updates, schedules, and documents.',
+                gradient: 'from-pink-500 to-rose-500'
+              }
+            ].map((feature, idx) => (
+              <div key={idx} className="group relative">
+                <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-500`}></div>
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-white/20 transition-all h-full">
+                  <div className={`inline-flex h-12 w-12 rounded-xl bg-gradient-to-r ${feature.gradient} items-center justify-center mb-4`}>
+                    <feature.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                  <p className="text-slate-400 leading-relaxed">{feature.description}</p>
                 </div>
               </div>
-            </div>
-
-            <div className="relative group cursor-pointer sm:col-span-2 lg:col-span-1">
-              <div className="aspect-[4/5] rounded-2xl overflow-hidden mb-4">
-                <img 
-                  src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&q=80" 
-                  alt="Specialty Contractors" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl p-4 sm:p-6">
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Specialty Contractors</h3>
-                  <p className="text-slate-600 text-sm mb-3 sm:mb-4">Give your teams from field to office the tools they need.</p>
-                  <button className="text-orange-600 font-medium text-sm flex items-center gap-2 hover:gap-3 transition-all">
-                    Learn more <ArrowRight className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Platform Features */}
-      <section className="bg-slate-50 py-12 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">
-              Your platform for the future of construction
-            </h2>
-            <button className="text-orange-600 font-medium flex items-center gap-2 mx-auto hover:gap-3 transition-all text-sm sm:text-base">
-              See all products <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
-            <div className="bg-white rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-              <div className="aspect-video bg-slate-100 rounded-lg mb-3 sm:mb-4 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=600&q=80" 
-                  alt="Preconstruction" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Preconstruction</h3>
-              <p className="text-slate-600 text-sm mb-3 sm:mb-4">Manage designs, estimates, bids, and budgets across projects all-in-one. Integrated platform.</p>
-              <button className="text-orange-600 font-medium text-sm flex items-center gap-2 hover:gap-3 transition-all">
-                Learn more <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-              <div className="aspect-video bg-slate-100 rounded-lg mb-3 sm:mb-4 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80" 
-                  alt="Project Management" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Project Management</h3>
-              <p className="text-slate-600 text-sm mb-3 sm:mb-4">Mobile and desktop tools that improve efficiency by connecting field and office for real-time visibility.</p>
-              <button className="text-orange-600 font-medium text-sm flex items-center gap-2 hover:gap-3 transition-all">
-                Learn more <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
-              <div className="aspect-video bg-slate-100 rounded-lg mb-3 sm:mb-4 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80" 
-                  alt="Financial Management" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Financial Management</h3>
-              <p className="text-slate-600 text-sm mb-3 sm:mb-4">More accurate insights by delivering relevant financial insights to the field and timely closed job solutions to the...</p>
-              <button className="text-orange-600 font-medium text-sm flex items-center gap-2 hover:gap-3 transition-all">
-                Learn more <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-            <div className="bg-white rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-              <div className="aspect-video bg-slate-900 rounded-lg mb-3 sm:mb-4 overflow-hidden relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80" 
-                  alt="Procore Helix" 
-                  className="w-full h-full object-cover opacity-80"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white text-xl sm:text-2xl font-bold">AI-POWERED</span>
-                </div>
-              </div>
-              <span className="text-xs text-slate-500 uppercase tracking-wide">WHY IS PROCORE</span>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 mt-1">Procore Helix</h3>
-              <p className="text-slate-600 text-sm mb-3 sm:mb-4">Get real-time insights from an advanced-intelligence layer that answers questions and automates labor within...</p>
-              <button className="text-orange-600 font-medium text-sm flex items-center gap-2 hover:gap-3 transition-all">
-                Learn more <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="bg-white rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-              <div className="aspect-video bg-slate-100 rounded-lg mb-3 sm:mb-4 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80" 
-                  alt="Procore Platform" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Procore Platform</h3>
-              <p className="text-slate-600 text-sm mb-3 sm:mb-4">Drive Procore features by making data-driven decisions that help achieve greater project-level performance...</p>
-              <button className="text-orange-600 font-medium text-sm flex items-center gap-2 hover:gap-3 transition-all">
-                Learn more <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pick Your Path */}
-      <section className="bg-slate-900 text-white py-12 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-orange-500 text-xs sm:text-sm uppercase tracking-wide mb-3 sm:mb-4">PICK YOUR PATH</p>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-8 sm:mb-12">Let's find the right tools for you</h2>
-          <Button onClick={handleSignup} size="lg" className="bg-orange-600 hover:bg-orange-700 text-white text-base w-full sm:w-auto">
-            Get Started
+      {/* CTA Section */}
+      <section className="py-24 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_70%)]"></div>
+        
+        <div className="relative max-w-4xl mx-auto text-center">
+          <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6">
+            Ready to Dominate Your Market?
+          </h2>
+          <p className="text-xl text-slate-300 mb-10">
+            Join the leading low voltage contractors who've transformed their business with GSIS Manager
+          </p>
+          <Button 
+            size="lg"
+            onClick={handleGetStarted}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xl px-12 py-8 h-auto shadow-2xl shadow-blue-500/50"
+          >
+            Start Your Free Trial
+            <ArrowRight className="ml-3 h-6 w-6" />
           </Button>
+          <p className="text-slate-400 mt-6">
+            No credit card • 14 days free • Cancel anytime
+          </p>
         </div>
       </section>
-
-
 
       {/* Footer */}
-      <footer className="bg-white border-t py-6 sm:py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-600">
-          <p className="text-sm sm:text-base">&copy; 2026 GSIS Manager. All rights reserved.</p>
+      <footer className="bg-slate-900/50 backdrop-blur-sm border-t border-white/10 py-12 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                  <Zap className="h-6 w-6 text-white" />
+                </div>
+                <span className="font-bold text-white">GSIS Manager</span>
+              </div>
+              <p className="text-sm text-slate-400">
+                Empowering low voltage contractors with AI-powered construction intelligence.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Platform</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="#" className="hover:text-white transition">Features</a></li>
+                <li><a href="#" className="hover:text-white transition">Pricing</a></li>
+                <li><a href="#" className="hover:text-white transition">Security</a></li>
+                <li><a href="#" className="hover:text-white transition">Integrations</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="#" className="hover:text-white transition">About</a></li>
+                <li><a href="#" className="hover:text-white transition">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition">Contact</a></li>
+                <li><a href="#" className="hover:text-white transition">Blog</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="#" className="hover:text-white transition">Privacy</a></li>
+                <li><a href="#" className="hover:text-white transition">Terms</a></li>
+                <li><a href="#" className="hover:text-white transition">Cookies</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-white/10 pt-8 text-center">
+            <p className="text-sm text-slate-400">
+              © 2026 Golden State Integrated Systems Inc. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
