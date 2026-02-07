@@ -81,14 +81,14 @@ export default function Dashboard() {
            {/* Weather & Time */}
            <Card>
              <CardHeader>
-               <CardTitle className="text-base">Current Time & Weather</CardTitle>
+               <CardTitle className="text-base">Current Time & Weekly Forecast</CardTitle>
              </CardHeader>
-             <CardContent>
-               <div className="flex items-center justify-between">
+             <CardContent className="space-y-4">
+               <div className="flex items-center justify-between pb-4 border-b">
                  <div className="text-center">
-                   <div className="text-4xl">☀️</div>
-                   <p className="text-sm text-slate-600 mt-2">{weather.condition}</p>
-                   <p className="text-sm text-slate-500">H: {weather.high}° L: {weather.low}°</p>
+                   <div className="text-4xl">{weeklyForecast[0].condition}</div>
+                   <p className="text-sm text-slate-600 mt-2">{weeklyForecast[0].temp}°</p>
+                   <p className="text-xs text-slate-500">H: {weeklyForecast[0].high}° L: {weeklyForecast[0].low}°</p>
                  </div>
                  <div className="text-right">
                    <div className="text-3xl font-bold text-slate-900">{format(currentTime, 'h:mm')}</div>
@@ -96,6 +96,16 @@ export default function Dashboard() {
                    <div className="text-sm text-slate-500 mt-1">{format(currentTime, 'EEEE')}</div>
                    <div className="text-sm text-slate-500">{format(currentTime, 'MMMM d, yyyy')}</div>
                  </div>
+               </div>
+               <div className="grid grid-cols-7 gap-1 text-center text-xs">
+                 {weeklyForecast.map((day, i) => (
+                   <div key={day.day} className={i === 0 ? 'font-bold' : ''}>
+                     <div className="font-medium text-slate-700">{day.day}</div>
+                     <div className="text-lg mt-1">{day.condition}</div>
+                     <div className="text-slate-700 font-semibold">{day.high}°</div>
+                     <div className="text-slate-500 text-xs">{day.low}°</div>
+                   </div>
+                 ))}
                </div>
              </CardContent>
            </Card>
