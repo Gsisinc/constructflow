@@ -46,6 +46,20 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases'] });
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+      toast.success('Phase updated');
+    }
+  });
+
+  const reorderMutation = useMutation({
+    mutationFn: ({ phases }) => {
+      // Update order for each phase
+      return Promise.all(phases.map(p => 
+        base44.entities.CustomPhase.update(p.id, { order: p.order })
+      ));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
+      toast.success('Phases reordered');
     }
   });
 
