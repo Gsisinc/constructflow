@@ -192,10 +192,15 @@ Deno.serve(async (req) => {
 
         console.log(`📊 Total opportunities found: ${opportunities.length}`);
 
+        // Sort by date and limit results
+        const sortedOpportunities = opportunities
+          .filter(opp => opp.title && opp.url)
+          .sort((a, b) => new Date(b.due_date || 0) - new Date(a.due_date || 0));
+
         // Pagination logic
         const startIndex = (page - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, opportunities.length);
-        const paginatedOpportunities = opportunities.slice(startIndex, endIndex);
+        const endIndex = Math.min(startIndex + pageSize, sortedOpportunities.length);
+        const paginatedOpportunities = sortedOpportunities.slice(startIndex, endIndex);
     return Response.json({
       success: true,
       opportunities: paginatedOpportunities,
