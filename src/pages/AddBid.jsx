@@ -10,46 +10,46 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 const DEFAULT_PHASES = [
   {
-    name: 'Design & Planning',
-    duration_days: 7,
-    description: 'System design, planning, and proposal development',
-    requirements: ['Design documentation', 'Budget approval', 'Equipment selection']
+    name: 'Site Survey & Design',
+    duration_days: 5,
+    description: 'Assess location, design low voltage alarm system layout, and customer approval',
+    requirements: ['Site survey completed', 'System design approval', 'Permits reviewed']
   },
   {
     name: 'Material Procurement',
-    duration_days: 14,
-    description: 'Order and receive all materials and equipment',
-    requirements: ['Purchase orders', 'Vendor confirmations', 'Material delivery']
-  },
-  {
-    name: 'Installation & Wiring',
-    duration_days: 21,
-    description: 'Cable runs, equipment installation, and wiring',
-    requirements: ['Cabling install', 'Equipment mounting', 'Conduit installation']
-  },
-  {
-    name: 'System Configuration',
     duration_days: 10,
-    description: 'Programming and configuration of security system',
-    requirements: ['Panel programming', 'Sensor configuration', 'Network setup']
+    description: 'Order all alarm panels, sensors, wiring, and equipment',
+    requirements: ['Equipment ordered', 'Materials received', 'Quality inspection']
   },
   {
-    name: 'Testing & Commissioning',
+    name: 'Rough Wiring & Conduit',
+    duration_days: 14,
+    description: 'Install conduit runs, pull alarm wiring, place device boxes',
+    requirements: ['Conduit installation', 'Wiring runs completed', 'Box placement']
+  },
+  {
+    name: 'Device Installation',
+    duration_days: 10,
+    description: 'Mount sensors, detectors, keypads, and alarm panel',
+    requirements: ['Sensors mounted', 'Panel installed', 'Keypads mounted']
+  },
+  {
+    name: 'System Programming & Configuration',
     duration_days: 7,
-    description: 'System testing and performance verification',
-    requirements: ['System testing', 'Backup verification', 'Performance validation']
+    description: 'Program alarm zones, set sensor parameters, configure monitoring',
+    requirements: ['Zones programmed', 'Sensor calibration', 'Monitoring setup']
   },
   {
-    name: 'Documentation & Training',
+    name: 'Testing & Inspection',
     duration_days: 5,
-    description: 'Create documentation and train client staff',
-    requirements: ['As-built documentation', 'User manuals', 'Staff training']
+    description: 'Full system testing, alarm verification, and code compliance inspection',
+    requirements: ['System tested', 'Alarm signals verified', 'Final inspection passed']
   },
   {
-    name: 'Closeout',
+    name: 'Documentation & Customer Handoff',
     duration_days: 3,
-    description: 'Final inspections, warranty setup, and project closure',
-    requirements: ['Final inspection', 'Warranty registration', 'Closeout documentation']
+    description: 'Provide documentation, user manuals, and customer training',
+    requirements: ['Documentation provided', 'Customer trained', 'Warranty setup']
   }
 ];
 
