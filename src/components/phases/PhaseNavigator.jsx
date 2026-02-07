@@ -30,16 +30,28 @@ export default function PhaseNavigator({
   phaseGates = [], 
   customPhases = [],
   onInitiateGate,
-  onViewGate 
+  onViewGate,
+  projectId
 }) {
+  const queryClient = useQueryClient();
+  
   // Merge default phases with custom phases, sorted by order
   const PHASES = [...DEFAULT_PHASES, ...customPhases.map(cp => ({
     id: cp.phase_name,
     label: cp.display_name,
-    icon: cp.icon || '📌'
+    icon: cp.icon || '📌',
+    customPhaseId: cp.id
   }))];
   
   const currentPhaseIndex = PHASES.findIndex(p => p.id === currentPhase);
+
+  const deleteCustomPhaseMutation = useMutation({
+    mutationFn: (customPhaseId) => base44.entities.CustomPhase.delete(customPhaseId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
+      toast.success('Phase deleted');
+    }
+  });
 
   const getPhaseStatus = (phaseId) => {
     const phaseIndex = PHASES.findIndex(p => p.id === phaseId);
