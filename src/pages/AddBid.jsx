@@ -5,8 +5,53 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Upload, Loader, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Upload, Loader, CheckCircle, AlertCircle, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
+const DEFAULT_PHASES = [
+  {
+    name: 'Design & Planning',
+    duration_days: 7,
+    description: 'System design, planning, and proposal development',
+    requirements: ['Design documentation', 'Budget approval', 'Equipment selection']
+  },
+  {
+    name: 'Material Procurement',
+    duration_days: 14,
+    description: 'Order and receive all materials and equipment',
+    requirements: ['Purchase orders', 'Vendor confirmations', 'Material delivery']
+  },
+  {
+    name: 'Installation & Wiring',
+    duration_days: 21,
+    description: 'Cable runs, equipment installation, and wiring',
+    requirements: ['Cabling install', 'Equipment mounting', 'Conduit installation']
+  },
+  {
+    name: 'System Configuration',
+    duration_days: 10,
+    description: 'Programming and configuration of security system',
+    requirements: ['Panel programming', 'Sensor configuration', 'Network setup']
+  },
+  {
+    name: 'Testing & Commissioning',
+    duration_days: 7,
+    description: 'System testing and performance verification',
+    requirements: ['System testing', 'Backup verification', 'Performance validation']
+  },
+  {
+    name: 'Documentation & Training',
+    duration_days: 5,
+    description: 'Create documentation and train client staff',
+    requirements: ['As-built documentation', 'User manuals', 'Staff training']
+  },
+  {
+    name: 'Closeout',
+    duration_days: 3,
+    description: 'Final inspections, warranty setup, and project closure',
+    requirements: ['Final inspection', 'Warranty registration', 'Closeout documentation']
+  }
+];
 
 export default function AddBid() {
   const queryClient = useQueryClient();
@@ -17,6 +62,9 @@ export default function AddBid() {
     estimated_value: 0,
     due_date: ''
   });
+  const [phases, setPhases] = useState(DEFAULT_PHASES);
+  const [expandedPhase, setExpandedPhase] = useState(0);
+  const [newRequirement, setNewRequirement] = useState({});
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
