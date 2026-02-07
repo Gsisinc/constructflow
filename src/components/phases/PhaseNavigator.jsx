@@ -15,14 +15,14 @@ import {
 import { toast } from 'sonner';
 
 const DEFAULT_PHASES = [
-  { id: 'preconstruction', label: 'Pre-Construction', icon: '📋' },
-  { id: 'foundation', label: 'Foundation', icon: '🏗️' },
-  { id: 'superstructure', label: 'Superstructure', icon: '🏢' },
-  { id: 'enclosure', label: 'Enclosure', icon: '🪟' },
-  { id: 'mep_rough', label: 'MEP Rough-In', icon: '⚡' },
-  { id: 'interior_finishes', label: 'Interior Finishes', icon: '🎨' },
-  { id: 'commissioning', label: 'Commissioning', icon: '✅' },
-  { id: 'closeout', label: 'Closeout', icon: '🔑' },
+  { id: 'preconstruction', label: 'Pre-Construction', icon: '📋', isDefault: true },
+  { id: 'foundation', label: 'Foundation', icon: '🏗️', isDefault: true },
+  { id: 'superstructure', label: 'Superstructure', icon: '🏢', isDefault: true },
+  { id: 'enclosure', label: 'Enclosure', icon: '🪟', isDefault: true },
+  { id: 'mep_rough', label: 'MEP Rough-In', icon: '⚡', isDefault: true },
+  { id: 'interior_finishes', label: 'Interior Finishes', icon: '🎨', isDefault: true },
+  { id: 'commissioning', label: 'Commissioning', icon: '✅', isDefault: true },
+  { id: 'closeout', label: 'Closeout', icon: '🔑', isDefault: true },
 ];
 
 export default function PhaseNavigator({ 
