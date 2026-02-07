@@ -11,6 +11,7 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const { bidData, fileUrls } = body;
+    const customPhases = bidData.phases || [];
 
     // Call AI to analyze the documents
     const analysisPrompt = `You are a construction expert. Analyze the following bid opportunity and documents to provide a comprehensive project plan.
