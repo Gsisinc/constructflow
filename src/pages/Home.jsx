@@ -52,7 +52,7 @@ export default function Home() {
           <Button 
             onClick={handleLogin}
             variant="outline"
-            className="border-white/20 text-white hover:bg-white/10"
+            className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400"
           >
             Sign In
           </Button>
@@ -109,7 +109,7 @@ export default function Home() {
                 size="lg"
                 variant="outline"
                 onClick={handleLogin}
-                className="border-white/20 text-white hover:bg-white/10 text-lg px-10 py-7 h-auto"
+                className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400 text-lg px-10 py-7 h-auto"
               >
                 Watch Demo
               </Button>
