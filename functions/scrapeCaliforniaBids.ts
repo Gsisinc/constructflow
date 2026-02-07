@@ -2,6 +2,105 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import * as cheerio from 'npm:cheerio@1.0.0';
 import { parseFeed } from 'npm:htmlparser2@9.1.0';
 
+// In-memory cache for scraping results
+const scrapeCache = new Map();
+
+// Check robots.txt before scraping
+async function checkRobotsTxt(siteUrl) {
+  try {
+    const robotsUrl = new URL('/robots.txt', siteUrl).toString();
+    const resp = await fetch(robotsUrl, { timeout: 5000 });
+    if (resp.ok) {
+      const text = await resp.text();
+      if (text.includes('User-agent: *') && text.includes('Disallow: /')) {
+        console.warn(`🚫 robots.txt disallows scraping for ${siteUrl}`);
+        return false;
+      }
+    }
+  } catch (error) {
+    console.log(`No robots.txt found for ${siteUrl}, proceeding cautiously.`);
+  }
+  return true;
+}
+
+// Defensive fetch with anti-blocking measures
+async function defensiveFetch(url, options = {}) {
+  const cacheKey = `fetch:${url}`;
+  const now = Date.now();
+  const cacheEntry = scrapeCache.get(cacheKey);
+
+  // Return cached result if less than 5 minutes old
+  if (cacheEntry && (now - cacheEntry.timestamp < 300000)) {
+    console.log(`✓ Using cached result for ${url}`);
+    return cacheEntry.html;
+  }
+
+  // Random delay between 2-5 seconds
+  const delay = 2000 + Math.random() * 3000;
+  console.log(`⏳ Waiting ${Math.round(delay / 1000)}s before fetching...`);
+  await new Promise(resolve => setTimeout(resolve, delay));
+
+  // Comprehensive browser headers
+  const defaultHeaders = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1',
+    'Cache-Control': 'max-age=0',
+    'DNT': '1'
+  };
+
+  const fetchOptions = {
+    headers: { ...defaultHeaders, ...options.headers },
+    redirect: 'follow',
+    timeout: 30000,
+    ...options
+  };
+
+  try {
+    const response = await fetch(url, fetchOptions);
+    
+    // Handle common blocks
+    if (response.status === 403) {
+      throw new Error('403 Forbidden - IP or user-agent blocked');
+    }
+    if (response.status === 429) {
+      throw new Error('429 Rate Limited - too many requests');
+    }
+    if (response.status === 503) {
+      throw new Error('503 Service Unavailable - anti-bot protection');
+    }
+
+    const html = await response.text();
+    
+    // Detect Cloudflare or anti-bot challenges
+    if (html.includes('Checking your browser') || 
+        html.includes('Enable JavaScript and cookies') ||
+        html.includes('cloudflare-challenge')) {
+      throw new Error('Anti-bot challenge detected (Cloudflare/security)');
+    }
+
+    // Cache successful result
+    scrapeCache.set(cacheKey, {
+      html: html,
+      timestamp: now
+    });
+
+    console.log(`✓ Fetched ${url} - Status: ${response.status}`);
+    return html;
+
+  } catch (error) {
+    console.error(`✗ Defensive fetch failed for ${url}:`, error.message);
+    throw error;
+  }
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
