@@ -34,40 +34,48 @@ async function defensiveFetch(url) {
   return html;
 }
 
-// California county bid sources
+// VERIFIED California county bid sources (real URLs confirmed by user)
 const caCountySources = [
+  // Priority 1: Verified active portals
   {
     id: 'la-county',
     name: 'Los Angeles County',
     url: 'https://camisvr.co.la.ca.us/lacobids/',
     active: true,
-    priority: 1
-  },
-  {
-    id: 'san-diego',
-    name: 'San Diego County',
-    url: 'https://www.sandiegocounty.gov/content/sdc/purchasing.html',
-    active: true,
-    priority: 1
+    priority: 1,
+    verified: true
   },
   {
     id: 'orange-county',
     name: 'Orange County',
     url: 'https://cpo.oc.gov/open-bids-county-contracts-portal',
     active: true,
-    priority: 1
+    priority: 1,
+    verified: true
   },
   {
-    id: 'riverside',
-    name: 'Riverside County',
-    url: 'https://www.rivco.org/purchasing',
+    id: 'del-norte',
+    name: 'Del Norte County',
+    url: 'https://www.co.del-norte.ca.us/BidOpportunities',
     active: true,
-    priority: 2
+    priority: 1,
+    verified: true
   },
   {
-    id: 'san-bernardino',
-    name: 'San Bernardino County',
-    url: 'https://pws.sbcounty.gov/pws/default.aspx',
+    id: 'ca-state-dgs',
+    name: 'CA Dept of General Services',
+    url: 'https://www.dgs.ca.gov/OBAS/Bid-Opportunities',
+    active: true,
+    priority: 1,
+    verified: true,
+    isState: true
+  },
+  
+  // Priority 2: Large counties with procurement portals
+  {
+    id: 'san-diego',
+    name: 'San Diego County',
+    url: 'https://www.sandiegocounty.gov/content/sdc/purchasing.html',
     active: true,
     priority: 2
   },
@@ -82,6 +90,20 @@ const caCountySources = [
     id: 'alameda',
     name: 'Alameda County',
     url: 'https://www.acgov.org/gsa/purchasing/bidopportunities.htm',
+    active: true,
+    priority: 2
+  },
+  {
+    id: 'riverside',
+    name: 'Riverside County',
+    url: 'https://www.rivco.org/purchasing',
+    active: true,
+    priority: 2
+  },
+  {
+    id: 'san-bernardino',
+    name: 'San Bernardino County',
+    url: 'https://pws.sbcounty.gov/pws/default.aspx',
     active: true,
     priority: 2
   },
@@ -105,6 +127,27 @@ const caCountySources = [
     url: 'https://www.co.fresno.ca.us/departments/general-services-department/purchasing-division',
     active: true,
     priority: 3
+  },
+  {
+    id: 'kern',
+    name: 'Kern County',
+    url: 'https://www.kerncounty.com/government/purchasing',
+    active: true,
+    priority: 3
+  },
+  {
+    id: 'ventura',
+    name: 'Ventura County',
+    url: 'https://vcportal.ventura.org/Purchase/tabid/211/Default.aspx',
+    active: true,
+    priority: 3
+  },
+  {
+    id: 'san-francisco',
+    name: 'City and County of San Francisco',
+    url: 'https://sfgov.org/oca/bidders-contractors',
+    active: true,
+    priority: 2
   }
 ];
 
@@ -291,23 +334,32 @@ Deno.serve(async (req) => {
     
     console.log(`🚀 Starting California county scrape for ${workType}`);
     
-    // Get active sources
-    const activeSources = caCountySources.filter(s => s.active);
+    // Prioritize verified sources first
+    const verifiedSources = caCountySources.filter(s => s.active && s.verified);
+    const otherSources = caCountySources.filter(s => s.active && !s.verified);
+    const allSources = [...verifiedSources, ...otherSources];
+    
     const allResults = [];
     const errors = [];
     
-    // Scrape each county with 2 second delay between requests
-    for (const source of activeSources) {
+    console.log(`📋 Scanning ${verifiedSources.length} verified + ${otherSources.length} other sources`);
+    
+    // Scrape each county with delays
+    for (const source of allSources) {
       const result = await scrapeCounty(source, workType);
       
       if (result.success) {
         allResults.push(...result.bids);
+        console.log(`  ✓ ${source.name}: ${result.bids.length} bids`);
       } else {
         errors.push({ source: result.source, error: result.error });
+        console.log(`  ✗ ${source.name}: ${result.error}`);
       }
       
-      // Polite delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Polite delay only between requests (not after last one)
+      if (allSources.indexOf(source) < allSources.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
     }
     
     // Remove duplicates

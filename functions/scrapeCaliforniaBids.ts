@@ -115,8 +115,28 @@ Deno.serve(async (req) => {
     const sitesScraped = [];
     const errors = [];
 
-    // 1. Create SAMPLE DATA for demonstration
-    console.log('📊 Generating sample California bid data...');
+    // 1. REAL CALIFORNIA COUNTY SCRAPING
+    console.log('🔍 Scraping real California county bid sites...');
+
+    // Call the dedicated county scraper
+    try {
+      const countyResponse = await base44.functions.invoke('scrapeCaCounties', {
+        workType: workType
+      });
+
+      if (countyResponse.data.success && countyResponse.data.bids?.length > 0) {
+        opportunities.push(...countyResponse.data.bids);
+        sitesScraped.push(...(countyResponse.data.sources?.map(s => s.name) || []));
+        console.log(`✓ County scraper found ${countyResponse.data.bids.length} opportunities`);
+      }
+    } catch (err) {
+      errors.push(`County Scraper: ${err.message}`);
+      console.error('County scraper error:', err);
+    }
+
+    // 2. SAMPLE DATA (only if no real data found)
+    if (opportunities.length === 0) {
+      console.log('📊 No real data found, generating sample bids...');
 
     const sampleBids = [
       // Low Voltage (multiple samples)
