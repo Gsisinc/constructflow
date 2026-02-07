@@ -192,17 +192,20 @@ export default function BidDiscovery() {
 
       console.log('✅ Scraper response:', response.data);
 
-      if (response.data.success && response.data.opportunities?.length > 0) {
+      // Handle both CA counties response and general scraper response
+      const opportunities = response.data.opportunities || response.data.bids || [];
+
+      if (response.data.success && opportunities.length > 0) {
         if (page === 1) {
-          setSearchResults(response.data.opportunities);
+          setSearchResults(opportunities);
         } else {
-          setSearchResults(prev => [...prev, ...response.data.opportunities]);
+          setSearchResults(prev => [...prev, ...opportunities]);
         }
         setTotalPages(response.data.totalPages || 1);
-        setTotalAvailable(response.data.totalAvailable || response.data.opportunities.length);
+        setTotalAvailable(response.data.totalAvailable || response.data.summary?.uniqueBids || opportunities.length);
         setHasMore(response.data.hasMore || false);
         setCurrentPage(page);
-        toast.success(`✓ Found ${response.data.opportunities.length} ${workTypeDisplay} bids (${response.data.totalAvailable} total available)!`);
+        toast.success(`✓ Found ${opportunities.length} ${workTypeDisplay} bids!`);
       } else if (response.data.success) {
         setSearchResults([]);
         setHasMore(false);
