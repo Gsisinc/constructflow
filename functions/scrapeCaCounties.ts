@@ -156,14 +156,15 @@ function isRelevantBid(title, description, workType) {
   const text = (title + ' ' + description).toLowerCase();
   
   const keywordMap = {
-    low_voltage: ['low voltage', 'low-voltage', 'structured cabling', 'data cabling', 'cat6', 'cat5e', 'network cabling'],
-    fire_alarm: ['fire alarm', 'fire detection', 'fire safety', 'fire protection', 'fire panel', 'fire system'],
-    electrical: ['electrical', 'power distribution', 'lighting', 'electrical system', 'electrical work'],
-    security_systems: ['security system', 'access control', 'cctv', 'video surveillance', 'intrusion detection'],
-    av_systems: ['audio visual', 'av system', 'sound system', 'presentation system', 'conference room av'],
-    telecommunications: ['telecommunications', 'telecom', 'telephone system', 'voip', 'pbx'],
-    hvac: ['hvac', 'heating', 'ventilation', 'air conditioning', 'cooling'],
-    plumbing: ['plumbing', 'plumbing system', 'water', 'sewer', 'drainage']
+    low_voltage: ['low voltage', 'low-voltage', 'structured cabling', 'data cabling', 'cat6', 'cat5e', 'cat 6', 'network cabling', 'voice data', 'telecommunications cabling', 'it infrastructure', 'network infrastructure'],
+    fire_alarm: ['fire alarm', 'fire detection', 'fire safety', 'fire protection', 'fire panel', 'fire system', 'smoke detector'],
+    electrical: ['electrical', 'power distribution', 'lighting', 'electrical system', 'electrical work', 'power system', 'generator', 'panel upgrade'],
+    security_systems: ['security system', 'access control', 'cctv', 'video surveillance', 'intrusion detection', 'camera system', 'security camera'],
+    av_systems: ['audio visual', 'av system', 'audiovisual', 'sound system', 'presentation system', 'conference room av', 'multimedia'],
+    telecommunications: ['telecommunications', 'telecom', 'telephone system', 'voip', 'pbx', 'phone system'],
+    hvac: ['hvac', 'heating', 'ventilation', 'air conditioning', 'cooling', 'mechanical', 'climate control'],
+    plumbing: ['plumbing', 'plumbing system', 'water', 'sewer', 'drainage', 'pipe'],
+    all: ['construction', 'project', 'contract', 'work']
   };
   
   const keywords = keywordMap[workType] || [workType.replace('_', ' ')];
@@ -213,31 +214,89 @@ async function scrapeCounty(source, workType) {
     const html = await defensiveFetch(source.url);
     const $ = cheerio.load(html);
     
-    // Generic scraping - look for common patterns
-    // Tables
-    $('table tr').each((i, row) => {
-      if (i === 0) return; // Skip header
+    // AGGRESSIVE PARSING - Find ALL links mentioning bids/RFPs
+    const allLinks = [];
+    $('a').each((i, link) => {
+      const $link = $(link);
+      const linkText = $link.text().trim();
+      const href = $link.attr('href');
       
-      const $row = $(row);
-      const cells = $row.find('td');
+      if (!href || !linkText || linkText.length < 10) return;
       
-      if (cells.length >= 2) {
-        const titleCell = cells.first();
-        const title = titleCell.text().trim() || titleCell.find('a').text().trim();
-        const link = titleCell.find('a').attr('href') || $row.find('a').attr('href');
-        const rowText = $row.text();
+      // Get context around the link
+      const parent = $link.parent();
+      const contextText = parent.text();
+      
+      // Check if looks like a bid
+      const isBidLink = linkText.toLowerCase().includes('bid') ||
+                       linkText.toLowerCase().includes('rfp') ||
+                       linkText.toLowerCase().includes('rfq') ||
+                       linkText.toLowerCase().includes('solicitation') ||
+                       linkText.toLowerCase().includes('project') ||
+                       contextText.toLowerCase().includes('bid') ||
+                       contextText.toLowerCase().includes('solicitation');
+      
+      if (isBidLink) {
+        allLinks.push({
+          title: linkText,
+          href: href,
+          context: contextText,
+          element: parent
+        });
+      }
+    });
+    
+    console.log(`  Found ${allLinks.length} potential bid links`);
+    
+    // Process links and filter by work type
+    allLinks.forEach(item => {
+      const fullText = item.title + ' ' + item.context;
+      
+      if (!isRelevantBid(item.title, item.context, workType)) return;
+      
+      try {
+        const fullUrl = item.href.startsWith('http') ? item.href : new URL(item.href, source.url).href;
         
-        if (title && title.length > 10 && isRelevantBid(title, rowText, workType)) {
-          const fullUrl = link ? (link.startsWith('http') ? link : new URL(link, source.url).href) : source.url;
+        bids.push({
+          title: item.title.substring(0, 200),
+          project_name: item.title.substring(0, 200),
+          agency: source.name,
+          location: `${source.name}, California`,
+          estimated_value: extractValue(fullText),
+          due_date: extractDate(fullText),
+          description: fullText.substring(0, 400).replace(/\s+/g, ' ').trim(),
+          url: fullUrl,
+          source: source.name,
+          source_url: source.url,
+          project_type: workType,
+          status: 'active'
+        });
+      } catch (e) {
+        // Skip invalid URLs
+      }
+    });
+    
+    // FALLBACK: Parse tables if links didn't work
+    if (bids.length === 0) {
+      $('table tr').each((i, row) => {
+        if (i === 0) return;
+        const $row = $(row);
+        const rowText = $row.text();
+        const link = $row.find('a').first();
+        const title = link.text().trim() || $row.find('td').first().text().trim();
+        
+        if (title.length > 15 && isRelevantBid(title, rowText, workType)) {
+          const href = link.attr('href');
+          const fullUrl = href ? (href.startsWith('http') ? href : new URL(href, source.url).href) : source.url;
           
           bids.push({
-            title,
-            project_name: title,
+            title: title.substring(0, 200),
+            project_name: title.substring(0, 200),
             agency: source.name,
             location: `${source.name}, California`,
             estimated_value: extractValue(rowText),
             due_date: extractDate(rowText),
-            description: rowText.substring(0, 300).trim(),
+            description: rowText.substring(0, 400).replace(/\s+/g, ' ').trim(),
             url: fullUrl,
             source: source.name,
             source_url: source.url,
@@ -245,63 +304,8 @@ async function scrapeCounty(source, workType) {
             status: 'active'
           });
         }
-      }
-    });
-    
-    // Lists with links
-    $('ul li, ol li').each((i, item) => {
-      const $item = $(item);
-      const link = $item.find('a');
-      const title = link.text().trim() || $item.text().trim();
-      const href = link.attr('href');
-      const itemText = $item.text();
-      
-      if (title && title.length > 10 && href && isRelevantBid(title, itemText, workType)) {
-        const fullUrl = href.startsWith('http') ? href : new URL(href, source.url).href;
-        
-        bids.push({
-          title,
-          project_name: title,
-          agency: source.name,
-          location: `${source.name}, California`,
-          estimated_value: extractValue(itemText),
-          due_date: extractDate(itemText),
-          description: itemText.substring(0, 300).trim(),
-          url: fullUrl,
-          source: source.name,
-          source_url: source.url,
-          project_type: workType,
-          status: 'active'
-        });
-      }
-    });
-    
-    // Div containers
-    $('div.bid-item, div.opportunity, div.solicitation, article').each((i, elem) => {
-      const $elem = $(elem);
-      const title = $elem.find('h2, h3, h4, .title').text().trim() || $elem.find('a').first().text().trim();
-      const link = $elem.find('a').attr('href');
-      const elemText = $elem.text();
-      
-      if (title && title.length > 10 && isRelevantBid(title, elemText, workType)) {
-        const fullUrl = link ? (link.startsWith('http') ? link : new URL(link, source.url).href) : source.url;
-        
-        bids.push({
-          title,
-          project_name: title,
-          agency: source.name,
-          location: `${source.name}, California`,
-          estimated_value: extractValue(elemText),
-          due_date: extractDate(elemText),
-          description: elemText.substring(0, 300).trim(),
-          url: fullUrl,
-          source: source.name,
-          source_url: source.url,
-          project_type: workType,
-          status: 'active'
-        });
-      }
-    });
+      });
+    }
     
     console.log(`✓ ${source.name}: Found ${bids.length} relevant bids`);
     return { success: true, bids, source: source.name };
@@ -374,7 +378,7 @@ Deno.serve(async (req) => {
       }
     });
     
-    console.log(`📊 Total: ${uniqueBids.length} unique bids from ${activeSources.length} counties`);
+    console.log(`📊 Total: ${uniqueBids.length} unique bids from ${allSources.length} counties`);
     
     // Save to database unless test mode
     let savedCount = 0;
@@ -392,15 +396,15 @@ Deno.serve(async (req) => {
     return Response.json({
       success: true,
       summary: {
-        countiesScraped: activeSources.length,
-        countiesSucceeded: activeSources.length - errors.length,
+        countiesScraped: allSources.length,
+        countiesSucceeded: allSources.length - errors.length,
         bidsFound: allResults.length,
         uniqueBids: uniqueBids.length,
         savedToDb: savedCount
       },
       bids: testMode ? uniqueBids.slice(0, 20) : uniqueBids,
       errors: errors.length > 0 ? errors : undefined,
-      sources: activeSources.map(s => ({ name: s.name, url: s.url }))
+      sources: allSources.map(s => ({ name: s.name, url: s.url }))
     });
     
   } catch (error) {
