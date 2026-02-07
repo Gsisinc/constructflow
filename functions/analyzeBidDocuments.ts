@@ -115,25 +115,28 @@ Return ONLY valid JSON with this exact structure:
       health_status: 'green'
     });
 
+    // Use custom phases if provided, otherwise use AI-generated phases
+    const phasesToUse = customPhases.length > 0 ? customPhases : analysisResult.phases;
+
     // Create phase requirements
     const phaseRequirements = [];
-    for (const phase of analysisResult.phases) {
+    for (const phase of phasesToUse) {
       const created = await base44.entities.PhaseRequirement.create({
         project_id: project.id,
         phase: phase.name,
-        description: phase.description,
-        requirements: phase.requirements,
+        description: phase.description || '',
+        requirements: phase.requirements || [],
         estimated_duration_days: phase.duration_days
       });
       phaseRequirements.push(created);
     }
 
     // Create phase budget
-    for (const phase of analysisResult.phases) {
+    for (const phase of phasesToUse) {
       await base44.entities.PhaseBudget.create({
         project_id: project.id,
         phase_name: phase.name,
-        allocated_budget: (analysisResult.total_budget / analysisResult.phases.length),
+        allocated_budget: (analysisResult.total_budget / phasesToUse.length),
         spent: 0,
         committed: 0
       });
