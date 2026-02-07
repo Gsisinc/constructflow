@@ -332,12 +332,10 @@ Deno.serve(async (req) => {
     // 4. PlanetBids Open Data
     try {
       const planetUrl = `https://www.planetbids.com/portal/rss/activebids.xml`;
-      const pbResponse = await fetch(planetUrl, {
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
-      
-      if (pbResponse.ok) {
-        const xml = await pbResponse.text();
+      const canScrape = await checkRobotsTxt(planetUrl);
+
+      if (canScrape) {
+        const xml = await defensiveFetch(planetUrl);
         const $ = cheerio.load(xml, { xmlMode: true });
         
         $('item').slice(0, 100).each((i, elem) => {
