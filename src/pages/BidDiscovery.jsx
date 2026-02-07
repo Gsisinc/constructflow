@@ -157,13 +157,38 @@ export default function BidDiscovery() {
     toast.info(`🔍 Fetching ${workTypeDisplay} opportunities in ${state} (page ${page})...`);
 
     try {
-      const response = await base44.functions.invoke('scrapeCaliforniaBids', {
-        workType: workType,
-        state: state,
-        city: cityCounty || null,
-        page: page,
-        pageSize: 500
-      });
+      // Try California counties first if California is selected
+      let response;
+      if (state === 'California') {
+        response = await base44.functions.invoke('scrapeCaCounties', {
+          workType: workType,
+          testMode: false
+        });
+
+        // If CA counties returned results, use those
+        if (response.data.success && response.data.bids?.length > 0) {
+          console.log('✓ Using California county data');
+        } else {
+          // Fall back to general scraper
+          console.log('⚠ CA counties empty, trying general scraper');
+          response = await base44.functions.invoke('scrapeCaliforniaBids', {
+            workType: workType,
+            state: state,
+            city: cityCounty || null,
+            page: page,
+            pageSize: 500
+          });
+        }
+      } else {
+        // Use general scraper for other states
+        response = await base44.functions.invoke('scrapeCaliforniaBids', {
+          workType: workType,
+          state: state,
+          city: cityCounty || null,
+          page: page,
+          pageSize: 500
+        });
+      }
 
       console.log('✅ Scraper response:', response.data);
 
