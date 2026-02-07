@@ -71,6 +71,7 @@ import Team from './pages/Team';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import DailyLog from './pages/DailyLog';
+import Safety from './pages/Safety';
 import __Layout from './Layout.jsx';
 
 
@@ -99,6 +100,7 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "DailyLog": DailyLog,
+    "Safety": Safety,
 }
 
 export const pagesConfig = {
