@@ -23,7 +23,8 @@ import {
   Settings,
   User,
   Bot,
-  Search
+  Search,
+  Grid3x3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,6 +33,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import MegaMenu from '@/components/layout/MegaMenu';
 
 const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
@@ -113,6 +115,7 @@ function UserMenu({ user, onLogout }) {
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [megaMenuOpen, setMegaMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [organization, setOrganization] = useState(null);
   const location = useLocation();
@@ -219,6 +222,20 @@ export default function Layout({ children, currentPageName }) {
             </div>
           </div>
 
+          {/* Quick Access Menu Button */}
+          <div className="hidden lg:block">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMegaMenuOpen(!megaMenuOpen)}
+              className="flex items-center gap-2 text-slate-600 hover:text-amber-600"
+            >
+              <Grid3x3 className="h-4 w-4" />
+              Quick Access
+              <ChevronDown className={cn("h-4 w-4 transition-transform", megaMenuOpen && "rotate-180")} />
+            </Button>
+          </div>
+
           {/* Project Selector & User Menu */}
           <div className="flex items-center gap-3 ml-auto">
             <ProjectSelector />
@@ -226,6 +243,9 @@ export default function Layout({ children, currentPageName }) {
           </div>
         </div>
       </div>
+
+      {/* Mega Menu */}
+      <MegaMenu isOpen={megaMenuOpen} onClose={() => setMegaMenuOpen(false)} />
 
       {/* Sidebar Overlay */}
       {sidebarOpen && (
