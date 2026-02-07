@@ -55,12 +55,15 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, []);
 
-  const weather = {
-    condition: 'Sunny',
-    temp: 72,
-    high: 78,
-    low: 65
-  };
+  const weeklyForecast = [
+    { day: 'Mon', high: 78, low: 65, condition: '☀️', temp: 72 },
+    { day: 'Tue', high: 76, low: 64, condition: '☀️', temp: 70 },
+    { day: 'Wed', high: 74, low: 62, condition: '⛅', temp: 68 },
+    { day: 'Thu', high: 72, low: 61, condition: '🌧️', temp: 65 },
+    { day: 'Fri', high: 75, low: 63, condition: '⛅', temp: 69 },
+    { day: 'Sat', high: 79, low: 66, condition: '☀️', temp: 73 },
+    { day: 'Sun', high: 80, low: 67, condition: '☀️', temp: 74 }
+  ];
 
   return (
     <div className="space-y-6">
