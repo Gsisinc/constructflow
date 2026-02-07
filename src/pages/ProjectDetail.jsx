@@ -418,6 +418,7 @@ export default function ProjectDetail() {
           <div className="space-y-6">
             <PhaseRequirementManager projectId={projectId} />
             <PhaseNavigator
+              projectId={projectId}
               currentPhase={project.current_phase || 'preconstruction'}
               phaseGates={phaseGates}
               customPhases={customPhases}
