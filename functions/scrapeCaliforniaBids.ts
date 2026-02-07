@@ -38,7 +38,10 @@ Deno.serve(async (req) => {
       const naicsCode = naicsMap[workType] || '';
       
       // SAM.gov API v2 - search for construction opportunities
-      let samUrl = `https://api.sam.gov/opportunities/v2/search?api_key=${Deno.env.get('SAM_GOV_API_KEY')}&postedFrom=${new Date(Date.now() - 90*24*60*60*1000).toISOString().split('T')[0]}&limit=1000&ptype=p,o,k`;
+      const postedFrom = new Date(Date.now() - 90*24*60*60*1000).toISOString().split('T')[0];
+      const postedTo = new Date().toISOString().split('T')[0];
+      
+      let samUrl = `https://api.sam.gov/opportunities/v2/search?api_key=${Deno.env.get('SAM_GOV_API_KEY')}&postedFrom=${postedFrom}&postedTo=${postedTo}&limit=1000&ptype=p,o,k`;
       
       if (naicsCode) {
         samUrl += `&ncode=${naicsCode}`;
