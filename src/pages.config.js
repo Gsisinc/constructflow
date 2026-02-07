@@ -75,6 +75,7 @@ import Safety from './pages/Safety';
 import VehicleLogs from './pages/VehicleLogs';
 import Photos from './pages/Photos';
 import Invoices from './pages/Invoices';
+import Submittals from './pages/Submittals';
 import __Layout from './Layout.jsx';
 
 
@@ -107,6 +108,7 @@ export const PAGES = {
     "VehicleLogs": VehicleLogs,
     "Photos": Photos,
     "Invoices": Invoices,
+    "Submittals": Submittals,
 }
 
 export const pagesConfig = {
