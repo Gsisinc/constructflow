@@ -116,8 +116,8 @@ export default function MegaMenu({ isOpen, onClose }) {
       />
       
       {/* Mega Menu */}
-      <div className="fixed left-0 right-0 top-16 z-50 bg-white border-b border-slate-200 shadow-xl">
-        <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="fixed left-0 right-0 top-16 z-50 bg-white border-b border-slate-200 shadow-xl lg:left-64">
+        <div className="max-w-7xl mx-auto px-8 py-8 lg:px-6">
           <div className="grid grid-cols-5 gap-8">
             {menuSections.map((section, idx) => (
               <div key={idx}>
