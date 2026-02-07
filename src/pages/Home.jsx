@@ -41,8 +41,8 @@ export default function Home() {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/dfd5a4daa_ChatGPTImageJan20202602_32_55PM.png"
                 alt="Golden State Integrated Systems"
-                className="relative h-24 w-auto drop-shadow-2xl mix-blend-lighten"
-                style={{ filter: 'brightness(1.2) contrast(1.1)' }}
+                className="relative h-24 w-auto drop-shadow-2xl"
+                style={{ mixBlendMode: 'multiply', filter: 'brightness(0.9)' }}
               />
             </div>
             <div>
@@ -255,8 +255,8 @@ export default function Home() {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/dfd5a4daa_ChatGPTImageJan20202602_32_55PM.png"
                 alt="Golden State Integrated Systems"
-                className="h-20 w-auto mb-4 mix-blend-lighten"
-                style={{ filter: 'brightness(1.2) contrast(1.1)' }}
+                className="h-20 w-auto mb-4"
+                style={{ mixBlendMode: 'multiply' }}
               />
               <p className="text-sm text-slate-400">
                 Empowering low voltage contractors with AI-powered construction intelligence.
