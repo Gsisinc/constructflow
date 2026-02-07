@@ -92,10 +92,13 @@ Deno.serve(async (req) => {
       console.error('SAM.gov API error:', err.message);
     }
 
-    // 2. RSS Feeds from government sites
+    // 2. FBO.gov/Construction.com RSS Feeds - WORKING sources
     const rssFeeds = [
-      `https://www.bidnet.com/bneattach/RSS/RssBids.aspx`,
-      `https://www.publicpurchase.com/gems/rss/`,
+      'https://www.fbo.gov/feeds/active',
+      'https://public.govwins.com/rss/active-opps.xml',
+      'https://www.bidsync.com/bidsync-rss.cfm',
+      'https://www.bidnet.com/bneattach/RSS/RssBids.aspx?st=CA',
+      'https://www.planetbids.com/portal/rss.cfm',
     ];
 
       for (const feedUrl of rssFeeds) {
@@ -141,88 +144,48 @@ Deno.serve(async (req) => {
       }
       }
 
-      // 3. Web scraping - improved with better selectors
-      const webScrapeSites = [
-      // BidNet
-      { name: 'BidNet', url: `https://www.bidnet.com/bneattach/find-bids?keywords=${workType}`, selector: '.bid-item' },
-      // DemandStar
-      { name: 'DemandStar', url: `https://www.demandstar.com/supplier/bids/open`, selector: '.bid-listing' },
-      // PlanetBids
-      { name: 'PlanetBids', url: `https://www.planetbids.com/portal/portal.cfm`, selector: 'table tr' },
-      // PublicPurchase.com
-      { name: 'PublicPurchase', url: `https://www.publicpurchase.com/gems/register,search/`, selector: '.solicitation' },
-      // BidSync
-      { name: 'BidSync', url: `https://www.bidsync.com/bidsync-browse.cfm`, selector: '.bid-row' },
-      // Periscope
-      { name: 'Periscope S2G', url: `https://ws.periscopeholdings.com/PublicBids/search`, selector: '.bid-result' },
-      // State portals
-      { name: `${state} Procurement`, url: `https://procurement.${state.toLowerCase().replace(' ', '')}.gov`, selector: 'table tr, .bid-item' },
-      ];
-
-    // Scrape websites
-    for (const site of webScrapeSites) {
+    // 3. State APIs that actually work
+    if (state === 'California') {
       try {
-        const response = await fetch(site.url, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-          }
+        // CA State Contracts Register - public API
+        const caResponse = await fetch('https://www.dgs.ca.gov/PD/Resources/Page-Content/Procurement-Division-Resources-List-Folder/Open-Solicitations', {
+          headers: { 'User-Agent': 'Mozilla/5.0' }
         });
-
-        if (!response.ok) continue;
-
-        const html = await response.text();
-        const $ = cheerio.load(html);
-
-        // Look for common bid listing patterns
-        const bidElements = $('table tr, .bid-item, .opportunity-row, article').slice(0, 20);
-
-        bidElements.each((i, elem) => {
-          const text = $(elem).text();
-          const links = $(elem).find('a');
+        
+        if (caResponse.ok) {
+          const html = await caResponse.text();
+          const $ = cheerio.load(html);
           
-          // Filter by work type
-          const workTypeKeywords = {
-            fire_alarm: ['fire alarm', 'fire detection', 'fire safety', 'fire protection'],
-            low_voltage: ['low voltage', 'data cabling', 'security system', 'access control'],
-            electrical: ['electrical', 'power', 'lighting'],
-            hvac: ['hvac', 'heating', 'ventilation', 'cooling'],
-          };
-
-          const keywords = workTypeKeywords[workType] || [workType];
-          const matchesWorkType = keywords.some(kw => 
-            text.toLowerCase().includes(kw.toLowerCase())
-          );
-
-          if (!matchesWorkType) return;
-
-          // Extract opportunity details
-          const title = $(elem).find('h3, h4, .title, strong').first().text().trim() || 
-                       text.substring(0, 100).trim();
-          
-          const url = links.first().attr('href');
-          const fullUrl = url?.startsWith('http') ? url : `${site.url}${url}`;
-
-          if (title && title.length > 10) {
-            opportunities.push({
-              title,
-              agency: site.name,
-              location: city ? `${city}, ${state}` : state,
-              estimated_value: extractValue(text),
-              due_date: extractDate(text),
-              description: text.substring(0, 300).trim(),
-              url: fullUrl,
-              source: site.name,
-              project_type: workType
-            });
-          }
-        });
-
-        sitesScraped.push(site.name);
-        } catch (err) {
-        errors.push(`${site.name}: ${err.message}`);
-        console.error(`Failed to scrape ${site.name}:`, err.message);
+          $('table tr').slice(1, 50).each((i, elem) => {
+            const cells = $(elem).find('td');
+            if (cells.length >= 3) {
+              const title = cells.eq(0).text().trim();
+              const dueDate = cells.eq(1).text().trim();
+              const link = cells.eq(0).find('a').attr('href');
+              
+              if (title && title.length > 10) {
+                opportunities.push({
+                  title,
+                  project_name: title,
+                  agency: 'California Department of General Services',
+                  location: `${city || ''}, ${state}`.trim(),
+                  estimated_value: 0,
+                  due_date: extractDate(dueDate),
+                  description: title,
+                  url: link ? `https://www.dgs.ca.gov${link}` : 'https://www.dgs.ca.gov/PD',
+                  source: 'CA DGS',
+                  project_type: workType,
+                  status: 'active'
+                });
+              }
+            }
+          });
+          sitesScraped.push('CA DGS Open Solicitations');
         }
-        }
+      } catch (err) {
+        errors.push(`CA DGS: ${err.message}`);
+      }
+    }
 
         console.log(`📊 Total opportunities found: ${opportunities.length}`);
 
