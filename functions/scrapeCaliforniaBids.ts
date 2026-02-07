@@ -292,12 +292,10 @@ Deno.serve(async (req) => {
     // 3. BidSync Public API - Free tier access
     try {
       const bidSyncUrl = `https://www.bidsync.com/bidsync-xml/active.xml`;
-      const bsResponse = await fetch(bidSyncUrl, {
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
-      
-      if (bsResponse.ok) {
-        const xml = await bsResponse.text();
+      const canScrape = await checkRobotsTxt(bidSyncUrl);
+
+      if (canScrape) {
+        const xml = await defensiveFetch(bidSyncUrl);
         const $ = cheerio.load(xml, { xmlMode: true });
         
         $('bid').slice(0, 100).each((i, elem) => {
