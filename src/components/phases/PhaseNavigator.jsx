@@ -119,13 +119,37 @@ export default function PhaseNavigator({
                 </div>
 
                 {/* Label */}
-                <p className={cn(
-                  "text-xs mt-2 text-center font-medium",
-                  status === 'current' ? "text-blue-600" : 
-                  status === 'completed' ? "text-green-600" : "text-slate-500"
-                )}>
-                  {phase.label}
-                </p>
+                <div className="flex items-center gap-1 mt-2">
+                  <p className={cn(
+                    "text-xs text-center font-medium",
+                    status === 'current' ? "text-blue-600" : 
+                    status === 'completed' ? "text-green-600" : "text-slate-500"
+                  )}>
+                    {phase.label}
+                  </p>
+                  {phase.customPhaseId && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="ghost" className="h-5 w-5 p-0">
+                          <MoreVertical className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="center">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
+                              deleteCustomPhaseMutation.mutate(phase.customPhaseId);
+                            }
+                          }}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Phase
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
 
                 {/* Gate Action */}
                 {index === currentPhaseIndex && index < PHASES.length - 1 && (
