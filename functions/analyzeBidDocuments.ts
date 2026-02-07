@@ -115,8 +115,8 @@ Return ONLY valid JSON with this exact structure:
       health_status: 'green'
     });
 
-    // Use custom phases if provided, otherwise use AI-generated phases
-    const phasesToUse = customPhases.length > 0 ? customPhases : analysisResult.phases;
+    // Use custom phases from the form (these are the low voltage alarm phases)
+    const phasesToUse = customPhases;
 
     // Create phase requirements
     const phaseRequirements = [];
