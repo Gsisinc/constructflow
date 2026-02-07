@@ -207,10 +207,10 @@ Deno.serve(async (req) => {
       sitesScraped,
       errors: errors.length > 0 ? errors : undefined,
       totalFound: paginatedOpportunities.length,
-      totalAvailable: opportunities.length,
+      totalAvailable: sortedOpportunities.length,
       currentPage: page,
-      totalPages: Math.ceil(opportunities.length / pageSize),
-      hasMore: page < Math.ceil(opportunities.length / pageSize),
+      totalPages: Math.ceil(sortedOpportunities.length / pageSize),
+      hasMore: page < Math.ceil(sortedOpportunities.length / pageSize),
       message: opportunities.length === 0 ? 'No opportunities found. Try different search criteria or check back later.' : undefined
     });
 
