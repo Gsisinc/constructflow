@@ -369,12 +369,10 @@ Deno.serve(async (req) => {
     // 5. Construct Connect Public Leads
     try {
       const ccUrl = `https://public.construction.com/projects/search?state=${state}&type=bid`;
-      const ccResponse = await fetch(ccUrl, {
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
-      
-      if (ccResponse.ok) {
-        const html = await ccResponse.text();
+      const canScrape = await checkRobotsTxt(ccUrl);
+
+      if (canScrape) {
+        const html = await defensiveFetch(ccUrl);
         const $ = cheerio.load(html);
         
         $('.project-card, .bid-item, [data-project]').slice(0, 50).each((i, elem) => {
