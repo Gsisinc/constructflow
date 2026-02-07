@@ -177,6 +177,114 @@ export default function AddBid() {
 
       <Card>
         <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Project Phases & Requirements</CardTitle>
+            <Button size="sm" onClick={handleAddPhase} className="bg-amber-600 hover:bg-amber-700">
+              <Plus className="h-4 w-4 mr-1" /> Add Phase
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {phases.map((phase, phaseIdx) => (
+            <div key={phaseIdx} className="border rounded-lg">
+              <button
+                onClick={() => setExpandedPhase(expandedPhase === phaseIdx ? -1 : phaseIdx)}
+                className="w-full p-3 flex justify-between items-center hover:bg-slate-50"
+              >
+                <div className="text-left flex-1">
+                  <p className="font-semibold text-slate-900">{phase.name}</p>
+                  <p className="text-sm text-slate-600">{phase.duration_days} days • {phase.requirements.length} requirements</p>
+                </div>
+                {expandedPhase === phaseIdx ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+              </button>
+
+              {expandedPhase === phaseIdx && (
+                <div className="border-t p-3 space-y-3 bg-slate-50">
+                  <Input
+                    placeholder="Phase Name"
+                    value={phase.name}
+                    onChange={(e) => {
+                      const updated = [...phases];
+                      updated[phaseIdx].name = e.target.value;
+                      setPhases(updated);
+                    }}
+                  />
+                  <Textarea
+                    placeholder="Phase Description"
+                    value={phase.description}
+                    onChange={(e) => {
+                      const updated = [...phases];
+                      updated[phaseIdx].description = e.target.value;
+                      setPhases(updated);
+                    }}
+                    className="resize-none"
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Duration (days)"
+                    value={phase.duration_days}
+                    onChange={(e) => {
+                      const updated = [...phases];
+                      updated[phaseIdx].duration_days = parseInt(e.target.value);
+                      setPhases(updated);
+                    }}
+                  />
+
+                  <div>
+                    <p className="font-semibold text-slate-700 mb-2">Requirements:</p>
+                    <div className="space-y-2">
+                      {phase.requirements.map((req, reqIdx) => (
+                        <div key={reqIdx} className="flex justify-between items-center bg-white p-2 rounded border">
+                          <span className="text-sm text-slate-600">{req}</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDeleteRequirement(phaseIdx, reqIdx)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-2 mt-2">
+                      <Input
+                        placeholder="Add requirement"
+                        value={newRequirement[phaseIdx] || ''}
+                        onChange={(e) => setNewRequirement({ ...newRequirement, [phaseIdx]: e.target.value })}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleAddRequirement(phaseIdx);
+                          }
+                        }}
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => handleAddRequirement(phaseIdx)}
+                        className="bg-amber-600 hover:bg-amber-700"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleDeletePhase(phaseIdx)}
+                    className="w-full"
+                  >
+                    Delete Phase
+                  </Button>
+                </div>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Upload Documents</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
