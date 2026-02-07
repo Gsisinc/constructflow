@@ -16,52 +16,127 @@ Deno.serve(async (req) => {
     const sitesScraped = [];
     const errors = [];
 
-    // 1. LAUSD Procurement - Real California school district bids
-    try {
-      console.log('🔍 Fetching from LAUSD Procurement...');
-      const lausdResponse = await fetch('https://procurement.lausd.org/apps/pages/Solicitations', {
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
+    // 1. Create SAMPLE DATA for demonstration
+    console.log('📊 Generating sample California bid data...');
 
-      if (lausdResponse.ok) {
-        const html = await lausdResponse.text();
-        const $ = cheerio.load(html);
-
-        // Parse the three bid tables
-        $('table tr').each((i, row) => {
-          const $row = $(row);
-          const cells = $row.find('td');
-
-          if (cells.length >= 3) {
-            const dueDate = cells.eq(0).text().trim();
-            const bidNo = cells.eq(1).text().trim();
-            const description = cells.eq(2).text().trim();
-
-            if (description && description.length > 5 && !description.includes('Bid Description')) {
-              opportunities.push({
-                title: description,
-                project_name: description,
-                agency: 'Los Angeles Unified School District',
-                location: 'Los Angeles, California',
-                estimated_value: 0,
-                due_date: extractDate(dueDate),
-                description: `${bidNo}: ${description}`,
-                url: 'https://procurement.lausd.org/apps/pages/Solicitations',
-                source: 'LAUSD',
-                project_type: workType,
-                status: 'active'
-              });
-            }
-          }
-        });
-
-        sitesScraped.push('LAUSD Procurement');
-        console.log(`✓ LAUSD: Found ${opportunities.length} opportunities`);
+    const sampleBids = [
+      {
+        title: 'Electrical System Upgrade - High School Campus',
+        project_name: 'Electrical System Upgrade - High School Campus',
+        agency: 'Los Angeles Unified School District',
+        location: 'Los Angeles, California',
+        estimated_value: 450000,
+        due_date: '2026-03-15',
+        description: 'Complete electrical system modernization including panel upgrades, LED lighting installation, and emergency power systems.',
+        url: 'https://procurement.lausd.org',
+        source: 'LAUSD (Sample)',
+        project_type: 'electrical',
+        status: 'active'
+      },
+      {
+        title: 'Low Voltage Cabling Infrastructure - New Building',
+        project_name: 'Low Voltage Cabling Infrastructure',
+        agency: 'San Diego Unified School District',
+        location: 'San Diego, California',
+        estimated_value: 280000,
+        due_date: '2026-03-22',
+        description: 'Installation of Category 6A cabling, fiber optic backbone, and network infrastructure for new administration building.',
+        url: 'https://sandi.net',
+        source: 'SDUSD (Sample)',
+        project_type: 'low_voltage',
+        status: 'active'
+      },
+      {
+        title: 'Fire Alarm System Replacement',
+        project_name: 'Fire Alarm System Replacement',
+        agency: 'Orange County Public Works',
+        location: 'Orange County, California',
+        estimated_value: 195000,
+        due_date: '2026-03-10',
+        description: 'Replace existing fire alarm system with addressable system, including pull stations, smoke detectors, and monitoring equipment.',
+        url: 'https://cpo.oc.gov',
+        source: 'OC Public Works (Sample)',
+        project_type: 'fire_alarm',
+        status: 'active'
+      },
+      {
+        title: 'Security Camera and Access Control System',
+        project_name: 'Security Camera and Access Control System',
+        agency: 'City of San Francisco',
+        location: 'San Francisco, California',
+        estimated_value: 520000,
+        due_date: '2026-03-28',
+        description: 'Design and installation of IP-based surveillance cameras, card access system, and integrated security monitoring platform.',
+        url: 'https://sfgov.org',
+        source: 'SF City (Sample)',
+        project_type: 'security_systems',
+        status: 'active'
+      },
+      {
+        title: 'HVAC Controls Upgrade',
+        project_name: 'HVAC Controls Upgrade',
+        agency: 'California Department of General Services',
+        location: 'Sacramento, California',
+        estimated_value: 380000,
+        due_date: '2026-04-05',
+        description: 'Upgrade building automation system for HVAC control, including DDC controllers, sensors, and energy management software.',
+        url: 'https://dgs.ca.gov',
+        source: 'CA DGS (Sample)',
+        project_type: 'hvac',
+        status: 'active'
+      },
+      {
+        title: 'Data Center Electrical Infrastructure',
+        project_name: 'Data Center Electrical Infrastructure',
+        agency: 'County of Santa Clara',
+        location: 'San Jose, California',
+        estimated_value: 890000,
+        due_date: '2026-03-18',
+        description: 'Power distribution for new data center including UPS systems, PDUs, backup generators, and redundant electrical feeds.',
+        url: 'https://sccgov.org',
+        source: 'Santa Clara County (Sample)',
+        project_type: 'electrical',
+        status: 'active'
+      },
+      {
+        title: 'Audiovisual System Installation - Conference Center',
+        project_name: 'AV System Installation',
+        agency: 'City of Los Angeles',
+        location: 'Los Angeles, California',
+        estimated_value: 325000,
+        due_date: '2026-04-12',
+        description: 'Complete AV system for conference center including projection, sound reinforcement, video conferencing, and control systems.',
+        url: 'https://lacity.org',
+        source: 'LA City (Sample)',
+        project_type: 'av_systems',
+        status: 'active'
+      },
+      {
+        title: 'Fiber Optic Network Expansion',
+        project_name: 'Fiber Optic Network Expansion',
+        agency: 'Alameda County',
+        location: 'Oakland, California',
+        estimated_value: 650000,
+        due_date: '2026-03-25',
+        description: 'Install fiber optic cabling connecting 15 county facilities with redundant network paths and high-speed connectivity.',
+        url: 'https://acgov.org',
+        source: 'Alameda County (Sample)',
+        project_type: 'fiber_optic',
+        status: 'active'
       }
-    } catch (err) {
-      errors.push(`LAUSD: ${err.message}`);
-      console.error('LAUSD error:', err.message);
-    }
+    ];
+
+    // Filter by work type
+    const filteredSamples = sampleBids.filter(bid => 
+      workType === 'all' || bid.project_type === workType
+    );
+
+    opportunities.push(...filteredSamples);
+    sitesScraped.push('Sample Data (Demo)');
+    console.log(`✓ Generated ${filteredSamples.length} sample bids`);
+
+    // Add note about sample data
+    errors.push('NOTE: Showing sample data. Real bid aggregation requires paid API subscriptions to BidClerk, BidNet, Dodge, or similar services.');
 
     // 2. SAM.gov API - Federal (skip if rate limited)
     if (Deno.env.get('SAM_GOV_API_KEY')) {
