@@ -35,18 +35,18 @@ export default function Home() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute inset-0 bg-amber-500 blur-2xl opacity-60 rounded-full"></div>
-                <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center shadow-2xl shadow-amber-500/50">
-                  <Zap className="h-10 w-10 text-white drop-shadow-lg" />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-black text-white tracking-tight">Golden State Integrated Systems</h1>
-                <p className="text-sm text-amber-300/90 font-medium">Low Voltage • Security • AV Solutions</p>
-              </div>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-amber-500 blur-2xl opacity-60"></div>
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/dfd5a4daa_ChatGPTImageJan20202602_32_55PM.png"
+                alt="Golden State Integrated Systems"
+                className="relative h-16 w-auto drop-shadow-2xl"
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-white tracking-tight">Golden State Integrated Systems</h1>
+              <p className="text-sm text-amber-300/90 font-medium">Low Voltage • Security • AV Solutions</p>
             </div>
           </div>
           <Button 
@@ -251,12 +251,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
-                  <Zap className="h-6 w-6 text-white" />
-                </div>
-                <span className="font-bold text-white">GSIS Manager</span>
-              </div>
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/dfd5a4daa_ChatGPTImageJan20202602_32_55PM.png"
+                alt="Golden State Integrated Systems"
+                className="h-16 w-auto mb-4"
+              />
               <p className="text-sm text-slate-400">
                 Empowering low voltage contractors with AI-powered construction intelligence.
               </p>
