@@ -150,10 +150,40 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
       </div>
 
       <div className="grid gap-3">
-        {phases.map((phase) => (
+        {phases.map((phase, idx) => (
           <Card key={phase.id} className={phase.is_locked ? 'opacity-75' : ''}>
             <CardHeader>
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start gap-3">
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      if (idx > 0) {
+                        const updated = [...phases];
+                        [updated[idx].order, updated[idx - 1].order] = [updated[idx - 1].order, updated[idx].order];
+                        reorderMutation.mutate({ phases: updated });
+                      }
+                    }}
+                    disabled={idx === 0}
+                  >
+                    ↑
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      if (idx < phases.length - 1) {
+                        const updated = [...phases];
+                        [updated[idx].order, updated[idx + 1].order] = [updated[idx + 1].order, updated[idx].order];
+                        reorderMutation.mutate({ phases: updated });
+                      }
+                    }}
+                    disabled={idx === phases.length - 1}
+                  >
+                    ↓
+                  </Button>
+                </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <CardTitle className="text-base">{phase.display_name}</CardTitle>
@@ -162,16 +192,16 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
                       phase.status === 'in_progress' ? 'secondary' :
                       'outline'
                     }>
-                      {phase.status.replace('_', ' ')}
+                      {phase.status?.replace('_', ' ') || 'pending'}
                     </Badge>
                     {phase.is_locked && <Lock className="h-4 w-4 text-slate-400" />}
                   </div>
                   <div className="mt-2">
                     <div className="flex items-center justify-between text-sm mb-1">
                       <span className="text-slate-500">Progress</span>
-                      <span className="font-medium">{phase.progress_percent}%</span>
+                      <span className="font-medium">{phase.progress_percent || 0}%</span>
                     </div>
-                    <Progress value={phase.progress_percent} className="h-2" />
+                    <Progress value={phase.progress_percent || 0} className="h-2" />
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -179,18 +209,6 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
                     <Button size="sm" variant="outline" onClick={() => closePhase(phase)}>
                       <CheckCircle className="h-4 w-4 mr-1" />
                       Close
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => toggleLock(phase)}
-                  >
-                    {phase.is_locked ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-                  </Button>
-                  {!phase.is_locked && (
-                    <Button size="sm" onClick={() => onSelectPhase(phase.phase_name)}>
-                      Edit
                     </Button>
                   )}
                   <Button
