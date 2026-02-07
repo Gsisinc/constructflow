@@ -1,7 +1,40 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import * as cheerio from 'npm:cheerio@1.0.0';
 
-// California county bid sources - VERIFIED URLs
+// In-memory cache
+const scrapeCache = new Map();
+
+// Defensive fetch with anti-blocking
+async function defensiveFetch(url) {
+  const cacheKey = `fetch:${url}`;
+  const now = Date.now();
+  const cached = scrapeCache.get(cacheKey);
+  
+  if (cached && (now - cached.timestamp < 300000)) {
+    console.log(`✓ Using cached result for ${url}`);
+    return cached.html;
+  }
+  
+  const delay = 2000 + Math.random() * 3000;
+  await new Promise(resolve => setTimeout(resolve, delay));
+  
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Connection': 'keep-alive',
+    'DNT': '1'
+  };
+  
+  const response = await fetch(url, { headers, redirect: 'follow', timeout: 30000 });
+  const html = await response.text();
+  
+  scrapeCache.set(cacheKey, { html, timestamp: now });
+  console.log(`✓ Fetched ${url} - Status: ${response.status}`);
+  return html;
+}
+
+// California county bid sources
 const caCountySources = [
   {
     id: 'la-county',
@@ -25,6 +58,20 @@ const caCountySources = [
     priority: 1
   },
   {
+    id: 'riverside',
+    name: 'Riverside County',
+    url: 'https://www.rivco.org/purchasing',
+    active: true,
+    priority: 2
+  },
+  {
+    id: 'san-bernardino',
+    name: 'San Bernardino County',
+    url: 'https://pws.sbcounty.gov/pws/default.aspx',
+    active: true,
+    priority: 2
+  },
+  {
     id: 'santa-clara',
     name: 'Santa Clara County',
     url: 'https://www.sccgov.org/sites/prc/Pages/solicitations.aspx',
@@ -37,6 +84,27 @@ const caCountySources = [
     url: 'https://www.acgov.org/gsa/purchasing/bidopportunities.htm',
     active: true,
     priority: 2
+  },
+  {
+    id: 'sacramento',
+    name: 'Sacramento County',
+    url: 'https://procurement.saccounty.net',
+    active: true,
+    priority: 3
+  },
+  {
+    id: 'contra-costa',
+    name: 'Contra Costa County',
+    url: 'https://www.contracosta.ca.gov/1846/Bids-RFPs',
+    active: true,
+    priority: 3
+  },
+  {
+    id: 'fresno',
+    name: 'Fresno County',
+    url: 'https://www.co.fresno.ca.us/departments/general-services-department/purchasing-division',
+    active: true,
+    priority: 3
   }
 ];
 
@@ -99,17 +167,7 @@ async function scrapeCounty(source, workType) {
   try {
     console.log(`🔍 Scraping ${source.name}...`);
     
-    const response = await fetch(source.url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    
-    const html = await response.text();
+    const html = await defensiveFetch(source.url);
     const $ = cheerio.load(html);
     
     // Generic scraping - look for common patterns
