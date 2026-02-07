@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle2, Circle, Lock, ChevronRight, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, Circle, Lock, ChevronRight, AlertTriangle, MoreVertical, Trash2 } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 const DEFAULT_PHASES = [
   { id: 'preconstruction', label: 'Pre-Construction', icon: '📋' },
