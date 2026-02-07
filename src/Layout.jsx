@@ -34,52 +34,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import MegaMenu from '@/components/layout/MegaMenu';
-
 const navItems = [
-        { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
-        { name: 'Projects', icon: FolderKanban, page: 'Projects' },
-        { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
-        { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
-        { name: 'Add Bid', icon: FileText, page: 'AddBid' },
-        { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
-        { name: 'Directory', icon: Users, page: 'Directory' },
-        { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
-        { name: 'Settings', icon: Settings, page: 'Settings' },
-      ];
+              { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
+              { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+              { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
+              { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
+              { name: 'Add Bid', icon: FileText, page: 'AddBid' },
+              { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
+              { name: 'Directory', icon: Users, page: 'Directory' },
+              { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
+              { name: 'Settings', icon: Settings, page: 'Settings' },
+            ];
 
 const adminNavItems = [
-  { name: 'User Approvals', icon: User, page: 'UserApprovals' },
-];
-
-function ProjectSelector() {
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list('-created_date', 10)
-  });
-
-  const [selectedProject, setSelectedProject] = useState(null);
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="min-w-[200px] justify-between">
-          {selectedProject?.name || 'Select a Project'}
-          <ChevronDown className="h-4 w-4 ml-2" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[250px]">
-        {projects.map((project) => (
-          <DropdownMenuItem key={project.id} onClick={() => setSelectedProject(project)}>
-            {project.name}
-          </DropdownMenuItem>
-        ))}
-        {projects.length === 0 && (
-          <DropdownMenuItem disabled>No projects available</DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
+        { name: 'User Approvals', icon: User, page: 'UserApprovals' },
+      ];
 
 function UserMenu({ user, onLogout }) {
   return (
