@@ -25,7 +25,9 @@ import {
   Video,
   Building2,
   Search,
-  Bot
+  Bot,
+  Shield,
+  Radio
 } from 'lucide-react';
 
 const menuSections = [
