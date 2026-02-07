@@ -207,7 +207,7 @@ export default function ProjectDetail() {
       project_id: projectId,
       from_phase: fromPhase,
       to_phase: toPhase,
-      status: 'pending',
+      status: 'in_review',
       checklist_items: [
         { item: 'All required inspections passed', required: true, completed: false },
         { item: 'Documentation complete and approved', required: true, completed: false },
@@ -222,7 +222,23 @@ export default function ProjectDetail() {
       ],
       initiated_date: new Date().toISOString().split('T')[0],
     };
-    createGateMutation.mutate(newGate);
+    createGateMutation.mutate(newGate, {
+      onSuccess: () => {
+        // Update project's current phase and progress
+        const totalPhases = 8; // Default phases count
+        const PHASES = [
+          'preconstruction', 'foundation', 'superstructure', 'enclosure',
+          'mep_rough', 'interior_finishes', 'commissioning', 'closeout'
+        ];
+        const nextPhaseIndex = PHASES.indexOf(toPhase);
+        const progress = nextPhaseIndex >= 0 ? ((nextPhaseIndex + 1) / totalPhases) * 100 : project.progress;
+        
+        updateMutation.mutate({
+          current_phase: toPhase,
+          progress: progress
+        });
+      }
+    });
   };
 
   const locations = [...new Set(calendarEvents.map(e => e.location).filter(Boolean))];

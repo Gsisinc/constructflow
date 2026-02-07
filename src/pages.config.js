@@ -48,6 +48,7 @@
  * The mainPage value must match a key in the PAGES object exactly.
  */
 import AIAgents from './pages/AIAgents';
+import AddBid from './pages/AddBid';
 import BidDetail from './pages/BidDetail';
 import BidDiscovery from './pages/BidDiscovery';
 import BidOpportunities from './pages/BidOpportunities';
@@ -55,33 +56,33 @@ import Bids from './pages/Bids';
 import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
 import ClientPortal from './pages/ClientPortal';
+import DailyLog from './pages/DailyLog';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Estimates from './pages/Estimates';
 import Home from './pages/Home';
+import Invoices from './pages/Invoices';
 import Issues from './pages/Issues';
 import JoinRequest from './pages/JoinRequest';
 import Materials from './pages/Materials';
 import Onboarding from './pages/Onboarding';
+import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
+import Safety from './pages/Safety';
 import Settings from './pages/Settings';
+import Submittals from './pages/Submittals';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
-import DailyLog from './pages/DailyLog';
-import Safety from './pages/Safety';
 import VehicleLogs from './pages/VehicleLogs';
-import Photos from './pages/Photos';
-import Invoices from './pages/Invoices';
-import Submittals from './pages/Submittals';
-import AddBid from './pages/AddBid';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AIAgents": AIAgents,
+    "AddBid": AddBid,
     "BidDetail": BidDetail,
     "BidDiscovery": BidDiscovery,
     "BidOpportunities": BidOpportunities,
@@ -89,28 +90,27 @@ export const PAGES = {
     "Budget": Budget,
     "Calendar": Calendar,
     "ClientPortal": ClientPortal,
+    "DailyLog": DailyLog,
     "Dashboard": Dashboard,
     "Directory": Directory,
     "Estimates": Estimates,
     "Home": Home,
+    "Invoices": Invoices,
     "Issues": Issues,
     "JoinRequest": JoinRequest,
     "Materials": Materials,
     "Onboarding": Onboarding,
+    "Photos": Photos,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
+    "Safety": Safety,
     "Settings": Settings,
+    "Submittals": Submittals,
     "Tasks": Tasks,
     "Team": Team,
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
-    "DailyLog": DailyLog,
-    "Safety": Safety,
     "VehicleLogs": VehicleLogs,
-    "Photos": Photos,
-    "Invoices": Invoices,
-    "Submittals": Submittals,
-    "AddBid": AddBid,
 }
 
 export const pagesConfig = {
