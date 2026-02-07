@@ -148,6 +148,20 @@ export default function BidDiscovery() {
   const performAutoSearch = async () => {
     if (!workType || workType === 'all' || searching) return;
     console.log('🔍 AUTO-FETCHING:', workType, state, cityCounty || 'All Cities');
+    
+    // First, load LAUSD bids from database
+    try {
+      const dbBids = await base44.entities.BidOpportunity.filter({ source: 'LAUSD' });
+      if (dbBids.length > 0) {
+        setSearchResults(dbBids);
+        setTotalAvailable(dbBids.length);
+        toast.success(`✓ Loaded ${dbBids.length} opportunities from database`);
+      }
+    } catch (err) {
+      console.error('Failed to load from DB:', err);
+    }
+    
+    // Then try to fetch fresh data
     await executeAISearch();
   };
 
