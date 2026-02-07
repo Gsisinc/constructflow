@@ -19,39 +19,70 @@ Deno.serve(async (req) => {
     // 1. SAM.gov API - Federal government bids
     try {
       console.log('🔍 Fetching from SAM.gov API...');
-      const samResponse = await fetch(
-        `https://api.sam.gov/opportunities/v2/search?api_key=${Deno.env.get('SAM_GOV_API_KEY') || 'DEMO_KEY'}&postedFrom=${new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0]}&limit=100`,
-        { headers: { 'Accept': 'application/json' } }
-      );
+      
+      // Build NAICS codes based on work type
+      const naicsMap = {
+        low_voltage: '238210',
+        electrical: '238210',
+        fire_alarm: '238210',
+        data_cabling: '238210',
+        security_systems: '238210',
+        av_systems: '238210',
+        telecommunications: '517311',
+        hvac: '238220',
+        plumbing: '238220',
+        general_contractor: '236220',
+        construction_management: '236220'
+      };
+      
+      const naicsCode = naicsMap[workType] || '';
+      
+      // SAM.gov API v2 - search for construction opportunities
+      let samUrl = `https://api.sam.gov/opportunities/v2/search?api_key=${Deno.env.get('SAM_GOV_API_KEY')}&postedFrom=${new Date(Date.now() - 90*24*60*60*1000).toISOString().split('T')[0]}&limit=1000&ptype=p,o,k`;
+      
+      if (naicsCode) {
+        samUrl += `&ncode=${naicsCode}`;
+      }
+      
+      console.log('SAM.gov URL:', samUrl.replace(Deno.env.get('SAM_GOV_API_KEY'), 'API_KEY'));
+      
+      const samResponse = await fetch(samUrl, {
+        headers: { 
+          'Accept': 'application/json',
+          'User-Agent': 'BidDiscovery/1.0'
+        }
+      });
 
       if (samResponse.ok) {
         const samData = await samResponse.json();
-        if (samData.opportunitiesData) {
+        console.log(`SAM.gov response: ${samData.totalRecords || 0} total records`);
+        
+        if (samData.opportunitiesData && samData.opportunitiesData.length > 0) {
           samData.opportunitiesData.forEach(opp => {
-            const oppType = opp.type?.toLowerCase() || '';
-            const oppTitle = (opp.title || '').toLowerCase();
-            const oppDesc = (opp.description || '').toLowerCase();
-            const searchTerms = workType.toLowerCase().replace('_', ' ');
-
-            if (oppTitle.includes(searchTerms) || oppDesc.includes(searchTerms) || oppType.includes(searchTerms)) {
-              opportunities.push({
-                title: opp.title,
-                project_name: opp.title,
-                agency: opp.department || opp.organizationName,
-                location: `${opp.placeOfPerformance?.city?.name || ''}, ${opp.placeOfPerformance?.state?.name || state}`.trim(),
-                estimated_value: parseFloat(opp.award?.amount || 0),
-                due_date: opp.responseDeadLine?.split('T')[0],
-                description: opp.description?.substring(0, 500),
-                url: `https://sam.gov/opp/${opp.noticeId}/view`,
-                source: 'SAM.gov (Federal)',
-                project_type: workType,
-                status: 'active'
-              });
-            }
+            // Add ALL federal opportunities - no filtering
+            opportunities.push({
+              title: opp.title,
+              project_name: opp.title,
+              agency: opp.department || opp.organizationName || opp.fullParentPathName || 'Federal Agency',
+              location: `${opp.placeOfPerformance?.city?.name || ''}, ${opp.placeOfPerformance?.state?.name || state}`.trim() || 'United States',
+              estimated_value: parseFloat(opp.award?.amount || 0),
+              due_date: opp.responseDeadLine?.split('T')[0],
+              description: opp.description?.substring(0, 500) || 'Federal construction opportunity',
+              url: `https://sam.gov/opp/${opp.noticeId}/view`,
+              source: 'SAM.gov (Federal)',
+              project_type: workType,
+              status: 'active'
+            });
           });
           sitesScraped.push('SAM.gov API');
           console.log(`✓ SAM.gov: Found ${opportunities.length} federal opportunities`);
+        } else {
+          console.log('SAM.gov returned no opportunitiesData');
         }
+      } else {
+        const errorText = await samResponse.text();
+        console.error('SAM.gov API error:', samResponse.status, errorText);
+        errors.push(`SAM.gov API: ${samResponse.status} - ${errorText.substring(0, 100)}`);
       }
     } catch (err) {
       errors.push(`SAM.gov API: ${err.message}`);
