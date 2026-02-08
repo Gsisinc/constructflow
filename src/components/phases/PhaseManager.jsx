@@ -413,6 +413,13 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
     }
   });
 
+  const updateRequirementMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.PhaseRequirement.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
+    }
+  });
+
   const handleDragEnd = (result) => {
     if (!result.destination) return;
 
@@ -424,23 +431,27 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
       const draggedReq = requirements.find(r => r.id === draggableId);
       
       // Don't allow making a requirement its own child or creating circular dependencies
-      if (draggedReq.id === newParentId) return;
+      if (draggedReq?.id === newParentId) return;
       
       // Update the parent_requirement_id
-      updateOrderMutation.mutate({ 
+      updateRequirementMutation.mutate({ 
         id: draggableId, 
-        order: destination.index,
-        parent_requirement_id: newParentId
+        data: {
+          parent_requirement_id: newParentId,
+          order: destination.index
+        }
       });
       return;
     }
 
     // Check if dragging from sub list to main list (converting to main requirement)
     if (source.droppableId.startsWith('sub-') && destination.droppableId === 'requirements') {
-      updateOrderMutation.mutate({ 
+      updateRequirementMutation.mutate({ 
         id: draggableId, 
-        order: destination.index,
-        parent_requirement_id: null
+        data: {
+          parent_requirement_id: null,
+          order: destination.index
+        }
       });
       return;
     }
@@ -587,22 +598,16 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                 </div>
                               </CardContent>
                             </Card>
-                            <Droppable droppableId={`sub-${req.id}`} type={`sub-${req.id}`}>
+                            <Droppable droppableId={`sub-${req.id}`} type="main">
                               {(provided, snapshot) => (
                                 <div
                                   {...provided.droppableProps}
                                   ref={provided.innerRef}
                                   className={cn(
-                                    "ml-8 space-y-2 min-h-[40px] rounded-lg transition-colors",
-                                    snapshot.isDraggingOver && "bg-blue-50 border-2 border-dashed border-blue-300",
-                                    subReqs.length === 0 && "border-2 border-dashed border-slate-200 p-2"
+                                    "ml-8 space-y-2 min-h-[8px] rounded-lg transition-colors",
+                                    snapshot.isDraggingOver && "bg-blue-50"
                                   )}
                                 >
-                                  {subReqs.length === 0 && (
-                                    <p className="text-xs text-slate-400 text-center py-2">
-                                      Drag requirements here to make them sub-requirements
-                                    </p>
-                                  )}
                                   {subReqs.map((subReq, subIndex) => (
                                       <Draggable key={subReq.id} draggableId={subReq.id} index={subIndex}>
                                         {(provided) => (
