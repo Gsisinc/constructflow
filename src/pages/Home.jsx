@@ -87,14 +87,14 @@ export default function Home() {
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 leading-tight">
-              Build the Future.<br />
+              Complete Project Control.<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400">
-                Win Every Bid.
+                From Bid to Built.
               </span>
             </h1>
 
             <p className="text-sm sm:text-base lg:text-lg text-slate-400 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
-              All-in-one platform for contractors: bid discovery, project management, and AI insights.
+              End-to-end project management for contractors: discover bids, manage teams, track budgets, and deliver on time.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6 sm:mb-8">
