@@ -207,8 +207,8 @@ export default function Home() {
             ].map((feature, idx) => (
               <div key={idx} className="group relative">
                 <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-500`}></div>
-                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-5 sm:p-6 hover:border-white/20 transition-all h-full">
-                  <div className={`inline-flex h-10 w-10 rounded-lg bg-gradient-to-r ${feature.gradient} items-center justify-center mb-3`}>
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-5 sm:p-6 hover:border-white/20 transition-all h-full flex flex-col items-center text-center">
+                  <div className={`flex h-10 w-10 rounded-lg bg-gradient-to-r ${feature.gradient} items-center justify-center mb-3`}>
                     <feature.icon className="h-5 w-5 text-white" />
                   </div>
                   <h3 className="text-sm sm:text-base font-semibold text-white mb-2">{feature.title}</h3>
