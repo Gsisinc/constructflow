@@ -416,7 +416,6 @@ export default function ProjectDetail() {
 
         <TabsContent value="phases" className="mt-6">
           <div className="space-y-6">
-            <PhaseRequirementManager projectId={projectId} />
             <PhaseNavigator
               projectId={projectId}
               currentPhase={project.current_phase || 'preconstruction'}
@@ -426,16 +425,6 @@ export default function ProjectDetail() {
               onViewGate={(gate) => {
                 setSelectedGate(gate);
                 setShowGateChecklist(true);
-              }}
-            />
-            <PhaseManager
-              projectId={projectId}
-              currentPhase={project.current_phase || 'preconstruction'}
-            />
-            <CustomPhaseManager
-              projectId={projectId}
-              onSelectPhase={(phaseName) => {
-                // Could navigate to phase detail or open edit dialog
               }}
             />
           </div>

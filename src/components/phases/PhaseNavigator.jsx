@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle2, Circle, Lock, ChevronRight, AlertTriangle, MoreVertical, Trash2 } from 'lucide-react';
+import { CheckCircle2, Circle, Lock, ChevronRight, AlertTriangle, MoreVertical, Trash2, Plus } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import {
@@ -12,6 +12,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 const DEFAULT_PHASES = [
@@ -35,13 +44,9 @@ export default function PhaseNavigator({
 }) {
   const queryClient = useQueryClient();
   
-  // Filter out hidden default phases
-  const hiddenPhases = customPhases.filter(cp => cp.is_hidden).map(cp => cp.phase_name);
-  const visibleDefaults = DEFAULT_PHASES.filter(dp => !hiddenPhases.includes(dp.id));
-  
   const PHASES = [
-    ...visibleDefaults,
-    ...customPhases.filter(cp => !cp.is_hidden).map(cp => ({
+    ...DEFAULT_PHASES,
+    ...customPhases.map(cp => ({
       id: cp.phase_name,
       label: cp.display_name,
       icon: cp.icon || '📌',
@@ -59,17 +64,18 @@ export default function PhaseNavigator({
     }
   });
 
-  const hideDefaultPhaseMutation = useMutation({
-    mutationFn: (phaseId) => base44.entities.CustomPhase.create({
-      project_id: projectId,
-      phase_name: phaseId,
-      display_name: phaseId,
-      is_hidden: true,
-      order: 999
-    }),
+  const [showNewPhaseDialog, setShowNewPhaseDialog] = useState(false);
+  const [newPhaseName, setNewPhaseName] = useState('');
+  const [newPhaseIcon, setNewPhaseIcon] = useState('📌');
+
+  const createPhaseMutation = useMutation({
+    mutationFn: (phaseData) => base44.entities.CustomPhase.create(phaseData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
-      toast.success('Phase deleted');
+      setShowNewPhaseDialog(false);
+      setNewPhaseName('');
+      setNewPhaseIcon('📌');
+      toast.success('Phase created');
     }
   });
 
@@ -98,9 +104,15 @@ export default function PhaseNavigator({
           <h3 className="text-lg font-semibold text-slate-900">Project Phases</h3>
           <p className="text-sm text-slate-500">Visual phase navigator with gate controls</p>
         </div>
-        <Badge className="bg-blue-100 text-blue-700">
-          Current: {PHASES.find(p => p.id === currentPhase)?.label}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Button onClick={() => setShowNewPhaseDialog(true)} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            New Phase
+          </Button>
+          <Badge className="bg-blue-100 text-blue-700">
+            Current: {PHASES.find(p => p.id === currentPhase)?.label}
+          </Badge>
+        </div>
       </div>
 
       {/* Phase Timeline */}
@@ -156,21 +168,19 @@ export default function PhaseNavigator({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="center">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
-                            if (phase.customPhaseId) {
+                      {phase.customPhaseId && (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
                               deleteCustomPhaseMutation.mutate(phase.customPhaseId);
-                            } else {
-                              hideDefaultPhaseMutation.mutate(phase.id);
                             }
-                          }
-                        }}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Phase
-                      </DropdownMenuItem>
+                          }}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Phase
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -223,6 +233,54 @@ export default function PhaseNavigator({
           className="h-2 mt-3" 
         />
       </div>
+
+      {/* New Phase Dialog */}
+      <Dialog open={showNewPhaseDialog} onOpenChange={setShowNewPhaseDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Phase</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Phase Name</Label>
+              <Input
+                value={newPhaseName}
+                onChange={(e) => setNewPhaseName(e.target.value)}
+                placeholder="e.g., Site Preparation"
+              />
+            </div>
+            <div>
+              <Label>Icon (Emoji)</Label>
+              <Input
+                value={newPhaseIcon}
+                onChange={(e) => setNewPhaseIcon(e.target.value)}
+                placeholder="📌"
+                maxLength={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewPhaseDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!newPhaseName.trim()) return;
+                createPhaseMutation.mutate({
+                  project_id: projectId,
+                  phase_name: newPhaseName.toLowerCase().replace(/\s+/g, '_'),
+                  display_name: newPhaseName,
+                  icon: newPhaseIcon,
+                  order: customPhases.length
+                });
+              }}
+              disabled={!newPhaseName.trim()}
+            >
+              Create Phase
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
