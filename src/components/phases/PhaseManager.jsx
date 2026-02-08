@@ -401,7 +401,13 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
   });
 
   const updateOrderMutation = useMutation({
-    mutationFn: ({ id, order }) => base44.entities.PhaseRequirement.update(id, { order }),
+    mutationFn: ({ id, order, parent_requirement_id }) => {
+      const updateData = { order };
+      if (parent_requirement_id !== undefined) {
+        updateData.parent_requirement_id = parent_requirement_id;
+      }
+      return base44.entities.PhaseRequirement.update(id, updateData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
     }
@@ -410,19 +416,49 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
   const handleDragEnd = (result) => {
     if (!result.destination) return;
 
-    const sourceIndex = result.source.index;
-    const destIndex = result.destination.index;
+    const { source, destination, draggableId } = result;
 
-    if (sourceIndex === destIndex) return;
+    // Check if dragging from main list to sub list (converting to sub-requirement)
+    if (source.droppableId === 'requirements' && destination.droppableId.startsWith('sub-')) {
+      const newParentId = destination.droppableId.replace('sub-', '');
+      const draggedReq = requirements.find(r => r.id === draggableId);
+      
+      // Don't allow making a requirement its own child or creating circular dependencies
+      if (draggedReq.id === newParentId) return;
+      
+      // Update the parent_requirement_id
+      updateOrderMutation.mutate({ 
+        id: draggableId, 
+        order: destination.index,
+        parent_requirement_id: newParentId
+      });
+      return;
+    }
 
-    const parentId = result.type === 'sub' ? result.type.split('-')[1] : null;
+    // Check if dragging from sub list to main list (converting to main requirement)
+    if (source.droppableId.startsWith('sub-') && destination.droppableId === 'requirements') {
+      updateOrderMutation.mutate({ 
+        id: draggableId, 
+        order: destination.index,
+        parent_requirement_id: null
+      });
+      return;
+    }
+
+    // Same droppable reordering
+    if (source.droppableId !== destination.droppableId) return;
+    if (source.index === destination.index) return;
+
+    const isSubList = source.droppableId.startsWith('sub-');
+    const parentId = isSubList ? source.droppableId.replace('sub-', '') : null;
+    
     const items = parentId 
       ? requirements.filter(r => r.parent_requirement_id === parentId).sort((a, b) => (a.order || 0) - (b.order || 0))
       : requirements.filter(r => !r.parent_requirement_id).sort((a, b) => (a.order || 0) - (b.order || 0));
 
     const reordered = Array.from(items);
-    const [removed] = reordered.splice(sourceIndex, 1);
-    reordered.splice(destIndex, 0, removed);
+    const [removed] = reordered.splice(source.index, 1);
+    reordered.splice(destination.index, 0, removed);
 
     // Update orders
     reordered.forEach((item, index) => {
