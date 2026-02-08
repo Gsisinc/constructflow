@@ -130,7 +130,7 @@ export default function Home() {
           </div>
 
           {/* Service Icons */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto mt-20">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 max-w-3xl mx-auto mt-10 sm:mt-16">
             {[
               { icon: Network, label: 'Structured Cabling', color: 'from-amber-500 to-yellow-500' },
               { icon: Lock, label: 'Access Control', color: 'from-orange-500 to-amber-600' },
