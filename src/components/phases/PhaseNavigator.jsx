@@ -51,6 +51,7 @@ export default function PhaseNavigator({
   const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [requirements, setRequirements] = useState('');
+  const [selectedParentReq, setSelectedParentReq] = useState(null);
   
   const { data: allRequirements = [] } = useQuery({
     queryKey: ['phaseRequirements', projectId],
@@ -125,6 +126,7 @@ export default function PhaseNavigator({
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements', projectId] });
       setShowRequirementsDialog(false);
       setRequirements('');
+      setSelectedParentReq(null);
       toast.success('Requirements added');
     }
   });
@@ -420,36 +422,85 @@ export default function PhaseNavigator({
             {allRequirements.filter(r => r.phase_name === selectedPhase?.id).length > 0 && (
               <div className="space-y-2">
                 <Label>Existing Requirements</Label>
-                <div className="space-y-2 max-h-40 overflow-y-auto">
+                <div className="space-y-1 max-h-60 overflow-y-auto">
                   {allRequirements
-                    .filter(r => r.phase_name === selectedPhase?.id)
-                    .map(req => (
-                      <div key={req.id} className="flex items-center gap-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={req.status === 'completed'}
-                          onChange={(e) => {
-                            updateRequirementMutation.mutate({
-                              id: req.id,
-                              data: { status: e.target.checked ? 'completed' : 'pending' }
-                            });
-                          }}
-                          className="h-4 w-4"
-                        />
-                        <span className={cn(req.status === 'completed' && 'line-through text-slate-400')}>
-                          {req.requirement_text}
-                        </span>
-                      </div>
-                    ))}
+                    .filter(r => r.phase_name === selectedPhase?.id && !r.parent_requirement_id)
+                    .map(req => {
+                      const subReqs = allRequirements.filter(sr => sr.parent_requirement_id === req.id);
+                      return (
+                        <div key={req.id} className="space-y-1">
+                          <div className="flex items-center gap-2 text-sm group">
+                            <input
+                              type="checkbox"
+                              checked={req.status === 'completed'}
+                              onChange={(e) => {
+                                updateRequirementMutation.mutate({
+                                  id: req.id,
+                                  data: { status: e.target.checked ? 'completed' : 'pending' }
+                                });
+                              }}
+                              className="h-4 w-4"
+                            />
+                            <span className={cn(req.status === 'completed' && 'line-through text-slate-400', 'flex-1')}>
+                              {req.requirement_text}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 px-2 text-xs opacity-0 group-hover:opacity-100"
+                              onClick={() => {
+                                setSelectedParentReq(req);
+                                setRequirements('');
+                              }}
+                            >
+                              + Sub
+                            </Button>
+                          </div>
+                          {subReqs.map(subReq => (
+                            <div key={subReq.id} className="flex items-center gap-2 text-sm ml-6">
+                              <input
+                                type="checkbox"
+                                checked={subReq.status === 'completed'}
+                                onChange={(e) => {
+                                  updateRequirementMutation.mutate({
+                                    id: subReq.id,
+                                    data: { status: e.target.checked ? 'completed' : 'pending' }
+                                  });
+                                }}
+                                className="h-3.5 w-3.5"
+                              />
+                              <span className={cn(subReq.status === 'completed' && 'line-through text-slate-400', 'text-xs text-slate-600')}>
+                                {subReq.requirement_text}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             )}
             <div>
-              <Label>New Requirements (one per line)</Label>
+              <Label>
+                {selectedParentReq 
+                  ? `Add Sub-Requirements to "${selectedParentReq.requirement_text}"`
+                  : 'New Requirements (one per line)'
+                }
+              </Label>
+              {selectedParentReq && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-xs mb-2"
+                  onClick={() => setSelectedParentReq(null)}
+                >
+                  ← Back to main requirements
+                </Button>
+              )}
               <Textarea
                 value={requirements}
                 onChange={(e) => setRequirements(e.target.value)}
-                placeholder="Enter requirements, one per line..."
+                placeholder={selectedParentReq ? "Enter sub-requirements, one per line..." : "Enter requirements, one per line..."}
                 rows={5}
               />
             </div>
@@ -467,13 +518,14 @@ export default function PhaseNavigator({
                     project_id: projectId,
                     phase_name: selectedPhase.id,
                     requirement_text: req.trim(),
+                    parent_requirement_id: selectedParentReq?.id || null,
                     status: 'pending'
                   });
                 });
               }}
               disabled={!requirements.trim()}
             >
-              Add Requirements
+              {selectedParentReq ? 'Add Sub-Requirements' : 'Add Requirements'}
             </Button>
           </DialogFooter>
         </DialogContent>
