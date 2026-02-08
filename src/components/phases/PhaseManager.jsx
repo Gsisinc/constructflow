@@ -587,15 +587,23 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                 </div>
                               </CardContent>
                             </Card>
-                            {subReqs.length > 0 && (
-                              <Droppable droppableId={`sub-${req.id}`} type={`sub-${req.id}`}>
-                                {(provided) => (
-                                  <div
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                    className="ml-8 space-y-2"
-                                  >
-                                    {subReqs.map((subReq, subIndex) => (
+                            <Droppable droppableId={`sub-${req.id}`} type={`sub-${req.id}`}>
+                              {(provided, snapshot) => (
+                                <div
+                                  {...provided.droppableProps}
+                                  ref={provided.innerRef}
+                                  className={cn(
+                                    "ml-8 space-y-2 min-h-[40px] rounded-lg transition-colors",
+                                    snapshot.isDraggingOver && "bg-blue-50 border-2 border-dashed border-blue-300",
+                                    subReqs.length === 0 && "border-2 border-dashed border-slate-200 p-2"
+                                  )}
+                                >
+                                  {subReqs.length === 0 && (
+                                    <p className="text-xs text-slate-400 text-center py-2">
+                                      Drag requirements here to make them sub-requirements
+                                    </p>
+                                  )}
+                                  {subReqs.map((subReq, subIndex) => (
                                       <Draggable key={subReq.id} draggableId={subReq.id} index={subIndex}>
                                         {(provided) => (
                                           <Card
@@ -638,12 +646,11 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                           </Card>
                                         )}
                                       </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                  </div>
-                                )}
-                              </Droppable>
-                            )}
+                                  ))}
+                                  {provided.placeholder}
+                                </div>
+                              )}
+                            </Droppable>
                           </div>
                         )}
                       </Draggable>
