@@ -201,10 +201,10 @@ export default function Layout({ children, currentPageName }) {
             `}</style>
 
       {/* Top Header */}
-      <div className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 z-40 lg:pl-64" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="h-full flex items-center justify-between px-4">
-          {/* Mobile menu button & back button */}
-              <div className="lg:hidden flex items-center gap-2">
+              <div className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-amber-100 dark:border-amber-900/30 z-40 lg:pl-64" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+                <div className="h-full flex items-center justify-between px-3 sm:px-4">
+                  {/* Mobile menu button & back button */}
+                  <div className="lg:hidden flex items-center gap-1 sm:gap-2">
                 {!isRootPage && (
                   <Button
                     variant="ghost"
@@ -223,33 +223,33 @@ export default function Layout({ children, currentPageName }) {
                 >
                   {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </Button>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               {organization?.logo_url ? (
-                <img src={organization.logo_url} alt={organization.name} className="h-8 w-auto" />
+                <img src={organization.logo_url} alt={organization.name} className="h-7 sm:h-8 w-auto" />
               ) : (
                 <>
                   <img 
                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
                     alt="GSIS Manager" 
-                    className="h-8 w-auto"
+                    className="h-6 sm:h-8 w-auto"
                   />
-                  <span className="font-semibold text-sm text-slate-900 hidden sm:inline">{organization?.name || 'GSIS Manager'}</span>
+                  <span className="font-semibold text-xs sm:text-sm text-slate-900 hidden sm:inline">{organization?.name || 'GSIS Manager'}</span>
                 </>
               )}
             </div>
           </div>
 
           {/* Quick Access Menu Button */}
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setMegaMenuOpen(!megaMenuOpen)}
-              className="flex items-center gap-1.5 text-slate-600 hover:text-amber-600 hover:bg-amber-50 h-9 px-2 sm:px-3"
+              className="flex items-center gap-1 sm:gap-1.5 text-slate-600 hover:text-amber-600 hover:bg-amber-50/80 dark:hover:bg-amber-950/20 h-9 px-1.5 sm:px-3 text-xs sm:text-sm select-none"
             >
-              <Grid3x3 className="h-4 w-4" />
-              <span className="text-xs sm:text-sm font-medium hidden sm:inline">Quick Access</span>
-              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", megaMenuOpen && "rotate-180")} />
+              <Grid3x3 className="h-4 w-4 flex-shrink-0" />
+              <span className="font-medium hidden sm:inline">Quick Access</span>
+              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform hidden sm:block", megaMenuOpen && "rotate-180")} />
             </Button>
             {user && <UserMenu user={user} onLogout={handleLogout} />}
           </div>
@@ -270,49 +270,49 @@ export default function Layout({ children, currentPageName }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-full w-64 bg-white border-r border-slate-200 z-50 transition-transform duration-300 lg:translate-x-0",
+          "fixed top-0 left-0 h-full w-64 bg-white dark:bg-slate-950 border-r border-amber-100 dark:border-amber-900/30 z-50 transition-transform duration-300 lg:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="h-16 flex items-center gap-3 px-6 border-b border-slate-100">
-            {organization?.logo_url ? (
-              <img src={organization.logo_url} alt={organization.name} className="h-14 w-auto" />
-            ) : (
-              <>
-                <img 
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
-                  alt="GSIS Manager" 
-                  className="h-14 w-auto"
-                />
-                <span className="font-semibold text-lg text-slate-900 tracking-tight">{organization?.name || 'GSIS Manager'}</span>
-              </>
-            )}
-          </div>
+              <div className="h-16 flex items-center gap-2 px-4 sm:px-6 border-b border-amber-100">
+                {organization?.logo_url ? (
+                  <img src={organization.logo_url} alt={organization.name} className="h-12 sm:h-14 w-auto" />
+                ) : (
+                  <>
+                    <img 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
+                      alt="GSIS Manager" 
+                      className="h-10 sm:h-14 w-auto"
+                    />
+                    <span className="font-semibold text-sm sm:text-lg text-slate-900 tracking-tight hidden sm:inline">{organization?.name || 'GSIS Manager'}</span>
+                  </>
+                )}
+              </div>
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
-              const isActive = currentPageName === item.page;
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.page}
-                  to={createPageUrl(item.page)}
-                  onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
-                    isActive
-                      ? "bg-slate-900 text-white shadow-sm"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  )}
-                >
-                  <Icon className={cn("h-4.5 w-4.5", isActive ? "text-white" : "text-slate-400")} />
-                  {item.name}
-                </Link>
-              );
-            })}
+                const isActive = currentPageName === item.page;
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.page}
+                    to={createPageUrl(item.page)}
+                    onClick={() => setSidebarOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] select-none",
+                      isActive
+                        ? "bg-amber-600 text-white shadow-sm hover:bg-amber-700"
+                        : "text-slate-600 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-700"
+                    )}
+                  >
+                    <Icon className={cn("h-4.5 w-4.5", isActive ? "text-white" : "text-amber-600")} />
+                    {item.name}
+                  </Link>
+                );
+              })}
 
             {user?.role === 'admin' && (
               <>
@@ -368,7 +368,16 @@ export default function Layout({ children, currentPageName }) {
               </main>
 
       {/* Mobile Bottom Navigation */}
-      {!isHomePage && <MobileBottomNav currentPageName={currentPageName} />}
+              {!isHomePage && <MobileBottomNav currentPageName={currentPageName} />}
+
+              {/* Global Styles */}
+              <style>{`
+                @media (max-width: 640px) {
+                  h1, h2, h3, h4, h5, h6 {
+                    line-height: 1.3;
+                  }
+                }
+              `}</style>
     </div>
   );
 }
