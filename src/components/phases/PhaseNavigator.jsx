@@ -14,7 +14,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 
-const DEFAULT_PHASES = [];
+const DEFAULT_PHASES = [
+  { id: 'preconstruction', label: 'Pre-Construction', icon: '📋' },
+  { id: 'foundation', label: 'Foundation', icon: '🏗️' },
+  { id: 'superstructure', label: 'Superstructure', icon: '🏢' },
+  { id: 'enclosure', label: 'Enclosure', icon: '🪟' },
+  { id: 'mep_rough', label: 'MEP Rough-In', icon: '⚡' },
+  { id: 'interior_finishes', label: 'Interior Finishes', icon: '🎨' },
+  { id: 'commissioning', label: 'Commissioning', icon: '✅' },
+  { id: 'closeout', label: 'Closeout', icon: '🔑' },
+];
 
 export default function PhaseNavigator({ 
   currentPhase, 
@@ -26,18 +35,38 @@ export default function PhaseNavigator({
 }) {
   const queryClient = useQueryClient();
   
-  // Only show custom phases
-  const PHASES = customPhases.map(cp => ({
-    id: cp.phase_name,
-    label: cp.display_name,
-    icon: cp.icon || '📌',
-    customPhaseId: cp.id
-  }));
+  // Filter out hidden default phases
+  const hiddenPhases = customPhases.filter(cp => cp.is_hidden).map(cp => cp.phase_name);
+  const visibleDefaults = DEFAULT_PHASES.filter(dp => !hiddenPhases.includes(dp.id));
+  
+  const PHASES = [
+    ...visibleDefaults,
+    ...customPhases.filter(cp => !cp.is_hidden).map(cp => ({
+      id: cp.phase_name,
+      label: cp.display_name,
+      icon: cp.icon || '📌',
+      customPhaseId: cp.id
+    }))
+  ];
   
   const currentPhaseIndex = PHASES.findIndex(p => p.id === currentPhase);
 
   const deleteCustomPhaseMutation = useMutation({
     mutationFn: (customPhaseId) => base44.entities.CustomPhase.delete(customPhaseId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
+      toast.success('Phase deleted');
+    }
+  });
+
+  const hideDefaultPhaseMutation = useMutation({
+    mutationFn: (phaseId) => base44.entities.CustomPhase.create({
+      project_id: projectId,
+      phase_name: phaseId,
+      display_name: phaseId,
+      is_hidden: true,
+      order: 999
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
       toast.success('Phase deleted');
@@ -120,28 +149,30 @@ export default function PhaseNavigator({
                   )}>
                     {phase.label}
                   </p>
-                  {phase.customPhaseId && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="sm" variant="ghost" className="h-5 w-5 p-0">
-                          <MoreVertical className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="center">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="sm" variant="ghost" className="h-5 w-5 p-0">
+                        <MoreVertical className="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="center">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
+                            if (phase.customPhaseId) {
                               deleteCustomPhaseMutation.mutate(phase.customPhaseId);
+                            } else {
+                              hideDefaultPhaseMutation.mutate(phase.id);
                             }
-                          }}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Phase
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
+                          }
+                        }}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Phase
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Gate Action */}
