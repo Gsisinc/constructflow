@@ -353,11 +353,11 @@ export default function PhaseManager({ projectId, currentPhase }) {
         </Card>
       ) : (
         <Tabs defaultValue="requirements" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="requirements">Requirements</TabsTrigger>
-            <TabsTrigger value="files">Files</TabsTrigger>
-            <TabsTrigger value="notes">Notes</TabsTrigger>
-            <TabsTrigger value="budget">Budget</TabsTrigger>
+          <TabsList className="w-full h-auto flex flex-wrap gap-1 p-1 bg-slate-100 rounded-lg justify-start lg:grid lg:grid-cols-4">
+            <TabsTrigger value="requirements" className="text-xs sm:text-sm">Requirements</TabsTrigger>
+            <TabsTrigger value="files" className="text-xs sm:text-sm">Files</TabsTrigger>
+            <TabsTrigger value="notes" className="text-xs sm:text-sm">Notes</TabsTrigger>
+            <TabsTrigger value="budget" className="text-xs sm:text-sm">Budget</TabsTrigger>
           </TabsList>
 
           <TabsContent value="requirements" className="mt-6">
@@ -582,10 +582,10 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                     checked={req.status === 'completed'}
                                     onCheckedChange={(checked) => onToggle.mutate({ id: req.id, completed: checked })}
                                   />
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2">
-                                      <span className={req.status === 'completed' ? 'line-through text-slate-500' : ''}>{req.requirement_text}</span>
-                                      {req.is_mandatory && <Badge variant="outline" className="text-xs">Mandatory</Badge>}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <span className={cn("text-sm break-words", req.status === 'completed' ? 'line-through text-slate-500' : '')}>{req.requirement_text}</span>
+                                      {req.is_mandatory && <Badge variant="outline" className="text-xs flex-shrink-0">Mandatory</Badge>}
                                     </div>
                                     {req.completed_date && (
                                       <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(req.completed_date), 'MMM d, yyyy')}</p>
@@ -989,7 +989,7 @@ function FilesTab({ projectId, phaseName, files }) {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {currentFiles.map(file => (
             <Card key={file.id}>
               <CardContent className="py-4">
