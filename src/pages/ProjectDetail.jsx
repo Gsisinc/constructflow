@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import ProjectForm from '../components/projects/ProjectForm';
 import PhaseNavigator from '../components/phases/PhaseNavigator';
+import PhaseManager from '../components/phases/PhaseManager';
 import PhaseGateChecklist from '../components/phases/PhaseGateChecklist';
 import PhaseManager from '../components/phases/PhaseManager';
 import CustomPhaseManager from '../components/phases/CustomPhaseManager';
