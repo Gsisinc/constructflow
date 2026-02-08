@@ -168,7 +168,11 @@ export default function Layout({ children, currentPageName }) {
   };
 
   const handleLogout = () => {
-    base44.auth.logout(createPageUrl('Home'));
+    // Clear stored user data and session
+    localStorage.clear();
+    sessionStorage.clear();
+    // Redirect to home with logout
+    window.location.href = createPageUrl('Home');
   };
 
   const isRootPage = ['Dashboard', 'Projects', 'Bids', 'TaskTracker', 'Settings'].includes(currentPageName);
