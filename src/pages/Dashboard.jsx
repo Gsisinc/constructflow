@@ -34,8 +34,16 @@ export default function Dashboard() {
   const isProjectManager = isAdmin;
 
   const { data: projects = [], isLoading: loadingProjects } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list('-created_date', 50),
+    queryKey: ['projects', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return [];
+      const teamRecords = await base44.entities.ProjectTeam.filter({ user_email: user.email });
+      const projectIds = [...new Set(teamRecords.map(t => t.project_id))];
+      if (projectIds.length === 0) return [];
+      const allProjects = await base44.entities.Project.list('-created_date', 50);
+      return allProjects.filter(p => projectIds.includes(p.id));
+    },
+    enabled: !!user?.email,
   });
 
   const { data: bidOpportunities = [], isLoading: loadingBidOpps } = useQuery({
