@@ -1,51 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '../utils';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Building2, Upload } from 'lucide-react';
-import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertCircle, Building2, Users, Loader2 } from 'lucide-react';
 
 export default function Onboarding() {
-  const [step, setStep] = useState(1);
+  const navigate = useNavigate();
+  const [step, setStep] = useState('choice'); // choice, create, join
+  const [orgName, setOrgName] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
-  const [orgData, setOrgData] = useState({
-    name: '',
-    industry: 'low_voltage',
-    phone: '',
-    website: ''
-  });
-  const [userData, setUserData] = useState({
-    user_role: 'owner',
-    phone: ''
-  });
+  const [error, setError] = useState('');
+  const [user, setUser] = useState(null);
 
-  const handleCreateOrganization = async () => {
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+        // If user already has organization, redirect to dashboard
+        if (currentUser?.organization_id) {
+          navigate(createPageUrl('Dashboard'));
+        }
+      } catch (err) {
+        console.error('Error fetching user:', err);
+      }
+    };
+    getUser();
+  }, [navigate]);
+
+  const handleCreateOrg = async () => {
+    if (!orgName.trim()) {
+      setError('Organization name is required');
+      return;
+    }
+
     setLoading(true);
+    setError('');
     try {
-      const user = await base44.auth.me();
-      
-      // Create organization
-      const org = await base44.entities.Organization.create({
-        ...orgData,
-        owner_email: user.email
+      const response = await base44.functions.invoke('setupOrganization', {
+        action: 'create',
+        org_name: orgName
       });
 
-      // Update user with organization
-      await base44.auth.updateMe({
-        organization_id: org.id,
-        organization_name: org.name,
-        user_role: userData.user_role,
-        phone: userData.phone
+      if (response.data.success) {
+        navigate(createPageUrl('Dashboard'));
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to create organization');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleJoinOrg = async () => {
+    if (!inviteCode.trim()) {
+      setError('Invite code is required');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    try {
+      const response = await base44.functions.invoke('setupOrganization', {
+        action: 'join',
+        invite_code: inviteCode
       });
 
-      toast.success('Organization created successfully!');
-      window.location.href = '/Dashboard';
-    } catch (error) {
-      toast.error('Failed to create organization');
-      console.error(error);
+      if (response.data.success) {
+        navigate(createPageUrl('Dashboard'));
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to join organization');
     } finally {
       setLoading(false);
     }
@@ -53,117 +82,160 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl border-slate-200 shadow-xl">
-        <CardHeader>
-          <div className="flex items-center gap-4 mb-2">
-            <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png" 
-              alt="GSIS Manager" 
-              className="h-12 w-auto"
-            />
-            <div>
-              <CardTitle className="text-2xl font-bold text-slate-900">Welcome to GSIS Manager</CardTitle>
-              <CardDescription>Set up your organization to get started</CardDescription>
-            </div>
+      <div className="w-full max-w-md">
+        {/* Welcome Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100 mb-4">
+            <Building2 className="h-6 w-6 text-amber-600" />
           </div>
-        </CardHeader>
-        <CardContent>
-          {step === 1 ? (
-            <div className="space-y-4">
-              <div>
-                <Label>Organization Name</Label>
+          <h1 className="text-2xl font-bold text-slate-900">Welcome to Nexus Construct</h1>
+          <p className="text-slate-600 mt-2">Let's get your workspace set up</p>
+          {user && <p className="text-sm text-slate-500 mt-2">Signed in as {user.email}</p>}
+        </div>
+
+        {/* Step: Choose */}
+        {step === 'choice' && (
+          <div className="grid gap-4">
+            <Button
+              onClick={() => setStep('create')}
+              className="h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
+            >
+              <Building2 className="h-6 w-6" />
+              <span className="text-sm font-semibold">Create New Organization</span>
+              <span className="text-xs opacity-90">Start your own workspace</span>
+            </Button>
+
+            <Button
+              onClick={() => setStep('join')}
+              variant="outline"
+              className="h-24 flex flex-col items-center justify-center gap-2"
+            >
+              <Users className="h-6 w-6" />
+              <span className="text-sm font-semibold">Join Existing Organization</span>
+              <span className="text-xs text-slate-500">Use an invite code</span>
+            </Button>
+          </div>
+        )}
+
+        {/* Step: Create Organization */}
+        {step === 'create' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Create Organization</CardTitle>
+              <CardDescription>Set up your new workspace</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex gap-2">
+                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Organization Name</label>
                 <Input
-                  value={orgData.name}
-                  onChange={(e) => setOrgData({ ...orgData, name: e.target.value })}
-                  placeholder="Your Company Name"
-                />
-              </div>
-
-              <div>
-                <Label>Industry</Label>
-                <Select value={orgData.industry} onValueChange={(value) => setOrgData({ ...orgData, industry: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low_voltage">Low Voltage / Data Cabling</SelectItem>
-                    <SelectItem value="electrical">Electrical</SelectItem>
-                    <SelectItem value="general_contractor">General Contractor</SelectItem>
-                    <SelectItem value="plumbing">Plumbing</SelectItem>
-                    <SelectItem value="hvac">HVAC</SelectItem>
-                    <SelectItem value="specialty">Specialty Contractor</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label>Company Phone</Label>
-                <Input
-                  value={orgData.phone}
-                  onChange={(e) => setOrgData({ ...orgData, phone: e.target.value })}
-                  placeholder="+1 (555) 000-0000"
-                />
-              </div>
-
-              <div>
-                <Label>Website (Optional)</Label>
-                <Input
-                  value={orgData.website}
-                  onChange={(e) => setOrgData({ ...orgData, website: e.target.value })}
-                  placeholder="https://yourcompany.com"
-                />
-              </div>
-
-              <Button onClick={() => setStep(2)} className="w-full" disabled={!orgData.name}>
-                Continue
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div>
-                <Label>Your Role</Label>
-                <Select value={userData.user_role} onValueChange={(value) => setUserData({ ...userData, user_role: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="owner">Owner</SelectItem>
-                    <SelectItem value="administrator">Administrator</SelectItem>
-                    <SelectItem value="project_manager">Project Manager</SelectItem>
-                    <SelectItem value="team_member">Team Member</SelectItem>
-                    <SelectItem value="stakeholder">Stakeholder</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-slate-500 mt-1">
-                  {userData.user_role === 'owner' && 'Full access to all features and settings'}
-                  {userData.user_role === 'administrator' && 'Manage projects, users, and settings'}
-                  {userData.user_role === 'project_manager' && 'Create and manage projects'}
-                  {userData.user_role === 'team_member' && 'Work on assigned tasks and projects'}
-                  {userData.user_role === 'stakeholder' && 'View project progress and updates'}
-                </p>
-              </div>
-
-              <div>
-                <Label>Your Phone</Label>
-                <Input
-                  value={userData.phone}
-                  onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="e.g., Golden State Integrated Systems"
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                  disabled={loading}
                 />
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setStep('choice');
+                    setError('');
+                    setOrgName('');
+                  }}
+                  disabled={loading}
+                  className="flex-1"
+                >
                   Back
                 </Button>
-                <Button onClick={handleCreateOrganization} className="flex-1" disabled={loading}>
-                  {loading ? 'Creating...' : 'Complete Setup'}
+                <Button
+                  onClick={handleCreateOrg}
+                  disabled={loading}
+                  className="flex-1 bg-amber-500 hover:bg-amber-600"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create'
+                  )}
                 </Button>
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Step: Join Organization */}
+        {step === 'join' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Join Organization</CardTitle>
+              <CardDescription>Enter the invite code from your organization</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex gap-2">
+                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Invite Code</label>
+                <Input
+                  placeholder="Enter invite code"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                  disabled={loading}
+                  maxLength="20"
+                />
+              </div>
+
+              <p className="text-xs text-slate-500">
+                Ask your organization administrator for an invite code.
+              </p>
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setStep('choice');
+                    setError('');
+                    setInviteCode('');
+                  }}
+                  disabled={loading}
+                  className="flex-1"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={handleJoinOrg}
+                  disabled={loading}
+                  className="flex-1 bg-amber-500 hover:bg-amber-600"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Joining...
+                    </>
+                  ) : (
+                    'Join'
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
