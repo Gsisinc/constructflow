@@ -690,6 +690,8 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
 function FilesTab({ projectId, phaseName, files }) {
   const [uploading, setUploading] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState(null);
+  const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const [folderName, setFolderName] = useState('');
   const queryClient = useQueryClient();
 
   // Query requirements to create missing folders
@@ -699,12 +701,24 @@ function FilesTab({ projectId, phaseName, files }) {
     enabled: !!projectId && !!phaseName
   });
 
-  // Create folders for requirements that don't have them
+  // Create folders for main requirements that don't have them, and delete folders for sub-requirements
   useEffect(() => {
-    const createMissingFolders = async () => {
+    const syncFolders = async () => {
       const mainRequirements = requirements.filter(r => !r.parent_requirement_id);
-      const existingFolderUrls = files.filter(f => f.file_url?.startsWith('folder://')).map(f => f.file_url);
+      const subRequirements = requirements.filter(r => r.parent_requirement_id);
+      const existingFolders = files.filter(f => f.file_url?.startsWith('folder://'));
       
+      // Delete folders for sub-requirements
+      for (const folder of existingFolders) {
+        const reqId = folder.file_url.replace('folder://', '');
+        const isSubReq = subRequirements.some(sr => sr.id === reqId);
+        if (isSubReq) {
+          await base44.entities.PhaseFile.delete(folder.id);
+        }
+      }
+      
+      // Create folders for main requirements
+      const existingFolderUrls = existingFolders.map(f => f.file_url);
       for (const req of mainRequirements) {
         const folderUrl = `folder://${req.id}`;
         if (!existingFolderUrls.includes(folderUrl)) {
@@ -714,7 +728,8 @@ function FilesTab({ projectId, phaseName, files }) {
             file_name: `[Folder] ${req.requirement_text}`,
             file_url: folderUrl,
             file_type: 'other',
-            description: `Folder for requirement: ${req.requirement_text}`
+            description: `Folder for requirement: ${req.requirement_text}`,
+            order: req.order || 0
           });
         }
       }
@@ -722,9 +737,69 @@ function FilesTab({ projectId, phaseName, files }) {
     };
 
     if (requirements.length > 0 && files) {
-      createMissingFolders();
+      syncFolders();
     }
   }, [requirements.length, projectId, phaseName]);
+
+  const createFolderMutation = useMutation({
+    mutationFn: async (name) => {
+      const maxOrder = Math.max(...folders.map(f => f.order || 0), 0);
+      return base44.entities.PhaseFile.create({
+        project_id: projectId,
+        phase_name: phaseName,
+        file_name: `[Folder] ${name}`,
+        file_url: `folder://custom_${Date.now()}`,
+        file_type: 'other',
+        description: 'Custom folder',
+        order: maxOrder + 1
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
+      setShowCreateFolder(false);
+      setFolderName('');
+      toast.success('Folder created');
+    }
+  });
+
+  const deleteFolderMutation = useMutation({
+    mutationFn: async (folderId) => {
+      // Delete all files in the folder first
+      const folderFiles = files.filter(f => f.parent_folder_id === folderId);
+      for (const file of folderFiles) {
+        await base44.entities.PhaseFile.delete(file.id);
+      }
+      // Delete the folder
+      await base44.entities.PhaseFile.delete(folderId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
+      setSelectedFolder(null);
+      toast.success('Folder deleted');
+    }
+  });
+
+  const updateFolderOrderMutation = useMutation({
+    mutationFn: ({ id, order }) => base44.entities.PhaseFile.update(id, { order }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
+    }
+  });
+
+  const handleFolderDragEnd = (result) => {
+    if (!result.destination) return;
+    if (result.source.index === result.destination.index) return;
+
+    const reordered = Array.from(folders);
+    const [removed] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, removed);
+
+    reordered.forEach((folder, index) => {
+      if (folder.order !== index) {
+        updateFolderOrderMutation.mutate({ id: folder.id, order: index });
+      }
+    });
+  };
 
   const handleUpload = async (e) => {
     const file = e.target.files[0];
@@ -752,18 +827,17 @@ function FilesTab({ projectId, phaseName, files }) {
     }
   };
 
-  // Get folders and sort them by requirement order
+  // Get folders and sort them by order
   const folders = files
     .filter(f => f.file_url?.startsWith('folder://'))
     .map(folder => {
-      const reqId = folder.file_url.replace('folder://', '');
+      const reqId = folder.file_url.replace('folder://', '').replace('custom_', '');
       const req = requirements.find(r => r.id === reqId);
       return { ...folder, requirement: req };
     })
-    .filter(f => f.requirement) // Only show folders that have a corresponding requirement
     .sort((a, b) => {
-      const orderA = a.requirement?.order ?? new Date(a.requirement?.created_date).getTime();
-      const orderB = b.requirement?.order ?? new Date(b.requirement?.created_date).getTime();
+      const orderA = a.order ?? 999;
+      const orderB = b.order ?? 999;
       return orderA - orderB;
     });
 
@@ -781,50 +855,122 @@ function FilesTab({ projectId, phaseName, files }) {
         )}
         <div className={cn("flex gap-2", !selectedFolder && "ml-auto")}>
           {selectedFolder && (
-            <Badge variant="secondary" className="text-sm">
-              {selectedFolder.file_name.replace('[Folder] ', '')}
-            </Badge>
+            <>
+              <Badge variant="secondary" className="text-sm">
+                {selectedFolder.file_name.replace('[Folder] ', '')}
+              </Badge>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-red-600 hover:bg-red-50"
+                onClick={() => {
+                  if (confirm('Delete this folder and all its files?')) {
+                    deleteFolderMutation.mutate(selectedFolder.id);
+                  }
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+          {!selectedFolder && (
+            <Dialog open={showCreateFolder} onOpenChange={setShowCreateFolder}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Folder
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Folder</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <Input
+                    value={folderName}
+                    onChange={(e) => setFolderName(e.target.value)}
+                    placeholder="Folder name"
+                  />
+                  <Button onClick={() => createFolderMutation.mutate(folderName)} className="w-full">
+                    Create Folder
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           )}
           <label>
-            <Button size="sm" disabled={uploading} asChild>
+            <Button size="sm" disabled={uploading || !selectedFolder} asChild>
               <span>
                 <Upload className="h-4 w-4 mr-2" />
                 {uploading ? 'Uploading...' : 'Upload File'}
               </span>
             </Button>
-            <input type="file" className="hidden" onChange={handleUpload} />
+            <input type="file" className="hidden" onChange={handleUpload} disabled={!selectedFolder} />
           </label>
         </div>
       </div>
 
       {!selectedFolder && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {folders.length === 0 ? (
-            <Card className="md:col-span-2">
-              <CardContent className="py-12 text-center text-slate-500">
-                No requirement folders yet
-              </CardContent>
-            </Card>
-          ) : (
-            folders.map(folder => (
-              <Card key={folder.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setSelectedFolder(folder)}>
-                <CardContent className="py-4">
-                  <div className="flex items-start gap-3">
-                    <Folder className="h-5 w-5 text-amber-500" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {folder.file_name.replace('[Folder] ', '')}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {files.filter(f => f.parent_folder_id === folder.id).length} files
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+        <DragDropContext onDragEnd={handleFolderDragEnd}>
+          <Droppable droppableId="folders">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {folders.length === 0 ? (
+                  <Card className="md:col-span-2">
+                    <CardContent className="py-12 text-center text-slate-500">
+                      No folders yet. Create one to get started.
+                    </CardContent>
+                  </Card>
+                ) : (
+                  folders.map((folder, index) => (
+                    <Draggable key={folder.id} draggableId={folder.id} index={index}>
+                      {(provided) => (
+                        <Card
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className="cursor-pointer hover:bg-slate-50 transition-colors"
+                        >
+                          <CardContent className="py-4">
+                            <div className="flex items-start gap-3">
+                              <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
+                                <GripVertical className="h-5 w-5 text-slate-400" />
+                              </div>
+                              <div className="flex-1 min-w-0" onClick={() => setSelectedFolder(folder)}>
+                                <div className="flex items-center gap-2">
+                                  <Folder className="h-5 w-5 text-amber-500" />
+                                  <p className="text-sm font-medium truncate">
+                                    {folder.file_name.replace('[Folder] ', '')}
+                                  </p>
+                                </div>
+                                <p className="text-xs text-slate-500 ml-7">
+                                  {files.filter(f => f.parent_folder_id === folder.id).length} files
+                                </p>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 w-7 p-0 text-red-600 hover:bg-red-50"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm('Delete this folder and all its files?')) {
+                                    deleteFolderMutation.mutate(folder.id);
+                                  }
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </Draggable>
+                  ))
+                )}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       )}
 
       {currentFiles.length === 0 ? (
