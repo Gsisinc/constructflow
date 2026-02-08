@@ -279,29 +279,29 @@ export default function Layout({ children, currentPageName }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-full w-64 bg-slate-900 border-r border-slate-800 z-50 transition-transform duration-300 lg:translate-x-0 shadow-2xl",
+          "fixed top-0 left-0 h-full w-64 bg-white border-r border-amber-100 z-50 transition-transform duration-300 lg:translate-x-0 shadow-sm",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-              <div className="h-16 flex items-center gap-3 px-6 border-b border-slate-800 bg-slate-950">
+              <div className="h-16 flex items-center gap-3 px-6 border-b border-amber-100/50 bg-gradient-to-r from-white to-amber-50/30">
                 {organization?.logo_url ? (
                   <img src={organization.logo_url} alt={organization.name} className="h-10 w-auto" />
                 ) : (
                   <>
                     <img 
-                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png" 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
                       alt="GSIS Manager" 
                       className="h-8 w-auto"
                     />
-                    <span className="font-bold text-lg text-white tracking-tight hidden sm:inline">{organization?.name || 'GSIS'}</span>
+                    <span className="font-bold text-lg text-slate-900 tracking-tight hidden sm:inline">{organization?.name || 'GSIS'}</span>
                   </>
                 )}
               </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto bg-slate-900">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto bg-white">
             {navItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 const Icon = item.icon;
@@ -313,11 +313,11 @@ export default function Layout({ children, currentPageName }) {
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] select-none",
                       isActive
-                        ? "bg-amber-500 text-slate-900 shadow-md hover:bg-amber-400 font-semibold"
-                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                        ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/20"
+                        : "text-slate-600 hover:bg-amber-50 hover:text-amber-700"
                     )}
                   >
-                    <Icon className={cn("h-4.5 w-4.5", isActive ? "text-slate-900" : "text-slate-500 group-hover:text-white")} />
+                    <Icon className={cn("h-4.5 w-4.5", isActive ? "text-white" : "text-slate-400 group-hover:text-amber-600")} />
                     {item.name}
                   </Link>
                 );
@@ -325,8 +325,8 @@ export default function Layout({ children, currentPageName }) {
 
             {user?.role === 'admin' && (
               <>
-                <div className="h-px bg-slate-800 my-4 mx-2" />
-                <div className="text-xs font-semibold text-slate-500 px-3 py-2 uppercase tracking-wider">Administration</div>
+                <div className="h-px bg-slate-100 my-4 mx-2" />
+                <div className="text-xs font-semibold text-slate-400 px-3 py-2 uppercase tracking-wider">Administration</div>
                 {adminNavItems.map((item) => {
                   const isActive = currentPageName === item.page;
                   const Icon = item.icon;
@@ -338,11 +338,11 @@ export default function Layout({ children, currentPageName }) {
                       className={cn(
                         "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                         isActive
-                          ? "bg-amber-500 text-slate-900 shadow-md font-semibold"
-                          : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                          ? "bg-slate-900 text-white shadow-md"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                       )}
                     >
-                      <Icon className={cn("h-4.5 w-4.5", isActive ? "text-slate-900" : "text-slate-500")} />
+                      <Icon className={cn("h-4.5 w-4.5", isActive ? "text-white" : "text-slate-400")} />
                       {item.name}
                     </Link>
                   );
@@ -352,14 +352,14 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             {/* Footer */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950">
+            <div className="p-4 border-t border-amber-100 bg-amber-50/30">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold text-xs">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-xs shadow-sm">
                  {organization?.name?.[0] || 'G'}
               </div>
-              <div className="text-xs text-slate-400">
-                <p className="font-medium text-slate-300">{organization?.name || 'GSIS Manager'}</p>
-                <p className="opacity-70">Pro Plan</p>
+              <div className="text-xs text-slate-500">
+                <p className="font-semibold text-slate-900">{organization?.name || 'GSIS Manager'}</p>
+                <p className="opacity-70 text-amber-600">Pro Plan</p>
               </div>
             </div>
             </div>
