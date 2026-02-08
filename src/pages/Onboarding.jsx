@@ -53,14 +53,16 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
+      <Card className="w-full max-w-2xl border-slate-200 shadow-xl">
         <CardHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-12 w-12 rounded-lg bg-slate-900 flex items-center justify-center">
-              <Building2 className="h-6 w-6 text-white" />
-            </div>
+          <div className="flex items-center gap-4 mb-2">
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png" 
+              alt="GSIS Manager" 
+              className="h-12 w-auto"
+            />
             <div>
-              <CardTitle className="text-2xl">Welcome to BuildFlow</CardTitle>
+              <CardTitle className="text-2xl font-bold text-slate-900">Welcome to GSIS Manager</CardTitle>
               <CardDescription>Set up your organization to get started</CardDescription>
             </div>
           </div>

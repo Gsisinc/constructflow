@@ -190,7 +190,16 @@ export default function Layout({ children, currentPageName }) {
               :root {
                 --primary: 222.2 47.4% 11.2%;
                 --primary-foreground: 210 40% 98%;
-                --accent: 210 40% 96.1%;
+                --accent: 38 92% 50%;
+                --accent-foreground: 48 96% 89%;
+                --muted: 210 40% 96.1%;
+                --muted-foreground: 215.4 16.3% 46.9%;
+                --card: 0 0% 100%;
+                --card-foreground: 222.2 47.4% 11.2%;
+                --border: 214.3 31.8% 91.4%;
+                --input: 214.3 31.8% 91.4%;
+                --ring: 222.2 84% 4.9%;
+                --radius: 0.5rem;
               }
               @supports (padding: max(0px)) {
                 body {
@@ -201,8 +210,8 @@ export default function Layout({ children, currentPageName }) {
             `}</style>
 
       {/* Top Header */}
-              <div className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-amber-100 dark:border-amber-900/30 z-40 lg:pl-64" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-                <div className="h-full flex items-center justify-between px-3 sm:px-4">
+              <div className="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 z-40 lg:pl-64" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+                <div className="h-full flex items-center justify-between px-4 sm:px-6">
                   {/* Mobile menu button & back button */}
                   <div className="lg:hidden flex items-center gap-1 sm:gap-2">
                 {!isRootPage && (
@@ -270,29 +279,29 @@ export default function Layout({ children, currentPageName }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-full w-64 bg-white dark:bg-slate-950 border-r border-amber-100 dark:border-amber-900/30 z-50 transition-transform duration-300 lg:translate-x-0",
+          "fixed top-0 left-0 h-full w-64 bg-slate-900 border-r border-slate-800 z-50 transition-transform duration-300 lg:translate-x-0 shadow-2xl",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-              <div className="h-16 flex items-center gap-2 px-4 sm:px-6 border-b border-amber-100">
+              <div className="h-16 flex items-center gap-3 px-6 border-b border-slate-800 bg-slate-950">
                 {organization?.logo_url ? (
-                  <img src={organization.logo_url} alt={organization.name} className="h-12 sm:h-14 w-auto" />
+                  <img src={organization.logo_url} alt={organization.name} className="h-10 w-auto" />
                 ) : (
                   <>
                     <img 
-                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png" 
                       alt="GSIS Manager" 
-                      className="h-10 sm:h-14 w-auto"
+                      className="h-8 w-auto"
                     />
-                    <span className="font-semibold text-sm sm:text-lg text-slate-900 tracking-tight hidden sm:inline">{organization?.name || 'GSIS Manager'}</span>
+                    <span className="font-bold text-lg text-white tracking-tight hidden sm:inline">{organization?.name || 'GSIS'}</span>
                   </>
                 )}
               </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto bg-slate-900">
             {navItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 const Icon = item.icon;
@@ -304,11 +313,11 @@ export default function Layout({ children, currentPageName }) {
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] select-none",
                       isActive
-                        ? "bg-amber-600 text-white shadow-sm hover:bg-amber-700"
-                        : "text-slate-600 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-700"
+                        ? "bg-amber-500 text-slate-900 shadow-md hover:bg-amber-400 font-semibold"
+                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
                     )}
                   >
-                    <Icon className={cn("h-4.5 w-4.5", isActive ? "text-white" : "text-amber-600")} />
+                    <Icon className={cn("h-4.5 w-4.5", isActive ? "text-slate-900" : "text-slate-500 group-hover:text-white")} />
                     {item.name}
                   </Link>
                 );
@@ -316,8 +325,8 @@ export default function Layout({ children, currentPageName }) {
 
             {user?.role === 'admin' && (
               <>
-                <div className="h-px bg-slate-200 my-2" />
-                <div className="text-xs font-semibold text-slate-400 px-3 py-2">ADMIN</div>
+                <div className="h-px bg-slate-800 my-4 mx-2" />
+                <div className="text-xs font-semibold text-slate-500 px-3 py-2 uppercase tracking-wider">Administration</div>
                 {adminNavItems.map((item) => {
                   const isActive = currentPageName === item.page;
                   const Icon = item.icon;
@@ -329,25 +338,31 @@ export default function Layout({ children, currentPageName }) {
                       className={cn(
                         "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                         isActive
-                          ? "bg-slate-900 text-white shadow-sm"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-amber-500 text-slate-900 shadow-md font-semibold"
+                          : "text-slate-400 hover:bg-slate-800 hover:text-white"
                       )}
                     >
-                      <Icon className={cn("h-4.5 w-4.5", isActive ? "text-white" : "text-slate-400")} />
+                      <Icon className={cn("h-4.5 w-4.5", isActive ? "text-slate-900" : "text-slate-500")} />
                       {item.name}
                     </Link>
                   );
                 })}
               </>
             )}
-          </nav>
+            </nav>
 
-          {/* Footer */}
-          <div className="p-4 border-t border-slate-100">
-            <div className="text-xs text-slate-500 text-center">
-              {organization?.name || 'GSIS Manager'}
+            {/* Footer */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold text-xs">
+                 {organization?.name?.[0] || 'G'}
+              </div>
+              <div className="text-xs text-slate-400">
+                <p className="font-medium text-slate-300">{organization?.name || 'GSIS Manager'}</p>
+                <p className="opacity-70">Pro Plan</p>
+              </div>
             </div>
-          </div>
+            </div>
         </div>
       </aside>
 
