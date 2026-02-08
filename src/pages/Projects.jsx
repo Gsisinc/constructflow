@@ -26,9 +26,22 @@ export default function Projects() {
   const [viewMode, setViewMode] = useState('grid');
   const queryClient = useQueryClient();
 
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
+  });
+
   const { data: projects = [], isLoading } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list('-created_date'),
+    queryKey: ['projects', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return [];
+      const teamRecords = await base44.entities.ProjectTeam.filter({ user_email: user.email });
+      const projectIds = [...new Set(teamRecords.map(t => t.project_id))];
+      if (projectIds.length === 0) return [];
+      const allProjects = await base44.entities.Project.list('-created_date');
+      return allProjects.filter(p => projectIds.includes(p.id));
+    },
+    enabled: !!user?.email,
   });
 
   const createMutation = useMutation({
