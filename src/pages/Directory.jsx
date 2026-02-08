@@ -32,15 +32,16 @@ export default function Directory() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Directory</h1>
-          <p className="text-slate-500 mt-1">Manage contacts and team members</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Directory</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Manage your team and contacts</p>
         </div>
-        <Button>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Contact
+        <Button className="bg-amber-600 hover:bg-amber-700 min-h-[44px] text-sm select-none">
+          <UserPlus className="h-4 w-4 mr-1.5 sm:mr-2" />
+          <span className="hidden sm:inline">Contact</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </div>
 
@@ -48,26 +49,26 @@ export default function Directory() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
-            placeholder="Search for Contacts"
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-sm min-h-[44px]"
           />
         </div>
-        <Button variant="outline">Filter</Button>
+        <Button variant="outline" className="hidden sm:flex">Filter</Button>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-blue-600" />
-          <span className="text-sm text-blue-900">
-            Purchased Licenses: <strong>69999</strong> | Used Licenses: <strong>#1</strong> | Available Licenses: <strong>#9998</strong>
+          <Users className="h-4 sm:h-5 w-4 sm:w-5 text-blue-600 flex-shrink-0" />
+          <span className="text-xs sm:text-sm text-blue-900">
+            <strong>69,999</strong> Licenses | <strong>1</strong> Used | <strong>9,998</strong> Available
           </span>
         </div>
-        <Button size="sm" variant="outline">Upgrade</Button>
+        <Button size="sm" variant="outline" className="text-xs">Upgrade</Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Contacts by Type</CardTitle>
@@ -127,47 +128,65 @@ export default function Directory() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="border-amber-100">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          {/* Mobile View */}
+          <div className="sm:hidden space-y-2 p-3">
+            {filteredWorkers.map((worker) => (
+              <div key={worker.id} className="border-b border-amber-100 pb-2.5 last:border-0">
+                <div className="flex items-start gap-2 mb-1.5">
+                  <div className="h-7 w-7 rounded-full bg-amber-200 flex items-center justify-center text-xs font-medium flex-shrink-0">
+                    {worker.name?.[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-xs text-slate-900 truncate">{worker.name}</p>
+                    <p className="text-xs text-slate-600 truncate">{worker.company || 'Direct'}</p>
+                  </div>
+                  {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />}
+                </div>
+                <div className="text-xs text-slate-600 flex gap-2">
+                  <span className="flex-1 truncate">{worker.phone || '-'}</span>
+                  <Badge variant="outline" className="text-xs flex-shrink-0">{worker.company ? 'Contractor' : 'Employee'}</Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop View */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-50 border-b">
+              <thead className="bg-amber-50 border-b border-amber-100">
                 <tr>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Company</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Name</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Phone</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Cell</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Address</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Type</th>
-                  <th className="text-center py-3 px-4 text-sm font-medium text-slate-600"></th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Company</th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Name</th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Phone</th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Type</th>
+                  <th className="text-center py-2.5 px-3 text-xs font-medium text-slate-600"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredWorkers.map((worker) => (
-                  <tr key={worker.id} className="border-b hover:bg-slate-50">
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
-                        {worker.company && <Building2 className="h-4 w-4 text-slate-400" />}
-                        <span className="font-medium">{worker.company || '-'}</span>
+                  <tr key={worker.id} className="border-b border-amber-100 hover:bg-amber-50">
+                    <td className="py-2.5 px-3">
+                      <div className="flex items-center gap-1.5">
+                        {worker.company && <Building2 className="h-3 w-3 text-slate-400" />}
+                        <span className="font-medium text-xs">{worker.company || '-'}</span>
                       </div>
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-2.5 px-3">
                       <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-medium">
+                        <div className="h-6 w-6 rounded-full bg-amber-200 flex items-center justify-center text-xs font-medium">
                           {worker.name?.[0]}
                         </div>
-                        <span>{worker.name}</span>
+                        <span className="text-xs">{worker.name}</span>
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-slate-600">{worker.phone || '-'}</td>
-                    <td className="py-3 px-4 text-slate-600">{worker.phone || '-'}</td>
-                    <td className="py-3 px-4 text-slate-600">-</td>
-                    <td className="py-3 px-4">
-                      <Badge variant="outline">{worker.company ? 'Contractor' : 'Employee'}</Badge>
+                    <td className="py-2.5 px-3 text-xs text-slate-600">{worker.phone || '-'}</td>
+                    <td className="py-2.5 px-3">
+                      <Badge variant="outline" className="text-xs">{worker.company ? 'Contractor' : 'Employee'}</Badge>
                     </td>
-                    <td className="py-3 px-4 text-center">
-                      {worker.productivity_score >= 90 && <Star className="h-4 w-4 text-yellow-500 inline" />}
-                      <button className="text-slate-400 hover:text-slate-600 ml-2">⋮</button>
+                    <td className="py-2.5 px-3 text-center">
+                      {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500 inline" />}
                     </td>
                   </tr>
                 ))}
