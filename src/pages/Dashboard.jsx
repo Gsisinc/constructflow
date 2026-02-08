@@ -34,8 +34,9 @@ export default function Dashboard() {
   const isProjectManager = isAdmin;
 
   const { data: projects = [], isLoading: loadingProjects } = useQuery({
-    queryKey: ['projects'],
+    queryKey: ['projects', user?.organization_id],
     queryFn: () => base44.entities.Project.list('-created_date', 50),
+    enabled: !!user?.organization_id
   });
 
   const { data: bidOpportunities = [], isLoading: loadingBidOpps } = useQuery({

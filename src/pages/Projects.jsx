@@ -26,9 +26,15 @@ export default function Projects() {
   const [viewMode, setViewMode] = useState('grid');
   const queryClient = useQueryClient();
 
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
+  });
+
   const { data: projects = [], isLoading } = useQuery({
-    queryKey: ['projects'],
+    queryKey: ['projects', user?.organization_id],
     queryFn: () => base44.entities.Project.list('-created_date'),
+    enabled: !!user?.organization_id
   });
 
   const createMutation = useMutation({
