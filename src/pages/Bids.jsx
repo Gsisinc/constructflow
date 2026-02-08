@@ -102,69 +102,70 @@ export default function Bids() {
     : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Bids</h1>
-          <p className="text-slate-500 mt-1">Track and manage your bid proposals</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Bids</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Track and manage your bid proposals</p>
         </div>
-        <Button onClick={() => { setEditingBid(null); setShowForm(true); }} className="bg-slate-900 hover:bg-slate-800">
-          <Plus className="h-4 w-4 mr-2" />
-          New Bid
+        <Button onClick={() => { setEditingBid(null); setShowForm(true); }} className="bg-amber-600 hover:bg-amber-700 min-h-[44px] select-none text-sm sm:text-base">
+          <Plus className="h-4 w-4 mr-1.5 sm:mr-2" />
+          <span className="hidden sm:inline">New Bid</span>
+          <span className="sm:hidden">New</span>
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="bg-white rounded-lg sm:rounded-xl border border-amber-100 p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-500">Total Pipeline</p>
-              <p className="text-2xl font-semibold mt-1">${totalBidValue.toLocaleString()}</p>
+              <p className="text-xs sm:text-sm text-slate-600">Total Pipeline</p>
+              <p className="text-lg sm:text-2xl font-semibold mt-0.5 sm:mt-1">${totalBidValue.toLocaleString()}</p>
             </div>
-            <div className="p-3 rounded-xl bg-blue-100">
-              <DollarSign className="h-5 w-5 text-blue-600" />
+            <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-blue-100">
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-lg sm:rounded-xl border border-amber-100 p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-500">Won Value</p>
-              <p className="text-2xl font-semibold mt-1 text-green-600">${wonValue.toLocaleString()}</p>
+              <p className="text-xs sm:text-sm text-slate-600">Won Value</p>
+              <p className="text-lg sm:text-2xl font-semibold mt-0.5 sm:mt-1 text-green-600">${wonValue.toLocaleString()}</p>
             </div>
-            <div className="p-3 rounded-xl bg-green-100">
-              <TrendingUp className="h-5 w-5 text-green-600" />
+            <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-green-100">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-lg sm:rounded-xl border border-amber-100 p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-500">Win Rate</p>
-              <p className="text-2xl font-semibold mt-1">{winRate}%</p>
+              <p className="text-xs sm:text-sm text-slate-600">Win Rate</p>
+              <p className="text-lg sm:text-2xl font-semibold mt-0.5 sm:mt-1">{winRate}%</p>
             </div>
-            <div className="p-3 rounded-xl bg-purple-100">
-              <FileText className="h-5 w-5 text-purple-600" />
+            <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-purple-100">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
             placeholder="Search bids..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-sm min-h-[44px]"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-48 text-sm min-h-[44px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -176,11 +177,11 @@ export default function Bids() {
         </Select>
       </div>
 
-      {/* Bids Table */}
+      {/* Bids List - Mobile Card Layout / Desktop Table */}
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {Array(5).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-16 rounded-xl" />
+            <Skeleton key={i} className="h-20 sm:h-16 rounded-lg sm:rounded-xl" />
           ))}
         </div>
       ) : filteredBids.length === 0 ? (
@@ -192,54 +193,98 @@ export default function Bids() {
           onAction={() => setShowForm(true)}
         />
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>RFP Name</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Win Prob.</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredBids.map((bid) => (
-                <TableRow
-                  key={bid.id}
-                  className="cursor-pointer hover:bg-slate-50"
-                  onClick={() => { setEditingBid(bid); setShowForm(true); }}
-                >
-                  <TableCell className="font-medium">{bid.rfp_name}</TableCell>
-                  <TableCell>{bid.client_name}</TableCell>
-                  <TableCell>${(bid.bid_amount || 0).toLocaleString()}</TableCell>
-                  <TableCell>
-                    {bid.due_date && (
-                      <div className="flex items-center gap-1.5 text-sm">
-                        <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                        {format(new Date(bid.due_date), 'MMM d, yyyy')}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {bid.win_probability && (
-                      <div className="flex items-center gap-2">
-                        <Progress value={bid.win_probability} className="w-16 h-1.5" />
-                        <span className="text-sm text-slate-500">{bid.win_probability}%</span>
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={cn("border", statusColors[bid.status])}>
+        <>
+          {/* Mobile Card View */}
+          <div className="sm:hidden space-y-3">
+            {filteredBids.map((bid) => (
+              <div
+                key={bid.id}
+                className="bg-white rounded-lg border border-amber-100 p-3 cursor-pointer hover:bg-amber-50 transition-colors"
+                onClick={() => { setEditingBid(bid); setShowForm(true); }}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-slate-900 line-clamp-2">{bid.rfp_name}</h3>
+                      <p className="text-xs text-slate-600 mt-0.5">{bid.client_name}</p>
+                    </div>
+                    <Badge className={cn("border flex-shrink-0 text-xs", statusColors[bid.status])}>
                       {bid.status?.replace('_', ' ')}
                     </Badge>
-                  </TableCell>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <p className="text-slate-500">Amount</p>
+                      <p className="font-semibold text-slate-900">${(bid.bid_amount || 0).toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Due Date</p>
+                      <p className="font-semibold text-slate-900">
+                        {bid.due_date ? format(new Date(bid.due_date), 'MMM d') : '-'}
+                      </p>
+                    </div>
+                  </div>
+                  {bid.win_probability && (
+                    <div className="flex items-center gap-2">
+                      <Progress value={bid.win_probability} className="flex-1 h-1.5" />
+                      <span className="text-xs font-semibold text-slate-700">{bid.win_probability}%</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden sm:block bg-white rounded-xl border border-amber-100 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-b border-amber-100">
+                  <TableHead className="text-xs">RFP Name</TableHead>
+                  <TableHead className="text-xs">Client</TableHead>
+                  <TableHead className="text-xs">Amount</TableHead>
+                  <TableHead className="text-xs">Due Date</TableHead>
+                  <TableHead className="text-xs">Win Prob.</TableHead>
+                  <TableHead className="text-xs">Status</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {filteredBids.map((bid) => (
+                  <TableRow
+                    key={bid.id}
+                    className="cursor-pointer hover:bg-amber-50 text-sm"
+                    onClick={() => { setEditingBid(bid); setShowForm(true); }}
+                  >
+                    <TableCell className="font-medium max-w-xs truncate">{bid.rfp_name}</TableCell>
+                    <TableCell className="text-xs">{bid.client_name}</TableCell>
+                    <TableCell className="text-sm font-medium">${(bid.bid_amount || 0).toLocaleString()}</TableCell>
+                    <TableCell className="text-xs">
+                      {bid.due_date && (
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3 text-slate-400" />
+                          {format(new Date(bid.due_date), 'MMM d')}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {bid.win_probability && (
+                        <div className="flex items-center gap-2">
+                          <Progress value={bid.win_probability} className="w-12 h-1" />
+                          <span className="text-xs font-semibold">{bid.win_probability}%</span>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={cn("border text-xs", statusColors[bid.status])}>
+                        {bid.status?.replace('_', ' ')}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
 
       {/* Bid Form Dialog */}
