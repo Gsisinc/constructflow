@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import ProjectCard from '../components/dashboard/ProjectCard';
 import ProjectForm from '../components/projects/ProjectForm';
+import PullToRefresh from '@/components/ui/PullToRefresh';
 import EmptyState from '../components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,8 +54,13 @@ export default function Projects() {
     completed: projects.filter((p) => p.status === 'completed').length,
   };
 
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['projects'] });
+  };
+
   return (
-    <div className="space-y-6">
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -150,6 +156,7 @@ export default function Projects() {
         onOpenChange={setShowForm}
         onSubmit={(data) => createMutation.mutate(data)}
       />
-    </div>
+      </div>
+    </PullToRefresh>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
@@ -166,14 +167,16 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <style>{`
-        html {
-          -webkit-user-select: none;
-          user-select: none;
-          overscroll-behavior: none;
-        }
-        body {
-          overscroll-behavior: none;
-        }
+                html {
+                  overscroll-behavior: none;
+                }
+                body {
+                  overscroll-behavior: none;
+                }
+                button, a, [role="button"], .select-none {
+                  -webkit-user-select: none;
+                  user-select: none;
+                }
         :root {
           --primary: 222.2 47.4% 11.2%;
           --primary-foreground: 210 40% 98%;
@@ -329,11 +332,20 @@ export default function Layout({ children, currentPageName }) {
       </aside>
 
       {/* Main Content */}
-      <main className="lg:pl-64 pt-16 min-h-screen pb-20 lg:pb-0" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
-        <div className="p-3 sm:p-4 md:p-6 lg:p-8">
-          {children}
-        </div>
-      </main>
+              <main className="lg:pl-64 pt-16 min-h-screen pb-20 lg:pb-0" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={location.pathname}
+                    initial={{ opacity: 0, x: 300 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -300 }}
+                    transition={{ duration: 0.3 }}
+                    className="p-3 sm:p-4 md:p-6 lg:p-8"
+                  >
+                    {children}
+                  </motion.div>
+                </AnimatePresence>
+              </main>
 
       {/* Mobile Bottom Navigation */}
       {!isHomePage && <MobileBottomNav currentPageName={currentPageName} />}

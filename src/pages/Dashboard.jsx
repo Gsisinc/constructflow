@@ -1,6 +1,7 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import PullToRefresh from '@/components/ui/PullToRefresh';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import ProjectCard from '../components/dashboard/ProjectCard';
@@ -65,8 +66,18 @@ export default function Dashboard() {
     { day: 'Sun', high: 80, low: 67, condition: '☀️', temp: 74 }
   ];
 
+  const handleRefresh = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['projects'] }),
+      queryClient.invalidateQueries({ queryKey: ['bidOpportunities'] }),
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] }),
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    ]);
+  };
+
   return (
-    <div className="space-y-6">
+        <PullToRefresh onRefresh={handleRefresh}>
+          <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold text-slate-900">
@@ -151,9 +162,12 @@ export default function Dashboard() {
            {/* Team Members */}
            <EmployeeWidget />
          </div>
-       </div>
+         </div>
 
 
-    </div>
-  );
-}
+         </div>
+         </PullToRefresh>
+         );
+         }
+
+         const queryClient = useQueryClient();
