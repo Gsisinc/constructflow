@@ -46,20 +46,16 @@ export default function Home() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="text-amber-400 hover:bg-amber-400/10">
-              <Menu className="h-5 w-5" />
-            </Button>
+          <Button variant="ghost" size="icon" className="text-amber-400 hover:bg-amber-400/10">
+            <Menu className="h-5 w-5" />
+          </Button>
+          <div className="flex-1 flex items-center justify-center">
             <div className="relative flex-shrink-0 h-40 w-40 sm:h-56 sm:w-56">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
                 className="h-full w-auto"
               />
-            </div>
-            <div className="hidden lg:block">
-              <h1 className="text-2xl font-black text-white tracking-tight">GSIS</h1>
-              <p className="text-base text-amber-300/90 font-medium">Construction Platform</p>
             </div>
           </div>
           <Button 
