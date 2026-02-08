@@ -67,7 +67,7 @@ export default function Projects() {
           <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Projects</h1>
           <p className="text-slate-500 mt-1">Manage all your construction projects</p>
         </div>
-        <Button onClick={() => setShowForm(true)} className="bg-slate-900 hover:bg-slate-800">
+        <Button onClick={() => setShowForm(true)} className="bg-slate-900 hover:bg-slate-800 min-h-[44px] min-w-[44px] select-none">
           <Plus className="h-4 w-4 mr-2" />
           New Project
         </Button>
@@ -99,7 +99,7 @@ export default function Projects() {
           <button
             onClick={() => setViewMode('grid')}
             className={cn(
-              "p-2.5 transition-colors",
+              "p-2.5 transition-colors min-h-[44px] select-none",
               viewMode === 'grid' ? 'bg-slate-100 text-slate-900' : 'text-slate-400 hover:text-slate-600'
             )}
           >
@@ -108,7 +108,7 @@ export default function Projects() {
           <button
             onClick={() => setViewMode('list')}
             className={cn(
-              "p-2.5 transition-colors",
+              "p-2.5 transition-colors min-h-[44px] select-none",
               viewMode === 'list' ? 'bg-slate-100 text-slate-900' : 'text-slate-400 hover:text-slate-600'
             )}
           >

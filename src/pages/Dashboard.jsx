@@ -66,6 +66,8 @@ export default function Dashboard() {
     { day: 'Sun', high: 80, low: 67, condition: '☀️', temp: 74 }
   ];
 
+  const queryClient = useQueryClient();
+
   const handleRefresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['projects'] }),
@@ -169,5 +171,3 @@ export default function Dashboard() {
          </PullToRefresh>
          );
          }
-
-         const queryClient = useQueryClient();
