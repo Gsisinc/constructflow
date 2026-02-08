@@ -14,16 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 
-const DEFAULT_PHASES = [
-  { id: 'preconstruction', label: 'Pre-Construction', icon: '📋', isDefault: true },
-  { id: 'foundation', label: 'Foundation', icon: '🏗️', isDefault: true },
-  { id: 'superstructure', label: 'Superstructure', icon: '🏢', isDefault: true },
-  { id: 'enclosure', label: 'Enclosure', icon: '🪟', isDefault: true },
-  { id: 'mep_rough', label: 'MEP Rough-In', icon: '⚡', isDefault: true },
-  { id: 'interior_finishes', label: 'Interior Finishes', icon: '🎨', isDefault: true },
-  { id: 'commissioning', label: 'Commissioning', icon: '✅', isDefault: true },
-  { id: 'closeout', label: 'Closeout', icon: '🔑', isDefault: true },
-];
+const DEFAULT_PHASES = [];
 
 export default function PhaseNavigator({ 
   currentPhase, 
