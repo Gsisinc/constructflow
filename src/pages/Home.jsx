@@ -169,39 +169,39 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {[
               {
+                icon: Users,
+                title: 'Team Management',
+                description: 'Manage workers, skills, certifications, and productivity tracking.',
+                gradient: 'from-yellow-500 to-orange-500'
+              },
+              {
+                icon: FileStack,
+                title: 'Task & Schedule Tracking',
+                description: 'Real-time updates, phase gates, and milestone management.',
+                gradient: 'from-orange-500 to-amber-600'
+              },
+              {
+                icon: DollarSign,
+                title: 'Budget & Cost Control',
+                description: 'Live budget tracking, change orders, and financial forecasting.',
+                gradient: 'from-amber-600 to-orange-600'
+              },
+              {
                 icon: Zap,
                 title: 'AI Bid Discovery',
                 description: 'Find opportunities from 75+ government portals automatically.',
                 gradient: 'from-amber-500 to-yellow-500'
               },
               {
-                icon: TrendingUp,
-                title: 'Smart Estimating',
-                description: 'AI-powered cost estimation with win probability scoring.',
-                gradient: 'from-orange-500 to-amber-600'
-              },
-              {
-                icon: Users,
-                title: 'Team Collaboration',
-                description: 'Real-time updates and role-based task management.',
-                gradient: 'from-yellow-500 to-orange-500'
-              },
-              {
                 icon: Shield,
-                title: 'Compliance Tracking',
-                description: 'Manage permits and safety documentation automatically.',
-                gradient: 'from-amber-600 to-orange-600'
+                title: 'Compliance & Safety',
+                description: 'Manage permits, safety incidents, and documentation.',
+                gradient: 'from-yellow-400 to-amber-500'
               },
               {
                 icon: Network,
                 title: 'Project Intelligence',
-                description: 'AI monitors budgets, schedules, and project risks.',
-                gradient: 'from-yellow-400 to-amber-500'
-              },
-              {
-                icon: Video,
-                title: 'Client Portals',
-                description: 'Branded access for clients to updates and schedules.',
+                description: 'AI monitors risks, suggests optimizations, and predicts outcomes.',
                 gradient: 'from-orange-400 to-amber-500'
               }
             ].map((feature, idx) => (
