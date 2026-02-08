@@ -383,9 +383,22 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.PhaseRequirement.create(data),
+    mutationFn: async (data) => {
+      const req = await base44.entities.PhaseRequirement.create(data);
+      // Create a folder for this requirement
+      await base44.entities.PhaseFile.create({
+        project_id: data.project_id,
+        phase_name: data.phase_name,
+        file_name: `[Folder] ${data.requirement_text}`,
+        file_url: `folder://${req.id}`,
+        file_type: 'other',
+        description: `Folder for requirement: ${data.requirement_text}`
+      });
+      return req;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
+      queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
       setShowForm(false);
       setSelectedParentReq(null);
       toast.success('Requirement added');
