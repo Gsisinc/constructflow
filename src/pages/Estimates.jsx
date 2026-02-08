@@ -26,26 +26,26 @@ export default function Estimates() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Estimates</h1>
-          <p className="text-slate-500 mt-1">{user?.full_name}</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Estimates</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">{user?.full_name}</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">
+        <div className="flex gap-1.5 sm:gap-2">
+          <Button variant="outline" size="sm">
             <Search className="h-4 w-4" />
           </Button>
           <Link to={createPageUrl('BidOpportunities')}>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Estimate
+            <Button size="sm">
+              <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Estimate</span>
             </Button>
           </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Recent Client Responses</CardTitle>
@@ -101,7 +101,7 @@ export default function Estimates() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Estimates by Status</CardTitle>

@@ -18,17 +18,17 @@ export default function TimeCards() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Time Cards</h1>
-          <p className="text-slate-500 mt-1">Track and manage crew time</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Time Cards</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Track and manage crew time</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">Time Card</Button>
-          <Button variant="outline">Crew Card</Button>
-          <Button variant="outline">Crew Sheet</Button>
-          <Button>Weekly Sheet</Button>
+        <div className="flex gap-1.5 sm:gap-2 flex-wrap">
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Time Card</Button>
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Crew Card</Button>
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Crew Sheet</Button>
+          <Button size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Weekly Sheet</Button>
         </div>
       </div>
 
@@ -146,30 +146,30 @@ export default function TimeCards() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto text-xs sm:text-sm">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-slate-600">Employee</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-slate-600">Mon</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-slate-600">Tue</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-slate-600">Wed</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-slate-600">Thu</th>
-                      <th className="text-center py-3 px-4 text-sm font-medium text-slate-600">Fri</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-slate-600">Total Hours</th>
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-600">Employee</th>
+                      <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-600">Mon</th>
+                       <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-600">Tue</th>
+                       <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-600">Wed</th>
+                       <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-600">Thu</th>
+                       <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-600">Fri</th>
+                       <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-600">Total Hours</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b">
-                      <td className="py-3 px-4">
-                        <div className="font-medium">Total Hours</div>
-                      </td>
-                      <td className="text-center py-3 px-4">00:00</td>
-                      <td className="text-center py-3 px-4">00:00</td>
-                      <td className="text-center py-3 px-4">00:00</td>
-                      <td className="text-center py-3 px-4">00:00</td>
-                      <td className="text-center py-3 px-4">00:00</td>
-                      <td className="text-right py-3 px-4 font-semibold">00:00</td>
+                       <td className="py-2 sm:py-3 px-2 sm:px-4">
+                         <div className="font-medium text-xs sm:text-sm">Total Hours</div>
+                       </td>
+                       <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm">00:00</td>
+                       <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm">00:00</td>
+                       <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm">00:00</td>
+                       <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm">00:00</td>
+                       <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm">00:00</td>
+                       <td className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">00:00</td>
                     </tr>
                   </tbody>
                 </table>
