@@ -49,7 +49,7 @@ export default function Home() {
           <Button variant="ghost" size="icon" className="text-amber-400 hover:bg-amber-400/10">
             <Menu className="h-5 w-5" />
           </Button>
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-start ml-16">
             <div className="relative flex-shrink-0 h-40 w-40 sm:h-56 sm:w-56">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
