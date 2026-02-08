@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -691,6 +691,40 @@ function FilesTab({ projectId, phaseName, files }) {
   const [uploading, setUploading] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState(null);
   const queryClient = useQueryClient();
+
+  // Query requirements to create missing folders
+  const { data: requirements = [] } = useQuery({
+    queryKey: ['phaseRequirements', projectId, phaseName],
+    queryFn: () => base44.entities.PhaseRequirement.filter({ project_id: projectId, phase_name: phaseName }),
+    enabled: !!projectId && !!phaseName
+  });
+
+  // Create folders for requirements that don't have them
+  useEffect(() => {
+    const createMissingFolders = async () => {
+      const mainRequirements = requirements.filter(r => !r.parent_requirement_id);
+      const existingFolderUrls = files.filter(f => f.file_url?.startsWith('folder://')).map(f => f.file_url);
+      
+      for (const req of mainRequirements) {
+        const folderUrl = `folder://${req.id}`;
+        if (!existingFolderUrls.includes(folderUrl)) {
+          await base44.entities.PhaseFile.create({
+            project_id: projectId,
+            phase_name: phaseName,
+            file_name: `[Folder] ${req.requirement_text}`,
+            file_url: folderUrl,
+            file_type: 'other',
+            description: `Folder for requirement: ${req.requirement_text}`
+          });
+        }
+      }
+      queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
+    };
+
+    if (requirements.length > 0 && files) {
+      createMissingFolders();
+    }
+  }, [requirements.length, projectId, phaseName]);
 
   const handleUpload = async (e) => {
     const file = e.target.files[0];
