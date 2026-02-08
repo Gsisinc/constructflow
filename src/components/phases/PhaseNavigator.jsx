@@ -36,11 +36,9 @@ export default function PhaseNavigator({
   const queryClient = useQueryClient();
   
   // Merge default phases with custom phases, sorted by order
-  const hiddenPhaseNames = customPhases.filter(cp => cp.is_hidden).map(cp => cp.phase_name);
-  
   const PHASES = [
-    ...DEFAULT_PHASES.filter(dp => !hiddenPhaseNames.includes(dp.id)),
-    ...customPhases.filter(cp => !cp.is_hidden).map(cp => ({
+    ...DEFAULT_PHASES,
+    ...customPhases.map(cp => ({
       id: cp.phase_name,
       label: cp.display_name,
       icon: cp.icon || '📌',
