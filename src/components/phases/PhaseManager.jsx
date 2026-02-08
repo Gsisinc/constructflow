@@ -508,9 +508,9 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                           >
                             <Card>
                               <CardContent className="py-4">
-                                <div className="flex items-start gap-3 group">
+                                <div className="flex items-start gap-3">
                                   <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
-                                    <GripVertical className="h-5 w-5 text-slate-400" />
+                                    <GripVertical className="h-5 w-5 text-slate-400 hover:text-slate-600" />
                                   </div>
                                   <Checkbox
                                     checked={req.status === 'completed'}
@@ -528,7 +528,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="opacity-0 group-hover:opacity-100 h-7 px-2 text-xs"
+                                    className="h-7 px-2 text-xs"
                                     onClick={() => {
                                       setSelectedParentReq(req);
                                       setShowForm(true);
@@ -539,7 +539,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="opacity-0 group-hover:opacity-100 h-7 w-7 p-0 text-red-600"
+                                    className="h-7 w-7 p-0 text-red-600 hover:bg-red-50"
                                     onClick={() => {
                                       if (confirm('Delete this requirement and all its sub-requirements?')) {
                                         deleteMutation.mutate(req.id);
@@ -568,9 +568,9 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                             className="bg-slate-50"
                                           >
                                             <CardContent className="py-3">
-                                              <div className="flex items-start gap-3 group">
+                                              <div className="flex items-start gap-3">
                                                 <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
-                                                  <GripVertical className="h-4 w-4 text-slate-400" />
+                                                  <GripVertical className="h-4 w-4 text-slate-400 hover:text-slate-600" />
                                                 </div>
                                                 <Checkbox
                                                   checked={subReq.status === 'completed'}
@@ -588,7 +588,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                                 <Button
                                                   size="sm"
                                                   variant="ghost"
-                                                  className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 text-red-600"
+                                                  className="h-6 w-6 p-0 text-red-600 hover:bg-red-50"
                                                   onClick={() => {
                                                     if (confirm('Delete this sub-requirement?')) {
                                                       deleteMutation.mutate(subReq.id);
