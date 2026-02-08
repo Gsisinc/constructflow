@@ -426,6 +426,9 @@ export default function ProjectDetail() {
                 setSelectedGate(gate);
                 setShowGateChecklist(true);
               }}
+              onPhaseChange={(newPhase) => {
+                updateMutation.mutate({ current_phase: newPhase });
+              }}
             />
           </div>
         </TabsContent>

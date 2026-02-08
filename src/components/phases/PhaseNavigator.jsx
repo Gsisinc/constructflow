@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle2, Circle, Lock, ChevronRight, AlertTriangle, MoreVertical, Trash2, Plus } from 'lucide-react';
+import { CheckCircle2, Circle, Lock, Unlock, ChevronRight, AlertTriangle, MoreVertical, Trash2, Plus, Target, FileText } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import {
@@ -23,6 +23,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import EmojiPicker from '@/components/ui/EmojiPicker';
+import { useQuery } from '@tanstack/react-query';
+import { Textarea } from '@/components/ui/textarea';
 
 const DEFAULT_PHASES = [
   { id: 'preconstruction', label: 'Pre-Construction', icon: '📋' },
@@ -41,9 +43,20 @@ export default function PhaseNavigator({
   customPhases = [],
   onInitiateGate,
   onViewGate,
-  projectId
+  projectId,
+  onPhaseChange
 }) {
   const queryClient = useQueryClient();
+  
+  const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
+  const [selectedPhase, setSelectedPhase] = useState(null);
+  const [requirements, setRequirements] = useState('');
+  
+  const { data: allRequirements = [] } = useQuery({
+    queryKey: ['phaseRequirements', projectId],
+    queryFn: () => base44.entities.PhaseRequirement.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
   
   // Filter out hidden default phases
   const hiddenPhases = customPhases.filter(cp => cp.is_hidden).map(cp => cp.phase_name);
@@ -97,6 +110,66 @@ export default function PhaseNavigator({
       toast.success('Phase created');
     }
   });
+
+  const updatePhaseMutation = useMutation({
+    mutationFn: ({ phaseId, data }) => base44.entities.CustomPhase.update(phaseId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
+      toast.success('Phase updated');
+    }
+  });
+
+  const addRequirementsMutation = useMutation({
+    mutationFn: (data) => base44.entities.PhaseRequirement.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['phaseRequirements', projectId] });
+      setShowRequirementsDialog(false);
+      setRequirements('');
+      toast.success('Requirements added');
+    }
+  });
+
+  const updateRequirementMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.PhaseRequirement.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['phaseRequirements', projectId] });
+    }
+  });
+
+  const getPhaseProgress = (phaseId) => {
+    const phaseReqs = allRequirements.filter(r => r.phase_name === phaseId);
+    if (phaseReqs.length === 0) return 0;
+    const completed = phaseReqs.filter(r => r.status === 'completed').length;
+    return Math.round((completed / phaseReqs.length) * 100);
+  };
+
+  const getPhaseData = (phaseId) => {
+    return customPhases.find(cp => cp.phase_name === phaseId);
+  };
+
+  const handleLockToggle = (phase) => {
+    const phaseData = getPhaseData(phase.id);
+    if (phaseData) {
+      updatePhaseMutation.mutate({
+        phaseId: phaseData.id,
+        data: { is_locked: !phaseData.is_locked }
+      });
+    } else {
+      // Create a custom phase entry for default phase
+      createPhaseMutation.mutate({
+        project_id: projectId,
+        phase_name: phase.id,
+        display_name: phase.label,
+        icon: phase.icon,
+        is_locked: true,
+        order: DEFAULT_PHASES.findIndex(p => p.id === phase.id)
+      });
+    }
+  };
+
+  const handleSetCurrent = (phase) => {
+    onPhaseChange?.(phase.id);
+  };
 
 
 
@@ -171,22 +244,52 @@ export default function PhaseNavigator({
                   )}
                 </div>
 
-                {/* Label */}
-                <div className="flex items-center gap-1 mt-2">
-                  <p className={cn(
-                    "text-xs text-center font-medium",
-                    status === 'current' ? "text-blue-600" : 
-                    status === 'completed' ? "text-green-600" : "text-slate-500"
-                  )}>
-                    {phase.label}
-                  </p>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="ghost" className="h-5 w-5 p-0">
-                        <MoreVertical className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
+                {/* Label and Progress */}
+                <div className="flex flex-col items-center gap-1 mt-2 min-w-0">
+                  <div className="flex items-center gap-1">
+                    <p className={cn(
+                      "text-xs text-center font-medium truncate",
+                      status === 'current' ? "text-blue-600" : 
+                      status === 'completed' ? "text-green-600" : "text-slate-500"
+                    )}>
+                      {phase.label}
+                    </p>
+                    {getPhaseData(phase.id)?.is_locked && (
+                      <Lock className="h-3 w-3 text-slate-400" />
+                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="ghost" className="h-5 w-5 p-0">
+                          <MoreVertical className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
                     <DropdownMenuContent align="center">
+                      <DropdownMenuItem onClick={() => handleSetCurrent(phase)}>
+                        <Target className="h-4 w-4 mr-2" />
+                        Set as Current
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedPhase(phase);
+                          setShowRequirementsDialog(true);
+                        }}
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Add Requirements
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleLockToggle(phase)}>
+                        {getPhaseData(phase.id)?.is_locked ? (
+                          <>
+                            <Unlock className="h-4 w-4 mr-2" />
+                            Unlock Phase
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="h-4 w-4 mr-2" />
+                            Lock Phase
+                          </>
+                        )}
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
                           if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
@@ -203,7 +306,16 @@ export default function PhaseNavigator({
                         Delete Phase
                       </DropdownMenuItem>
                     </DropdownMenuContent>
-                  </DropdownMenu>
+                    </DropdownMenu>
+                  </div>
+                  {allRequirements.filter(r => r.phase_name === phase.id).length > 0 && (
+                    <div className="w-full px-2">
+                      <Progress value={getPhaseProgress(phase.id)} className="h-1" />
+                      <p className="text-[10px] text-slate-400 text-center mt-0.5">
+                        {getPhaseProgress(phase.id)}%
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Gate Action */}
@@ -293,6 +405,75 @@ export default function PhaseNavigator({
               disabled={!newPhaseName.trim()}
             >
               Create Phase
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Requirements Dialog */}
+      <Dialog open={showRequirementsDialog} onOpenChange={setShowRequirementsDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Requirements to {selectedPhase?.label}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {allRequirements.filter(r => r.phase_name === selectedPhase?.id).length > 0 && (
+              <div className="space-y-2">
+                <Label>Existing Requirements</Label>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {allRequirements
+                    .filter(r => r.phase_name === selectedPhase?.id)
+                    .map(req => (
+                      <div key={req.id} className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={req.status === 'completed'}
+                          onChange={(e) => {
+                            updateRequirementMutation.mutate({
+                              id: req.id,
+                              data: { status: e.target.checked ? 'completed' : 'pending' }
+                            });
+                          }}
+                          className="h-4 w-4"
+                        />
+                        <span className={cn(req.status === 'completed' && 'line-through text-slate-400')}>
+                          {req.requirement_text}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+            <div>
+              <Label>New Requirements (one per line)</Label>
+              <Textarea
+                value={requirements}
+                onChange={(e) => setRequirements(e.target.value)}
+                placeholder="Enter requirements, one per line..."
+                rows={5}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRequirementsDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!requirements.trim()) return;
+                const reqLines = requirements.split('\n').filter(r => r.trim());
+                reqLines.forEach(req => {
+                  addRequirementsMutation.mutate({
+                    project_id: projectId,
+                    phase_name: selectedPhase.id,
+                    requirement_text: req.trim(),
+                    status: 'pending'
+                  });
+                });
+              }}
+              disabled={!requirements.trim()}
+            >
+              Add Requirements
             </Button>
           </DialogFooter>
         </DialogContent>
