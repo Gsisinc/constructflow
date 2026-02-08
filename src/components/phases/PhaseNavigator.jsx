@@ -195,158 +195,161 @@ export default function PhaseNavigator({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-white rounded-2xl border border-slate-200 p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h3 className="text-lg font-semibold text-slate-900">Project Phases</h3>
-          <p className="text-sm text-slate-500">Visual phase navigator with gate controls</p>
+          <p className="text-sm text-slate-500 hidden sm:block">Visual phase navigator with gate controls</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button onClick={() => setShowNewPhaseDialog(true)} size="sm">
             <Plus className="h-4 w-4 mr-2" />
-            New Phase
+            <span className="hidden sm:inline">New Phase</span>
+            <span className="sm:hidden">New</span>
           </Button>
-          <Badge className="bg-blue-100 text-blue-700">
+          <Badge className="bg-blue-100 text-blue-700 whitespace-nowrap">
             Current: {PHASES.find(p => p.id === currentPhase)?.label}
           </Badge>
         </div>
       </div>
 
       {/* Phase Timeline */}
-      <div className="relative">
-        {/* Progress Line */}
-        <div className="absolute top-6 left-6 right-6 h-1 bg-slate-200 rounded-full">
-          <div 
-            className="h-full bg-gradient-to-r from-green-500 to-blue-500 rounded-full transition-all duration-500"
-            style={{ width: `${(currentPhaseIndex / (PHASES.length - 1)) * 100}%` }}
-          />
-        </div>
+      <div className="relative overflow-x-auto pb-4">
+        <div className="min-w-max">
+          {/* Progress Line */}
+          <div className="absolute top-6 left-6 right-6 h-1 bg-slate-200 rounded-full">
+            <div 
+              className="h-full bg-gradient-to-r from-green-500 to-blue-500 rounded-full transition-all duration-500"
+              style={{ width: `${(currentPhaseIndex / (PHASES.length - 1)) * 100}%` }}
+            />
+          </div>
 
-        {/* Phase Nodes */}
-        <div className="relative flex justify-between">
-          {PHASES.map((phase, index) => {
-            const status = getPhaseStatus(phase.id);
-            const gate = index > 0 ? getGateForPhase(PHASES[index - 1].id, phase.id) : null;
+          {/* Phase Nodes */}
+          <div className="relative flex" style={{ gap: '1rem' }}>
+            {PHASES.map((phase, index) => {
+              const status = getPhaseStatus(phase.id);
+              const gate = index > 0 ? getGateForPhase(PHASES[index - 1].id, phase.id) : null;
 
-            return (
-              <div key={phase.id} className="flex flex-col items-center" style={{ width: `${100 / PHASES.length}%` }}>
-                {/* Node */}
-                <div
-                  className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center text-lg z-10 transition-all duration-300",
-                    status === 'completed' && "bg-green-500 text-white shadow-lg shadow-green-200",
-                    status === 'current' && "bg-blue-500 text-white shadow-lg shadow-blue-200 ring-4 ring-blue-100",
-                    status === 'pending_gate' && "bg-amber-100 text-amber-600 border-2 border-amber-300",
-                    status === 'locked' && "bg-slate-100 text-slate-400"
-                  )}
-                >
-                  {status === 'completed' ? (
-                    <CheckCircle2 className="h-6 w-6" />
-                  ) : status === 'locked' ? (
-                    <Lock className="h-5 w-5" />
-                  ) : (
-                    phase.icon
-                  )}
-                </div>
-
-                {/* Label and Progress */}
-                <div className="flex flex-col items-center gap-1 mt-2 min-w-0">
-                  <div className="flex items-center gap-1">
-                    <p className={cn(
-                      "text-xs text-center font-medium truncate",
-                      status === 'current' ? "text-blue-600" : 
-                      status === 'completed' ? "text-green-600" : "text-slate-500"
-                    )}>
-                      {phase.label}
-                    </p>
-                    {getPhaseData(phase.id)?.is_locked && (
-                      <Lock className="h-3 w-3 text-slate-400" />
+              return (
+                <div key={phase.id} className="flex flex-col items-center flex-shrink-0" style={{ width: '120px' }}>
+                  {/* Node */}
+                  <div
+                    className={cn(
+                      "w-12 h-12 rounded-full flex items-center justify-center text-lg z-10 transition-all duration-300 flex-shrink-0",
+                      status === 'completed' && "bg-green-500 text-white shadow-lg shadow-green-200",
+                      status === 'current' && "bg-blue-500 text-white shadow-lg shadow-blue-200 ring-4 ring-blue-100",
+                      status === 'pending_gate' && "bg-amber-100 text-amber-600 border-2 border-amber-300",
+                      status === 'locked' && "bg-slate-100 text-slate-400"
                     )}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="sm" variant="ghost" className="h-5 w-5 p-0">
-                          <MoreVertical className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                    <DropdownMenuContent align="center">
-                      <DropdownMenuItem onClick={() => handleSetCurrent(phase)}>
-                        <Target className="h-4 w-4 mr-2" />
-                        Set as Current
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedPhase(phase);
-                          setShowRequirementsDialog(true);
-                        }}
-                      >
-                        <FileText className="h-4 w-4 mr-2" />
-                        Add Requirements
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleLockToggle(phase)}>
-                        {getPhaseData(phase.id)?.is_locked ? (
-                          <>
-                            <Unlock className="h-4 w-4 mr-2" />
-                            Unlock Phase
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="h-4 w-4 mr-2" />
-                            Lock Phase
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
-                            if (phase.customPhaseId) {
-                              deleteCustomPhaseMutation.mutate(phase.customPhaseId);
-                            } else {
-                              hideDefaultPhaseMutation.mutate(phase.id);
-                            }
-                          }
-                        }}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Phase
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                  {allRequirements.filter(r => r.phase_name === phase.id).length > 0 && (
-                    <div className="w-full px-2">
-                      <Progress value={getPhaseProgress(phase.id)} className="h-1" />
-                      <p className="text-[10px] text-slate-400 text-center mt-0.5">
-                        {getPhaseProgress(phase.id)}%
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Gate Action */}
-                {index === currentPhaseIndex && index < PHASES.length - 1 && (
-                  <Button
-                    size="sm"
-                    className="mt-2 text-xs h-7"
-                    variant={gate?.status === 'in_review' ? 'outline' : 'default'}
-                    onClick={() => gate ? onViewGate?.(gate) : onInitiateGate?.(phase.id, PHASES[index + 1].id)}
                   >
-                    {gate?.status === 'in_review' ? (
-                      <>
-                        <AlertTriangle className="h-3 w-3 mr-1" />
-                        Review Gate
-                      </>
+                    {status === 'completed' ? (
+                      <CheckCircle2 className="h-6 w-6" />
+                    ) : status === 'locked' ? (
+                      <Lock className="h-5 w-5" />
                     ) : (
-                      <>
-                        <ChevronRight className="h-3 w-3 mr-1" />
-                        Initiate Gate
-                      </>
+                      phase.icon
                     )}
-                  </Button>
-                )}
-              </div>
-            );
-          })}
+                  </div>
+
+                  {/* Label and Progress */}
+                  <div className="flex flex-col items-center gap-1 mt-2 w-full">
+                    <div className="flex items-center justify-center gap-1 flex-wrap">
+                      <p className={cn(
+                        "text-xs text-center font-medium break-words",
+                        status === 'current' ? "text-blue-600" : 
+                        status === 'completed' ? "text-green-600" : "text-slate-500"
+                      )}>
+                        {phase.label}
+                      </p>
+                      {getPhaseData(phase.id)?.is_locked && (
+                        <Lock className="h-3 w-3 text-slate-400 flex-shrink-0" />
+                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="sm" variant="ghost" className="h-5 w-5 p-0 flex-shrink-0">
+                            <MoreVertical className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                      <DropdownMenuContent align="center">
+                        <DropdownMenuItem onClick={() => handleSetCurrent(phase)}>
+                          <Target className="h-4 w-4 mr-2" />
+                          Set as Current
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedPhase(phase);
+                            setShowRequirementsDialog(true);
+                          }}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Add Requirements
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleLockToggle(phase)}>
+                          {getPhaseData(phase.id)?.is_locked ? (
+                            <>
+                              <Unlock className="h-4 w-4 mr-2" />
+                              Unlock Phase
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="h-4 w-4 mr-2" />
+                              Lock Phase
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
+                              if (phase.customPhaseId) {
+                                deleteCustomPhaseMutation.mutate(phase.customPhaseId);
+                              } else {
+                                hideDefaultPhaseMutation.mutate(phase.id);
+                              }
+                            }
+                          }}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Phase
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    {allRequirements.filter(r => r.phase_name === phase.id).length > 0 && (
+                      <div className="w-full px-2">
+                        <Progress value={getPhaseProgress(phase.id)} className="h-1" />
+                        <p className="text-[10px] text-slate-400 text-center mt-0.5">
+                          {getPhaseProgress(phase.id)}%
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Gate Action */}
+                  {index === currentPhaseIndex && index < PHASES.length - 1 && (
+                    <Button
+                      size="sm"
+                      className="mt-2 text-xs h-7 whitespace-nowrap"
+                      variant={gate?.status === 'in_review' ? 'outline' : 'default'}
+                      onClick={() => gate ? onViewGate?.(gate) : onInitiateGate?.(phase.id, PHASES[index + 1].id)}
+                    >
+                      {gate?.status === 'in_review' ? (
+                        <>
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          Review
+                        </>
+                      ) : (
+                        <>
+                          <ChevronRight className="h-3 w-3 mr-1" />
+                          Gate
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
