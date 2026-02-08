@@ -50,16 +50,16 @@ export default function Home() {
             <Button variant="ghost" size="icon" className="text-amber-400 hover:bg-amber-400/10">
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="relative flex-shrink-0 h-24 w-24 sm:h-32 sm:w-32">
+            <div className="relative flex-shrink-0 h-40 w-40 sm:h-56 sm:w-56">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
                 className="h-full w-auto"
               />
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-lg font-black text-white tracking-tight">GSIS</h1>
-              <p className="text-sm text-amber-300/90 font-medium">Construction Platform</p>
+            <div className="hidden lg:block">
+              <h1 className="text-2xl font-black text-white tracking-tight">GSIS</h1>
+              <p className="text-base text-amber-300/90 font-medium">Construction Platform</p>
             </div>
           </div>
           <Button 
