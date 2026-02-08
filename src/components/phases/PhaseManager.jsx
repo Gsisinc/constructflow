@@ -204,25 +204,25 @@ export default function PhaseManager({ projectId, currentPhase }) {
   return (
     <div className="space-y-6">
       {/* Phase Selector */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
         {allPhases.map(phase => {
           const customPhase = customPhases.find(p => p.phase_name === phase.value);
           return (
-            <div key={phase.value} className="flex items-center gap-1">
+            <div key={phase.value} className="flex items-center gap-1 flex-shrink-0">
               <Button
                 variant={selectedPhase === phase.value ? 'default' : 'outline'}
                 onClick={() => setSelectedPhase(phase.value)}
-                className="whitespace-nowrap"
+                className="whitespace-nowrap flex-shrink-0"
               >
-                {phase.label}
+                <span className="text-sm">{phase.label}</span>
                 {phase.value === currentPhase && (
-                  <Badge variant="secondary" className="ml-2">Current</Badge>
+                  <Badge variant="secondary" className="ml-2 hidden sm:inline-flex">Current</Badge>
                 )}
               </Button>
               {customPhase && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="icon" variant="ghost" className="h-8 w-8">
+                    <Button size="icon" variant="ghost" className="h-8 w-8 flex-shrink-0">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -252,9 +252,10 @@ export default function PhaseManager({ projectId, currentPhase }) {
           }
         }}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="whitespace-nowrap">
+            <Button variant="outline" className="whitespace-nowrap flex-shrink-0">
               <Plus className="h-4 w-4 mr-2" />
-              New Phase
+              <span className="hidden sm:inline">New Phase</span>
+              <span className="sm:hidden">New</span>
             </Button>
           </DialogTrigger>
           <DialogContent>
