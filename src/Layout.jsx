@@ -166,10 +166,24 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <style>{`
+        html {
+          -webkit-user-select: none;
+          user-select: none;
+          overscroll-behavior: none;
+        }
+        body {
+          overscroll-behavior: none;
+        }
         :root {
           --primary: 222.2 47.4% 11.2%;
           --primary-foreground: 210 40% 98%;
           --accent: 210 40% 96.1%;
+        }
+        @supports (padding: max(0px)) {
+          body {
+            padding-left: max(0px, env(safe-area-inset-left));
+            padding-right: max(0px, env(safe-area-inset-right));
+          }
         }
       `}</style>
 
