@@ -60,16 +60,17 @@ export default function Projects() {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Projects</h1>
-          <p className="text-slate-500 mt-1">Manage all your construction projects</p>
-        </div>
-        <Button onClick={() => setShowForm(true)} className="bg-slate-900 hover:bg-slate-800 min-h-[44px] min-w-[44px] select-none">
-          <Plus className="h-4 w-4 mr-2" />
-          New Project
+      <div className="space-y-4 sm:space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Projects</h1>
+            <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Manage your construction work</p>
+          </div>
+        <Button onClick={() => setShowForm(true)} className="bg-amber-600 hover:bg-amber-700 min-h-[44px] select-none text-sm sm:text-base">
+          <Plus className="h-4 w-4 mr-1.5 sm:mr-2" />
+          <span className="hidden sm:inline">New Project</span>
+          <span className="sm:hidden">New</span>
         </Button>
       </div>
 
