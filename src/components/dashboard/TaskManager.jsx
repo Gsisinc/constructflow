@@ -106,32 +106,40 @@ export default function TaskManager({ projectId = null }) {
           {tasks.length === 0 ? (
             <div className="text-center py-6 text-slate-400">No tasks yet</div>
           ) : (
-            tasks.slice(0, 5).map(task => (
-              <div key={task.id} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50">
-                <button
-                  onClick={() => updateMutation.mutate({
-                    id: task.id,
-                    status: task.status === 'completed' ? 'pending' : 'completed'
-                  })}
-                  className="flex-shrink-0"
-                >
-                  {task.status === 'completed' ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  ) : (
-                    <Circle className="h-5 w-5 text-slate-300" />
-                  )}
-                </button>
-                <span className={`flex-1 text-sm ${task.status === 'completed' ? 'line-through text-slate-400' : ''}`}>
-                  {task.name}
-                </span>
-                <button
-                  onClick={() => deleteMutation.mutate(task.id)}
-                  className="flex-shrink-0 text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            ))
+            tasks.slice(0, 5).map(task => {
+              const optimisticStatus = optimisticTasks[task.id];
+              const currentStatus = optimisticStatus !== undefined ? optimisticStatus : task.status;
+              return (
+                <div key={task.id} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 dark:hover:bg-slate-800 select-none">
+                  <button
+                    onClick={() => {
+                      const newStatus = task.status === 'completed' ? 'pending' : 'completed';
+                      setOptimisticTasks({ ...optimisticTasks, [task.id]: newStatus });
+                      updateMutation.mutate({
+                        id: task.id,
+                        status: newStatus
+                      });
+                    }}
+                    className="flex-shrink-0 select-none"
+                  >
+                    {currentStatus === 'completed' ? (
+                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    ) : (
+                      <Circle className="h-5 w-5 text-slate-300" />
+                    )}
+                  </button>
+                  <span className={`flex-1 text-sm ${currentStatus === 'completed' ? 'line-through text-slate-400' : ''}`}>
+                    {task.name}
+                  </span>
+                  <button
+                    onClick={() => deleteMutation.mutate(task.id)}
+                    className="flex-shrink-0 text-red-600 hover:text-red-700 select-none"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              );
+            })
           )}
         </div>
       </CardContent>
