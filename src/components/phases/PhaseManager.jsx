@@ -10,7 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Upload, Lock, Unlock, FileText, Image as ImageIcon, CheckCircle, Circle, MoreVertical, Trash2, Edit } from 'lucide-react';
+import { Plus, Upload, Lock, Unlock, FileText, Image as ImageIcon, CheckCircle, Circle, MoreVertical, Trash2, Edit, GripVertical } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -391,6 +392,46 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
     }
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.PhaseRequirement.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
+      toast.success('Requirement deleted');
+    }
+  });
+
+  const updateOrderMutation = useMutation({
+    mutationFn: ({ id, order }) => base44.entities.PhaseRequirement.update(id, { order }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
+    }
+  });
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const sourceIndex = result.source.index;
+    const destIndex = result.destination.index;
+
+    if (sourceIndex === destIndex) return;
+
+    const parentId = result.type === 'sub' ? result.type.split('-')[1] : null;
+    const items = parentId 
+      ? requirements.filter(r => r.parent_requirement_id === parentId).sort((a, b) => (a.order || 0) - (b.order || 0))
+      : requirements.filter(r => !r.parent_requirement_id).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    const reordered = Array.from(items);
+    const [removed] = reordered.splice(sourceIndex, 1);
+    reordered.splice(destIndex, 0, removed);
+
+    // Update orders
+    reordered.forEach((item, index) => {
+      if (item.order !== index) {
+        updateOrderMutation.mutate({ id: item.id, order: index });
+      }
+    });
+  };
+
   const [formData, setFormData] = useState({ requirement_text: '', is_mandatory: true });
 
   return (
@@ -446,70 +487,137 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-2">
-          {requirements.filter(r => !r.parent_requirement_id).map(req => {
-            const subReqs = requirements.filter(sr => sr.parent_requirement_id === req.id);
-            return (
-              <div key={req.id} className="space-y-2">
-                <Card>
-                  <CardContent className="py-4">
-                    <div className="flex items-start gap-3 group">
-                      <Checkbox
-                        checked={req.status === 'completed'}
-                        onCheckedChange={(checked) => onToggle.mutate({ id: req.id, completed: checked })}
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className={req.status === 'completed' ? 'line-through text-slate-500' : ''}>{req.requirement_text}</span>
-                          {req.is_mandatory && <Badge variant="outline" className="text-xs">Mandatory</Badge>}
-                        </div>
-                        {req.completed_date && (
-                          <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(req.completed_date), 'MMM d, yyyy')}</p>
-                        )}
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="opacity-0 group-hover:opacity-100 h-7 px-2 text-xs"
-                        onClick={() => {
-                          setSelectedParentReq(req);
-                          setShowForm(true);
-                        }}
-                      >
-                        + Sub
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                {subReqs.length > 0 && (
-                  <div className="ml-8 space-y-2">
-                    {subReqs.map(subReq => (
-                      <Card key={subReq.id} className="bg-slate-50">
-                        <CardContent className="py-3">
-                          <div className="flex items-start gap-3">
-                            <Checkbox
-                              checked={subReq.status === 'completed'}
-                              onCheckedChange={(checked) => onToggle.mutate({ id: subReq.id, completed: checked })}
-                              className="mt-0.5"
-                            />
-                            <div className="flex-1">
-                              <span className={cn("text-sm", subReq.status === 'completed' && 'line-through text-slate-500')}>
-                                {subReq.requirement_text}
-                              </span>
-                              {subReq.completed_date && (
-                                <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(subReq.completed_date), 'MMM d, yyyy')}</p>
-                              )}
-                            </div>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="requirements" type="main">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                {requirements
+                  .filter(r => !r.parent_requirement_id)
+                  .sort((a, b) => (a.order || 0) - (b.order || 0))
+                  .map((req, index) => {
+                    const subReqs = requirements
+                      .filter(sr => sr.parent_requirement_id === req.id)
+                      .sort((a, b) => (a.order || 0) - (b.order || 0));
+                    return (
+                      <Draggable key={req.id} draggableId={req.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className="space-y-2"
+                          >
+                            <Card>
+                              <CardContent className="py-4">
+                                <div className="flex items-start gap-3 group">
+                                  <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
+                                    <GripVertical className="h-5 w-5 text-slate-400" />
+                                  </div>
+                                  <Checkbox
+                                    checked={req.status === 'completed'}
+                                    onCheckedChange={(checked) => onToggle.mutate({ id: req.id, completed: checked })}
+                                  />
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className={req.status === 'completed' ? 'line-through text-slate-500' : ''}>{req.requirement_text}</span>
+                                      {req.is_mandatory && <Badge variant="outline" className="text-xs">Mandatory</Badge>}
+                                    </div>
+                                    {req.completed_date && (
+                                      <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(req.completed_date), 'MMM d, yyyy')}</p>
+                                    )}
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="opacity-0 group-hover:opacity-100 h-7 px-2 text-xs"
+                                    onClick={() => {
+                                      setSelectedParentReq(req);
+                                      setShowForm(true);
+                                    }}
+                                  >
+                                    + Sub
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="opacity-0 group-hover:opacity-100 h-7 w-7 p-0 text-red-600"
+                                    onClick={() => {
+                                      if (confirm('Delete this requirement and all its sub-requirements?')) {
+                                        deleteMutation.mutate(req.id);
+                                      }
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                            {subReqs.length > 0 && (
+                              <Droppable droppableId={`sub-${req.id}`} type={`sub-${req.id}`}>
+                                {(provided) => (
+                                  <div
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                    className="ml-8 space-y-2"
+                                  >
+                                    {subReqs.map((subReq, subIndex) => (
+                                      <Draggable key={subReq.id} draggableId={subReq.id} index={subIndex}>
+                                        {(provided) => (
+                                          <Card
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            className="bg-slate-50"
+                                          >
+                                            <CardContent className="py-3">
+                                              <div className="flex items-start gap-3 group">
+                                                <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
+                                                  <GripVertical className="h-4 w-4 text-slate-400" />
+                                                </div>
+                                                <Checkbox
+                                                  checked={subReq.status === 'completed'}
+                                                  onCheckedChange={(checked) => onToggle.mutate({ id: subReq.id, completed: checked })}
+                                                  className="mt-0.5"
+                                                />
+                                                <div className="flex-1">
+                                                  <span className={cn("text-sm", subReq.status === 'completed' && 'line-through text-slate-500')}>
+                                                    {subReq.requirement_text}
+                                                  </span>
+                                                  {subReq.completed_date && (
+                                                    <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(subReq.completed_date), 'MMM d, yyyy')}</p>
+                                                  )}
+                                                </div>
+                                                <Button
+                                                  size="sm"
+                                                  variant="ghost"
+                                                  className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 text-red-600"
+                                                  onClick={() => {
+                                                    if (confirm('Delete this sub-requirement?')) {
+                                                      deleteMutation.mutate(subReq.id);
+                                                    }
+                                                  }}
+                                                >
+                                                  <Trash2 className="h-3 w-3" />
+                                                </Button>
+                                              </div>
+                                            </CardContent>
+                                          </Card>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
+                            )}
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                {provided.placeholder}
               </div>
-            );
-          })}
-        </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       )}
     </div>
   );
