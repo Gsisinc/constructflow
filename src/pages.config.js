@@ -79,6 +79,7 @@ import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import TemplateLibrary from './pages/TemplateLibrary';
 import TaskTracker from './pages/TaskTracker';
+import PMSetupGuide from './pages/PMSetupGuide';
 import __Layout from './Layout.jsx';
 
 
@@ -115,6 +116,7 @@ export const PAGES = {
     "VehicleLogs": VehicleLogs,
     "TemplateLibrary": TemplateLibrary,
     "TaskTracker": TaskTracker,
+    "PMSetupGuide": PMSetupGuide,
 }
 
 export const pagesConfig = {
