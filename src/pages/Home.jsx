@@ -18,7 +18,7 @@ import {
   Video,
   Wifi,
   Menu,
-  AlertTriangle
+  Flame
 } from 'lucide-react';
 
 export default function Home() {
