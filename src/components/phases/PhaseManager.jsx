@@ -752,7 +752,21 @@ function FilesTab({ projectId, phaseName, files }) {
     }
   };
 
-  const folders = files.filter(f => f.file_url?.startsWith('folder://')).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+  // Get folders and sort them by requirement order
+  const folders = files
+    .filter(f => f.file_url?.startsWith('folder://'))
+    .map(folder => {
+      const reqId = folder.file_url.replace('folder://', '');
+      const req = requirements.find(r => r.id === reqId);
+      return { ...folder, requirement: req };
+    })
+    .filter(f => f.requirement) // Only show folders that have a corresponding requirement
+    .sort((a, b) => {
+      const orderA = a.requirement?.order ?? new Date(a.requirement?.created_date).getTime();
+      const orderB = b.requirement?.order ?? new Date(b.requirement?.created_date).getTime();
+      return orderA - orderB;
+    });
+
   const currentFiles = selectedFolder 
     ? files.filter(f => f.parent_folder_id === selectedFolder.id && !f.file_url?.startsWith('folder://')).sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
     : [];
