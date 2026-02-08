@@ -49,10 +49,7 @@ export default function Home() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 lg:py-3 flex items-center justify-between">
-          <Button variant="ghost" size="icon" className="text-amber-400 hover:bg-amber-400/10">
-            <Menu className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center justify-start ml-16 lg:ml-0">
+          <div className="flex items-center justify-start">
             <div className="relative flex-shrink-0 h-40 w-40 sm:h-56 sm:w-56 lg:h-8 lg:w-8">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
