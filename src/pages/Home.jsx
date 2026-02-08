@@ -85,14 +85,14 @@ export default function Home() {
               <span className="text-amber-200">AI-Powered Construction Intelligence</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 lg:mb-4 leading-tight">
               Complete Project Control.<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-300">
                 From Bid to Built.
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base lg:text-lg text-slate-400 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm lg:text-base text-slate-300 mb-4 sm:mb-6 lg:mb-8 max-w-2xl mx-auto leading-relaxed">
               End-to-end project management for contractors: discover bids, manage teams, track budgets, and deliver on time.
             </p>
 
@@ -132,22 +132,22 @@ export default function Home() {
           {/* Service Icons */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3 sm:gap-4 max-w-3xl mx-auto mt-10 sm:mt-16">
             {[
-              { icon: Network, label: 'Structured Cabling', color: 'from-amber-500 to-yellow-500' },
-              { icon: Lock, label: 'Access Control', color: 'from-orange-500 to-amber-600' },
-              { icon: Video, label: 'Video Surveillance', color: 'from-yellow-500 to-orange-500' },
-              { icon: Flame, label: 'Fire Alarm', color: 'from-amber-600 to-orange-600' },
-              { icon: Wifi, label: 'Wireless Systems', color: 'from-yellow-400 to-amber-500' },
-              { icon: Radio, label: 'AV Systems', color: 'from-orange-400 to-amber-500' }
-            ].map((service, idx) => (
-              <div key={idx} className="group relative">
-                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all">
-                  <div className={`h-8 w-8 mx-auto mb-2 bg-gradient-to-r ${service.color} rounded-lg flex items-center justify-center`}>
-                    <service.icon className="h-5 w-5 text-white" />
+                { icon: Network, label: 'Cabling', color: 'from-amber-500 to-yellow-500' },
+                { icon: Lock, label: 'Access', color: 'from-orange-500 to-amber-600' },
+                { icon: Video, label: 'Video', color: 'from-yellow-500 to-orange-500' },
+                { icon: Flame, label: 'Fire Safety', color: 'from-amber-600 to-orange-600' },
+                { icon: Wifi, label: 'Wireless', color: 'from-yellow-400 to-amber-500' },
+                { icon: Radio, label: 'AV Systems', color: 'from-orange-400 to-amber-500' }
+              ].map((service, idx) => (
+                <div key={idx} className="group relative">
+                  <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all">
+                    <div className={`h-7 w-7 mx-auto mb-1.5 bg-gradient-to-r ${service.color} rounded flex items-center justify-center`}>
+                      <service.icon className="h-4 w-4 text-white" />
+                    </div>
+                    <p className="text-xs text-slate-400 text-center leading-tight">{service.label}</p>
                   </div>
-                  <p className="text-xs text-slate-400 text-center">{service.label}</p>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </section>
@@ -157,10 +157,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8 sm:mb-12 px-2">
             <Badge className="mb-2 sm:mb-3 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">Features</Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1.5 sm:mb-2 lg:mb-3">
               Everything You Need
             </h2>
-            <p className="text-xs sm:text-sm lg:text-base text-slate-400 max-w-2xl mx-auto">
+            <p className="text-xs text-slate-400 max-w-2xl mx-auto">
               From opportunity discovery to project completion
             </p>
           </div>
@@ -225,10 +225,10 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.1),transparent_70%)]"></div>
 
         <div className="relative max-w-3xl mx-auto text-center px-2">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 sm:mb-3">
             Ready to Get Started?
           </h2>
-          <p className="text-sm sm:text-base text-slate-300 mb-6 sm:mb-8">
+          <p className="text-xs sm:text-sm text-slate-300 mb-4 sm:mb-6">
             Join leading contractors transforming their business
           </p>
           <Button 
