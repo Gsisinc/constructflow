@@ -26,16 +26,7 @@ import EmojiPicker from '@/components/ui/EmojiPicker';
 import { useQuery } from '@tanstack/react-query';
 import { Textarea } from '@/components/ui/textarea';
 
-const DEFAULT_PHASES = [
-  { id: 'preconstruction', label: 'Pre-Construction', icon: '📋' },
-  { id: 'foundation', label: 'Foundation', icon: '🏗️' },
-  { id: 'superstructure', label: 'Superstructure', icon: '🏢' },
-  { id: 'enclosure', label: 'Enclosure', icon: '🪟' },
-  { id: 'mep_rough', label: 'MEP Rough-In', icon: '⚡' },
-  { id: 'interior_finishes', label: 'Interior Finishes', icon: '🎨' },
-  { id: 'commissioning', label: 'Commissioning', icon: '✅' },
-  { id: 'closeout', label: 'Closeout', icon: '🔑' },
-];
+
 
 export default function PhaseNavigator({ 
   currentPhase, 
@@ -59,19 +50,14 @@ export default function PhaseNavigator({
     enabled: !!projectId,
   });
   
-  // Filter out hidden default phases
-  const hiddenPhases = customPhases.filter(cp => cp.is_hidden).map(cp => cp.phase_name);
-  const visibleDefaults = DEFAULT_PHASES.filter(dp => !hiddenPhases.includes(dp.id));
-  
-  const PHASES = [
-    ...visibleDefaults,
-    ...customPhases.filter(cp => !cp.is_hidden).map(cp => ({
+  const PHASES = customPhases
+    .filter(cp => !cp.is_hidden)
+    .map(cp => ({
       id: cp.phase_name,
       label: cp.display_name,
       icon: cp.icon || '📌',
       customPhaseId: cp.id
-    }))
-  ];
+    }));
   
   const currentPhaseIndex = PHASES.findIndex(p => p.id === currentPhase);
 
@@ -83,19 +69,7 @@ export default function PhaseNavigator({
     }
   });
 
-  const hideDefaultPhaseMutation = useMutation({
-    mutationFn: (phaseId) => base44.entities.CustomPhase.create({
-      project_id: projectId,
-      phase_name: phaseId,
-      display_name: phaseId,
-      is_hidden: true,
-      order: 999
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
-      toast.success('Phase deleted');
-    }
-  });
+
 
   const [showNewPhaseDialog, setShowNewPhaseDialog] = useState(false);
   const [newPhaseName, setNewPhaseName] = useState('');
@@ -158,16 +132,6 @@ export default function PhaseNavigator({
       updatePhaseMutation.mutate({
         phaseId: phaseData.id,
         data: { is_locked: !phaseData.is_locked }
-      });
-    } else {
-      // Create a custom phase entry for default phase
-      createPhaseMutation.mutate({
-        project_id: projectId,
-        phase_name: phase.id,
-        display_name: phase.label,
-        icon: phase.icon,
-        is_locked: true,
-        order: DEFAULT_PHASES.findIndex(p => p.id === phase.id)
       });
     }
   };
@@ -300,11 +264,7 @@ export default function PhaseNavigator({
                         <DropdownMenuItem
                           onClick={() => {
                             if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
-                              if (phase.customPhaseId) {
-                                deleteCustomPhaseMutation.mutate(phase.customPhaseId);
-                              } else {
-                                hideDefaultPhaseMutation.mutate(phase.id);
-                              }
+                              deleteCustomPhaseMutation.mutate(phase.customPhaseId);
                             }
                           }}
                           className="text-red-600"
