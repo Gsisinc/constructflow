@@ -1,168 +1,219 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Building2, Upload } from 'lucide-react';
-import { toast } from 'sonner';
+import { Card } from '@/components/ui/card';
+import { Loader2, Upload, ArrowRight } from 'lucide-react';
+import { createPageUrl } from '../utils';
 
 export default function Onboarding() {
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [orgData, setOrgData] = useState({
+  const navigate = useNavigate();
+  const [step, setStep] = useState('company'); // company, colors, done
+  const [companyData, setCompanyData] = useState({
     name: '',
-    industry: 'low_voltage',
-    phone: '',
-    website: ''
+    logo_url: '',
+    primary_color: '#1e40af',
+    secondary_color: '#3b82f6',
+    accent_color: '#60a5fa',
   });
-  const [userData, setUserData] = useState({
-    user_role: 'owner',
-    phone: ''
+  const [uploading, setUploading] = useState(false);
+
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me(),
   });
 
-  const handleCreateOrganization = async () => {
-    setLoading(true);
-    try {
-      const user = await base44.auth.me();
-      
-      // Create organization
-      const org = await base44.entities.Organization.create({
-        ...orgData,
-        owner_email: user.email
-      });
+  const { data: existingOrg } = useQuery({
+    queryKey: ['existingOrg', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const orgs = await base44.entities.Organization.filter({ owner_email: user.email });
+      return orgs[0] || null;
+    },
+    enabled: !!user?.email,
+  });
 
-      // Update user with organization
-      await base44.auth.updateMe({
-        organization_id: org.id,
-        organization_name: org.name,
-        user_role: userData.user_role,
-        phone: userData.phone
-      });
-
-      toast.success('Organization created successfully!');
-      window.location.href = '/Dashboard';
-    } catch (error) {
-      toast.error('Failed to create organization');
-      console.error(error);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (userLoading) return;
+    
+    if (!user) {
+      navigate(createPageUrl('Home'));
+      return;
     }
+
+    if (existingOrg) {
+      navigate(createPageUrl('Dashboard'));
+    }
+  }, [user, existingOrg, userLoading, navigate]);
+
+  const createOrgMutation = useMutation({
+    mutationFn: (data) =>
+      base44.entities.Organization.create({
+        ...data,
+        owner_email: user.email,
+        industry: 'general_contractor',
+        subscription_tier: 'starter',
+      }),
+    onSuccess: () => {
+      navigate(createPageUrl('Dashboard'));
+    },
+  });
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    setCompanyData({ ...companyData, logo_url: file_url });
+    setUploading(false);
   };
 
+  const handleCreateOrg = () => {
+    createOrgMutation.mutate(companyData);
+  };
+
+  if (userLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl border-slate-200 shadow-xl">
-        <CardHeader>
-          <div className="flex items-center gap-4 mb-2">
-            <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png" 
-              alt="GSIS Manager" 
-              className="h-12 w-auto"
-            />
-            <div>
-              <CardTitle className="text-2xl font-bold text-slate-900">Welcome to GSIS Manager</CardTitle>
-              <CardDescription>Set up your organization to get started</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {step === 1 ? (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-white/10 border-white/20 backdrop-blur-md">
+        <div className="p-6 sm:p-8">
+          <h1 className="text-2xl font-bold text-white mb-2">Setup Your Company</h1>
+          <p className="text-slate-400 mb-6">Welcome, {user?.full_name}!</p>
+
+          {step === 'company' && (
             <div className="space-y-4">
               <div>
-                <Label>Organization Name</Label>
+                <Label className="text-white">Company Name</Label>
                 <Input
-                  value={orgData.name}
-                  onChange={(e) => setOrgData({ ...orgData, name: e.target.value })}
-                  placeholder="Your Company Name"
+                  value={companyData.name}
+                  onChange={(e) => setCompanyData({ ...companyData, name: e.target.value })}
+                  placeholder="Your company name"
+                  className="mt-1 bg-white/5 border-white/20 text-white placeholder:text-slate-500"
                 />
               </div>
 
               <div>
-                <Label>Industry</Label>
-                <Select value={orgData.industry} onValueChange={(value) => setOrgData({ ...orgData, industry: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low_voltage">Low Voltage / Data Cabling</SelectItem>
-                    <SelectItem value="electrical">Electrical</SelectItem>
-                    <SelectItem value="general_contractor">General Contractor</SelectItem>
-                    <SelectItem value="plumbing">Plumbing</SelectItem>
-                    <SelectItem value="hvac">HVAC</SelectItem>
-                    <SelectItem value="specialty">Specialty Contractor</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label className="text-white">Company Logo</Label>
+                <label className="mt-1 block">
+                  <div className="relative border-2 border-dashed border-white/20 rounded-lg p-6 text-center cursor-pointer hover:border-white/40 transition">
+                    {companyData.logo_url ? (
+                      <img src={companyData.logo_url} alt="Logo" className="h-16 mx-auto mb-2" />
+                    ) : (
+                      <Upload className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+                    )}
+                    <p className="text-sm text-slate-400">
+                      {uploading ? 'Uploading...' : 'Click to upload logo'}
+                    </p>
+                    <input
+                      type="file"
+                      onChange={handleLogoUpload}
+                      disabled={uploading}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </div>
+                </label>
               </div>
 
-              <div>
-                <Label>Company Phone</Label>
-                <Input
-                  value={orgData.phone}
-                  onChange={(e) => setOrgData({ ...orgData, phone: e.target.value })}
-                  placeholder="+1 (555) 000-0000"
-                />
-              </div>
-
-              <div>
-                <Label>Website (Optional)</Label>
-                <Input
-                  value={orgData.website}
-                  onChange={(e) => setOrgData({ ...orgData, website: e.target.value })}
-                  placeholder="https://yourcompany.com"
-                />
-              </div>
-
-              <Button onClick={() => setStep(2)} className="w-full" disabled={!orgData.name}>
-                Continue
+              <Button
+                onClick={() => setStep('colors')}
+                disabled={!companyData.name}
+                className="w-full bg-amber-600 hover:bg-amber-700"
+              >
+                Next <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
-          ) : (
+          )}
+
+          {step === 'colors' && (
             <div className="space-y-4">
               <div>
-                <Label>Your Role</Label>
-                <Select value={userData.user_role} onValueChange={(value) => setUserData({ ...userData, user_role: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="owner">Owner</SelectItem>
-                    <SelectItem value="administrator">Administrator</SelectItem>
-                    <SelectItem value="project_manager">Project Manager</SelectItem>
-                    <SelectItem value="team_member">Team Member</SelectItem>
-                    <SelectItem value="stakeholder">Stakeholder</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-slate-500 mt-1">
-                  {userData.user_role === 'owner' && 'Full access to all features and settings'}
-                  {userData.user_role === 'administrator' && 'Manage projects, users, and settings'}
-                  {userData.user_role === 'project_manager' && 'Create and manage projects'}
-                  {userData.user_role === 'team_member' && 'Work on assigned tasks and projects'}
-                  {userData.user_role === 'stakeholder' && 'View project progress and updates'}
-                </p>
+                <Label className="text-white">Primary Color</Label>
+                <div className="mt-1 flex gap-2">
+                  <input
+                    type="color"
+                    value={companyData.primary_color}
+                    onChange={(e) => setCompanyData({ ...companyData, primary_color: e.target.value })}
+                    className="h-10 w-14 rounded cursor-pointer"
+                  />
+                  <Input
+                    value={companyData.primary_color}
+                    onChange={(e) => setCompanyData({ ...companyData, primary_color: e.target.value })}
+                    className="flex-1 bg-white/5 border-white/20 text-white"
+                  />
+                </div>
               </div>
 
               <div>
-                <Label>Your Phone</Label>
-                <Input
-                  value={userData.phone}
-                  onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
-                  placeholder="+1 (555) 000-0000"
-                />
+                <Label className="text-white">Secondary Color</Label>
+                <div className="mt-1 flex gap-2">
+                  <input
+                    type="color"
+                    value={companyData.secondary_color}
+                    onChange={(e) => setCompanyData({ ...companyData, secondary_color: e.target.value })}
+                    className="h-10 w-14 rounded cursor-pointer"
+                  />
+                  <Input
+                    value={companyData.secondary_color}
+                    onChange={(e) => setCompanyData({ ...companyData, secondary_color: e.target.value })}
+                    className="flex-1 bg-white/5 border-white/20 text-white"
+                  />
+                </div>
               </div>
 
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+              <div>
+                <Label className="text-white">Accent Color</Label>
+                <div className="mt-1 flex gap-2">
+                  <input
+                    type="color"
+                    value={companyData.accent_color}
+                    onChange={(e) => setCompanyData({ ...companyData, accent_color: e.target.value })}
+                    className="h-10 w-14 rounded cursor-pointer"
+                  />
+                  <Input
+                    value={companyData.accent_color}
+                    onChange={(e) => setCompanyData({ ...companyData, accent_color: e.target.value })}
+                    className="flex-1 bg-white/5 border-white/20 text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setStep('company')}
+                  className="flex-1 border-white/20 text-white hover:bg-white/10"
+                >
                   Back
                 </Button>
-                <Button onClick={handleCreateOrganization} className="flex-1" disabled={loading}>
-                  {loading ? 'Creating...' : 'Complete Setup'}
+                <Button
+                  onClick={handleCreateOrg}
+                  disabled={createOrgMutation.isPending}
+                  className="flex-1 bg-amber-600 hover:bg-amber-700"
+                >
+                  {createOrgMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      Complete Setup <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
           )}
-        </CardContent>
+        </div>
       </Card>
     </div>
   );
