@@ -60,6 +60,7 @@ import DailyLog from './pages/DailyLog';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Estimates from './pages/Estimates';
+import Home from './pages/Home';
 import Invoices from './pages/Invoices';
 import Issues from './pages/Issues';
 import JoinRequest from './pages/JoinRequest';
@@ -79,7 +80,6 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
@@ -97,6 +97,7 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "Directory": Directory,
     "Estimates": Estimates,
+    "Home": Home,
     "Invoices": Invoices,
     "Issues": Issues,
     "JoinRequest": JoinRequest,
@@ -116,7 +117,6 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "Home": Home,
 }
 
 export const pagesConfig = {
