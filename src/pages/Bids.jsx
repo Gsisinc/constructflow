@@ -195,41 +195,39 @@ export default function Bids() {
       ) : (
         <>
           {/* Mobile Card View */}
-          <div className="sm:hidden space-y-3">
+          <div className="sm:hidden space-y-2">
             {filteredBids.map((bid) => (
               <div
                 key={bid.id}
-                className="bg-white rounded-lg border border-amber-100 p-3 cursor-pointer hover:bg-amber-50 transition-colors"
+                className="bg-white rounded-lg border border-amber-100 p-2.5 cursor-pointer hover:bg-amber-50 transition-colors active:bg-amber-100"
                 onClick={() => { setEditingBid(bid); setShowForm(true); }}
               >
-                <div className="space-y-2">
-                  <div className="flex items-start justify-between gap-2">
+                <div className="space-y-1.5">
+                  <div className="flex items-start justify-between gap-1.5">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-slate-900 line-clamp-2">{bid.rfp_name}</h3>
-                      <p className="text-xs text-slate-600 mt-0.5">{bid.client_name}</p>
+                      <h3 className="text-xs font-semibold text-slate-900 line-clamp-2">{bid.rfp_name}</h3>
+                      <p className="text-xs text-slate-600 mt-0.5 truncate">{bid.client_name}</p>
                     </div>
-                    <Badge className={cn("border flex-shrink-0 text-xs", statusColors[bid.status])}>
-                      {bid.status?.replace('_', ' ')}
+                    <Badge className={cn("border flex-shrink-0 text-xs py-0.5 px-1.5", statusColors[bid.status])}>
+                      {bid.status?.split('_')[0]}
                     </Badge>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="grid grid-cols-3 gap-1.5 text-xs">
                     <div>
-                      <p className="text-slate-500">Amount</p>
-                      <p className="font-semibold text-slate-900">${(bid.bid_amount || 0).toLocaleString()}</p>
+                      <p className="text-slate-500 text-xs">Amount</p>
+                      <p className="font-semibold text-slate-900 truncate">${((bid.bid_amount || 0) / 1000).toFixed(0)}K</p>
                     </div>
                     <div>
-                      <p className="text-slate-500">Due Date</p>
+                      <p className="text-slate-500 text-xs">Date</p>
                       <p className="font-semibold text-slate-900">
                         {bid.due_date ? format(new Date(bid.due_date), 'MMM d') : '-'}
                       </p>
                     </div>
-                  </div>
-                  {bid.win_probability && (
-                    <div className="flex items-center gap-2">
-                      <Progress value={bid.win_probability} className="flex-1 h-1.5" />
-                      <span className="text-xs font-semibold text-slate-700">{bid.win_probability}%</span>
+                    <div>
+                      <p className="text-slate-500 text-xs">Win %</p>
+                      <p className="font-semibold text-slate-900">{bid.win_probability || '-'}%</p>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
             ))}
