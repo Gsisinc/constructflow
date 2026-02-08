@@ -69,70 +69,61 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-40 sm:pt-56 pb-16 sm:pb-20 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-24 sm:pt-40 pb-12 sm:pb-16 px-4 sm:px-6 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-600/20 via-orange-600/20 to-slate-950"></div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.1),transparent_50%)]"></div>
           <div className="absolute top-20 left-10 h-72 w-72 bg-amber-500/30 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-20 right-10 h-96 w-96 bg-yellow-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          
-          {/* California Map Outline */}
-          <div className="absolute right-20 top-1/4 opacity-5 hidden lg:block">
-            <svg width="300" height="400" viewBox="0 0 300 400" fill="none" className="text-amber-400">
-              <path d="M150 20 L180 50 L190 100 L200 150 L210 200 L220 250 L230 300 L240 350 L230 380 L200 390 L170 385 L150 380 L130 370 L110 350 L90 320 L80 280 L70 240 L60 200 L50 160 L40 120 L50 80 L70 50 L100 30 L130 25 Z" 
-                    stroke="currentColor" strokeWidth="2" fill="currentColor" fillOpacity="0.1"/>
-            </svg>
-          </div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12">
-            <div className="inline-flex items-center gap-2 bg-amber-500/10 backdrop-blur-sm border border-amber-500/20 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-6 sm:mb-8 text-xs sm:text-sm">
-              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-amber-400 flex-shrink-0" />
-              <span className="text-amber-200">AI-Powered Construction Intelligence Platform</span>
+        <div className="relative max-w-5xl mx-auto">
+          <div className="text-center mb-6 sm:mb-10">
+            <div className="inline-flex items-center gap-2 bg-amber-500/10 backdrop-blur-sm border border-amber-500/20 rounded-full px-3 sm:px-4 py-1 sm:py-1.5 mb-4 sm:mb-6 text-xs">
+              <Sparkles className="h-3 w-3 text-amber-400 flex-shrink-0" />
+              <span className="text-amber-200">AI-Powered Construction Intelligence</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-black text-white mb-4 sm:mb-6 leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 leading-tight">
               Build the Future.<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400">
                 Win Every Bid.
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-slate-400 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-2">
-              The all-in-one platform for low voltage contractors, integrating bid discovery, 
-              project management, and AI-powered insights to dominate your market.
+            <p className="text-sm sm:text-base lg:text-lg text-slate-400 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
+              All-in-one platform for contractors: bid discovery, project management, and AI insights.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6 sm:mb-8">
               <Button 
                 onClick={handleGetStarted}
-                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm sm:text-base px-6 sm:px-10 py-5 sm:py-7 h-auto shadow-2xl shadow-amber-500/50 w-full sm:w-auto"
+                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm px-8 py-2.5 shadow-xl shadow-amber-500/50 w-full sm:w-auto"
               >
                 Get Started Free
-                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button 
                 variant="outline"
                 onClick={handleLogin}
-                className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400 text-sm sm:text-base px-6 sm:px-10 py-5 sm:py-7 h-auto w-full sm:w-auto"
+                className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400 text-sm px-8 py-2.5 w-full sm:w-auto"
               >
                 Watch Demo
               </Button>
             </div>
 
-            <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-8 justify-center text-slate-400 text-xs sm:text-sm px-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 flex-shrink-0" />
-                <span>No credit card required</span>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6 justify-center text-slate-400 text-xs">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />
+                <span>No credit card</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 flex-shrink-0" />
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />
                 <span>14-day free trial</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 flex-shrink-0" />
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-400 flex-shrink-0" />
                 <span>Setup in minutes</span>
               </div>
             </div>
