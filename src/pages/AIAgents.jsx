@@ -148,18 +148,18 @@ export default function AIAgents() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 rounded-2xl p-8 text-white">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-3 bg-white/10 backdrop-blur rounded-xl">
-                <Sparkles className="h-8 w-8" />
+      <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 rounded-xl sm:rounded-2xl p-4 sm:p-8 text-white">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div className="flex-1">
+            <div className="flex items-start gap-2 sm:gap-3 mb-3">
+              <div className="p-2 sm:p-3 bg-white/10 backdrop-blur rounded-lg sm:rounded-xl flex-shrink-0">
+                <Sparkles className="h-5 w-5 sm:h-8 sm:w-8" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold">Nexus Construct AI Agents</h1>
-                <p className="text-slate-300 mt-1">Autonomous Project Intelligence Network</p>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-3xl font-bold">Nexus Construct AI Agents</h1>
+                <p className="text-xs sm:text-sm text-slate-300 mt-0.5 sm:mt-1">Autonomous Project Intelligence Network</p>
               </div>
             </div>
             <p className="text-slate-200 max-w-2xl">
@@ -189,7 +189,7 @@ export default function AIAgents() {
       </div>
 
       {/* Agent Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
         {filteredAgents.map((agent) => {
           const Icon = agent.icon;
           return (
