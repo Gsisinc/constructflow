@@ -47,11 +47,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-20 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
           <div className="flex items-center gap-2 sm:gap-4 order-1 sm:order-1">
             <div className="relative flex-shrink-0">
-              <div className="absolute inset-0 bg-amber-500/50 blur-3xl"></div>
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/1037cb786_ChatGPTImageJan20202602_32_55PM.png"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
-                className="relative h-12 sm:h-16 w-auto"
+                className="h-16 sm:h-20 w-auto"
               />
             </div>
             <div className="hidden sm:block">
@@ -259,9 +258,9 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-12 mb-8 sm:mb-12">
             <div>
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/1037cb786_ChatGPTImageJan20202602_32_55PM.png"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
-                className="h-20 sm:h-24 w-auto mb-3 sm:mb-4"
+                className="h-32 sm:h-40 w-auto mb-3 sm:mb-4"
               />
               <p className="text-xs sm:text-sm text-slate-400">
                 Empowering low voltage contractors with AI-powered construction intelligence.
