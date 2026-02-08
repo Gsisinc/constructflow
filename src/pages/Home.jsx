@@ -16,8 +16,7 @@ import {
   Lock,
   Radio,
   Video,
-  Wifi,
-  Menu
+  Wifi
 } from 'lucide-react';
 
 export default function Home() {
@@ -45,27 +44,25 @@ export default function Home() {
     <div className="min-h-screen bg-slate-950">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="text-amber-400 hover:bg-amber-400/10">
-              <Menu className="h-5 w-5" />
-            </Button>
-            <div className="relative flex-shrink-0 h-40 w-40 sm:h-56 sm:w-56">
+            <div className="relative">
+              <div className="absolute inset-0 bg-amber-500/50 blur-3xl"></div>
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/1037cb786_ChatGPTImageJan20202602_32_55PM.png"
                 alt="Golden State Integrated Systems"
-                className="h-full w-auto"
+                className="relative h-32 w-auto"
               />
             </div>
-            <div className="hidden lg:block">
-              <h1 className="text-2xl font-black text-white tracking-tight">GSIS</h1>
-              <p className="text-base text-amber-300/90 font-medium">Construction Platform</p>
+            <div>
+              <h1 className="text-2xl font-black text-white tracking-tight">Golden State Integrated Systems</h1>
+              <p className="text-sm text-amber-300/90 font-medium">Low Voltage • Security • AV Solutions</p>
             </div>
           </div>
           <Button 
             onClick={handleLogin}
             variant="outline"
-            className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400 text-sm h-9"
+            className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400"
           >
             Sign In
           </Button>
@@ -73,7 +70,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-40 sm:pt-56 pb-16 sm:pb-20 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-600/20 via-orange-600/20 to-slate-950"></div>
@@ -91,52 +88,54 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-7xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12">
-            <div className="inline-flex items-center gap-2 bg-amber-500/10 backdrop-blur-sm border border-amber-500/20 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-6 sm:mb-8 text-xs sm:text-sm">
-              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-amber-400 flex-shrink-0" />
-              <span className="text-amber-200">AI-Powered Construction Intelligence Platform</span>
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-amber-500/10 backdrop-blur-sm border border-amber-500/20 rounded-full px-4 py-2 mb-8">
+              <Sparkles className="h-4 w-4 text-amber-400" />
+              <span className="text-sm text-amber-200">AI-Powered Construction Intelligence Platform</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-black text-white mb-4 sm:mb-6 leading-tight tracking-tight">
+            <h1 className="text-6xl lg:text-8xl font-black text-white mb-6 leading-tight tracking-tight">
               Build the Future.<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400">
                 Win Every Bid.
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-slate-400 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-2">
+            <p className="text-xl lg:text-2xl text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
               The all-in-one platform for low voltage contractors, integrating bid discovery, 
               project management, and AI-powered insights to dominate your market.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <Button 
+                size="lg"
                 onClick={handleGetStarted}
-                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm sm:text-base px-6 sm:px-10 py-5 sm:py-7 h-auto shadow-2xl shadow-amber-500/50 w-full sm:w-auto"
+                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-lg px-10 py-7 h-auto shadow-2xl shadow-amber-500/50"
               >
                 Get Started Free
-                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button 
+                size="lg"
                 variant="outline"
                 onClick={handleLogin}
-                className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400 text-sm sm:text-base px-6 sm:px-10 py-5 sm:py-7 h-auto w-full sm:w-auto"
+                className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400 text-lg px-10 py-7 h-auto"
               >
                 Watch Demo
               </Button>
             </div>
 
-            <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-8 justify-center text-slate-400 text-xs sm:text-sm px-2">
+            <div className="flex flex-wrap gap-8 justify-center text-slate-400 text-sm">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-green-400" />
                 <span>No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-green-400" />
                 <span>14-day free trial</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-green-400" />
                 <span>Setup in minutes</span>
               </div>
             </div>
@@ -165,14 +164,14 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-gradient-to-b from-slate-950 to-slate-900">
+      <section className="py-24 px-6 bg-gradient-to-b from-slate-950 to-slate-900">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16 px-2">
-            <Badge className="mb-3 sm:mb-4 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs sm:text-sm">Platform Features</Badge>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-amber-500/10 text-amber-400 border-amber-500/20">Platform Features</Badge>
+            <h2 className="text-5xl font-bold text-white mb-6">
               Everything You Need to Win
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
               From opportunity discovery to project completion, powered by cutting-edge AI
             </p>
           </div>
@@ -232,55 +231,83 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden">
+      <section className="py-24 px-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-600/20 to-orange-600/20"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.1),transparent_70%)]"></div>
         
-        <div className="relative max-w-4xl mx-auto text-center px-2">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6">
+        <div className="relative max-w-4xl mx-auto text-center">
+          <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6">
             Ready to Dominate Your Market?
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl text-slate-300 mb-8 sm:mb-10">
+          <p className="text-xl text-slate-300 mb-10">
             Join the leading low voltage contractors who've transformed their business with GSIS Manager
           </p>
           <Button 
+            size="lg"
             onClick={handleGetStarted}
-            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm sm:text-lg px-8 sm:px-12 py-6 sm:py-8 h-auto shadow-2xl shadow-amber-500/50 w-full sm:w-auto"
+            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xl px-12 py-8 h-auto shadow-2xl shadow-amber-500/50"
           >
             Start Your Free Trial
-            <ArrowRight className="ml-2 sm:ml-3 h-4 w-4 sm:h-6 sm:w-6" />
+            <ArrowRight className="ml-3 h-6 w-6" />
           </Button>
-          <p className="text-slate-400 mt-4 sm:mt-6 text-sm sm:text-base">
+          <p className="text-slate-400 mt-6">
             No credit card • 14 days free • Cancel anytime
           </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900/50 backdrop-blur-sm border-t border-white/10 py-4 sm:py-6 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-shrink-0 h-16 w-16 sm:h-20 sm:w-20">
+      <footer className="bg-slate-900/50 backdrop-blur-sm border-t border-white/10 py-12 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/1037cb786_ChatGPTImageJan20202602_32_55PM.png"
                 alt="Golden State Integrated Systems"
-                className="h-full w-auto"
+                className="h-24 w-auto mb-4"
               />
-            </div>
-            <div className="hidden sm:block">
               <p className="text-sm text-slate-400">
-                © 2026 Golden State Integrated Systems Inc.
+                Empowering low voltage contractors with AI-powered construction intelligence.
               </p>
             </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Platform</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="#" className="hover:text-white transition">Features</a></li>
+                <li><a href="#" className="hover:text-white transition">Pricing</a></li>
+                <li><a href="#" className="hover:text-white transition">Security</a></li>
+                <li><a href="#" className="hover:text-white transition">Integrations</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="#" className="hover:text-white transition">About</a></li>
+                <li><a href="#" className="hover:text-white transition">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition">Contact</a></li>
+                <li><a href="#" className="hover:text-white transition">Blog</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="#" className="hover:text-white transition">Privacy</a></li>
+                <li><a href="#" className="hover:text-white transition">Terms</a></li>
+                <li><a href="#" className="hover:text-white transition">Cookies</a></li>
+              </ul>
+            </div>
           </div>
-          <div className="hidden lg:flex gap-6">
-            <a href="#" className="text-xs text-slate-400 hover:text-white transition">Privacy</a>
-            <a href="#" className="text-xs text-slate-400 hover:text-white transition">Terms</a>
-            <a href="#" className="text-xs text-slate-400 hover:text-white transition">Contact</a>
+          
+          <div className="border-t border-white/10 pt-8 text-center">
+            <p className="text-sm text-slate-400">
+              © 2026 Golden State Integrated Systems Inc. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
-
     </div>
   );
 }
