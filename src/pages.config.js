@@ -77,6 +77,8 @@ import Team from './pages/Team';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import TemplateLibrary from './pages/TemplateLibrary';
+import TaskTracker from './pages/TaskTracker';
 import __Layout from './Layout.jsx';
 
 
@@ -111,6 +113,8 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "TemplateLibrary": TemplateLibrary,
+    "TaskTracker": TaskTracker,
 }
 
 export const pagesConfig = {
