@@ -18,7 +18,9 @@ import {
   Video,
   Wifi,
   Menu,
-  Flame
+  Flame,
+  FileStack,
+  DollarSign
 } from 'lucide-react';
 
 export default function Home() {
