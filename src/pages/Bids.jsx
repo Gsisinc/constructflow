@@ -74,6 +74,7 @@ export default function Bids() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
       setShowForm(false);
+      setEditingBid(null);
     },
   });
 
@@ -428,7 +429,7 @@ function BidFormDialog({ open, onOpenChange, bid, projects, onSubmit, loading })
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="bg-slate-900 hover:bg-slate-800">
+            <Button type="submit" disabled={loading || !formData.rfp_name || !formData.client_name} className="bg-slate-900 hover:bg-slate-800">
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {bid ? 'Update' : 'Create'} Bid
             </Button>
