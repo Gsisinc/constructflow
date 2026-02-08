@@ -116,15 +116,15 @@ export default function MegaMenu({ isOpen, onClose }) {
       />
       
       {/* Mega Menu */}
-      <div className="fixed left-0 right-0 top-16 z-50 bg-white border-b border-slate-200 shadow-xl lg:left-64">
-        <div className="max-w-7xl mx-auto px-8 py-8 lg:px-6">
-          <div className="grid grid-cols-5 gap-8">
+      <div className="fixed left-0 right-0 top-16 z-50 bg-white border-b border-slate-200 shadow-xl lg:left-64 max-h-[80vh] overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 sm:py-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
             {menuSections.map((section, idx) => (
-              <div key={idx}>
-                <h3 className="text-sm font-semibold text-slate-900 mb-4 pb-2 border-b-2 border-amber-400">
+              <div key={idx} className="min-w-0">
+                <h3 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2 pb-1.5 border-b border-amber-400 truncate">
                   {section.title}
                 </h3>
-                <ul className="space-y-2">
+                <ul className="space-y-0.5 sm:space-y-1">
                   {section.items.map((item, itemIdx) => {
                     const Icon = item.icon;
                     return (
@@ -132,10 +132,10 @@ export default function MegaMenu({ isOpen, onClose }) {
                         <Link
                           to={createPageUrl(item.page)}
                           onClick={onClose}
-                          className="flex items-center gap-2 px-2 py-1.5 text-sm text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-colors group"
+                          className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 sm:py-1.5 text-xs sm:text-sm text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-colors group"
                         >
-                          <Icon className="h-4 w-4 text-slate-400 group-hover:text-amber-600" />
-                          {item.label}
+                          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400 group-hover:text-amber-600 flex-shrink-0" />
+                          <span className="truncate">{item.label}</span>
                         </Link>
                       </li>
                     );
