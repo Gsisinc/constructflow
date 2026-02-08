@@ -50,7 +50,7 @@ export default function Home() {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
-                className="h-16 sm:h-20 w-auto"
+                className="h-28 sm:h-40 w-auto"
               />
             </div>
             <div className="hidden sm:block">
@@ -260,7 +260,7 @@ export default function Home() {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
-                className="h-32 sm:h-40 w-auto mb-3 sm:mb-4"
+                className="h-56 sm:h-72 w-auto mb-3 sm:mb-4"
               />
               <p className="text-xs sm:text-sm text-slate-400">
                 Empowering low voltage contractors with AI-powered construction intelligence.
