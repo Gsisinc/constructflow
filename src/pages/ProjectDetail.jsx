@@ -7,9 +7,6 @@ import ProjectForm from '../components/projects/ProjectForm';
 import PhaseNavigator from '../components/phases/PhaseNavigator';
 import PhaseManager from '../components/phases/PhaseManager';
 import PhaseGateChecklist from '../components/phases/PhaseGateChecklist';
-import PhaseManager from '../components/phases/PhaseManager';
-import CustomPhaseManager from '../components/phases/CustomPhaseManager';
-import PhaseRequirementManager from '../components/phases/PhaseRequirementManager';
 import OutlookCalendar from '../components/calendar/OutlookCalendar';
 import PermitDashboard from '../components/permits/PermitDashboard';
 import PermitUploader from '../components/permits/PermitUploader';
@@ -430,6 +427,10 @@ export default function ProjectDetail() {
               onPhaseChange={(newPhase) => {
                 updateMutation.mutate({ current_phase: newPhase });
               }}
+            />
+            <PhaseManager 
+              projectId={projectId} 
+              currentPhase={project.current_phase || 'preconstruction'} 
             />
           </div>
         </TabsContent>
