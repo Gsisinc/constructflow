@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Upload, Lock, Unlock, FileText, Image as ImageIcon, CheckCircle, Circle, MoreVertical, Trash2, Edit } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -413,6 +414,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
 
 function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
   const [showForm, setShowForm] = useState(false);
+  const [selectedParentReq, setSelectedParentReq] = useState(null);
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
@@ -420,11 +422,12 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
       setShowForm(false);
+      setSelectedParentReq(null);
       toast.success('Requirement added');
     }
   });
 
-  const [formData, setFormData] = useState({ requirement_name: '', description: '', is_mandatory: true });
+  const [formData, setFormData] = useState({ requirement_text: '', is_mandatory: true });
 
   return (
     <div className="space-y-4">
@@ -438,25 +441,34 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
               <DialogTitle>Add Requirement</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              {selectedParentReq && (
+                <div className="text-sm text-slate-600 mb-2">
+                  Adding sub-requirement to: <span className="font-medium">{selectedParentReq.requirement_text}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="ml-2"
+                    onClick={() => setSelectedParentReq(null)}
+                  >
+                    ← Back
+                  </Button>
+                </div>
+              )}
               <Input
-                value={formData.requirement_name}
-                onChange={(e) => setFormData({ ...formData, requirement_name: e.target.value })}
-                placeholder="Requirement name"
+                value={formData.requirement_text}
+                onChange={(e) => setFormData({ ...formData, requirement_text: e.target.value })}
+                placeholder={selectedParentReq ? "Sub-requirement text" : "Requirement text"}
               />
-              <Textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Description"
-              />
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={formData.is_mandatory}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_mandatory: checked })}
-                />
-                <Label>Mandatory</Label>
-              </div>
-              <Button onClick={() => createMutation.mutate({ project_id: projectId, phase_name: phaseName, ...formData })} className="w-full">
-                Add
+              <Button 
+                onClick={() => createMutation.mutate({ 
+                  project_id: projectId, 
+                  phase_name: phaseName, 
+                  parent_requirement_id: selectedParentReq?.id || null,
+                  ...formData 
+                })} 
+                className="w-full"
+              >
+                Add {selectedParentReq ? 'Sub-Requirement' : 'Requirement'}
               </Button>
             </div>
           </DialogContent>
@@ -471,28 +483,68 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
         </Card>
       ) : (
         <div className="space-y-2">
-          {requirements.map(req => (
-            <Card key={req.id}>
-              <CardContent className="py-4">
-                <div className="flex items-start gap-3">
-                  <Checkbox
-                    checked={req.status === 'completed'}
-                    onCheckedChange={(checked) => onToggle.mutate({ id: req.id, completed: checked })}
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className={req.status === 'completed' ? 'line-through text-slate-500' : ''}>{req.requirement_name}</span>
-                      {req.is_mandatory && <Badge variant="outline" className="text-xs">Mandatory</Badge>}
+          {requirements.filter(r => !r.parent_requirement_id).map(req => {
+            const subReqs = requirements.filter(sr => sr.parent_requirement_id === req.id);
+            return (
+              <div key={req.id} className="space-y-2">
+                <Card>
+                  <CardContent className="py-4">
+                    <div className="flex items-start gap-3 group">
+                      <Checkbox
+                        checked={req.status === 'completed'}
+                        onCheckedChange={(checked) => onToggle.mutate({ id: req.id, completed: checked })}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className={req.status === 'completed' ? 'line-through text-slate-500' : ''}>{req.requirement_text}</span>
+                          {req.is_mandatory && <Badge variant="outline" className="text-xs">Mandatory</Badge>}
+                        </div>
+                        {req.completed_date && (
+                          <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(req.completed_date), 'MMM d, yyyy')}</p>
+                        )}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="opacity-0 group-hover:opacity-100 h-7 px-2 text-xs"
+                        onClick={() => {
+                          setSelectedParentReq(req);
+                          setShowForm(true);
+                        }}
+                      >
+                        + Sub
+                      </Button>
                     </div>
-                    {req.description && <p className="text-sm text-slate-500 mt-1">{req.description}</p>}
-                    {req.completed_date && (
-                      <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(req.completed_date), 'MMM d, yyyy')}</p>
-                    )}
+                  </CardContent>
+                </Card>
+                {subReqs.length > 0 && (
+                  <div className="ml-8 space-y-2">
+                    {subReqs.map(subReq => (
+                      <Card key={subReq.id} className="bg-slate-50">
+                        <CardContent className="py-3">
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              checked={subReq.status === 'completed'}
+                              onCheckedChange={(checked) => onToggle.mutate({ id: subReq.id, completed: checked })}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1">
+                              <span className={cn("text-sm", subReq.status === 'completed' && 'line-through text-slate-500')}>
+                                {subReq.requirement_text}
+                              </span>
+                              {subReq.completed_date && (
+                                <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(subReq.completed_date), 'MMM d, yyyy')}</p>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
