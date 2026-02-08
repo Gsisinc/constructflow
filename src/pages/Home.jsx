@@ -50,7 +50,7 @@ export default function Home() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 lg:py-3 flex items-center justify-between">
           <div className="flex items-center justify-start">
-            <div className="relative flex-shrink-0 h-40 w-40 sm:h-56 sm:w-56 lg:h-8 lg:w-8">
+            <div className="relative flex-shrink-0 h-32 w-32 sm:h-40 sm:w-40 lg:h-6 lg:w-6">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
