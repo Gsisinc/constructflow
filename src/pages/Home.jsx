@@ -130,13 +130,14 @@ export default function Home() {
           </div>
 
           {/* Service Icons */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 max-w-3xl mx-auto mt-10 sm:mt-16">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 sm:gap-4 max-w-3xl mx-auto mt-10 sm:mt-16">
             {[
               { icon: Network, label: 'Structured Cabling', color: 'from-amber-500 to-yellow-500' },
               { icon: Lock, label: 'Access Control', color: 'from-orange-500 to-amber-600' },
               { icon: Video, label: 'Video Surveillance', color: 'from-yellow-500 to-orange-500' },
-              { icon: Radio, label: 'Fire Alarm', color: 'from-amber-600 to-orange-600' },
-              { icon: Wifi, label: 'Wireless Systems', color: 'from-yellow-400 to-amber-500' }
+              { icon: AlertTriangle, label: 'Fire Alarm', color: 'from-amber-600 to-orange-600' },
+              { icon: Wifi, label: 'Wireless Systems', color: 'from-yellow-400 to-amber-500' },
+              { icon: Radio, label: 'AV Systems', color: 'from-orange-400 to-amber-500' }
             ].map((service, idx) => (
               <div key={idx} className="group relative">
                 <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all">
