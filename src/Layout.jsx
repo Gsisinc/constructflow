@@ -37,12 +37,15 @@ import MegaMenu from '@/components/layout/MegaMenu';
 const navItems = [
               { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
               { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+              { name: 'Task Tracker', icon: FileStack, page: 'TaskTracker' },
+              { name: 'Templates', icon: FileText, page: 'TemplateLibrary' },
               { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
               { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
               { name: 'Add Bid', icon: FileText, page: 'AddBid' },
               { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
               { name: 'Directory', icon: Users, page: 'Directory' },
               { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
+              { name: 'PM Guide', icon: FileText, page: 'PMSetupGuide' },
               { name: 'Settings', icon: Settings, page: 'Settings' },
             ];
 
