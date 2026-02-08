@@ -16,7 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, X } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 
 const PROJECT_TYPES = [
   { value: 'residential', label: 'Residential' },
@@ -55,8 +57,10 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
     budget: '',
     description: '',
     project_manager: '',
+    image_url: '',
   });
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,6 +70,22 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
       budget: formData.budget ? parseFloat(formData.budget) : null,
     });
     setLoading(false);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, image_url: file_url });
+      toast.success('Banner uploaded');
+    } catch (error) {
+      toast.error('Upload failed');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -217,6 +237,46 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
               placeholder="Project details..."
               rows={4}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Project Banner Image</Label>
+            {formData.image_url ? (
+              <div className="relative">
+                <img src={formData.image_url} alt="Banner" className="w-full h-40 object-cover rounded-lg" />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="destructive"
+                  className="absolute top-2 right-2 h-8 w-8"
+                  onClick={() => setFormData({ ...formData, image_url: '' })}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-8 w-8 text-slate-400 mb-2 animate-spin" />
+                    <span className="text-sm text-slate-500">Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                    <span className="text-sm text-slate-500">Click to upload banner</span>
+                    <span className="text-xs text-slate-400 mt-1">PNG, JPG up to 10MB</span>
+                  </>
+                )}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                />
+              </label>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
