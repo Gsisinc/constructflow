@@ -790,11 +790,12 @@ function FilesTab({ projectId, phaseName, files }) {
   });
 
   const updateFolderOrderMutation = useMutation({
-    mutationFn: ({ id, order }) => base44.entities.PhaseFile.update(id, { order }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
-    }
-  });
+      mutationFn: ({ id, order }) => base44.entities.PhaseFile.update(id, { order }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
+        queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
+      }
+    });
 
   const handleFolderDragEnd = (result) => {
     if (!result.destination) return;
@@ -805,9 +806,7 @@ function FilesTab({ projectId, phaseName, files }) {
     reordered.splice(result.destination.index, 0, removed);
 
     reordered.forEach((folder, index) => {
-      if (folder.order !== index) {
-        updateFolderOrderMutation.mutate({ id: folder.id, order: index });
-      }
+      updateFolderOrderMutation.mutate({ id: folder.id, order: index });
     });
   };
 
