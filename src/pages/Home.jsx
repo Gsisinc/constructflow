@@ -45,12 +45,12 @@ export default function Home() {
     <div className="min-h-screen bg-slate-950">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" className="text-amber-400 hover:bg-amber-400/10">
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="relative flex-shrink-0 h-12 w-12">
+            <div className="relative flex-shrink-0 h-16 w-16 sm:h-20 sm:w-20">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
@@ -58,8 +58,8 @@ export default function Home() {
               />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-sm font-black text-white tracking-tight">GSIS</h1>
-              <p className="text-xs text-amber-300/90 font-medium">Construction Platform</p>
+              <h1 className="text-lg font-black text-white tracking-tight">GSIS</h1>
+              <p className="text-sm text-amber-300/90 font-medium">Construction Platform</p>
             </div>
           </div>
           <Button 
@@ -73,7 +73,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-32 sm:pt-40 pb-16 sm:pb-20 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-40 sm:pt-56 pb-16 sm:pb-20 px-4 sm:px-6 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-600/20 via-orange-600/20 to-slate-950"></div>
@@ -257,10 +257,10 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900/50 backdrop-blur-sm border-t border-white/10 h-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative flex-shrink-0 h-12 w-12">
+      <footer className="bg-slate-900/50 backdrop-blur-sm border-t border-white/10 py-4 sm:py-6 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="relative flex-shrink-0 h-16 w-16 sm:h-20 sm:w-20">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
@@ -268,7 +268,7 @@ export default function Home() {
               />
             </div>
             <div className="hidden sm:block">
-              <p className="text-xs text-slate-400">
+              <p className="text-sm text-slate-400">
                 © 2026 Golden State Integrated Systems Inc.
               </p>
             </div>
