@@ -57,16 +57,20 @@ import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
 import ClientPortal from './pages/ClientPortal';
 import DailyLog from './pages/DailyLog';
+import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Documents from './pages/Documents';
 import Estimates from './pages/Estimates';
+import Home from './pages/Home';
 import Invoices from './pages/Invoices';
 import Issues from './pages/Issues';
 import JoinRequest from './pages/JoinRequest';
 import Materials from './pages/Materials';
+import Onboarding from './pages/Onboarding';
 import PMSetupGuide from './pages/PMSetupGuide';
 import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
+import Projects from './pages/Projects';
 import PurchaseOrders from './pages/PurchaseOrders';
 import Safety from './pages/Safety';
 import Settings from './pages/Settings';
@@ -78,10 +82,6 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import Onboarding from './pages/Onboarding';
-import Projects from './pages/Projects';
-import Dashboard from './pages/Dashboard';
-import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
@@ -96,16 +96,20 @@ export const PAGES = {
     "Calendar": Calendar,
     "ClientPortal": ClientPortal,
     "DailyLog": DailyLog,
+    "Dashboard": Dashboard,
     "Directory": Directory,
     "Documents": Documents,
     "Estimates": Estimates,
+    "Home": Home,
     "Invoices": Invoices,
     "Issues": Issues,
     "JoinRequest": JoinRequest,
     "Materials": Materials,
+    "Onboarding": Onboarding,
     "PMSetupGuide": PMSetupGuide,
     "Photos": Photos,
     "ProjectDetail": ProjectDetail,
+    "Projects": Projects,
     "PurchaseOrders": PurchaseOrders,
     "Safety": Safety,
     "Settings": Settings,
@@ -117,10 +121,6 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "Onboarding": Onboarding,
-    "Projects": Projects,
-    "Dashboard": Dashboard,
-    "Home": Home,
 }
 
 export const pagesConfig = {

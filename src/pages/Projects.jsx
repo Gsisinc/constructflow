@@ -33,7 +33,7 @@ export default function Projects() {
 
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['projects', user?.organization_id],
-    queryFn: () => base44.entities.Project.list('-created_date'),
+    queryFn: () => base44.entities.Project.filter({ organization_id: user?.organization_id }, '-created_date'),
     enabled: !!user?.organization_id
   });
 
