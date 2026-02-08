@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Upload, Lock, Unlock, FileText, Image as ImageIcon, CheckCircle, Circle, MoreVertical, Trash2, Edit, GripVertical } from 'lucide-react';
+import { Plus, Upload, Lock, Unlock, FileText, Image as ImageIcon, CheckCircle, Circle, MoreVertical, Trash2, Edit, GripVertical, Folder } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { cn } from '@/lib/utils';
 import {
@@ -386,15 +386,17 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const req = await base44.entities.PhaseRequirement.create(data);
-      // Create a folder for this requirement
-      await base44.entities.PhaseFile.create({
-        project_id: data.project_id,
-        phase_name: data.phase_name,
-        file_name: `[Folder] ${data.requirement_text}`,
-        file_url: `folder://${req.id}`,
-        file_type: 'other',
-        description: `Folder for requirement: ${data.requirement_text}`
-      });
+      // Create a folder only for main requirements (not sub-requirements)
+      if (!data.parent_requirement_id) {
+        await base44.entities.PhaseFile.create({
+          project_id: data.project_id,
+          phase_name: data.phase_name,
+          file_name: `[Folder] ${data.requirement_text}`,
+          file_url: `folder://${req.id}`,
+          file_type: 'other',
+          description: `Folder for requirement: ${data.requirement_text}`
+        });
+      }
       return req;
     },
     onSuccess: () => {
@@ -760,7 +762,7 @@ function FilesTab({ projectId, phaseName, files }) {
               <Card key={folder.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setSelectedFolder(folder)}>
                 <CardContent className="py-4">
                   <div className="flex items-start gap-3">
-                    <FileText className="h-5 w-5 text-amber-500" />
+                    <Folder className="h-5 w-5 text-amber-500" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">
                         {folder.file_name.replace('[Folder] ', '')}
