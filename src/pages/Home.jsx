@@ -79,7 +79,7 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-5xl mx-auto">
-          <div className="text-center mb-6 sm:mb-10">
+          <div className="text-center mb-6 sm:mb-10 mt-8 sm:mt-12">
             <div className="inline-flex items-center gap-2 bg-amber-500/10 backdrop-blur-sm border border-amber-500/20 rounded-full px-3 sm:px-4 py-1 sm:py-1.5 mb-4 sm:mb-6 text-xs">
               <Sparkles className="h-3 w-3 text-amber-400 flex-shrink-0" />
               <span className="text-amber-200">AI-Powered Construction Intelligence</span>
