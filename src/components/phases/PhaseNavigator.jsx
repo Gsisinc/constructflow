@@ -121,10 +121,13 @@ export default function PhaseNavigator({
   });
 
   const addRequirementsMutation = useMutation({
-    mutationFn: (data) => base44.entities.PhaseRequirement.create(data),
+    mutationFn: async (dataArray) => {
+      // Create all requirements in parallel
+      const promises = dataArray.map(data => base44.entities.PhaseRequirement.create(data));
+      return await Promise.all(promises);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements', projectId] });
-      setShowRequirementsDialog(false);
       setRequirements('');
       setSelectedParentReq(null);
       toast.success('Requirements added');
@@ -513,19 +516,18 @@ export default function PhaseNavigator({
               onClick={() => {
                 if (!requirements.trim()) return;
                 const reqLines = requirements.split('\n').filter(r => r.trim());
-                reqLines.forEach(req => {
-                  addRequirementsMutation.mutate({
-                    project_id: projectId,
-                    phase_name: selectedPhase.id,
-                    requirement_text: req.trim(),
-                    parent_requirement_id: selectedParentReq?.id || null,
-                    status: 'pending'
-                  });
-                });
+                const reqData = reqLines.map(req => ({
+                  project_id: projectId,
+                  phase_name: selectedPhase.id,
+                  requirement_text: req.trim(),
+                  parent_requirement_id: selectedParentReq?.id || null,
+                  status: 'pending'
+                }));
+                addRequirementsMutation.mutate(reqData);
               }}
-              disabled={!requirements.trim()}
+              disabled={!requirements.trim() || addRequirementsMutation.isPending}
             >
-              {selectedParentReq ? 'Add Sub-Requirements' : 'Add Requirements'}
+              {addRequirementsMutation.isPending ? 'Adding...' : (selectedParentReq ? 'Add Sub-Requirements' : 'Add Requirements')}
             </Button>
           </DialogFooter>
         </DialogContent>
