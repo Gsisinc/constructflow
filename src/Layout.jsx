@@ -99,6 +99,7 @@ export default function Layout({ children, currentPageName }) {
 
   // Don't show layout on Home page
   const isHomePage = currentPageName === 'Home';
+  const isOnboardingPage = currentPageName === 'Onboarding';
 
   useEffect(() => {
     const loadUser = async () => {
@@ -176,7 +177,7 @@ export default function Layout({ children, currentPageName }) {
     navigate(-1);
   };
 
-  if (isHomePage) {
+  if (isHomePage || isOnboardingPage) {
     return children;
   }
 
