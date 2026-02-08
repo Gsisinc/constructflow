@@ -22,6 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import EmojiPicker from '@/components/ui/EmojiPicker';
 
 const DEFAULT_PHASES = [
   { id: 'preconstruction', label: 'Pre-Construction', icon: '📋' },
@@ -270,13 +271,8 @@ export default function PhaseNavigator({
               />
             </div>
             <div>
-              <Label>Icon (Emoji)</Label>
-              <Input
-                value={newPhaseIcon}
-                onChange={(e) => setNewPhaseIcon(e.target.value)}
-                placeholder="📌"
-                maxLength={2}
-              />
+              <Label>Icon</Label>
+              <EmojiPicker value={newPhaseIcon} onChange={setNewPhaseIcon} />
             </div>
           </div>
           <DialogFooter>
