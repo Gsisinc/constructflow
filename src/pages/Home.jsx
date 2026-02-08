@@ -44,8 +44,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10 h-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" className="text-amber-400 hover:bg-amber-400/10">
               <Menu className="h-5 w-5" />
@@ -73,7 +73,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-20 sm:pt-28 pb-16 sm:pb-20 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-32 sm:pt-40 pb-16 sm:pb-20 px-4 sm:px-6 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-600/20 via-orange-600/20 to-slate-950"></div>
