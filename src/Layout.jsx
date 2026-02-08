@@ -34,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import MegaMenu from '@/components/layout/MegaMenu';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
 const navItems = [
               { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
               { name: 'Projects', icon: FolderKanban, page: 'Projects' },
