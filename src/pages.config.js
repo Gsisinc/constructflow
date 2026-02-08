@@ -81,6 +81,7 @@ import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import Documents from './pages/Documents';
+import PurchaseOrders from './pages/PurchaseOrders';
 import __Layout from './Layout.jsx';
 
 
@@ -119,6 +120,7 @@ export const PAGES = {
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
     "Documents": Documents,
+    "PurchaseOrders": PurchaseOrders,
 }
 
 export const pagesConfig = {
