@@ -22,21 +22,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import PhaseBudgetManager from '../budget/PhaseBudgetManager';
 
-const PHASES = [
-  { value: 'preconstruction', label: 'Preconstruction' },
-  { value: 'foundation', label: 'Foundation' },
-  { value: 'superstructure', label: 'Superstructure' },
-  { value: 'enclosure', label: 'Enclosure' },
-  { value: 'mep_rough', label: 'MEP Rough-In' },
-  { value: 'interior_finishes', label: 'Interior Finishes' },
-  { value: 'commissioning', label: 'Commissioning' },
-  { value: 'closeout', label: 'Closeout' }
-];
-
 export default function PhaseManager({ projectId, currentPhase }) {
-  const [selectedPhase, setSelectedPhase] = useState(currentPhase || 'preconstruction');
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [editingPhase, setEditingPhase] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: customPhases = [] } = useQuery({
@@ -45,16 +31,23 @@ export default function PhaseManager({ projectId, currentPhase }) {
     enabled: !!projectId
   });
 
+  // Only show custom phases (user-created phases)
+  const allPhases = customPhases
+    .filter(p => !p.is_hidden)
+    .map(p => ({ value: p.phase_name, label: p.display_name }));
+
+  const [selectedPhase, setSelectedPhase] = useState(currentPhase || allPhases[0]?.value);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [editingPhase, setEditingPhase] = useState(null);
+
   const { data: phaseData } = useQuery({
     queryKey: ['customPhase', projectId, selectedPhase],
     queryFn: async () => {
       const phases = await base44.entities.CustomPhase.filter({ project_id: projectId, phase_name: selectedPhase });
       return phases[0];
     },
-    enabled: !!projectId
+    enabled: !!projectId && !!selectedPhase
   });
-
-  const allPhases = [...PHASES, ...customPhases.map(p => ({ value: p.phase_name, label: p.display_name }))];
 
   const createPhaseMutation = useMutation({
     mutationFn: (data) => base44.entities.CustomPhase.create(data),
@@ -142,8 +135,8 @@ export default function PhaseManager({ projectId, currentPhase }) {
   const handleDeletePhase = (phase) => {
     if (confirm(`Delete phase "${phase.display_name}"? This will also delete all associated requirements, files, notes, and budget data.`)) {
       deletePhaseMutation.mutate(phase.id);
-      if (selectedPhase === phase.phase_name) {
-        setSelectedPhase('preconstruction');
+      if (selectedPhase === phase.phase_name && allPhases.length > 1) {
+        setSelectedPhase(allPhases[0]?.value);
       }
     }
   };
@@ -338,36 +331,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
                       {isLocked ? 'Unlock Phase' : 'Lock Phase'}
                     </DropdownMenuItem>
                   )}
-                  {!phaseData && (
-                    <>
-                      <DropdownMenuItem onClick={() => {
-                        const defaultPhase = { project_id: projectId, phase_name: selectedPhase, display_name: currentPhaseLabel, order: 0, status: 'completed', progress_percent: 100, is_locked: true, completed_date: new Date().toISOString().split('T')[0] };
-                        base44.entities.CustomPhase.create(defaultPhase).then(() => {
-                          queryClient.invalidateQueries({ queryKey: ['customPhase'] });
-                          toast.success('Phase completed and locked');
-                          
-                          // Auto-select next phase
-                          const currentIndex = allPhases.findIndex(p => p.value === selectedPhase);
-                          if (currentIndex !== -1 && currentIndex < allPhases.length - 1) {
-                            setSelectedPhase(allPhases[currentIndex + 1].value);
-                          }
-                        });
-                      }}>
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Close Phase
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => {
-                        const defaultPhase = { project_id: projectId, phase_name: selectedPhase, display_name: currentPhaseLabel, order: 0, status: 'in_progress', progress_percent: progressPercent, is_locked: true };
-                        base44.entities.CustomPhase.create(defaultPhase).then(() => {
-                          queryClient.invalidateQueries({ queryKey: ['customPhase'] });
-                          toast.success('Phase locked');
-                        });
-                      }}>
-                        <Lock className="h-4 w-4 mr-2" />
-                        Lock Phase
-                      </DropdownMenuItem>
-                    </>
-                  )}
+
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
