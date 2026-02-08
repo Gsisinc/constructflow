@@ -26,16 +26,31 @@ import PhaseBudgetManager from '../budget/PhaseBudgetManager';
 export default function PhaseManager({ projectId, currentPhase }) {
   const queryClient = useQueryClient();
 
+  const DEFAULT_PHASES = [
+    { id: 'preconstruction', label: 'Pre-Construction' },
+    { id: 'foundation', label: 'Foundation' },
+    { id: 'superstructure', label: 'Superstructure' },
+    { id: 'enclosure', label: 'Enclosure' },
+    { id: 'mep_rough', label: 'MEP Rough-In' },
+    { id: 'interior_finishes', label: 'Interior Finishes' },
+    { id: 'commissioning', label: 'Commissioning' },
+    { id: 'closeout', label: 'Closeout' },
+  ];
+
   const { data: customPhases = [] } = useQuery({
     queryKey: ['customPhases', projectId],
     queryFn: () => base44.entities.CustomPhase.filter({ project_id: projectId }, 'order'),
     enabled: !!projectId
   });
 
-  // Only show custom phases (user-created phases)
-  const allPhases = customPhases
-    .filter(p => !p.is_hidden)
-    .map(p => ({ value: p.phase_name, label: p.display_name }));
+  // Combine default phases and custom phases, filtering out hidden defaults
+  const hiddenPhases = customPhases.filter(cp => cp.is_hidden).map(cp => cp.phase_name);
+  const visibleDefaults = DEFAULT_PHASES.filter(dp => !hiddenPhases.includes(dp.id));
+  
+  const allPhases = [
+    ...visibleDefaults.map(p => ({ value: p.id, label: p.label, isDefault: true })),
+    ...customPhases.filter(cp => !cp.is_hidden).map(cp => ({ value: cp.phase_name, label: cp.display_name, customPhaseId: cp.id }))
+  ];
 
   const [selectedPhase, setSelectedPhase] = useState(currentPhase || allPhases[0]?.value);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
