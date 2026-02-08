@@ -164,53 +164,53 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {[
               {
                 icon: Zap,
                 title: 'AI Bid Discovery',
-                description: 'Automatically find and analyze opportunities from 75+ government portals. Never miss a relevant project again.',
+                description: 'Find opportunities from 75+ government portals automatically.',
                 gradient: 'from-amber-500 to-yellow-500'
               },
               {
                 icon: TrendingUp,
                 title: 'Smart Estimating',
-                description: 'AI-powered cost estimation with historical data analysis and win probability scoring.',
+                description: 'AI-powered cost estimation with win probability scoring.',
                 gradient: 'from-orange-500 to-amber-600'
               },
               {
                 icon: Users,
                 title: 'Team Collaboration',
-                description: 'Real-time updates, task management, and role-based permissions for your entire crew.',
+                description: 'Real-time updates and role-based task management.',
                 gradient: 'from-yellow-500 to-orange-500'
               },
               {
                 icon: Shield,
                 title: 'Compliance Tracking',
-                description: 'Manage permits, certifications, and safety documentation with automated reminders.',
+                description: 'Manage permits and safety documentation automatically.',
                 gradient: 'from-amber-600 to-orange-600'
               },
               {
                 icon: Network,
                 title: 'Project Intelligence',
-                description: 'AI agents monitor budgets, schedules, and risks to keep projects on track.',
+                description: 'AI monitors budgets, schedules, and project risks.',
                 gradient: 'from-yellow-400 to-amber-500'
               },
               {
                 icon: Video,
                 title: 'Client Portals',
-                description: 'Branded portals give clients 24/7 access to updates, schedules, and documents.',
+                description: 'Branded access for clients to updates and schedules.',
                 gradient: 'from-orange-400 to-amber-500'
               }
             ].map((feature, idx) => (
               <div key={idx} className="group relative">
                 <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-500`}></div>
-                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-white/20 transition-all h-full">
-                  <div className={`inline-flex h-12 w-12 rounded-xl bg-gradient-to-r ${feature.gradient} items-center justify-center mb-4`}>
-                    <feature.icon className="h-6 w-6 text-white" />
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-5 sm:p-6 hover:border-white/20 transition-all h-full">
+                  <div className={`inline-flex h-10 w-10 rounded-lg bg-gradient-to-r ${feature.gradient} items-center justify-center mb-3`}>
+                    <feature.icon className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-                  <p className="text-slate-400 leading-relaxed">{feature.description}</p>
+                  <h3 className="text-sm sm:text-base font-semibold text-white mb-2">{feature.title}</h3>
+                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">{feature.description}</p>
                 </div>
               </div>
             ))}
