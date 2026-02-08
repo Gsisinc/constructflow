@@ -477,8 +477,8 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
     const parentId = isSubList ? source.droppableId.replace('sub-', '') : null;
     
     const items = parentId 
-      ? requirements.filter(r => r.parent_requirement_id === parentId).sort((a, b) => (a.order || 0) - (b.order || 0))
-      : requirements.filter(r => !r.parent_requirement_id).sort((a, b) => (a.order || 0) - (b.order || 0));
+      ? requirements.filter(r => r.parent_requirement_id === parentId).sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
+      : requirements.filter(r => !r.parent_requirement_id).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
 
     const reordered = Array.from(items);
     const [removed] = reordered.splice(source.index, 1);
@@ -553,11 +553,11 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
               <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
                 {requirements
                   .filter(r => !r.parent_requirement_id)
-                  .sort((a, b) => (a.order || 0) - (b.order || 0))
+                  .sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
                   .map((req, index) => {
                     const subReqs = requirements
                       .filter(sr => sr.parent_requirement_id === req.id)
-                      .sort((a, b) => (a.order || 0) - (b.order || 0));
+                      .sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
                     return (
                       <Draggable key={req.id} draggableId={req.id} index={index}>
                         {(provided) => (
