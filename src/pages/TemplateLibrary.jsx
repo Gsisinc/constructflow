@@ -81,11 +81,11 @@ export default function TemplateLibrary() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Template Library</h1>
-          <p className="text-slate-500">Manage construction templates for your projects</p>
+          <h1 className="text-xl sm:text-3xl font-bold text-slate-900">Template Library</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Manage construction templates for your projects</p>
         </div>
         <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
           <DialogTrigger asChild>
@@ -100,20 +100,18 @@ export default function TemplateLibrary() {
         </Dialog>
       </div>
 
-      <div className="flex gap-4 flex-col md:flex-row">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Search templates..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+      <div className="relative flex-1">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Input
+          placeholder="Search templates..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
       </div>
 
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 lg:grid-cols-12">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-12">
           {CATEGORIES.map(cat => (
             <TabsTrigger key={cat.value} value={cat.value} className="text-xs">
               {cat.label}

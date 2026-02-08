@@ -59,6 +59,7 @@ import ClientPortal from './pages/ClientPortal';
 import DailyLog from './pages/DailyLog';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
+import Documents from './pages/Documents';
 import Estimates from './pages/Estimates';
 import Home from './pages/Home';
 import Invoices from './pages/Invoices';
@@ -70,6 +71,7 @@ import PMSetupGuide from './pages/PMSetupGuide';
 import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
+import PurchaseOrders from './pages/PurchaseOrders';
 import Safety from './pages/Safety';
 import Settings from './pages/Settings';
 import Submittals from './pages/Submittals';
@@ -80,8 +82,6 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import Documents from './pages/Documents';
-import PurchaseOrders from './pages/PurchaseOrders';
 import __Layout from './Layout.jsx';
 
 
@@ -98,6 +98,7 @@ export const PAGES = {
     "DailyLog": DailyLog,
     "Dashboard": Dashboard,
     "Directory": Directory,
+    "Documents": Documents,
     "Estimates": Estimates,
     "Home": Home,
     "Invoices": Invoices,
@@ -109,6 +110,7 @@ export const PAGES = {
     "Photos": Photos,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
+    "PurchaseOrders": PurchaseOrders,
     "Safety": Safety,
     "Settings": Settings,
     "Submittals": Submittals,
@@ -119,8 +121,6 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "Documents": Documents,
-    "PurchaseOrders": PurchaseOrders,
 }
 
 export const pagesConfig = {
