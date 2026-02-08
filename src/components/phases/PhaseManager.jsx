@@ -207,7 +207,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
   return (
     <div className="space-y-6">
       {/* Phase Selector */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
         {allPhases.map(phase => {
           const customPhase = customPhases.find(p => p.phase_name === phase.value);
           return (
@@ -302,9 +302,9 @@ export default function PhaseManager({ projectId, currentPhase }) {
       {/* Phase Overview */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <CardTitle>{currentPhaseLabel} Phase</CardTitle>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <CardTitle className="text-lg">{currentPhaseLabel} Phase</CardTitle>
               {phaseData?.status && (
                 <Badge variant={phaseData.status === 'completed' ? 'default' : 'secondary'}>
                   {phaseData.status.replace('_', ' ')}
@@ -312,9 +312,9 @@ export default function PhaseManager({ projectId, currentPhase }) {
               )}
               {isLocked && <Lock className="h-4 w-4 text-slate-400" />}
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-slate-500">{completedReqs}/{requirements.length} complete</span>
-              <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+              <span className="text-xs sm:text-sm text-slate-500">{completedReqs}/{requirements.length} complete</span>
+              <div className="w-full sm:w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div className="h-full bg-green-600" style={{ width: `${progressPercent}%` }} />
               </div>
               <DropdownMenu>
