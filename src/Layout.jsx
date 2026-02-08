@@ -116,19 +116,28 @@ export default function Layout({ children, currentPageName }) {
         const userData = await base44.auth.me();
         setUser(userData);
         
-        const orgs = await base44.entities.Organization.filter({ owner_email: userData.email });
-        if (orgs.length > 0) {
-          setOrganization(orgs[0]);
-          
-          document.documentElement.style.setProperty('--primary', hexToHSL(orgs[0].primary_color || '#1e40af'));
-          document.documentElement.style.setProperty('--secondary', hexToHSL(orgs[0].secondary_color || '#3b82f6'));
+        // Check if user has an organization
+        if (!userData?.organization_id && currentPageName !== 'Onboarding' && !isHomePage) {
+          navigate(createPageUrl('Onboarding'));
+          return;
+        }
+        
+        // Fetch user's organization
+        if (userData?.organization_id) {
+          const org = await base44.entities.Organization.filter({ id: userData.organization_id });
+          if (org.length > 0) {
+            setOrganization(org[0]);
+            
+            document.documentElement.style.setProperty('--primary', hexToHSL(org[0].primary_color || '#1e40af'));
+            document.documentElement.style.setProperty('--secondary', hexToHSL(org[0].secondary_color || '#3b82f6'));
+          }
         }
       } catch (e) {
         console.log('User not logged in');
       }
     };
     loadUser();
-  }, []);
+  }, [currentPageName]);
 
   const hexToHSL = (hex) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
