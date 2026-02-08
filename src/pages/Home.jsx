@@ -52,7 +52,7 @@ export default function Home() {
             </Button>
             <div className="relative flex-shrink-0 h-40 w-40 sm:h-56 sm:w-56">
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
                 className="h-full w-auto"
               />
@@ -262,7 +262,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <div className="relative flex-shrink-0 h-16 w-16 sm:h-20 sm:w-20">
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
                 alt="Golden State Integrated Systems"
                 className="h-full w-auto"
               />
