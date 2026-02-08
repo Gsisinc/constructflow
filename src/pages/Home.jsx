@@ -69,7 +69,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-24 sm:pt-40 pb-12 sm:pb-16 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-56 sm:pt-72 pb-12 sm:pb-16 px-4 sm:px-6 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-600/20 via-orange-600/20 to-slate-950"></div>
