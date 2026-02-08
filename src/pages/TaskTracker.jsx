@@ -84,17 +84,18 @@ export default function TaskTracker() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Operational Task Tracker</h1>
-          <p className="text-slate-500">Daily and weekly tasks for active projects</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Task Tracker</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Manage your operational tasks</p>
         </div>
         <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 bg-amber-600 hover:bg-amber-700 min-h-[44px] text-sm sm:text-base select-none">
               <Plus className="h-4 w-4" />
-              New Task
+              <span className="hidden sm:inline">New Task</span>
+              <span className="sm:hidden">New</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-xl">
@@ -104,39 +105,39 @@ export default function TaskTracker() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+        <Card className="border-amber-100">
+          <CardContent className="pt-3 sm:pt-6 p-2 sm:p-6">
             <div className="text-center">
-              <Circle className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-              <p className="text-3xl font-bold">{stats.pending}</p>
+              <Circle className="h-5 sm:h-8 w-5 sm:w-8 text-slate-400 mx-auto mb-1.5 sm:mb-2" />
+              <p className="text-lg sm:text-3xl font-bold">{stats.pending}</p>
               <p className="text-xs text-slate-500">Pending</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="border-amber-100">
+          <CardContent className="pt-3 sm:pt-6 p-2 sm:p-6">
             <div className="text-center">
-              <AlertCircle className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-              <p className="text-3xl font-bold">{stats.inProgress}</p>
+              <AlertCircle className="h-5 sm:h-8 w-5 sm:w-8 text-blue-500 mx-auto mb-1.5 sm:mb-2" />
+              <p className="text-lg sm:text-3xl font-bold">{stats.inProgress}</p>
               <p className="text-xs text-slate-500">In Progress</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="border-amber-100">
+          <CardContent className="pt-3 sm:pt-6 p-2 sm:p-6">
             <div className="text-center">
-              <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-2" />
-              <p className="text-3xl font-bold">{stats.completed}</p>
+              <CheckCircle2 className="h-5 sm:h-8 w-5 sm:w-8 text-green-500 mx-auto mb-1.5 sm:mb-2" />
+              <p className="text-lg sm:text-3xl font-bold">{stats.completed}</p>
               <p className="text-xs text-slate-500">Completed</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="border-amber-100">
+          <CardContent className="pt-3 sm:pt-6 p-2 sm:p-6">
             <div className="text-center">
-              <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
-              <p className="text-3xl font-bold">{stats.blocked}</p>
+              <AlertCircle className="h-5 sm:h-8 w-5 sm:w-8 text-red-500 mx-auto mb-1.5 sm:mb-2" />
+              <p className="text-lg sm:text-3xl font-bold">{stats.blocked}</p>
               <p className="text-xs text-slate-500">Blocked</p>
             </div>
           </CardContent>
@@ -144,90 +145,83 @@ export default function TaskTracker() {
       </div>
 
       {/* Project Filter */}
-      <div className="flex gap-2 overflow-x-auto">
+      <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2">
         <Button
           variant={selectedProject === null ? 'default' : 'outline'}
           onClick={() => setSelectedProject(null)}
+          className="whitespace-nowrap bg-amber-600 hover:bg-amber-700 min-h-[40px] text-xs sm:text-sm h-auto py-2"
         >
-          All Projects
+          All
         </Button>
-        {projects.map(p => (
+        {projects.slice(0, 4).map(p => (
           <Button
             key={p.id}
             variant={selectedProject === p.id ? 'default' : 'outline'}
             onClick={() => setSelectedProject(p.id)}
-            className="whitespace-nowrap"
+            className="whitespace-nowrap bg-amber-600 hover:bg-amber-700 min-h-[40px] text-xs sm:text-sm h-auto py-2"
           >
-            {p.name}
+            {p.name?.substring(0, 12)}
           </Button>
         ))}
       </div>
 
       {/* Tasks by Status */}
       <Tabs value={selectedStatus} onValueChange={setSelectedStatus}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="in_progress">In Progress</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="blocked">Blocked</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 h-auto">
+          <TabsTrigger value="pending" className="text-xs sm:text-sm py-2">Pending</TabsTrigger>
+          <TabsTrigger value="in_progress" className="text-xs sm:text-sm py-2">In</TabsTrigger>
+          <TabsTrigger value="completed" className="text-xs sm:text-sm py-2">Done</TabsTrigger>
+          <TabsTrigger value="blocked" className="text-xs sm:text-sm py-2">Blocked</TabsTrigger>
         </TabsList>
 
         {STATUSES.map(status => (
-          <TabsContent key={status} value={status} className="space-y-4 mt-6">
+          <TabsContent key={status} value={status} className="space-y-2 sm:space-y-3 mt-3 sm:mt-6">
             {allStatusTasks.length === 0 ? (
               <Card>
-                <CardContent className="py-12 text-center text-slate-500">
+                <CardContent className="py-6 sm:py-12 text-center text-slate-500 text-xs sm:text-sm">
                   No {status} tasks
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {allStatusTasks.map(task => (
-                  <Card key={task.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="py-4">
-                      <div className="flex items-start gap-4">
+                  <Card key={task.id} className="hover:shadow-md transition-shadow border-amber-100">
+                    <CardContent className="py-2.5 sm:py-4 px-2.5 sm:px-6">
+                      <div className="flex items-start gap-2 sm:gap-4">
                         <button
                           onClick={() => handleToggleStatus(task)}
-                          className="mt-1 hover:opacity-70 transition"
+                          className="mt-0.5 hover:opacity-70 transition flex-shrink-0"
                         >
                           {task.status === 'completed' ? (
-                            <CheckCircle2 className="h-6 w-6 text-green-500" />
+                            <CheckCircle2 className="h-5 sm:h-6 w-5 sm:w-6 text-green-500" />
                           ) : task.status === 'blocked' ? (
-                            <AlertCircle className="h-6 w-6 text-red-500" />
+                            <AlertCircle className="h-5 sm:h-6 w-5 sm:w-6 text-red-500" />
                           ) : task.status === 'in_progress' ? (
-                            <AlertCircle className="h-6 w-6 text-blue-500" />
+                            <AlertCircle className="h-5 sm:h-6 w-5 sm:w-6 text-blue-500" />
                           ) : (
-                            <Circle className="h-6 w-6 text-slate-400" />
+                            <Circle className="h-5 sm:h-6 w-5 sm:w-6 text-slate-400" />
                           )}
                         </button>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-slate-900">{task.title}</h3>
-                          <p className="text-sm text-slate-600 mt-1">{task.description}</p>
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            <Badge variant="outline" className="text-xs">
-                              {task.category}
+                          <h3 className="font-semibold text-xs sm:text-base text-slate-900 line-clamp-1">{task.title}</h3>
+                          <p className="text-xs text-slate-600 mt-0.5 sm:mt-1 line-clamp-1">{task.description}</p>
+                          <div className="flex flex-wrap gap-1 mt-1.5 sm:mt-2">
+                            <Badge variant="outline" className="text-xs py-0 px-1.5">
+                              {task.category?.substring(0, 8)}
                             </Badge>
                             <Badge 
-                              className="text-xs"
+                              className="text-xs py-0 px-1.5"
                               variant={task.priority === 'critical' ? 'destructive' : 'secondary'}
                             >
-                              {task.priority}
+                              {task.priority?.substring(0, 4)}
                             </Badge>
-                            {task.due_date && (
-                              <Badge variant="outline" className="text-xs">
-                                Due: {format(new Date(task.due_date), 'MMM d')}
-                              </Badge>
-                            )}
                           </div>
-                          {task.assigned_to && (
-                            <p className="text-xs text-slate-500 mt-2">Assigned to: {task.assigned_to}</p>
-                          )}
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1 flex-shrink-0">
                           <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 px-2"
+                            className="h-7 w-7 p-0"
                             onClick={() => setEditingTask(task)}
                           >
                             <Edit className="h-3 w-3" />
@@ -235,9 +229,9 @@ export default function TaskTracker() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 px-2 text-red-600"
+                            className="h-7 w-7 p-0 text-red-600"
                             onClick={() => {
-                              if (confirm('Delete task?')) {
+                              if (confirm('Delete?')) {
                                 deleteMutation.mutate(task.id);
                               }
                             }}
