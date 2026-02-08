@@ -36,10 +36,12 @@ export default function Safety() {
     mutationFn: (data) => base44.entities.SafetyIncident.create({
       ...data,
       project_id: selectedProject,
-      status: 'open'
+      type: data.incident_type,
+      incident_date: new Date().toISOString().split('T')[0],
+      status: 'reported'
     }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['safetyIncidents'] });
+      queryClient.invalidateQueries({ queryKey: ['safetyIncidents', selectedProject] });
       setFormData({ incident_type: 'near_miss', severity: 'low', description: '', location: '', injuries: false });
       setShowForm(false);
     }
@@ -121,8 +123,12 @@ export default function Safety() {
                 <span>Injuries Involved</span>
               </label>
               <Button 
-                onClick={() => createMutation.mutate(formData)} 
-                disabled={!selectedProject || !formData.description || !formData.location || createMutation.isPending}
+                onClick={() => {
+                  if (selectedProject && formData.description && formData.location && formData.incident_type) {
+                    createMutation.mutate(formData);
+                  }
+                }}
+                disabled={!selectedProject || !formData.description || !formData.location || !formData.incident_type || createMutation.isPending}
                 className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {createMutation.isPending ? 'Submitting...' : 'Report Incident'}
