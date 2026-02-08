@@ -312,7 +312,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Main Content */}
       <main className="lg:pl-64 pt-16 min-h-screen">
-        <div className="p-4 md:p-6 lg:p-8">
+        <div className="p-3 sm:p-4 md:p-6 lg:p-8">
           {children}
         </div>
       </main>
