@@ -87,7 +87,9 @@ export default function Budget() {
     mutationFn: (data) => base44.entities.Expense.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       setShowForm(false);
+      setEditingExpense(null);
     },
   });
 
@@ -482,7 +484,7 @@ function ExpenseFormDialog({ open, onOpenChange, expense, projects, onSubmit, lo
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="bg-slate-900 hover:bg-slate-800">
+            <Button type="submit" disabled={loading || !formData.project_id || !formData.amount} className="bg-slate-900 hover:bg-slate-800">
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {expense ? 'Update' : 'Add'} Expense
             </Button>
