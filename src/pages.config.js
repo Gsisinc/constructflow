@@ -66,20 +66,20 @@ import Issues from './pages/Issues';
 import JoinRequest from './pages/JoinRequest';
 import Materials from './pages/Materials';
 import Onboarding from './pages/Onboarding';
+import PMSetupGuide from './pages/PMSetupGuide';
 import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
 import Safety from './pages/Safety';
 import Settings from './pages/Settings';
 import Submittals from './pages/Submittals';
+import TaskTracker from './pages/TaskTracker';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
+import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import TemplateLibrary from './pages/TemplateLibrary';
-import TaskTracker from './pages/TaskTracker';
-import PMSetupGuide from './pages/PMSetupGuide';
 import __Layout from './Layout.jsx';
 
 
@@ -103,20 +103,20 @@ export const PAGES = {
     "JoinRequest": JoinRequest,
     "Materials": Materials,
     "Onboarding": Onboarding,
+    "PMSetupGuide": PMSetupGuide,
     "Photos": Photos,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
     "Safety": Safety,
     "Settings": Settings,
     "Submittals": Submittals,
+    "TaskTracker": TaskTracker,
     "Tasks": Tasks,
     "Team": Team,
+    "TemplateLibrary": TemplateLibrary,
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "TemplateLibrary": TemplateLibrary,
-    "TaskTracker": TaskTracker,
-    "PMSetupGuide": PMSetupGuide,
 }
 
 export const pagesConfig = {
