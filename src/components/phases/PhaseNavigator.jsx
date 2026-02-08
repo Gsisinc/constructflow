@@ -132,30 +132,28 @@ export default function PhaseNavigator({
                   )}>
                     {phase.label}
                   </p>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="ghost" className="h-5 w-5 p-0">
-                        <MoreVertical className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="center">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          if (confirm(`Remove "${phase.label}"? This cannot be undone.`)) {
-                            if (phase.customPhaseId) {
+                  {phase.customPhaseId && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="ghost" className="h-5 w-5 p-0">
+                          <MoreVertical className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="center">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
                               deleteCustomPhaseMutation.mutate(phase.customPhaseId);
-                            } else if (phase.isDefault) {
-                              hideDefaultPhaseMutation.mutate(phase.id);
                             }
-                          }
-                        }}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Remove Phase
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                          }}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Phase
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
 
                 {/* Gate Action */}
