@@ -219,25 +219,25 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden">
+      <section className="py-10 sm:py-16 px-4 sm:px-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-600/20 to-orange-600/20"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.1),transparent_70%)]"></div>
-        
-        <div className="relative max-w-4xl mx-auto text-center px-2">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6">
-            Ready to Dominate Your Market?
+
+        <div className="relative max-w-3xl mx-auto text-center px-2">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4">
+            Ready to Get Started?
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl text-slate-300 mb-8 sm:mb-10">
-            Join the leading low voltage contractors who've transformed their business with GSIS Manager
+          <p className="text-sm sm:text-base text-slate-300 mb-6 sm:mb-8">
+            Join leading contractors transforming their business
           </p>
           <Button 
             onClick={handleGetStarted}
-            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm sm:text-lg px-8 sm:px-12 py-6 sm:py-8 h-auto shadow-2xl shadow-amber-500/50 w-full sm:w-auto"
+            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm px-8 py-2.5 shadow-xl shadow-amber-500/50 w-full sm:w-auto"
           >
             Start Your Free Trial
-            <ArrowRight className="ml-2 sm:ml-3 h-4 w-4 sm:h-6 sm:w-6" />
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-          <p className="text-slate-400 mt-4 sm:mt-6 text-sm sm:text-base">
+          <p className="text-slate-400 mt-4 text-xs sm:text-sm">
             No credit card • 14 days free • Cancel anytime
           </p>
         </div>
