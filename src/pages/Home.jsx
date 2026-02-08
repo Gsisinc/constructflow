@@ -17,7 +17,8 @@ import {
   Radio,
   Video,
   Wifi,
-  Menu
+  Menu,
+  AlertTriangle
 } from 'lucide-react';
 
 export default function Home() {
