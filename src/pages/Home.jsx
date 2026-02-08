@@ -247,7 +247,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-slate-900/50 backdrop-blur-sm border-t border-white/10 py-4 sm:py-6 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="max-w-7xl mx-auto flex flex-col items-center justify-center gap-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-shrink-0 h-16 w-16 sm:h-20 sm:w-20">
               <img 
