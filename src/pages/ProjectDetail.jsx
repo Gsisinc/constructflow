@@ -255,37 +255,38 @@ export default function ProjectDetail() {
       {/* Header */}
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         {project.image_url && (
-          <div className="h-48 bg-slate-100">
+          <div className="h-32 sm:h-48 bg-slate-100">
             <img src={project.image_url} alt={project.name} className="w-full h-full object-cover" />
           </div>
         )}
-        <div className="p-6">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-col gap-4">
             <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-semibold text-slate-900">{project.name}</h1>
-                <Badge className={cn("border", statusColors[project.status])}>
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-lg sm:text-2xl font-semibold text-slate-900 break-words">{project.name}</h1>
+                <Badge className={cn("border text-xs", statusColors[project.status])}>
                   {project.status?.replace('_', ' ')}
                 </Badge>
                 <div className={cn(
-                  "w-3 h-3 rounded-full",
+                  "w-3 h-3 rounded-full flex-shrink-0",
                   healthColors[project.health_status || 'green']
                 )} title={`Health: ${project.health_status || 'green'}`} />
               </div>
-              <p className="text-slate-500">{project.client_name}</p>
+              <p className="text-sm text-slate-500">{project.client_name}</p>
               {project.address && (
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                  <MapPin className="h-4 w-4" />
-                  <span>{project.address}</span>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500">
+                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                  <span className="break-words">{project.address}</span>
                 </div>
               )}
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setShowEditForm(true)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button variant="outline" onClick={() => setShowEditForm(true)} className="flex-1 sm:flex-none text-sm">
+                <Edit className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Edit</span>
+                <span className="sm:hidden">Edit</span>
               </Button>
-              <Button variant="outline" className="text-red-600 hover:text-red-700" onClick={() => setShowDeleteDialog(true)}>
+              <Button variant="outline" className="text-red-600 hover:text-red-700 flex-1 sm:flex-none text-sm" onClick={() => setShowDeleteDialog(true)}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -301,7 +302,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* Meta Info */}
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="mt-4 sm:mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
             {project.start_date && (
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-slate-400" />
@@ -343,7 +344,7 @@ export default function ProjectDetail() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white rounded-xl border border-slate-200 p-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-lg bg-blue-100">
@@ -403,7 +404,7 @@ export default function ProjectDetail() {
 
       {/* Tabs for detailed views */}
       <Tabs defaultValue="phases" className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto">
+        <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-slate-100 rounded-lg">
           <TabsTrigger value="phases">Phases</TabsTrigger>
           <TabsTrigger value="changeorders">Change Orders</TabsTrigger>
           <TabsTrigger value="safety">Safety</TabsTrigger>
