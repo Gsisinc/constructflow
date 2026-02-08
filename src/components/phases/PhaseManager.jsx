@@ -701,23 +701,26 @@ function FilesTab({ projectId, phaseName, files }) {
     enabled: !!projectId && !!phaseName
   });
 
-  // Create folders for main requirements that don't have them, and delete folders for sub-requirements
+  // Sync folders: only keep folders for main requirements, delete all others
   useEffect(() => {
     const syncFolders = async () => {
       const mainRequirements = requirements.filter(r => !r.parent_requirement_id);
-      const subRequirements = requirements.filter(r => r.parent_requirement_id);
+      const mainReqIds = mainRequirements.map(r => r.id);
       const existingFolders = files.filter(f => f.file_url?.startsWith('folder://'));
       
-      // Delete folders for sub-requirements
+      let needsRefresh = false;
+      
+      // Delete folders that are NOT for main requirements
       for (const folder of existingFolders) {
-        const reqId = folder.file_url.replace('folder://', '');
-        const isSubReq = subRequirements.some(sr => sr.id === reqId);
-        if (isSubReq) {
+        const reqId = folder.file_url.replace('folder://', '').replace('custom_', '');
+        // Delete if it's not a main requirement and not a custom folder
+        if (!mainReqIds.includes(reqId) && !folder.file_url.includes('custom_')) {
           await base44.entities.PhaseFile.delete(folder.id);
+          needsRefresh = true;
         }
       }
       
-      // Create folders for main requirements
+      // Create folders for main requirements that don't have them
       const existingFolderUrls = existingFolders.map(f => f.file_url);
       for (const req of mainRequirements) {
         const folderUrl = `folder://${req.id}`;
@@ -731,15 +734,19 @@ function FilesTab({ projectId, phaseName, files }) {
             description: `Folder for requirement: ${req.requirement_text}`,
             order: req.order || 0
           });
+          needsRefresh = true;
         }
       }
-      queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
+      
+      if (needsRefresh) {
+        queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
+      }
     };
 
     if (requirements.length > 0 && files) {
       syncFolders();
     }
-  }, [requirements.length, projectId, phaseName]);
+  }, [requirements, files, projectId, phaseName]);
 
   const createFolderMutation = useMutation({
     mutationFn: async (name) => {
@@ -842,7 +849,7 @@ function FilesTab({ projectId, phaseName, files }) {
     });
 
   const currentFiles = selectedFolder 
-    ? files.filter(f => f.parent_folder_id === selectedFolder.id && !f.file_url?.startsWith('folder://')).sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
+    ? files.filter(f => f.parent_folder_id === selectedFolder.id && !f.file_url?.startsWith('folder://')).sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
     : [];
 
   return (
