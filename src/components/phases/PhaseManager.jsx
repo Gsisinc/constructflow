@@ -36,7 +36,10 @@ export default function PhaseManager({ projectId, currentPhase }) {
     .filter(cp => !cp.is_hidden)
     .map(cp => ({ value: cp.phase_name, label: cp.display_name, customPhaseId: cp.id }));
 
-  const [selectedPhase, setSelectedPhase] = useState(currentPhase || allPhases[0]?.value);
+  const [selectedPhase, setSelectedPhase] = useState(() => {
+    if (currentPhase) return currentPhase;
+    return allPhases.length > 0 ? allPhases[0].value : null;
+  });
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingPhase, setEditingPhase] = useState(null);
 
