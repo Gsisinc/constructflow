@@ -15,7 +15,9 @@ import { createPageUrl } from '../utils';
 
 export default function Settings() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
