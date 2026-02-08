@@ -77,6 +77,19 @@ export default function Settings() {
     updateOrgMutation.mutate(orgForm);
   };
 
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      await base44.auth.deleteAccount();
+      toast.success('Account deleted');
+      base44.auth.logout(createPageUrl('Home'));
+    } catch (error) {
+      toast.error('Failed to delete account');
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
+
   if (!organization) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
