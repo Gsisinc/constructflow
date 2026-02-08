@@ -280,57 +280,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
-      {/* Old Footer Content Hidden */}
-      <div style={{display: 'none'}}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-12 mb-8 sm:mb-12">
-            <div>
-              <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/b1ea08819_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
-                alt="Golden State Integrated Systems"
-                className="h-80 sm:h-96 w-auto mb-3 sm:mb-4"
-              />
-              <p className="text-xs sm:text-sm text-slate-400">
-                Empowering low voltage contractors with AI-powered construction intelligence.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-3 sm:mb-4 text-sm">Platform</h4>
-              <ul className="space-y-2 text-xs sm:text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition">Features</a></li>
-                <li><a href="#" className="hover:text-white transition">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition">Security</a></li>
-                <li><a href="#" className="hover:text-white transition">Integrations</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-3 sm:mb-4 text-sm">Company</h4>
-              <ul className="space-y-2 text-xs sm:text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition">About</a></li>
-                <li><a href="#" className="hover:text-white transition">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition">Contact</a></li>
-                <li><a href="#" className="hover:text-white transition">Blog</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-3 sm:mb-4 text-sm">Legal</h4>
-              <ul className="space-y-2 text-xs sm:text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition">Terms</a></li>
-                <li><a href="#" className="hover:text-white transition">Cookies</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-white/10 pt-6 sm:pt-8 text-center">
-            <p className="text-xs sm:text-sm text-slate-400">
-              © 2026 Golden State Integrated Systems Inc. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+
     </div>
   );
 }
