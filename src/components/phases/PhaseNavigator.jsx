@@ -44,9 +44,13 @@ export default function PhaseNavigator({
 }) {
   const queryClient = useQueryClient();
   
+  // Filter out hidden default phases
+  const hiddenPhases = customPhases.filter(cp => cp.is_hidden).map(cp => cp.phase_name);
+  const visibleDefaults = DEFAULT_PHASES.filter(dp => !hiddenPhases.includes(dp.id));
+  
   const PHASES = [
-    ...DEFAULT_PHASES,
-    ...customPhases.map(cp => ({
+    ...visibleDefaults,
+    ...customPhases.filter(cp => !cp.is_hidden).map(cp => ({
       id: cp.phase_name,
       label: cp.display_name,
       icon: cp.icon || '📌',
@@ -58,6 +62,20 @@ export default function PhaseNavigator({
 
   const deleteCustomPhaseMutation = useMutation({
     mutationFn: (customPhaseId) => base44.entities.CustomPhase.delete(customPhaseId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
+      toast.success('Phase deleted');
+    }
+  });
+
+  const hideDefaultPhaseMutation = useMutation({
+    mutationFn: (phaseId) => base44.entities.CustomPhase.create({
+      project_id: projectId,
+      phase_name: phaseId,
+      display_name: phaseId,
+      is_hidden: true,
+      order: 999
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
       toast.success('Phase deleted');
@@ -168,19 +186,21 @@ export default function PhaseNavigator({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="center">
-                      {phase.customPhaseId && (
-                        <DropdownMenuItem
-                          onClick={() => {
-                            if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
+                      <DropdownMenuItem
+                        onClick={() => {
+                          if (confirm(`Delete "${phase.label}"? This cannot be undone.`)) {
+                            if (phase.customPhaseId) {
                               deleteCustomPhaseMutation.mutate(phase.customPhaseId);
+                            } else {
+                              hideDefaultPhaseMutation.mutate(phase.id);
                             }
-                          }}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Phase
-                        </DropdownMenuItem>
-                      )}
+                          }
+                        }}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Phase
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
