@@ -6,7 +6,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 export default function LiveBudgetTracker({ project, expenses = [], changeOrders = [] }) {
   const originalBudget = project?.budget || 0;
-  const spent = project?.spent || 0;
+  const approvedExpenses = expenses.filter(e => e.status === 'approved' || e.status === 'paid').reduce((sum, e) => sum + (e.amount || 0), 0);
+  const spent = approvedExpenses > 0 ? approvedExpenses : project?.spent || 0;
   const committedCosts = project?.committed_costs || 0;
   const pendingCosts = changeOrders.filter(co => co.status === 'pending_review' || co.status === 'client_review')
     .reduce((sum, co) => sum + (co.cost_impact || 0), 0);
