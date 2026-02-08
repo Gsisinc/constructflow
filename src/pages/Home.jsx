@@ -152,15 +152,15 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-gradient-to-b from-slate-950 to-slate-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16 px-2">
-            <Badge className="mb-3 sm:mb-4 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs sm:text-sm">Platform Features</Badge>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
-              Everything You Need to Win
+      <section className="py-12 sm:py-16 px-4 sm:px-6 bg-gradient-to-b from-slate-950 to-slate-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12 px-2">
+            <Badge className="mb-2 sm:mb-3 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">Features</Badge>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3">
+              Everything You Need
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto">
-              From opportunity discovery to project completion, powered by cutting-edge AI
+            <p className="text-xs sm:text-sm lg:text-base text-slate-400 max-w-2xl mx-auto">
+              From opportunity discovery to project completion
             </p>
           </div>
 
