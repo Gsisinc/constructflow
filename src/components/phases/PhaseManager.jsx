@@ -686,6 +686,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
 
 function FilesTab({ projectId, phaseName, files }) {
   const [uploading, setUploading] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState(null);
   const queryClient = useQueryClient();
 
   const handleUpload = async (e) => {
@@ -701,7 +702,8 @@ function FilesTab({ projectId, phaseName, files }) {
         phase_name: phaseName,
         file_name: file.name,
         file_url: file_url,
-        file_type: file.type.includes('image') ? 'photo' : 'document'
+        file_type: file.type.includes('image') ? 'photo' : 'document',
+        parent_folder_id: selectedFolder?.id || null
       });
 
       queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
@@ -713,29 +715,68 @@ function FilesTab({ projectId, phaseName, files }) {
     }
   };
 
+  const folders = files.filter(f => f.file_url?.startsWith('folder://')).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+  const currentFiles = selectedFolder 
+    ? files.filter(f => f.parent_folder_id === selectedFolder.id && !f.file_url?.startsWith('folder://')).sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
+    : files.filter(f => !f.parent_folder_id && !f.file_url?.startsWith('folder://')).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <label>
-          <Button size="sm" disabled={uploading} asChild>
-            <span>
-              <Upload className="h-4 w-4 mr-2" />
-              {uploading ? 'Uploading...' : 'Upload File'}
-            </span>
+      <div className="flex justify-between items-center">
+        {selectedFolder && (
+          <Button size="sm" variant="outline" onClick={() => setSelectedFolder(null)}>
+            ← Back to Folders
           </Button>
-          <input type="file" className="hidden" onChange={handleUpload} />
-        </label>
+        )}
+        <div className={cn("flex gap-2", !selectedFolder && "ml-auto")}>
+          {selectedFolder && (
+            <Badge variant="secondary" className="text-sm">
+              {selectedFolder.file_name.replace('[Folder] ', '')}
+            </Badge>
+          )}
+          <label>
+            <Button size="sm" disabled={uploading} asChild>
+              <span>
+                <Upload className="h-4 w-4 mr-2" />
+                {uploading ? 'Uploading...' : 'Upload File'}
+              </span>
+            </Button>
+            <input type="file" className="hidden" onChange={handleUpload} />
+          </label>
+        </div>
       </div>
 
-      {files.length === 0 ? (
+      {!selectedFolder && folders.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {folders.map(folder => (
+            <Card key={folder.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setSelectedFolder(folder)}>
+              <CardContent className="py-4">
+                <div className="flex items-start gap-3">
+                  <FileText className="h-5 w-5 text-amber-500" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {folder.file_name.replace('[Folder] ', '')}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {files.filter(f => f.parent_folder_id === folder.id).length} files
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {currentFiles.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-slate-500">
-            No files uploaded
+            {selectedFolder ? 'No files in this folder' : 'No files uploaded'}
           </CardContent>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {files.sort((a, b) => new Date(a.created_date) - new Date(b.created_date)).map(file => (
+          {currentFiles.map(file => (
             <Card key={file.id}>
               <CardContent className="py-4">
                 <div className="flex items-start gap-3">
