@@ -26,16 +26,13 @@ export default function PhaseNavigator({
 }) {
   const queryClient = useQueryClient();
   
-  // Merge default phases with custom phases, sorted by order
-  const PHASES = [
-    ...DEFAULT_PHASES,
-    ...customPhases.map(cp => ({
-      id: cp.phase_name,
-      label: cp.display_name,
-      icon: cp.icon || '📌',
-      customPhaseId: cp.id
-    }))
-  ];
+  // Only show custom phases
+  const PHASES = customPhases.map(cp => ({
+    id: cp.phase_name,
+    label: cp.display_name,
+    icon: cp.icon || '📌',
+    customPhaseId: cp.id
+  }));
   
   const currentPhaseIndex = PHASES.findIndex(p => p.id === currentPhase);
 
