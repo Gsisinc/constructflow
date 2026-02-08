@@ -25,7 +25,8 @@ import {
   User,
   Bot,
   Search,
-  Grid3x3
+  Grid3x3,
+  ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -160,6 +161,12 @@ export default function Layout({ children, currentPageName }) {
     base44.auth.logout(createPageUrl('Home'));
   };
 
+  const isRootPage = ['Dashboard', 'Projects', 'Bids', 'TaskTracker', 'Settings'].includes(currentPageName);
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   if (isHomePage) {
     return children;
   }
@@ -167,42 +174,55 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <style>{`
-                html {
-                  overscroll-behavior: none;
-                }
+              html {
+                overscroll-behavior: none;
+              }
+              body {
+                overscroll-behavior: none;
+              }
+              button, a, [role="button"], .select-none {
+                -webkit-user-select: none;
+                user-select: none;
+              }
+              input, textarea, select {
+                font-size: 16px !important;
+              }
+              :root {
+                --primary: 222.2 47.4% 11.2%;
+                --primary-foreground: 210 40% 98%;
+                --accent: 210 40% 96.1%;
+              }
+              @supports (padding: max(0px)) {
                 body {
-                  overscroll-behavior: none;
+                  padding-left: max(0px, env(safe-area-inset-left));
+                  padding-right: max(0px, env(safe-area-inset-right));
                 }
-                button, a, [role="button"], .select-none {
-                  -webkit-user-select: none;
-                  user-select: none;
-                }
-        :root {
-          --primary: 222.2 47.4% 11.2%;
-          --primary-foreground: 210 40% 98%;
-          --accent: 210 40% 96.1%;
-        }
-        @supports (padding: max(0px)) {
-          body {
-            padding-left: max(0px, env(safe-area-inset-left));
-            padding-right: max(0px, env(safe-area-inset-right));
-          }
-        }
-      `}</style>
+              }
+            `}</style>
 
       {/* Top Header */}
       <div className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 z-40 lg:pl-64" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="h-full flex items-center justify-between px-4">
-          {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="min-h-[44px] min-w-[44px] select-none"
-            >
-              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
+          {/* Mobile menu button & back button */}
+              <div className="lg:hidden flex items-center gap-2">
+                {!isRootPage && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleBack}
+                    className="min-h-[44px] min-w-[44px] select-none"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="min-h-[44px] min-w-[44px] select-none"
+                >
+                  {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </Button>
             <div className="flex items-center gap-1.5">
               {organization?.logo_url ? (
                 <img src={organization.logo_url} alt={organization.name} className="h-8 w-auto" />

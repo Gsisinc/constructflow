@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
 import { cn } from '@/lib/utils';
 import {
@@ -20,7 +20,16 @@ const navItems = [
 
 export default function MobileBottomNav({ currentPageName }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [lastTapTime, setLastTapTime] = useState({});
+  const [sectionHistory, setSectionHistory] = useState(() => {
+    const stored = sessionStorage.getItem('sectionHistory');
+    return stored ? JSON.parse(stored) : {};
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('sectionHistory', JSON.stringify(sectionHistory));
+  }, [sectionHistory]);
 
   const handleNavClick = (page) => {
     const now = Date.now();
@@ -34,8 +43,14 @@ export default function MobileBottomNav({ currentPageName }) {
       navigate(createPageUrl(page));
       window.scrollTo(0, 0);
     } else if (currentPageName !== page) {
-      // Different page - navigate
-      navigate(createPageUrl(page));
+      // Save current location before switching
+      setSectionHistory({
+        ...sectionHistory,
+        [currentPageName]: location.pathname,
+      });
+      // Navigate to saved location or root
+      const savedPath = sectionHistory[page];
+      navigate(savedPath || createPageUrl(page));
     }
   };
 
