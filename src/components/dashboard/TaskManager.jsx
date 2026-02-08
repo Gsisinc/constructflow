@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 export default function TaskManager({ projectId = null }) {
   const [showDialog, setShowDialog] = useState(false);
   const [taskName, setTaskName] = useState('');
+  const [optimisticTasks, setOptimisticTasks] = useState({});
   const queryClient = useQueryClient();
 
   const { data: tasks = [] } = useQuery({
@@ -29,7 +30,12 @@ export default function TaskManager({ projectId = null }) {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       setTaskName('');
       setShowDialog(false);
+      setOptimisticTasks({});
       toast.success('Task created');
+    },
+    onError: () => {
+      setOptimisticTasks({});
+      toast.error('Failed to create task');
     }
   });
 
@@ -37,7 +43,16 @@ export default function TaskManager({ projectId = null }) {
     mutationFn: ({ id, status }) => base44.entities.Task.update(id, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      setOptimisticTasks((prev) => {
+        const next = { ...prev };
+        delete next[Object.keys(next)[0]];
+        return next;
+      });
       toast.success('Task updated');
+    },
+    onError: () => {
+      setOptimisticTasks({});
+      toast.error('Failed to update task');
     }
   });
 
