@@ -234,7 +234,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
                   <Badge variant="secondary" className="ml-2 hidden sm:inline-flex">Current</Badge>
                 )}
               </Button>
-              {customPhase && (
+              {phase.customPhaseId && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button size="icon" variant="ghost" className="h-8 w-8 flex-shrink-0">
@@ -242,12 +242,12 @@ export default function PhaseManager({ projectId, currentPhase }) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleEditPhase(customPhase)}>
+                    <DropdownMenuItem onClick={() => handleEditPhase(customPhases.find(cp => cp.id === phase.customPhaseId))}>
                       <Edit className="h-4 w-4 mr-2" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => handleDeletePhase(customPhase)}
+                      onClick={() => handleDeletePhase(customPhases.find(cp => cp.id === phase.customPhaseId))}
                       className="text-red-600"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
