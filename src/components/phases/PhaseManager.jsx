@@ -46,6 +46,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
   const { data: phaseData } = useQuery({
     queryKey: ['customPhase', projectId, selectedPhase],
     queryFn: async () => {
+      if (!selectedPhase) return null;
       const phases = await base44.entities.CustomPhase.filter({ project_id: projectId, phase_name: selectedPhase });
       return phases[0];
     },
