@@ -120,8 +120,12 @@ export default function Safety() {
                 />
                 <span>Injuries Involved</span>
               </label>
-              <Button onClick={() => createMutation.mutate(formData)} className="w-full bg-red-600 hover:bg-red-700">
-                Report Incident
+              <Button 
+                onClick={() => createMutation.mutate(formData)} 
+                disabled={!selectedProject || !formData.description || !formData.location || createMutation.isPending}
+                className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {createMutation.isPending ? 'Submitting...' : 'Report Incident'}
               </Button>
             </div>
           </DialogContent>
