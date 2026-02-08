@@ -16,7 +16,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from './drawer';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 
 export function ResponsiveDropdownMenu({ children, trigger, ...props }) {

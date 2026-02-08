@@ -15,7 +15,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from './drawer';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 export function ResponsiveSelect({ children, value, onValueChange, trigger, ...props }) {
   const [open, setOpen] = useState(false);
