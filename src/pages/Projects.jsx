@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useOrganization } from '@/components/hooks/useOrganization';
 import ProjectCard from '../components/dashboard/ProjectCard';
 import ProjectForm from '../components/projects/ProjectForm';
 import PullToRefresh from '@/components/ui/PullToRefresh';
@@ -25,29 +26,21 @@ export default function Projects() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
   const queryClient = useQueryClient();
-
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
+  const { organization } = useOrganization();
 
   const { data: projects = [], isLoading } = useQuery({
-    queryKey: ['projects', user?.email],
+    queryKey: ['projects', organization?.id],
     queryFn: async () => {
-      if (!user?.email) return [];
-      const teamRecords = await base44.entities.ProjectTeam.filter({ user_email: user.email });
-      const projectIds = [...new Set(teamRecords.map(t => t.project_id))];
-      if (projectIds.length === 0) return [];
-      const allProjects = await base44.entities.Project.list('-created_date');
-      return allProjects.filter(p => projectIds.includes(p.id));
+      if (!organization?.id) return [];
+      return await base44.entities.Project.filter({ organization_id: organization.id }, '-created_date');
     },
-    enabled: !!user?.email,
+    enabled: !!organization?.id,
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Project.create(data),
+    mutationFn: (data) => base44.entities.Project.create({ ...data, organization_id: organization?.id }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['projects', organization?.id] });
       setShowForm(false);
     },
   });
@@ -68,7 +61,7 @@ export default function Projects() {
   };
 
   const handleRefresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['projects'] });
+    await queryClient.invalidateQueries({ queryKey: ['projects', organization?.id] });
   };
 
   return (
