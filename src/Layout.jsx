@@ -173,25 +173,26 @@ export default function Layout({ children, currentPageName }) {
       <div className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-40 lg:pl-64">
         <div className="h-full flex items-center justify-between px-4">
           {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center gap-3">
+          <div className="lg:hidden flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="h-9 w-9"
             >
               {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {organization?.logo_url ? (
-                <img src={organization.logo_url} alt={organization.name} className="h-12 w-auto" />
+                <img src={organization.logo_url} alt={organization.name} className="h-8 w-auto" />
               ) : (
                 <>
                   <img 
                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
                     alt="GSIS Manager" 
-                    className="h-12 w-auto"
+                    className="h-8 w-auto"
                   />
-                  <span className="font-semibold text-slate-900">{organization?.name || 'GSIS Manager'}</span>
+                  <span className="font-semibold text-sm text-slate-900 hidden sm:inline">{organization?.name || 'GSIS Manager'}</span>
                 </>
               )}
             </div>
