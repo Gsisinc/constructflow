@@ -14,11 +14,16 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
     if (!file) return;
 
     setUploading(true);
+    console.log('Starting file upload:', file.name);
+    
     try {
       // Upload file
+      console.log('Uploading file to Core.UploadFile...');
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      console.log('File uploaded successfully:', file_url);
       
       // Create document record
+      console.log('Creating BidDocument record...');
       const doc = await base44.entities.BidDocument.create({
         bid_opportunity_id: bidId,
         organization_id: organizationId,
@@ -27,13 +32,15 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
         file_type: file.type,
         file_size: file.size
       });
+      console.log('BidDocument created:', doc.id);
 
-      toast.success('File uploaded');
+      toast.success('File uploaded successfully');
       setUploading(false);
       setProcessing(true);
 
       // AI processing
       try {
+        console.log('Starting AI analysis...');
         const aiResult = await base44.integrations.Core.InvokeLLM({
           prompt: `Analyze this bid/RFP document and extract:
 1. All technical requirements
@@ -65,8 +72,10 @@ Provide structured output.`,
             }
           }
         });
+        console.log('AI analysis complete:', aiResult);
 
         // Update document with extracted data
+        console.log('Updating document with AI results...');
         await base44.entities.BidDocument.update(doc.id, {
           ai_processed: true,
           extracted_data: aiResult
@@ -74,6 +83,7 @@ Provide structured output.`,
 
         // Create requirement records
         if (aiResult.requirements?.length > 0) {
+          console.log(`Creating ${aiResult.requirements.length} requirements...`);
           const reqPromises = aiResult.requirements.map(req =>
             base44.entities.BidRequirement.create({
               bid_opportunity_id: bidId,
@@ -85,19 +95,20 @@ Provide structured output.`,
             })
           );
           await Promise.all(reqPromises);
+          console.log('Requirements created successfully');
         }
 
-        toast.success('AI analysis complete');
+        toast.success('✨ AI analysis complete - requirements extracted');
         onUploadComplete?.();
       } catch (err) {
-        console.error('AI processing failed:', err);
-        toast.error('AI analysis failed, but file uploaded');
+        console.error('AI processing error:', err);
+        toast.error('AI analysis failed: ' + (err.message || 'Unknown error'));
       }
       
       setProcessing(false);
     } catch (error) {
-      console.error('Upload failed:', error);
-      toast.error('Upload failed');
+      console.error('Upload error:', error);
+      toast.error('Upload failed: ' + (error.message || 'Unknown error'));
       setUploading(false);
       setProcessing(false);
     }
