@@ -51,7 +51,7 @@ export default function BidDetail() {
     loadUser();
   }, []);
 
-  const { data: bid } = useQuery({
+  const { data: bid, refetch: refetchBid } = useQuery({
     queryKey: ['bid', bidId],
     queryFn: async () => {
       const bids = await base44.entities.BidOpportunity.filter({ id: bidId });
@@ -248,8 +248,9 @@ export default function BidDetail() {
             bidId={bid.id} 
             organizationId={user.organization_id}
             onUploadComplete={() => {
-              queryClient.invalidateQueries({ queryKey: ['bidDocuments'] });
-              queryClient.invalidateQueries({ queryKey: ['bid'] });
+              queryClient.invalidateQueries({ queryKey: ['bidDocuments', bidId] });
+              queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+              refetchBid();
             }}
           />
           
