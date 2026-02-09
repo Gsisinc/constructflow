@@ -275,7 +275,11 @@ export default function Team() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-red-600"
-                          onClick={() => deleteMutation.mutate(worker.id)}
+                          onClick={() => {
+                            if (confirm(`Delete ${worker.name}? This action cannot be undone.`)) {
+                              deleteMutation.mutate(worker.id);
+                            }
+                          }}
                         >
                           Delete
                         </DropdownMenuItem>
