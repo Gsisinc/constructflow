@@ -81,6 +81,7 @@ Be thorough and extract as much useful information as possible.`,
           }
         });
         console.log('AI analysis complete:', aiResult);
+        toast.success('✅ AI extracted ' + (aiResult.requirements?.length || 0) + ' requirements');
 
         // Update document with extracted data
         console.log('Updating document with AI results...');
