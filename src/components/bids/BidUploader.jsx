@@ -125,12 +125,12 @@ Be thorough and extract as much useful information as possible.`,
         }
 
         setProcessing(false);
-        toast.success('✨ AI analysis complete!');
+        toast.success('✨ AI analysis complete! Check the AI Analysis tab.');
         
-        // Delay callback to ensure UI updates
-        setTimeout(() => {
-          onUploadComplete?.();
-        }, 500);
+        // Trigger callback immediately to refresh all data
+        if (onUploadComplete) {
+          onUploadComplete();
+        }
       } catch (err) {
         console.error('AI processing error:', err);
         setProcessing(false);

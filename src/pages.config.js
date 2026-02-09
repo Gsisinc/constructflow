@@ -49,6 +49,7 @@
  */
 import AIAgents from './pages/AIAgents';
 import AddBid from './pages/AddBid';
+import AlertSettings from './pages/AlertSettings';
 import BidDetail from './pages/BidDetail';
 import BidDiscovery from './pages/BidDiscovery';
 import BidOpportunities from './pages/BidOpportunities';
@@ -78,18 +79,18 @@ import Submittals from './pages/Submittals';
 import TaskTracker from './pages/TaskTracker';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
+import TeamManagement from './pages/TeamManagement';
 import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import TeamManagement from './pages/TeamManagement';
-import AlertSettings from './pages/AlertSettings';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AIAgents": AIAgents,
     "AddBid": AddBid,
+    "AlertSettings": AlertSettings,
     "BidDetail": BidDetail,
     "BidDiscovery": BidDiscovery,
     "BidOpportunities": BidOpportunities,
@@ -119,12 +120,11 @@ export const PAGES = {
     "TaskTracker": TaskTracker,
     "Tasks": Tasks,
     "Team": Team,
+    "TeamManagement": TeamManagement,
     "TemplateLibrary": TemplateLibrary,
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "TeamManagement": TeamManagement,
-    "AlertSettings": AlertSettings,
 }
 
 export const pagesConfig = {

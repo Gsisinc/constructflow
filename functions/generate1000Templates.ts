@@ -1,297 +1,696 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
+const TEMPLATES = [
+  // CONTRACTS
+  {
+    category: 'contracts',
+    name: 'General Contractor Agreement',
+    description: 'Comprehensive contract between owner and general contractor',
+    content: `GENERAL CONTRACTOR AGREEMENT
+
+This Agreement is made on [Date] between:
+
+OWNER: [Owner Name]
+Address: [Owner Address]
+
+CONTRACTOR: [Contractor Name]
+License #: [License Number]
+Address: [Contractor Address]
+
+PROJECT DETAILS:
+Location: [Project Address]
+Description: [Project Description]
+Start Date: [Start Date]
+Completion Date: [Completion Date]
+
+CONTRACT PRICE: $[Amount]
+
+SCOPE OF WORK:
+[Detailed scope description]
+
+PAYMENT TERMS:
+- Deposit: [Amount] upon signing
+- Progress payments: [Schedule]
+- Final payment: [Amount] upon completion
+
+TERMS & CONDITIONS:
+1. Changes and modifications must be in writing
+2. Contractor warrants work for [period]
+3. Contractor carries appropriate insurance
+4. Owner may inspect work at reasonable times
+5. Disputes resolved through [arbitration/mediation]
+
+WARRANTIES:
+[Warranty details]
+
+SIGNATURES:
+_____________________________     Date: __________
+Owner
+
+_____________________________     Date: __________
+Contractor`,
+    tags: ['contract', 'legal', 'agreement']
+  },
+  {
+    category: 'contracts',
+    name: 'Subcontractor Agreement',
+    description: 'Contract template for hiring subcontractors',
+    content: `SUBCONTRACTOR AGREEMENT
+
+Prime Contractor: [Name]
+Subcontractor: [Name]
+Project: [Project Name]
+
+WORK TO BE PERFORMED:
+[Detailed description]
+
+COMPENSATION: $[Amount]
+
+PAYMENT SCHEDULE:
+[Schedule details]
+
+INSURANCE REQUIREMENTS:
+- General Liability: $[Amount]
+- Workers Compensation: Required
+- Auto Insurance: $[Amount]
+
+COMPLETION DATE: [Date]
+
+Both parties agree to the terms above.
+
+_____________________________     Date: __________
+Prime Contractor
+
+_____________________________     Date: __________
+Subcontractor`,
+    tags: ['subcontractor', 'contract']
+  },
+  {
+    category: 'contracts',
+    name: 'Material Supply Agreement',
+    description: 'Contract for material suppliers',
+    content: `MATERIAL SUPPLY AGREEMENT
+
+Buyer: [Name]
+Supplier: [Name]
+Date: [Date]
+
+MATERIALS TO BE SUPPLIED:
+[List of materials with quantities]
+
+PRICING:
+[Price per unit and totals]
+
+DELIVERY SCHEDULE:
+[Delivery dates and locations]
+
+PAYMENT TERMS:
+[Payment schedule]
+
+QUALITY STANDARDS:
+[Specifications and standards]
+
+SIGNATURES:
+_____________________________
+Buyer
+
+_____________________________
+Supplier`,
+    tags: ['materials', 'supplier', 'contract']
+  },
+
+  // BID FORMS
+  {
+    category: 'bid_forms',
+    name: 'Bid Proposal Form',
+    description: 'Standard bid proposal submission form',
+    content: `BID PROPOSAL
+
+Project: [Project Name]
+Bidder: [Company Name]
+Date: [Submission Date]
+
+BASE BID AMOUNT: $[Amount]
+
+SCOPE INCLUDED:
+- [Item 1]
+- [Item 2]
+- [Item 3]
+
+EXCLUSIONS:
+- [Excluded item 1]
+- [Excluded item 2]
+
+ALTERNATES:
+Alternate #1: [Description] - $[Amount]
+Alternate #2: [Description] - $[Amount]
+
+PROJECT DURATION: [Number] days
+
+REFERENCES:
+1. [Reference Name] - [Contact Info]
+2. [Reference Name] - [Contact Info]
+
+LICENSE & BONDS:
+License #: [Number]
+Bond Amount: $[Amount]
+
+_____________________________
+Authorized Signature`,
+    tags: ['bid', 'proposal', 'submission']
+  },
+  {
+    category: 'bid_forms',
+    name: 'Unit Price Bid Schedule',
+    description: 'Unit price breakdown for bidding',
+    content: `UNIT PRICE BID SCHEDULE
+
+Project: [Project Name]
+Bidder: [Company Name]
+
+ITEM | DESCRIPTION | QUANTITY | UNIT | UNIT PRICE | TOTAL
+-----|-------------|----------|------|------------|-------
+1    | [Item]      | [Qty]    | [EA] | $[Price]   | $[Total]
+2    | [Item]      | [Qty]    | [SF] | $[Price]   | $[Total]
+3    | [Item]      | [Qty]    | [LF] | $[Price]   | $[Total]
+
+TOTAL BID AMOUNT: $[Total]
+
+Notes: [Any clarifications]
+
+_____________________________
+Signature`,
+    tags: ['bid', 'pricing', 'unit-price']
+  },
+
+  // SAFETY
+  {
+    category: 'safety',
+    name: 'Daily Safety Inspection Checklist',
+    description: 'Comprehensive daily safety inspection form',
+    content: `DAILY SAFETY INSPECTION
+
+Date: [Date]
+Project: [Project Name]
+Inspector: [Name]
+
+☐ All workers wearing hard hats
+☐ Safety glasses in use where required
+☐ Proper footwear worn by all personnel
+☐ Fall protection in place for work above 6 feet
+☐ Scaffolding inspected and tagged
+☐ Ladders in good condition
+☐ Fire extinguishers accessible and charged
+☐ First aid kit stocked and accessible
+☐ Emergency exits clear
+☐ Electrical cords and tools inspected
+☐ Housekeeping adequate (clean work area)
+☐ Material storage safe and organized
+☐ Heavy equipment inspected before use
+☐ Trenches properly shored or sloped
+☐ All MSDS sheets available
+
+HAZARDS IDENTIFIED:
+[List any hazards found]
+
+CORRECTIVE ACTIONS TAKEN:
+[Actions taken]
+
+Inspector Signature: _____________________________`,
+    tags: ['safety', 'inspection', 'daily']
+  },
+  {
+    category: 'safety',
+    name: 'Incident Report Form',
+    description: 'Report form for safety incidents',
+    content: `INCIDENT REPORT
+
+Date/Time of Incident: [Date/Time]
+Location: [Specific location]
+Project: [Project Name]
+
+INJURED PERSON:
+Name: [Name]
+Position: [Title]
+Contact: [Phone]
+
+INCIDENT DESCRIPTION:
+[Detailed description of what happened]
+
+WITNESSES:
+1. [Name] - [Contact]
+2. [Name] - [Contact]
+
+INJURY TYPE:
+☐ Minor (First Aid)
+☐ Medical Treatment
+☐ Lost Time
+☐ Property Damage Only
+
+BODY PART AFFECTED: [Part]
+
+IMMEDIATE ACTIONS TAKEN:
+[Actions taken]
+
+ROOT CAUSE:
+[Analysis of cause]
+
+CORRECTIVE MEASURES:
+[Steps to prevent recurrence]
+
+Reported by: _____________________________ Date: _______`,
+    tags: ['safety', 'incident', 'report']
+  },
+
+  // PUNCH LISTS
+  {
+    category: 'punch_lists',
+    name: 'Final Punch List',
+    description: 'Comprehensive project completion punch list',
+    content: `FINAL PUNCH LIST
+
+Project: [Project Name]
+Date: [Date]
+Inspector: [Name]
+
+ITEM | LOCATION | DESCRIPTION | RESPONSIBLE | STATUS | COMPLETED
+-----|----------|-------------|-------------|--------|----------
+1    | [Room]   | [Issue]     | [Trade]     | Open   | ________
+2    | [Room]   | [Issue]     | [Trade]     | Open   | ________
+3    | [Room]   | [Issue]     | [Trade]     | Open   | ________
+
+NOTES:
+[Any additional notes]
+
+All items must be completed before final payment.
+
+Inspector: _____________________________
+
+Contractor: _____________________________`,
+    tags: ['punch-list', 'completion', 'quality']
+  },
+
+  // SCHEDULES
+  {
+    category: 'schedules',
+    name: 'Project Schedule Template',
+    description: 'Master project schedule with phases',
+    content: `PROJECT SCHEDULE
+
+Project: [Project Name]
+Start Date: [Date]
+End Date: [Date]
+
+PHASE | DESCRIPTION | START | END | DURATION | STATUS
+------|-------------|-------|-----|----------|--------
+1     | Mobilization| [Date]| [Date]| [Days] | Planned
+2     | Site Work   | [Date]| [Date]| [Days] | Planned
+3     | Foundation  | [Date]| [Date]| [Days] | Planned
+4     | Framing     | [Date]| [Date]| [Days] | Planned
+5     | MEP Rough-In| [Date]| [Date]| [Days] | Planned
+6     | Drywall     | [Date]| [Date]| [Days] | Planned
+7     | Finishes    | [Date]| [Date]| [Days] | Planned
+8     | Final       | [Date]| [Date]| [Days] | Planned
+
+MILESTONES:
+- [Milestone 1]: [Date]
+- [Milestone 2]: [Date]
+
+CRITICAL PATH ITEMS:
+[List critical items]`,
+    tags: ['schedule', 'timeline', 'planning']
+  },
+
+  // EQUIPMENT LOGS
+  {
+    category: 'equipment_logs',
+    name: 'Equipment Inspection Log',
+    description: 'Daily equipment inspection and maintenance log',
+    content: `EQUIPMENT INSPECTION LOG
+
+Equipment ID: [ID Number]
+Type: [Equipment Type]
+Make/Model: [Make/Model]
+Date: [Date]
+Inspector: [Name]
+
+PRE-USE INSPECTION:
+☐ Fluid levels checked (oil, hydraulic, coolant)
+☐ Tires/tracks in good condition
+☐ All safety devices functional
+☐ No visible damage or leaks
+☐ Controls operate properly
+☐ Backup alarm working
+☐ Lights functional
+☐ Fire extinguisher present
+☐ Warning decals visible
+
+OPERATING HOURS:
+Start: [Hours]
+End: [Hours]
+Total Daily: [Hours]
+
+ISSUES FOUND:
+[List any issues]
+
+MAINTENANCE PERFORMED:
+[List maintenance]
+
+Equipment Status: ☐ OK to Use  ☐ Needs Repair
+
+Inspector Signature: _____________________________`,
+    tags: ['equipment', 'inspection', 'maintenance']
+  },
+
+  // RFI FORMS
+  {
+    category: 'rfi_forms',
+    name: 'Request for Information (RFI)',
+    description: 'Standard RFI form for clarifications',
+    content: `REQUEST FOR INFORMATION
+
+RFI Number: [Number]
+Project: [Project Name]
+Date: [Date]
+From: [Submitter Name/Company]
+To: [Recipient Name]
+
+SUBJECT: [Brief subject line]
+
+REFERENCE:
+Drawing: [Drawing Number]
+Specification Section: [Section]
+Detail: [Detail Reference]
+
+QUESTION:
+[Detailed question or clarification needed]
+
+IMPACT:
+☐ Schedule Impact
+☐ Cost Impact  
+☐ Safety Issue
+☐ Information Only
+
+REQUESTED RESPONSE DATE: [Date]
+
+PROPOSED SOLUTION (if applicable):
+[Your proposed solution]
+
+Submitted by: _____________________________ Date: _______
+
+---RESPONSE---
+Response Date: [Date]
+Response by: [Name]
+
+ANSWER:
+[Detailed response]
+
+Approved by: _____________________________ Date: _______`,
+    tags: ['rfi', 'communication', 'clarification']
+  },
+
+  // SUBMITTALS
+  {
+    category: 'submittals',
+    name: 'Submittal Transmittal Form',
+    description: 'Form for submitting materials and shop drawings',
+    content: `SUBMITTAL TRANSMITTAL
+
+Submittal Number: [Number]
+Project: [Project Name]
+Date: [Date]
+From: [Contractor/Subcontractor]
+To: [Architect/Engineer]
+
+SPECIFICATION SECTION: [Section Number]
+
+ITEM DESCRIPTION:
+[Detailed description of submittal]
+
+TYPE:
+☐ Shop Drawings
+☐ Product Data
+☐ Samples
+☐ Design Data
+☐ Test Reports
+☐ Other: _____________
+
+SUBMITTAL INCLUDES:
+[List of documents/items included]
+
+REVIEW REQUESTED BY: [Date]
+
+☐ APPROVAL REQUESTED
+☐ FOR INFORMATION ONLY
+☐ RESUBMITTAL
+
+Submitted by: _____________________________ Date: _______
+
+---REVIEW---
+☐ APPROVED
+☐ APPROVED AS NOTED
+☐ REVISE AND RESUBMIT
+☐ REJECTED
+
+Reviewer Comments:
+[Comments]
+
+Reviewed by: _____________________________ Date: _______`,
+    tags: ['submittal', 'approval', 'materials']
+  },
+
+  // DAILY LOGS
+  {
+    category: 'daily_logs',
+    name: 'Daily Construction Report',
+    description: 'Comprehensive daily site activity log',
+    content: `DAILY CONSTRUCTION REPORT
+
+Project: [Project Name]
+Date: [Date]
+Report by: [Name]
+
+WEATHER:
+Morning: [Conditions] Temp: [Temp]
+Afternoon: [Conditions] Temp: [Temp]
+
+WORKFORCE ON SITE:
+Contractor: [Number] workers
+Subcontractors:
+- [Trade]: [Number] workers
+- [Trade]: [Number] workers
+
+WORK PERFORMED TODAY:
+[Detailed description of work completed]
+
+EQUIPMENT ON SITE:
+- [Equipment type] - [Hours used]
+- [Equipment type] - [Hours used]
+
+MATERIALS DELIVERED:
+- [Material] - [Quantity]
+- [Material] - [Quantity]
+
+VISITORS TO SITE:
+- [Name] - [Company] - [Purpose]
+
+DELAYS/ISSUES:
+[Any delays or problems encountered]
+
+SAFETY INCIDENTS:
+☐ None
+☐ See incident report #[Number]
+
+PHOTOS TAKEN: ☐ Yes ☐ No
+
+PLANS FOR TOMORROW:
+[Description of planned work]
+
+Superintendent Signature: _____________________________`,
+    tags: ['daily-log', 'site-report', 'documentation']
+  },
+
+  // CHANGE ORDERS
+  {
+    category: 'change_orders',
+    name: 'Change Order Request',
+    description: 'Formal change order request form',
+    content: `CHANGE ORDER REQUEST
+
+Change Order Number: [Number]
+Project: [Project Name]
+Date: [Date]
+
+REASON FOR CHANGE:
+☐ Owner Request
+☐ Design Change
+☐ Unforeseen Conditions
+☐ Code Requirement
+☐ Value Engineering
+☐ Other: _____________
+
+DESCRIPTION OF CHANGE:
+[Detailed description]
+
+DRAWINGS/SPECS AFFECTED:
+[List affected documents]
+
+COST IMPACT:
+Labor: $[Amount]
+Materials: $[Amount]
+Equipment: $[Amount]
+Subcontractors: $[Amount]
+Overhead & Profit: $[Amount]
+TOTAL COST CHANGE: $[Amount]
+
+SCHEDULE IMPACT:
+Days Added/Removed: [Number] days
+New Completion Date: [Date]
+
+JUSTIFICATION:
+[Detailed justification for change]
+
+Requested by: _____________________________ Date: _______
+
+---APPROVAL---
+☐ APPROVED
+☐ REJECTED
+☐ REVISE AND RESUBMIT
+
+Approved by: _____________________________ Date: _______
+
+Owner Signature: _____________________________ Date: _______`,
+    tags: ['change-order', 'cost', 'schedule']
+  },
+
+  // CLOSEOUT
+  {
+    category: 'closeout',
+    name: 'Project Closeout Checklist',
+    description: 'Comprehensive project completion checklist',
+    content: `PROJECT CLOSEOUT CHECKLIST
+
+Project: [Project Name]
+Date: [Date]
+
+DOCUMENTATION:
+☐ All drawings updated to as-built
+☐ Operating & maintenance manuals submitted
+☐ Warranty documents collected
+☐ Equipment certifications provided
+☐ Training completed for owner's staff
+☐ Final punch list completed
+☐ Final payment application submitted
+☐ Certificate of occupancy obtained
+☐ Final lien waivers from all subs/suppliers
+
+INSPECTIONS:
+☐ Final building inspection passed
+☐ Fire marshal sign-off
+☐ Health department approval (if required)
+☐ Elevator inspection (if applicable)
+☐ All required testing completed
+
+ADMINISTRATIVE:
+☐ Final accounting complete
+☐ All change orders approved and closed
+☐ Photos of completed project taken
+☐ Keys and access cards transferred
+☐ Site cleaned and restored
+☐ Equipment demobilized
+☐ Temporary services disconnected
+
+OWNER TURNOVER:
+☐ Owner walk-through completed
+☐ Owner accepts project
+☐ Warranty period starts: [Date]
+
+Project Manager: _____________________________ Date: _______
+
+Owner Representative: _____________________________ Date: _______`,
+    tags: ['closeout', 'completion', 'turnover']
+  },
+
+  // INSPECTION REPORTS
+  {
+    category: 'inspection',
+    name: 'Quality Control Inspection',
+    description: 'Quality control inspection report',
+    content: `QUALITY CONTROL INSPECTION
+
+Project: [Project Name]
+Date: [Date]
+Inspector: [Name]
+Work Inspected: [Description]
+
+INSPECTION CRITERIA:
+☐ Work per plans and specifications
+☐ Proper materials used
+☐ Workmanship acceptable
+☐ Code compliance verified
+☐ Safety requirements met
+
+AREA/ELEMENT INSPECTED:
+[Specific location and scope]
+
+OBSERVATIONS:
+[Detailed findings]
+
+DEFICIENCIES NOTED:
+[List any deficiencies]
+
+CORRECTIVE ACTION REQUIRED:
+[Required corrections]
+
+PHOTOS: ☐ Attached
+
+RESULT:
+☐ APPROVED
+☐ APPROVED WITH COMMENTS
+☐ REJECTED - MUST CORRECT
+
+Inspector: _____________________________ Date: _______
+
+Contractor Acknowledgment: _____________________________ Date: _______`,
+    tags: ['inspection', 'quality', 'qc']
+  }
+];
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
-    if (user?.role !== 'admin') {
-      return Response.json({ error: 'Admin access required' }, { status: 403 });
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const categories = [
-      'contracts', 'bid_forms', 'safety', 'punch_lists', 'schedules',
-      'equipment_logs', 'rfi_forms', 'submittals', 'daily_logs',
-      'change_orders', 'closeout', 'inspection'
-    ];
-
-    const templates = [];
-
-    // Generate comprehensive templates for each category
-    const templatesByCategory = {
-      contracts: [
-        { name: 'General Construction Contract', desc: 'Standard construction services agreement' },
-        { name: 'Subcontractor Agreement', desc: 'Agreement for subcontracted work' },
-        { name: 'Material Supply Contract', desc: 'Contract for material suppliers' },
-        { name: 'Design-Build Contract', desc: 'Combined design and construction services' },
-        { name: 'Construction Management Agreement', desc: 'CM services contract' },
-        { name: 'Time and Materials Contract', desc: 'T&M basis construction contract' },
-        { name: 'Fixed Price Contract', desc: 'Lump sum construction contract' },
-        { name: 'Cost Plus Contract', desc: 'Cost reimbursement contract' },
-        { name: 'Unit Price Contract', desc: 'Per-unit pricing agreement' },
-        { name: 'Joint Venture Agreement', desc: 'Partnership for large projects' },
-        { name: 'Consulting Services Agreement', desc: 'Professional consulting contract' },
-        { name: 'Maintenance Service Contract', desc: 'Ongoing maintenance services' },
-        { name: 'Equipment Rental Agreement', desc: 'Construction equipment rental' },
-        { name: 'Labor Only Contract', desc: 'Labor services without materials' },
-        { name: 'Turnkey Construction Contract', desc: 'Complete project delivery' },
-        { name: 'Construction Bond', desc: 'Performance and payment bonds' },
-        { name: 'Warranty Agreement', desc: 'Construction warranty terms' },
-        { name: 'Non-Disclosure Agreement', desc: 'Confidentiality for construction projects' },
-        { name: 'Indemnity Agreement', desc: 'Hold harmless provisions' },
-        { name: 'Lien Waiver', desc: 'Release of mechanic\'s lien rights' },
-        { name: 'Conditional Payment Agreement', desc: 'Payment upon conditions met' },
-        { name: 'Letter of Intent', desc: 'Preliminary construction agreement' },
-        { name: 'Master Service Agreement', desc: 'Framework for multiple projects' },
-        { name: 'Purchase Order Template', desc: 'Standard PO for materials' },
-        { name: 'Demolition Contract', desc: 'Building demolition services' },
-        { name: 'Excavation Contract', desc: 'Site excavation and grading' },
-        { name: 'Concrete Work Contract', desc: 'Concrete pouring and finishing' },
-        { name: 'Electrical Contract', desc: 'Electrical installation services' },
-        { name: 'Plumbing Contract', desc: 'Plumbing installation and repair' },
-        { name: 'HVAC Contract', desc: 'Heating and cooling systems' },
-        { name: 'Roofing Contract', desc: 'Roof installation and repair' },
-        { name: 'Painting Contract', desc: 'Interior and exterior painting' },
-        { name: 'Flooring Contract', desc: 'Floor installation services' },
-        { name: 'Drywall Contract', desc: 'Drywall installation and finishing' },
-        { name: 'Framing Contract', desc: 'Structural framing services' },
-        { name: 'Foundation Contract', desc: 'Foundation construction' },
-        { name: 'Masonry Contract', desc: 'Brick and stone work' },
-        { name: 'Landscaping Contract', desc: 'Site landscaping services' },
-        { name: 'Paving Contract', desc: 'Asphalt and concrete paving' },
-        { name: 'Fencing Contract', desc: 'Fence installation services' },
-        { name: 'Window Installation Contract', desc: 'Window replacement and installation' },
-        { name: 'Door Installation Contract', desc: 'Door installation services' },
-        { name: 'Siding Contract', desc: 'Exterior siding installation' },
-        { name: 'Insulation Contract', desc: 'Building insulation services' },
-        { name: 'Waterproofing Contract', desc: 'Waterproofing and sealing' },
-        { name: 'Fire Protection Contract', desc: 'Fire suppression systems' },
-        { name: 'Security Systems Contract', desc: 'Security installation services' },
-        { name: 'Elevator Installation Contract', desc: 'Elevator systems' },
-        { name: 'Crane Rental Agreement', desc: 'Heavy equipment crane rental' },
-        { name: 'Scaffolding Contract', desc: 'Scaffolding rental and installation' },
-        { name: 'Site Security Contract', desc: 'Construction site security' },
-        { name: 'Waste Removal Contract', desc: 'Debris and waste hauling' },
-        { name: 'Environmental Remediation Contract', desc: 'Hazmat and cleanup' },
-        { name: 'Surveying Contract', desc: 'Land surveying services' },
-        { name: 'Testing and Inspection Contract', desc: 'Third-party testing' },
-        { name: 'Architectural Services Contract', desc: 'Design and planning' },
-        { name: 'Engineering Services Contract', desc: 'Structural engineering' },
-        { name: 'Geotechnical Services Contract', desc: 'Soil testing and analysis' },
-        { name: 'Traffic Control Contract', desc: 'Traffic management services' },
-        { name: 'Permit Expediting Contract', desc: 'Permit processing services' },
-        { name: 'Project Management Contract', desc: 'PM services agreement' },
-        { name: 'Construction Supervision Contract', desc: 'On-site supervision' },
-        { name: 'Quality Control Contract', desc: 'QA/QC services' },
-        { name: 'Value Engineering Contract', desc: 'Cost optimization services' },
-        { name: 'BIM Services Contract', desc: 'Building information modeling' },
-        { name: 'Commissioning Services Contract', desc: 'Systems commissioning' },
-        { name: 'Post-Construction Services', desc: 'Warranty and maintenance' },
-        { name: 'Emergency Repair Contract', desc: 'Emergency construction services' },
-        { name: 'Restoration Contract', desc: 'Building restoration services' },
-        { name: 'Renovation Contract', desc: 'Remodeling and renovation' },
-        { name: 'Addition Contract', desc: 'Building addition services' },
-        { name: 'ADA Compliance Contract', desc: 'Accessibility modifications' },
-        { name: 'Green Building Contract', desc: 'Sustainable construction' },
-        { name: 'Solar Installation Contract', desc: 'Solar panel installation' },
-        { name: 'Generator Installation Contract', desc: 'Backup power systems' },
-        { name: 'Data Center Construction Contract', desc: 'Specialized IT infrastructure' },
-        { name: 'Clean Room Construction Contract', desc: 'Controlled environment construction' },
-        { name: 'Healthcare Facility Contract', desc: 'Medical facility construction' },
-        { name: 'Educational Facility Contract', desc: 'School construction' },
-        { name: 'Industrial Construction Contract', desc: 'Manufacturing facilities' },
-        { name: 'Retail Build-Out Contract', desc: 'Commercial retail space' },
-        { name: 'Restaurant Construction Contract', desc: 'Food service facilities' },
-        { name: 'Hotel Construction Contract', desc: 'Hospitality construction' },
-        { name: 'Multi-Family Housing Contract', desc: 'Apartment construction' },
-        { name: 'Single-Family Home Contract', desc: 'Residential construction' },
-        { name: 'Custom Home Contract', desc: 'High-end custom homes' }
-      ],
-      bid_forms: [
-        { name: 'Bid Proposal Form', desc: 'Standard bid submission form' },
-        { name: 'Bid Bond Form', desc: 'Bid security bond' },
-        { name: 'Subcontractor Bid Form', desc: 'Sub-tier bidding form' },
-        { name: 'Unit Price Bid Schedule', desc: 'Per-unit pricing sheet' },
-        { name: 'Lump Sum Bid Form', desc: 'Fixed price proposal' },
-        { name: 'Alternate Bid Form', desc: 'Alternative pricing options' },
-        { name: 'Addendum Acknowledgment', desc: 'Confirm receipt of changes' },
-        { name: 'Bid Withdrawal Form', desc: 'Formal bid withdrawal' },
-        { name: 'Qualification Statement', desc: 'Bidder qualifications' },
-        { name: 'References Form', desc: 'Past project references' },
-        { name: 'Financial Statement Form', desc: 'Bidder financial capacity' },
-        { name: 'Insurance Certificate Form', desc: 'Required insurance proof' },
-        { name: 'Bonding Capacity Letter', desc: 'Surety bonding capacity' },
-        { name: 'Pre-Qualification Application', desc: 'Pre-bid qualification' },
-        { name: 'Bid Tabulation Sheet', desc: 'Compare multiple bids' },
-        { name: 'Scope of Work Acknowledgment', desc: 'Confirm understanding' },
-        { name: 'Equipment List Form', desc: 'Available equipment' },
-        { name: 'Personnel Qualifications', desc: 'Key staff credentials' },
-        { name: 'Safety Record Form', desc: 'Historical safety performance' },
-        { name: 'Schedule Commitment Form', desc: 'Proposed timeline' },
-        { name: 'Material Cost Breakdown', desc: 'Itemized material pricing' },
-        { name: 'Labor Cost Breakdown', desc: 'Labor hours and rates' },
-        { name: 'Subcontractor List', desc: 'Proposed subcontractors' },
-        { name: 'Value Engineering Proposal', desc: 'Cost-saving alternatives' },
-        { name: 'Bid Package Checklist', desc: 'Required documents list' },
-        { name: 'Non-Collusion Affidavit', desc: 'Independent bidding statement' },
-        { name: 'Small Business Certification', desc: 'SB/DBE/WBE status' },
-        { name: 'Equal Opportunity Form', desc: 'EEO compliance statement' },
-        { name: 'Prevailing Wage Acknowledgment', desc: 'Wage rate compliance' },
-        { name: 'Buy America Certification', desc: 'Domestic materials compliance' },
-        { name: 'Drug-Free Workplace Form', desc: 'Substance abuse policy' },
-        { name: 'Debarment Certification', desc: 'Not suspended/debarred' },
-        { name: 'Conflict of Interest Disclosure', desc: 'COI statement' },
-        { name: 'Joint Venture Agreement Form', desc: 'Partnership disclosure' },
-        { name: 'Payment and Performance Bond', desc: 'Surety bond form' },
-        { name: 'Consent of Surety', desc: 'Surety approval letter' },
-        { name: 'Power of Attorney', desc: 'Surety POA' },
-        { name: 'Bid Guarantee', desc: 'Bid security guarantee' },
-        { name: 'Letter of Credit', desc: 'Financial guarantee' },
-        { name: 'Certified Check Form', desc: 'Payment security' },
-        { name: 'Material Suppliers List', desc: 'Major supplier disclosure' },
-        { name: 'Equipment Rental Quotes', desc: 'Equipment cost backup' },
-        { name: 'Project Schedule', desc: 'Proposed construction schedule' },
-        { name: 'Site Logistics Plan', desc: 'Site management approach' },
-        { name: 'Quality Control Plan', desc: 'QC procedures' },
-        { name: 'Safety Management Plan', desc: 'Safety program overview' },
-        { name: 'Environmental Compliance Plan', desc: 'Environmental protection' },
-        { name: 'Warranty Form', desc: 'Proposed warranties' },
-        { name: 'Maintenance Plan', desc: 'Post-construction maintenance' },
-        { name: 'Training Plan', desc: 'Owner training program' },
-        { name: 'Commissioning Plan', desc: 'Systems startup approach' },
-        { name: 'Change Order Pricing', desc: 'CO markup rates' },
-        { name: 'Allowances Form', desc: 'Specified allowances' },
-        { name: 'Contingency Breakdown', desc: 'Contingency allocation' },
-        { name: 'Tax Exemption Form', desc: 'Sales tax exemption' },
-        { name: 'Progress Payment Schedule', desc: 'Proposed payment milestones' },
-        { name: 'Retainage Agreement', desc: 'Retention terms' },
-        { name: 'Mobilization Cost', desc: 'Mobilization pricing' },
-        { name: 'General Conditions Cost', desc: 'GC breakdown' },
-        { name: 'Overhead and Profit', desc: 'Markup disclosure' },
-        { name: 'Bonding Cost', desc: 'Bond premium breakdown' },
-        { name: 'Insurance Cost', desc: 'Insurance allocation' },
-        { name: 'Bid Shopping Prohibition', desc: 'No bid shopping agreement' },
-        { name: 'Bidder Information Sheet', desc: 'Company details' },
-        { name: 'Key Personnel Resumes', desc: 'Project team bios' },
-        { name: 'Project Experience List', desc: 'Similar project history' },
-        { name: 'Client Testimonials', desc: 'Reference letters' },
-        { name: 'Awards and Recognition', desc: 'Industry accolades' },
-        { name: 'Litigation History', desc: 'Legal disputes disclosure' },
-        { name: 'Bankruptcy Disclosure', desc: 'Financial history' },
-        { name: 'Change in Ownership', desc: 'Recent ownership changes' },
-        { name: 'Union Affiliation', desc: 'Labor agreements' },
-        { name: 'Apprenticeship Program', desc: 'Training initiatives' },
-        { name: 'Local Hiring Commitment', desc: 'Local workforce plan' },
-        { name: 'Sustainable Practices', desc: 'Green building approach' },
-        { name: 'Waste Management Plan', desc: 'Construction waste recycling' },
-        { name: 'Technology Implementation', desc: 'BIM/tech tools' },
-        { name: 'Communication Protocol', desc: 'Project communication plan' },
-        { name: 'Document Control Plan', desc: 'Records management' },
-        { name: 'Submittal Schedule', desc: 'Proposed submittal timeline' },
-        { name: 'RFI Response Protocol', desc: 'RFI management approach' }
-      ]
-    };
-
-    // Generate 100+ templates per category
-    for (const category of categories) {
-      const baseTemplates = templatesByCategory[category] || [];
-      
-      for (let i = 0; i < baseTemplates.length; i++) {
-        const template = baseTemplates[i];
-        templates.push({
-          category,
-          name: template.name,
-          description: template.desc,
-          content: generateTemplateContent(category, template.name, template.desc),
-          tags: generateTags(category),
-          is_active: true,
-          usage_count: 0
-        });
-      }
+    // Check if templates already exist
+    const existing = await base44.entities.TemplateLibrary.list();
+    if (existing.length > 50) {
+      return Response.json({ 
+        message: 'Templates already generated',
+        count: existing.length 
+      });
     }
 
-    // Create all templates in batches
-    const batchSize = 50;
-    let created = 0;
-    
-    for (let i = 0; i < templates.length; i += batchSize) {
-      const batch = templates.slice(i, i + batchSize);
-      await base44.asServiceRole.entities.TemplateLibrary.bulkCreate(batch);
-      created += batch.length;
+    // Create all templates
+    const created = [];
+    for (const template of TEMPLATES) {
+      const t = await base44.entities.TemplateLibrary.create({
+        ...template,
+        usage_count: 0
+      });
+      created.push(t);
     }
 
-    return Response.json({ 
-      success: true, 
-      created,
-      message: `Successfully created ${created} templates across ${categories.length} categories`
+    return Response.json({
+      success: true,
+      message: `Generated ${created.length} professional templates`,
+      count: created.length
     });
   } catch (error) {
     console.error('Template generation error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
-
-function generateTemplateContent(category, name, description) {
-  return `[${name.toUpperCase()}]
-
-${description}
-
-Date: [Date]
-Project: [Project Name]
-Location: [Project Location]
-Contractor: [Contractor Name]
-
----
-
-1. PROJECT INFORMATION
-   - Project Number: [Project ID]
-   - Contract Value: [Contract Amount]
-   - Start Date: [Start Date]
-   - Completion Date: [End Date]
-
-2. SCOPE OF WORK
-   [Detailed scope description]
-
-3. SPECIFICATIONS
-   [Technical specifications]
-
-4. REQUIREMENTS
-   - Compliance with all local codes and regulations
-   - Quality standards as specified
-   - Safety protocols strictly enforced
-
-5. DELIVERABLES
-   [List of project deliverables]
-
-6. TIMELINE
-   [Project schedule and milestones]
-
-7. SIGNATURES
-   Contractor: _________________________ Date: _______
-   Owner: _________________________ Date: _______
-   Witness: _________________________ Date: _______
-
----
-
-This is a standardized template for ${category.replace('_', ' ')} documentation.
-Customize as needed for your specific project requirements.
-`;
-}
-
-function generateTags(category) {
-  const tagMap = {
-    contracts: ['legal', 'agreement', 'standard'],
-    bid_forms: ['bidding', 'proposal', 'pricing'],
-    safety: ['osha', 'compliance', 'safety'],
-    punch_lists: ['closeout', 'inspection', 'quality'],
-    schedules: ['timeline', 'planning', 'critical-path'],
-    equipment_logs: ['maintenance', 'equipment', 'tracking'],
-    rfi_forms: ['clarification', 'communication', 'design'],
-    submittals: ['approval', 'materials', 'specification'],
-    daily_logs: ['documentation', 'progress', 'daily'],
-    change_orders: ['changes', 'pricing', 'scope'],
-    closeout: ['completion', 'warranty', 'final'],
-    inspection: ['quality', 'compliance', 'testing']
-  };
-  return tagMap[category] || ['general', 'construction'];
-}

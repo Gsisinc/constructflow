@@ -247,7 +247,10 @@ export default function BidDetail() {
           <BidUploader 
             bidId={bid.id} 
             organizationId={user.organization_id}
-            onUploadComplete={() => queryClient.invalidateQueries({ queryKey: ['bidDocuments'] })}
+            onUploadComplete={() => {
+              queryClient.invalidateQueries({ queryKey: ['bidDocuments'] });
+              queryClient.invalidateQueries({ queryKey: ['bid'] });
+            }}
           />
           
           {documents.length > 0 && (
