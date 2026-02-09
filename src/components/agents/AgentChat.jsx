@@ -47,11 +47,14 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   useEffect(() => {
     // Scroll to bottom when messages update
     if (chatContainerRef.current) {
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         if (chatContainerRef.current) {
-          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+          chatContainerRef.current.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
         }
-      });
+      }, 100);
     }
   }, [messages.length]);
 
@@ -464,7 +467,8 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         </div>
       </CardHeader>
 
-      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6" style={{maxHeight: 'calc(100% - 140px)'}}>
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 flex flex-col-reverse" style={{maxHeight: 'calc(100% - 140px)'}}>
+        <div>
           {/* History Toggle - Only show if there are messages */}
           {messages.length > 2 && (
             <Collapsible open={showHistory} onOpenChange={setShowHistory} className="mb-4">
@@ -533,6 +537,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
               </div>
             )}
           </div>
+        </div>
       </div>
 
       {/* Input */}
