@@ -83,11 +83,15 @@ Be thorough and extract as much useful information as possible.`,
         console.log('AI analysis complete:', aiResult);
         toast.success('✅ AI extracted ' + (aiResult.requirements?.length || 0) + ' requirements');
 
-        // Update document with extracted data
+        // Update document with extracted data - flatten requirements to strings
         console.log('Updating document with AI results...');
         await base44.entities.BidDocument.update(doc.id, {
           ai_processed: true,
-          extracted_data: aiResult
+          extracted_data: {
+            requirements: aiResult.requirements?.map(r => r.text) || [],
+            deadlines: aiResult.deadlines || [],
+            key_points: aiResult.key_points || []
+          }
         });
 
         // Create requirement records
