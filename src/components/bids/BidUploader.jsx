@@ -41,9 +41,9 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
       setProcessing(true);
       toast.info('🤖 AI analyzing document...');
 
-      // AI processing
+      // AI processing - with better error handling
       try {
-        console.log('Starting AI analysis...');
+        console.log('Starting AI analysis with file:', file_url);
         const aiResult = await base44.integrations.Core.InvokeLLM({
           prompt: `Analyze this bid/RFP document thoroughly and extract:
 
