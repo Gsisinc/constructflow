@@ -301,7 +301,7 @@ export default function Layout({ children, currentPageName }) {
           {/* Logo */}
               <div className="h-16 flex items-center gap-3 px-6 border-b border-amber-100/50 bg-gradient-to-r from-white to-amber-50/30">
                 {organization?.logo_url ? (
-                  <img src={organization.logo_url} alt={organization.name} className="h-30 w-auto" />
+                  <img src={organization.logo_url} alt={organization.name} className="h-32 w-auto" />
                 ) : (
                   <>
                     <img 
