@@ -301,13 +301,13 @@ export default function Layout({ children, currentPageName }) {
           {/* Logo */}
               <div className="h-16 flex items-center gap-3 px-6 border-b border-amber-100/50 bg-gradient-to-r from-white to-amber-50/30">
                 {organization?.logo_url ? (
-                  <img src={organization.logo_url} alt={organization.name} className="h-10 w-auto" />
+                  <img src={organization.logo_url} alt={organization.name} className="h-30 w-auto" />
                 ) : (
                   <>
                     <img 
                       src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
                       alt="GSIS Manager" 
-                      className="h-8 w-auto"
+                      className="h-24 w-auto"
                     />
                     <span className="font-bold text-lg text-slate-900 tracking-tight hidden sm:inline">{organization?.name || 'GSIS'}</span>
                   </>
