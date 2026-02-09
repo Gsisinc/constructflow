@@ -1,441 +1,451 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import EmptyState from '../components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Progress } from '@/components/ui/progress';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Search, FileText, Calendar, DollarSign, TrendingUp, Loader2 } from 'lucide-react';
+import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 
 const statusColors = {
-  draft: 'bg-slate-50 text-slate-700 border-slate-200',
-  submitted: 'bg-blue-50 text-blue-700 border-blue-200',
-  under_review: 'bg-amber-50 text-amber-700 border-amber-200',
-  won: 'bg-green-50 text-green-700 border-green-200',
-  lost: 'bg-red-50 text-red-700 border-red-200',
-  withdrawn: 'bg-slate-50 text-slate-500 border-slate-200',
+  new: 'bg-blue-100 text-blue-800',
+  analyzing: 'bg-purple-100 text-purple-800',
+  estimating: 'bg-yellow-100 text-yellow-800',
+  submitted: 'bg-green-100 text-green-800',
+  won: 'bg-emerald-100 text-emerald-800',
+  lost: 'bg-red-100 text-red-800',
+  declined: 'bg-slate-100 text-slate-800',
+  active: 'bg-blue-100 text-blue-800',
+  closing_soon: 'bg-orange-100 text-orange-800',
+  upcoming: 'bg-cyan-100 text-cyan-800'
 };
 
-const STATUSES = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'submitted', label: 'Submitted' },
-  { value: 'under_review', label: 'Under Review' },
-  { value: 'won', label: 'Won' },
-  { value: 'lost', label: 'Lost' },
-  { value: 'withdrawn', label: 'Withdrawn' },
-];
+const bidStatuses = ['All', 'new', 'analyzing', 'estimating', 'submitted', 'won', 'lost', 'declined'];
 
 export default function Bids() {
-  const [showForm, setShowForm] = useState(false);
+  const [user, setUser] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showDialog, setShowDialog] = useState(false);
   const [editingBid, setEditingBid] = useState(null);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const userData = await base44.auth.me();
+      setUser(userData);
+    };
+    loadUser();
+  }, []);
 
   const { data: bids = [], isLoading } = useQuery({
-    queryKey: ['bids'],
-    queryFn: () => base44.entities.Bid.list('-created_date'),
+    queryKey: ['bids', user?.organization_id],
+    queryFn: () => base44.entities.BidOpportunity.filter({ 
+      organization_id: user.organization_id 
+    }),
+    enabled: !!user?.organization_id
   });
 
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Bid.create(data),
+  const createBidMutation = useMutation({
+    mutationFn: (data) => base44.entities.BidOpportunity.create({ 
+      ...data, 
+      organization_id: user.organization_id 
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
-      setShowForm(false);
+      setShowDialog(false);
       setEditingBid(null);
-    },
+      toast.success('Bid saved');
+    }
   });
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Bid.update(id, data),
+  const updateBidMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.BidOpportunity.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
-      setShowForm(false);
+      setShowDialog(false);
       setEditingBid(null);
-    },
+      toast.success('Bid updated');
+    }
+  });
+
+  const deleteBidMutation = useMutation({
+    mutationFn: (id) => base44.entities.BidOpportunity.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bids'] });
+      toast.success('Bid deleted');
+    }
   });
 
   const filteredBids = bids.filter((bid) => {
-    const matchesSearch =
-      bid.rfp_name?.toLowerCase().includes(search.toLowerCase()) ||
-      bid.client_name?.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || bid.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesStatus = statusFilter === 'All' || bid.status === statusFilter;
+    const matchesSearch = 
+      bid.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      bid.project_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      bid.client_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      bid.agency?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesStatus && matchesSearch;
   });
 
-  const wonBids = bids.filter(b => b.status === 'won');
-  const totalBidValue = bids.reduce((sum, b) => sum + (b.bid_amount || 0), 0);
-  const wonValue = wonBids.reduce((sum, b) => sum + (b.bid_amount || 0), 0);
-  const winRate = bids.filter(b => ['won', 'lost'].includes(b.status)).length > 0
-    ? (wonBids.length / bids.filter(b => ['won', 'lost'].includes(b.status)).length * 100).toFixed(0)
-    : 0;
+  const stats = {
+    total: bids.length,
+    won: bids.filter(b => b.status === 'won').length,
+    active: bids.filter(b => ['new', 'analyzing', 'estimating', 'submitted'].includes(b.status)).length,
+    value: bids.reduce((sum, b) => sum + (b.estimated_value || 0), 0)
+  };
+
+  if (isLoading || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Bids</h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Track and manage your bid proposals</p>
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
+            <FileText className="h-8 w-8 text-amber-600" />
+            Bid Intelligence Center
+          </h1>
+          <p className="text-slate-600 mt-1">AI-powered bid management & conversion</p>
         </div>
-        <Button onClick={() => { setEditingBid(null); setShowForm(true); }} className="bg-amber-600 hover:bg-amber-700 min-h-[44px] select-none text-sm sm:text-base">
-          <Plus className="h-4 w-4 mr-1.5 sm:mr-2" />
-          <span className="hidden sm:inline">New Bid</span>
-          <span className="sm:hidden">New</span>
-        </Button>
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogTrigger asChild>
+            <Button 
+              onClick={() => setEditingBid(null)}
+              className="gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+            >
+              <Plus className="h-5 w-5" />
+              New Bid
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <BidForm 
+              bid={editingBid} 
+              onSubmit={(data) => {
+                if (editingBid) {
+                  updateBidMutation.mutate({ id: editingBid.id, data });
+                } else {
+                  createBidMutation.mutate(data);
+                }
+              }} 
+            />
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <div className="bg-white rounded-lg sm:rounded-xl border border-amber-100 p-3 sm:p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm text-slate-600">Total Pipeline</p>
-              <p className="text-lg sm:text-2xl font-semibold mt-0.5 sm:mt-1">${totalBidValue.toLocaleString()}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <Card className="border-amber-100">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Total Bids</p>
+                <p className="text-2xl font-bold mt-1">{stats.total}</p>
+              </div>
+              <FileText className="h-10 w-10 text-amber-600" />
             </div>
-            <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-blue-100">
-              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+          </CardContent>
+        </Card>
+        <Card className="border-green-100">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Won</p>
+                <p className="text-2xl font-bold mt-1 text-green-600">{stats.won}</p>
+              </div>
+              <TrendingUp className="h-10 w-10 text-green-600" />
             </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg sm:rounded-xl border border-amber-100 p-3 sm:p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm text-slate-600">Won Value</p>
-              <p className="text-lg sm:text-2xl font-semibold mt-0.5 sm:mt-1 text-green-600">${wonValue.toLocaleString()}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-blue-100">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Active</p>
+                <p className="text-2xl font-bold mt-1 text-blue-600">{stats.active}</p>
+              </div>
+              <Calendar className="h-10 w-10 text-blue-600" />
             </div>
-            <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-green-100">
-              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+          </CardContent>
+        </Card>
+        <Card className="border-purple-100">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Total Value</p>
+                <p className="text-xl font-bold mt-1 text-purple-600">
+                  ${(stats.value / 1000000).toFixed(1)}M
+                </p>
+              </div>
+              <DollarSign className="h-10 w-10 text-purple-600" />
             </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg sm:rounded-xl border border-amber-100 p-3 sm:p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm text-slate-600">Win Rate</p>
-              <p className="text-lg sm:text-2xl font-semibold mt-0.5 sm:mt-1">{winRate}%</p>
-            </div>
-            <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-purple-100">
-              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Search bids..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 text-sm min-h-[44px]"
-          />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48 text-sm min-h-[44px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            {STATUSES.map(s => (
-              <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <Card className="border-amber-100">
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search bids..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2 overflow-x-auto">
+              {bidStatuses.map((status) => (
+                <Button
+                  key={status}
+                  variant={statusFilter === status ? 'default' : 'outline'}
+                  onClick={() => setStatusFilter(status)}
+                  className={statusFilter === status ? 'bg-amber-600 hover:bg-amber-700' : ''}
+                  size="sm"
+                >
+                  {status}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Bids List - Mobile Card Layout / Desktop Table */}
-      {isLoading ? (
-        <div className="space-y-3 sm:space-y-4">
-          {Array(5).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-20 sm:h-16 rounded-lg sm:rounded-xl" />
-          ))}
-        </div>
-      ) : filteredBids.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title={search || statusFilter !== 'all' ? 'No bids found' : 'No bids yet'}
-          description="Start tracking your bid proposals"
-          actionLabel={!search && statusFilter === 'all' ? 'Create Bid' : null}
-          onAction={() => setShowForm(true)}
-        />
-      ) : (
-        <>
-          {/* Mobile Card View */}
-          <div className="sm:hidden space-y-2">
-            {filteredBids.map((bid) => (
-              <div
-                key={bid.id}
-                className="bg-white rounded-lg border border-amber-100 p-2.5 cursor-pointer hover:bg-amber-50 transition-colors active:bg-amber-100"
-                onClick={() => { setEditingBid(bid); setShowForm(true); }}
-              >
-                <div className="space-y-1.5">
-                  <div className="flex items-start justify-between gap-1.5">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-xs font-semibold text-slate-900 line-clamp-2">{bid.rfp_name}</h3>
-                      <p className="text-xs text-slate-600 mt-0.5 truncate">{bid.client_name}</p>
+      {/* Bids List */}
+      <div className="space-y-3">
+        {filteredBids.length === 0 ? (
+          <EmptyState
+            icon={FileText}
+            title="No bids found"
+            description={statusFilter === 'All' ? 'Create your first bid to get started' : `No ${statusFilter} bids`}
+            actionLabel="Create Bid"
+            onAction={() => {
+              setEditingBid(null);
+              setShowDialog(true);
+            }}
+          />
+        ) : (
+          filteredBids.map((bid) => (
+            <Card 
+              key={bid.id} 
+              className="hover:shadow-lg transition-all cursor-pointer group border-amber-100"
+              onClick={() => navigate(createPageUrl('BidDetail') + `?id=${bid.id}`)}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-start gap-2 mb-2">
+                      <h3 className="font-semibold text-lg text-slate-900 group-hover:text-amber-600 transition-colors">
+                        {bid.title || bid.project_name}
+                      </h3>
+                      {bid.ai_analysis && (
+                        <Sparkles className="h-4 w-4 text-purple-600 mt-1" />
+                      )}
                     </div>
-                    <Badge className={cn("border flex-shrink-0 text-xs py-0.5 px-1.5", statusColors[bid.status])}>
-                      {bid.status?.split('_')[0]}
-                    </Badge>
-                  </div>
-                  <div className="grid grid-cols-3 gap-1.5 text-xs">
-                    <div>
-                      <p className="text-slate-500 text-xs">Amount</p>
-                      <p className="font-semibold text-slate-900 truncate">${((bid.bid_amount || 0) / 1000).toFixed(0)}K</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500 text-xs">Date</p>
-                      <p className="font-semibold text-slate-900">
-                        {bid.due_date ? format(new Date(bid.due_date), 'MMM d') : '-'}
+                    <p className="text-sm text-slate-600">
+                      {bid.client_name || bid.agency}
+                    </p>
+                    {bid.description && (
+                      <p className="text-sm text-slate-500 mt-2 line-clamp-2">
+                        {bid.description}
                       </p>
+                    )}
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      <Badge className={statusColors[bid.status]}>
+                        {bid.status}
+                      </Badge>
+                      {bid.due_date && (
+                        <Badge variant="outline">
+                          Due: {format(new Date(bid.due_date), 'MMM d')}
+                        </Badge>
+                      )}
+                      {bid.estimated_value && (
+                        <Badge variant="outline" className="bg-green-50">
+                          ${(bid.estimated_value / 1000).toFixed(0)}K
+                        </Badge>
+                      )}
+                      {bid.win_probability && (
+                        <Badge variant="outline" className="bg-blue-50">
+                          {bid.win_probability}% win
+                        </Badge>
+                      )}
                     </div>
-                    <div>
-                      <p className="text-slate-500 text-xs">Win %</p>
-                      <p className="font-semibold text-slate-900">{bid.win_probability || '-'}%</p>
-                    </div>
+                  </div>
+                  <div className="flex gap-2 ml-4">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="group-hover:opacity-100 opacity-0 transition-opacity"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Desktop Table View */}
-          <div className="hidden sm:block bg-white rounded-xl border border-amber-100 overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-amber-100">
-                  <TableHead className="text-xs">RFP Name</TableHead>
-                  <TableHead className="text-xs">Client</TableHead>
-                  <TableHead className="text-xs">Amount</TableHead>
-                  <TableHead className="text-xs">Due Date</TableHead>
-                  <TableHead className="text-xs">Win Prob.</TableHead>
-                  <TableHead className="text-xs">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredBids.map((bid) => (
-                  <TableRow
-                    key={bid.id}
-                    className="cursor-pointer hover:bg-amber-50 text-sm"
-                    onClick={() => { setEditingBid(bid); setShowForm(true); }}
-                  >
-                    <TableCell className="font-medium max-w-xs truncate">{bid.rfp_name}</TableCell>
-                    <TableCell className="text-xs">{bid.client_name}</TableCell>
-                    <TableCell className="text-sm font-medium">${(bid.bid_amount || 0).toLocaleString()}</TableCell>
-                    <TableCell className="text-xs">
-                      {bid.due_date && (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3 text-slate-400" />
-                          {format(new Date(bid.due_date), 'MMM d')}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {bid.win_probability && (
-                        <div className="flex items-center gap-2">
-                          <Progress value={bid.win_probability} className="w-12 h-1" />
-                          <span className="text-xs font-semibold">{bid.win_probability}%</span>
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={cn("border text-xs", statusColors[bid.status])}>
-                        {bid.status?.replace('_', ' ')}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </>
-      )}
-
-      {/* Bid Form Dialog */}
-      <BidFormDialog
-        open={showForm}
-        onOpenChange={(open) => { setShowForm(open); if (!open) setEditingBid(null); }}
-        bid={editingBid}
-        projects={projects}
-        onSubmit={(data) => {
-          if (editingBid) {
-            updateMutation.mutate({ id: editingBid.id, data });
-          } else {
-            createMutation.mutate(data);
-          }
-        }}
-        loading={createMutation.isPending || updateMutation.isPending}
-      />
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
     </div>
   );
 }
 
-function BidFormDialog({ open, onOpenChange, bid, projects, onSubmit, loading }) {
+function BidForm({ bid, onSubmit }) {
   const [formData, setFormData] = useState(bid || {
-    rfp_name: '',
+    title: '',
+    project_name: '',
     client_name: '',
-    project_id: '',
-    status: 'draft',
-    bid_amount: '',
+    agency: '',
+    status: 'new',
+    estimated_value: '',
     due_date: '',
-    win_probability: '',
-    notes: '',
+    description: '',
+    scope_of_work: '',
+    location: '',
+    url: '',
+    win_probability: 50
   });
 
-  React.useEffect(() => {
-    if (bid) {
-      setFormData(bid);
-    } else {
-      setFormData({
-        rfp_name: '',
-        client_name: '',
-        project_id: '',
-        status: 'draft',
-        bid_amount: '',
-        due_date: '',
-        win_probability: '',
-        notes: '',
-      });
-    }
-  }, [bid]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({
-      ...formData,
-      bid_amount: formData.bid_amount ? parseFloat(formData.bid_amount) : null,
-      win_probability: formData.win_probability ? parseFloat(formData.win_probability) : null,
-    });
-  };
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{bid ? 'Edit Bid' : 'New Bid'}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label>RFP Name *</Label>
-            <Input
-              value={formData.rfp_name}
-              onChange={(e) => setFormData({ ...formData, rfp_name: e.target.value })}
-              placeholder="Enter RFP name"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Client Name *</Label>
-            <Input
-              value={formData.client_name}
-              onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
-              placeholder="Enter client name"
-              required
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Bid Amount ($)</Label>
-              <Input
-                type="number"
-                value={formData.bid_amount}
-                onChange={(e) => setFormData({ ...formData, bid_amount: e.target.value })}
-                placeholder="0.00"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUSES.map(s => (
-                    <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Due Date</Label>
-              <Input
-                type="date"
-                value={formData.due_date}
-                onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Win Probability (%)</Label>
-              <Input
-                type="number"
-                min="0"
-                max="100"
-                value={formData.win_probability}
-                onChange={(e) => setFormData({ ...formData, win_probability: e.target.value })}
-                placeholder="0-100"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Notes</Label>
-            <Textarea
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Additional notes..."
-              rows={3}
-            />
-          </div>
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading || !formData.rfp_name || !formData.client_name} className="bg-slate-900 hover:bg-slate-800">
-              {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {bid ? 'Update' : 'Create'} Bid
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>{bid ? 'Edit Bid' : 'Create New Bid'}</DialogTitle>
+      </DialogHeader>
+      <div>
+        <label className="text-sm font-semibold">Bid Title *</label>
+        <Input
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          placeholder="Brief title for this opportunity"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-semibold">Project Name</label>
+        <Input
+          value={formData.project_name}
+          onChange={(e) => setFormData({ ...formData, project_name: e.target.value })}
+          placeholder="Official project name"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-semibold">Client Name</label>
+          <Input
+            value={formData.client_name}
+            onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
+            placeholder="Client"
+          />
+        </div>
+        <div>
+          <label className="text-sm font-semibold">Agency</label>
+          <Input
+            value={formData.agency}
+            onChange={(e) => setFormData({ ...formData, agency: e.target.value })}
+            placeholder="Issuing agency"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="text-sm font-semibold">Description</label>
+        <Textarea
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Brief description..."
+          className="h-20"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-semibold">Scope of Work</label>
+        <Textarea
+          value={formData.scope_of_work}
+          onChange={(e) => setFormData({ ...formData, scope_of_work: e.target.value })}
+          placeholder="Detailed scope..."
+          className="h-24"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-semibold">Status</label>
+          <select
+            value={formData.status}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+            className="w-full border rounded p-2"
+          >
+            {bidStatuses.filter(s => s !== 'All').map((status) => (
+              <option key={status} value={status}>{status}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-sm font-semibold">Estimated Value</label>
+          <Input
+            type="number"
+            value={formData.estimated_value}
+            onChange={(e) => setFormData({ ...formData, estimated_value: parseFloat(e.target.value) })}
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-semibold">Due Date</label>
+          <Input
+            type="date"
+            value={formData.due_date}
+            onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="text-sm font-semibold">Win Probability (%)</label>
+          <Input
+            type="number"
+            min="0"
+            max="100"
+            value={formData.win_probability}
+            onChange={(e) => setFormData({ ...formData, win_probability: parseInt(e.target.value) })}
+          />
+        </div>
+      </div>
+      <div>
+        <label className="text-sm font-semibold">Location</label>
+        <Input
+          value={formData.location}
+          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+          placeholder="Project location"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-semibold">Source URL</label>
+        <Input
+          value={formData.url}
+          onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+          placeholder="https://..."
+        />
+      </div>
+      <Button onClick={() => onSubmit(formData)} className="w-full bg-amber-600 hover:bg-amber-700">
+        {bid ? 'Update Bid' : 'Create Bid'}
+      </Button>
+    </div>
   );
 }
