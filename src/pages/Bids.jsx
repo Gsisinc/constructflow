@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import { EmptyState } from '@/components/ui/EmptyState';
+import EmptyState from '@/components/ui/EmptyState';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
