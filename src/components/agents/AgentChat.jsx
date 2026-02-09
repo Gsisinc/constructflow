@@ -45,16 +45,9 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   }, [messages.length]);
 
   useEffect(() => {
-    // Scroll to bottom when messages update
-    if (chatContainerRef.current) {
-      setTimeout(() => {
-        if (chatContainerRef.current) {
-          chatContainerRef.current.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
+    // Scroll to bottom when messages update (bottom = highest scrollTop in normal scroll)
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages.length]);
 
@@ -467,76 +460,76 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         </div>
       </CardHeader>
 
-      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 flex flex-col-reverse" style={{maxHeight: 'calc(100% - 140px)'}}>
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6" style={{maxHeight: 'calc(100% - 140px)'}}>
+        {/* History Toggle - Only show if there are messages */}
+        {messages.length > 2 && (
+          <Collapsible open={showHistory} onOpenChange={setShowHistory} className="mb-4">
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" size="sm" className="w-full gap-2">
+                <History className="h-4 w-4" />
+                {showHistory ? 'Hide' : 'Show'} Chat History ({messages.length} messages)
+                <ChevronDown className={`h-4 w-4 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 space-y-4 border-l-2 border-slate-200 pl-4">
+              {messages.slice(0, -2).map((msg, idx) => (
+                <MessageBubble key={idx} message={msg} />
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+
+        {/* Current Conversation */}
         <div>
-          {/* History Toggle - Only show if there are messages */}
-          {messages.length > 2 && (
-            <Collapsible open={showHistory} onOpenChange={setShowHistory} className="mb-4">
-              <CollapsibleTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full gap-2">
-                  <History className="h-4 w-4" />
-                  {showHistory ? 'Hide' : 'Show'} Chat History ({messages.length} messages)
-                  <ChevronDown className={`h-4 w-4 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-4 space-y-4 border-l-2 border-slate-200 pl-4">
-                {messages.slice(0, -2).map((msg, idx) => (
-                  <MessageBubble key={idx} message={msg} />
+          {messages.length === 0 && opportunities.length === 0 && (
+            <div className="text-center py-12">
+              <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white mb-4`}>
+                <Bot className="h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Start a conversation</h3>
+              <p className="text-slate-600 text-sm mb-4">
+                {agent.name} is ready to help. Ask a question to get started.
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {agent.capabilities?.map((cap, idx) => (
+                  <Badge key={idx} variant="secondary">{cap}</Badge>
                 ))}
-              </CollapsibleContent>
-            </Collapsible>
+              </div>
+            </div>
           )}
+          
+          {/* Show messages in chronological order (oldest first, newest last) */}
+          {(showHistory ? messages : messages.slice(-2)).map((msg, idx) => (
+            <MessageBubble key={idx} message={msg} />
+          ))}
 
-          {/* Current Conversation */}
-          <div>
-            {messages.length === 0 && opportunities.length === 0 && (
-              <div className="text-center py-12">
-                <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white mb-4`}>
-                  <Bot className="h-8 w-8" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Start a conversation</h3>
-                <p className="text-slate-600 text-sm mb-4">
-                  {agent.name} is ready to help. Ask a question to get started.
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {agent.capabilities?.map((cap, idx) => (
-                    <Badge key={idx} variant="secondary">{cap}</Badge>
-                  ))}
-                </div>
+          {/* Opportunities Cards - Show after messages */}
+          {opportunities.length > 0 && (
+            <div className="mt-6">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b">
+                <Sparkles className="h-4 w-4 text-blue-600" />
+                <h3 className="text-sm font-semibold text-slate-700">Discovered Opportunities ({opportunities.length})</h3>
               </div>
-            )}
-            
-            {/* Show messages in chronological order (oldest first, newest last) */}
-            {(showHistory ? messages : messages.slice(-2)).map((msg, idx) => (
-              <MessageBubble key={idx} message={msg} />
-            ))}
-
-            {/* Opportunities Cards - Show after messages */}
-            {opportunities.length > 0 && (
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3 pb-2 border-b">
-                  <Sparkles className="h-4 w-4 text-blue-600" />
-                  <h3 className="text-sm font-semibold text-slate-700">Discovered Opportunities ({opportunities.length})</h3>
-                </div>
-                <div className="space-y-3">
-                  {opportunities.map((opp) => (
-                    <BidOpportunityCard key={opp.id} opportunity={opp} />
-                  ))}
-                </div>
+              <div className="space-y-3">
+                {opportunities.map((opp) => (
+                  <BidOpportunityCard key={opp.id} opportunity={opp} />
+                ))}
               </div>
-            )}
-            
-            {loading && (
-              <div className="flex gap-3 justify-start mb-4">
-                <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${agent.color} flex items-center justify-center text-white`}>
-                  <Bot className="h-4 w-4" />
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl px-4 py-2.5">
-                  <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                </div>
+            </div>
+          )}
+          
+          {loading && (
+            <div className="flex gap-3 justify-start mb-4">
+              <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${agent.color} flex items-center justify-center text-white`}>
+                <Bot className="h-4 w-4" />
               </div>
-            )}
-          </div>
+              <div className="bg-white border border-slate-200 rounded-2xl px-4 py-2.5">
+                <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+              </div>
+            </div>
+          )}
+          
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
