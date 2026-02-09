@@ -42,15 +42,18 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
       try {
         console.log('Starting AI analysis...');
         const aiResult = await base44.integrations.Core.InvokeLLM({
-          prompt: `Analyze this bid/RFP document and extract:
-1. All technical requirements
+          prompt: `Analyze this bid/RFP document thoroughly and extract:
+
+1. Technical requirements (list each one)
 2. Compliance requirements  
 3. Deadlines and key dates
 4. Deliverables
-5. Evaluation criteria
-6. Any risk factors or red flags
+5. Risk factors or red flags (cost overruns, tight deadlines, unclear specs, etc.)
+6. Complexity score (1-10, where 10 is most complex)
+7. Recommended markup percentage (10-25% based on risk and complexity)
+8. Key points and important notes
 
-Provide structured output.`,
+Be thorough and extract as much useful information as possible.`,
           file_urls: [file_url],
           response_json_schema: {
             type: "object",
@@ -68,7 +71,9 @@ Provide structured output.`,
               },
               deadlines: { type: "array", items: { type: "string" } },
               key_points: { type: "array", items: { type: "string" } },
-              risk_factors: { type: "array", items: { type: "string" } }
+              risk_factors: { type: "array", items: { type: "string" } },
+              complexity_score: { type: "number" },
+              recommended_markup: { type: "number" }
             }
           }
         });
@@ -96,6 +101,24 @@ Provide structured output.`,
           );
           await Promise.all(reqPromises);
           console.log('Requirements created successfully');
+        }
+
+        // Update bid opportunity with AI analysis
+        console.log('Updating bid opportunity with AI analysis...');
+        const bids = await base44.entities.BidOpportunity.filter({ id: bidId });
+        if (bids.length > 0) {
+          const currentBid = bids[0];
+          await base44.entities.BidOpportunity.update(bidId, {
+            ai_analysis: {
+              complexity_score: aiResult.complexity_score || 7,
+              risk_factors: aiResult.risk_factors || [],
+              recommended_markup: aiResult.recommended_markup || 15,
+              key_points: aiResult.key_points || [],
+              requirements_count: aiResult.requirements?.length || 0,
+              analyzed_at: new Date().toISOString()
+            }
+          });
+          console.log('Bid opportunity updated with AI analysis');
         }
 
         toast.success('✨ AI analysis complete - requirements extracted');
