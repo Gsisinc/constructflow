@@ -502,9 +502,9 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
               </div>
             )}
             
-            {/* Show only recent messages (last 2) if history is collapsed */}
-            {messages.slice(messages.length > 2 && !showHistory ? -2 : 0).map((msg, idx) => (
-              <MessageBubble key={showHistory ? idx : messages.length - 2 + idx} message={msg} />
+            {/* Show messages in chronological order (oldest first, newest last) */}
+            {(showHistory ? messages : messages.slice(-2)).map((msg, idx) => (
+              <MessageBubble key={idx} message={msg} />
             ))}
 
             {/* Opportunities Cards - Show after messages */}
