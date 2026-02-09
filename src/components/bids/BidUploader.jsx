@@ -126,7 +126,79 @@ Be thorough and extract as much useful information as possible.`,
         }
 
         setProcessing(false);
-        toast.success('✨ AI analysis complete! Check the AI Analysis tab.');
+        toast.success('✨ AI analysis complete! Auto-creating project...');
+
+        // Auto-create project from the bid
+        try {
+          const user = await base44.auth.me();
+          const currentBid = bids[0];
+          
+          if (currentBid && user.organization_id) {
+            const complexityScore = aiResult.complexity_score || 5;
+            const estimatedValue = currentBid.estimated_value || 100000;
+            const contingencyPercent = Math.max(10, complexityScore * 1.5);
+            const timelineDays = Math.max(30, Math.floor((estimatedValue / 10000) * (complexityScore / 5)));
+            const endDate = new Date(Date.now() + timelineDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+            const project = await base44.entities.Project.create({
+              organization_id: user.organization_id,
+              name: currentBid.title || currentBid.project_name,
+              client_name: currentBid.client_name || currentBid.agency,
+              project_type: currentBid.project_type || 'commercial',
+              status: 'planning',
+              current_phase: 'preconstruction',
+              description: currentBid.description || currentBid.scope_of_work,
+              budget: estimatedValue,
+              contingency_percent: contingencyPercent,
+              start_date: new Date().toISOString().split('T')[0],
+              end_date: endDate,
+              address: currentBid.location,
+              health_status: complexityScore > 7 ? 'yellow' : 'green',
+              projected_final_cost: estimatedValue * (1 + contingencyPercent / 100)
+            });
+
+            // Create phases with budgets
+            const phases = [
+              { name: 'preconstruction', budget: estimatedValue * 0.1 },
+              { name: 'foundation', budget: estimatedValue * 0.15 },
+              { name: 'superstructure', budget: estimatedValue * 0.25 },
+              { name: 'enclosure', budget: estimatedValue * 0.15 },
+              { name: 'mep_rough', budget: estimatedValue * 0.15 },
+              { name: 'interior_finishes', budget: estimatedValue * 0.15 },
+              { name: 'commissioning', budget: estimatedValue * 0.05 }
+            ];
+
+            await Promise.all(phases.map(phase =>
+              base44.entities.PhaseBudget.create({
+                project_id: project.id,
+                phase_name: phase.name,
+                allocated_budget: phase.budget,
+                spent: 0,
+                committed: 0
+              })
+            ));
+
+            // Create tasks from requirements
+            if (aiResult.requirements?.length > 0) {
+              await Promise.all(aiResult.requirements.slice(0, 10).map(req =>
+                base44.entities.OperationalTask.create({
+                  organization_id: user.organization_id,
+                  project_id: project.id,
+                  title: req.text.substring(0, 100),
+                  description: req.text,
+                  category: 'documentation',
+                  priority: req.priority?.toLowerCase() || 'medium',
+                  status: 'pending'
+                })
+              ));
+            }
+
+            toast.success('🎉 Project auto-created with phases, budget, and tasks!');
+          }
+        } catch (projectError) {
+          console.error('Failed to auto-create project:', projectError);
+          toast.error('Project creation failed, but analysis is saved');
+        }
         
         // Trigger callback immediately to refresh all data
         if (onUploadComplete) {
