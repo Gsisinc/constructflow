@@ -19,23 +19,40 @@ export default function TaskTracker() {
   const [selectedStatus, setSelectedStatus] = useState('pending');
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [user, setUser] = useState(null);
   const queryClient = useQueryClient();
 
+  React.useEffect(() => {
+    const loadUser = async () => {
+      const userData = await base44.auth.me();
+      setUser(userData);
+    };
+    loadUser();
+  }, []);
+
   const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list()
+    queryKey: ['projects', user?.organization_id],
+    queryFn: () => base44.entities.Project.filter({ organization_id: user.organization_id }),
+    enabled: !!user?.organization_id
   });
 
   const { data: tasks = [] } = useQuery({
-    queryKey: ['operationalTasks', selectedProject],
-    queryFn: () => base44.entities.OperationalTask.filter(
-      selectedProject ? { project_id: selectedProject } : {}
-    ),
-    enabled: true
+    queryKey: ['operationalTasks', selectedProject, user?.organization_id],
+    queryFn: () => {
+      const filter = { organization_id: user.organization_id };
+      if (selectedProject) {
+        filter.project_id = selectedProject;
+      }
+      return base44.entities.OperationalTask.filter(filter);
+    },
+    enabled: !!user?.organization_id
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.OperationalTask.create(data),
+    mutationFn: (data) => base44.entities.OperationalTask.create({ 
+      ...data, 
+      organization_id: user.organization_id 
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['operationalTasks'] });
       setShowNewDialog(false);
