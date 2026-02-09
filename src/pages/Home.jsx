@@ -29,18 +29,18 @@ export default function Home() {
   const handleLogin = async () => {
     const isAuth = await base44.auth.isAuthenticated();
     if (isAuth) {
-      navigate(createPageUrl('Dashboard'));
+      navigate(createPageUrl('Bids'));
     } else {
-      base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+      base44.auth.redirectToLogin(createPageUrl('Bids'));
     }
   };
 
   const handleGetStarted = async () => {
     const isAuth = await base44.auth.isAuthenticated();
     if (isAuth) {
-      navigate(createPageUrl('Dashboard'));
+      navigate(createPageUrl('Bids'));
     } else {
-      base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+      base44.auth.redirectToLogin(createPageUrl('Bids'));
     }
   };
 

@@ -38,8 +38,9 @@ import {
 import MegaMenu from '@/components/layout/MegaMenu';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 const navItems = [
-              { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
+              { name: 'Bids', icon: FileText, page: 'Bids' },
               { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+              { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
               { name: 'Task Tracker', icon: FileStack, page: 'TaskTracker' },
               { name: 'Templates', icon: FileText, page: 'TemplateLibrary' },
               { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
@@ -122,6 +123,12 @@ export default function Layout({ children, currentPageName }) {
           navigate(createPageUrl('Onboarding'));
           return;
         }
+
+        // Redirect to Bids if on Home page and authenticated
+        if (isHomePage) {
+          navigate(createPageUrl('Bids'));
+          return;
+        }
         
         // Fetch user's organization
         if (userData?.organization_id) {
@@ -175,7 +182,7 @@ export default function Layout({ children, currentPageName }) {
     window.location.href = createPageUrl('Home');
   };
 
-  const isRootPage = ['Dashboard', 'Projects', 'Bids', 'TaskTracker', 'Settings'].includes(currentPageName);
+  const isRootPage = ['Bids', 'Dashboard', 'Projects', 'TaskTracker', 'Settings'].includes(currentPageName);
 
   const handleBack = () => {
     navigate(-1);
