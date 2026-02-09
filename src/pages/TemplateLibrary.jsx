@@ -87,17 +87,36 @@ export default function TemplateLibrary() {
           <h1 className="text-xl sm:text-3xl font-bold text-slate-900">Template Library</h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Manage construction templates for your projects</p>
         </div>
-        <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
-          <DialogTrigger asChild>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              New Template
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <TemplateForm onSubmit={(data) => createMutation.mutate(data)} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={async () => {
+              if (confirm('Generate 1000+ professional templates? This may take a minute.')) {
+                toast.info('Generating templates...');
+                try {
+                  await base44.functions.invoke('generate1000Templates', {});
+                  queryClient.invalidateQueries({ queryKey: ['templates'] });
+                  toast.success('Templates generated successfully!');
+                } catch (err) {
+                  toast.error('Failed to generate templates');
+                }
+              }
+            }}
+          >
+            Generate 1000+ Templates
+          </Button>
+          <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Template
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <TemplateForm onSubmit={(data) => createMutation.mutate(data)} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="relative flex-1">
