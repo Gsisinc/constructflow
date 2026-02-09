@@ -38,20 +38,22 @@ import {
 import MegaMenu from '@/components/layout/MegaMenu';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 const navItems = [
-              { name: 'Bids', icon: FileText, page: 'Bids' },
-              { name: 'Projects', icon: FolderKanban, page: 'Projects' },
-              { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
-              { name: 'Task Tracker', icon: FileStack, page: 'TaskTracker' },
-              { name: 'Templates', icon: FileText, page: 'TemplateLibrary' },
-              { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
-              { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
-              { name: 'Add Bid', icon: FileText, page: 'AddBid' },
-              { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
-              { name: 'Directory', icon: Users, page: 'Directory' },
-              { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
-              { name: 'PM Guide', icon: FileText, page: 'PMSetupGuide' },
-              { name: 'Settings', icon: Settings, page: 'Settings' },
-            ];
+                    { name: 'Bids', icon: FileText, page: 'Bids' },
+                    { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+                    { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
+                    { name: 'Task Tracker', icon: FileStack, page: 'TaskTracker' },
+                    { name: 'Labor Force', icon: Users, page: 'TeamManagement' },
+                    { name: 'Templates', icon: FileText, page: 'TemplateLibrary' },
+                    { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
+                    { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
+                    { name: 'Add Bid', icon: FileText, page: 'AddBid' },
+                    { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
+                    { name: 'Directory', icon: Users, page: 'Directory' },
+                    { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
+                    { name: 'PM Guide', icon: FileText, page: 'PMSetupGuide' },
+                    { name: 'Alerts', icon: AlertTriangle, page: 'AlertSettings' },
+                    { name: 'Settings', icon: Settings, page: 'Settings' },
+                  ];
 
 const adminNavItems = [
         { name: 'User Approvals', icon: User, page: 'UserApprovals' },

@@ -3,37 +3,22 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Users, Plus } from 'lucide-react';
-import { toast } from 'sonner';
+import { Users, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 export default function EmployeeWidget() {
-  const [showDialog, setShowDialog] = useState(false);
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState('user');
-  const queryClient = useQueryClient();
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
+  });
 
   const { data: workers = [] } = useQuery({
-    queryKey: ['workers'],
-    queryFn: () => base44.entities.Worker.list('-created_date', 10)
+    queryKey: ['workers', user?.organization_id],
+    queryFn: () => base44.entities.Worker.filter({ organization_id: user.organization_id }, '-created_date', 10),
+    enabled: !!user?.organization_id
   });
-
-  const inviteMutation = useMutation({
-    mutationFn: (data) => base44.users.inviteUser(data.email, data.role),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
-      setEmail('');
-      setShowDialog(false);
-      toast.success('Invite sent');
-    }
-  });
-
-  const handleInvite = () => {
-    if (!email.trim()) return;
-    inviteMutation.mutate({ email, role });
-  };
 
   const getStatusColor = (status) => {
     const colors = {
@@ -52,41 +37,11 @@ export default function EmployeeWidget() {
           <Users className="h-5 w-5" />
           Team Members ({workers.length})
         </CardTitle>
-        <Dialog open={showDialog} onOpenChange={setShowDialog}>
-          <DialogTrigger asChild>
-            <Button size="sm" variant="outline">
-              <Plus className="h-4 w-4 mr-1" /> Add
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Invite Team Member</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <Input 
-                placeholder="Email address" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
-              />
-              <select 
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm"
-              >
-                <option value="user">Team Member</option>
-                <option value="admin">Admin</option>
-              </select>
-              <Button 
-                onClick={handleInvite} 
-                className="w-full"
-                disabled={inviteMutation.isPending}
-              >
-                {inviteMutation.isPending ? 'Sending...' : 'Send Invite'}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Link to={createPageUrl('TeamManagement')}>
+          <Button size="sm" variant="outline">
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </Link>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">

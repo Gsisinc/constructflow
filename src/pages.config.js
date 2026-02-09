@@ -82,6 +82,8 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import TeamManagement from './pages/TeamManagement';
+import AlertSettings from './pages/AlertSettings';
 import __Layout from './Layout.jsx';
 
 
@@ -121,6 +123,8 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "TeamManagement": TeamManagement,
+    "AlertSettings": AlertSettings,
 }
 
 export const pagesConfig = {
