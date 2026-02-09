@@ -13,6 +13,9 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Reset file input to allow re-uploading same file
+    e.target.value = '';
+
     setUploading(true);
     console.log('Starting file upload:', file.name);
     
@@ -34,9 +37,9 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
       });
       console.log('BidDocument created:', doc.id);
 
-      toast.success('File uploaded successfully');
       setUploading(false);
       setProcessing(true);
+      toast.info('🤖 AI analyzing document...');
 
       // AI processing
       try {
@@ -121,14 +124,18 @@ Be thorough and extract as much useful information as possible.`,
           console.log('Bid opportunity updated with AI analysis');
         }
 
-        toast.success('✨ AI analysis complete - requirements extracted');
-        onUploadComplete?.();
+        setProcessing(false);
+        toast.success('✨ AI analysis complete!');
+        
+        // Delay callback to ensure UI updates
+        setTimeout(() => {
+          onUploadComplete?.();
+        }, 500);
       } catch (err) {
         console.error('AI processing error:', err);
+        setProcessing(false);
         toast.error('AI analysis failed: ' + (err.message || 'Unknown error'));
       }
-      
-      setProcessing(false);
     } catch (error) {
       console.error('Upload error:', error);
       toast.error('Upload failed: ' + (error.message || 'Unknown error'));
