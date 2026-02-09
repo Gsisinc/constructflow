@@ -240,13 +240,54 @@ export default function TemplateLibrary() {
                 </div>
               )}
               <div className="flex gap-2 pt-4">
-                <Button className="flex-1">
+                <Button 
+                  className="flex-1"
+                  onClick={async () => {
+                    try {
+                      const response = await base44.functions.invoke('generateTemplateFile', {
+                        templateId: viewingTemplate.id,
+                        format: 'word'
+                      });
+                      const blob = new Blob([response.data], { type: 'application/msword' });
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${viewingTemplate.name}.doc`;
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                      toast.success('Template downloaded');
+                    } catch (err) {
+                      toast.error('Download failed');
+                    }
+                  }}
+                >
                   <Download className="h-4 w-4 mr-2" />
-                  Download
+                  Word
                 </Button>
-                <Button variant="outline" className="flex-1">
-                  <Copy className="h-4 w-4 mr-2" />
-                  Duplicate
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={async () => {
+                    try {
+                      const response = await base44.functions.invoke('generateTemplateFile', {
+                        templateId: viewingTemplate.id,
+                        format: 'excel'
+                      });
+                      const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${viewingTemplate.name}.xls`;
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                      toast.success('Template downloaded');
+                    } catch (err) {
+                      toast.error('Download failed');
+                    }
+                  }}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Excel
                 </Button>
               </div>
             </div>
