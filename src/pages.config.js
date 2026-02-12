@@ -75,8 +75,8 @@ import Phase3Operations from './pages/Phase3Operations';
 import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
-import RolePermissions from './pages/RolePermissions';
 import PurchaseOrders from './pages/PurchaseOrders';
+import RolePermissions from './pages/RolePermissions';
 import Safety from './pages/Safety';
 import Settings from './pages/Settings';
 import Submittals from './pages/Submittals';
@@ -120,8 +120,8 @@ export const PAGES = {
     "Photos": Photos,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
-    "RolePermissions": RolePermissions,
     "PurchaseOrders": PurchaseOrders,
+    "RolePermissions": RolePermissions,
     "Safety": Safety,
     "Settings": Settings,
     "Submittals": Submittals,
