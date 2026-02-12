@@ -12,13 +12,11 @@
  *   import HomePage from './pages/HomePage';
  *   import Dashboard from './pages/Dashboard';
  *   import Settings from './pages/Settings';
-import ServiceDesk from './pages/ServiceDesk';
  *   
  *   export const PAGES = {
  *       "HomePage": HomePage,
  *       "Dashboard": Dashboard,
  *       "Settings": Settings,
-    "ServiceDesk": ServiceDesk,
  *   }
  *   
  *   export const pagesConfig = {
@@ -30,13 +28,11 @@ import ServiceDesk from './pages/ServiceDesk';
  *
  *   import Home from './pages/Home';
  *   import Settings from './pages/Settings';
-import ServiceDesk from './pages/ServiceDesk';
  *   import __Layout from './Layout.jsx';
  *
  *   export const PAGES = {
  *       "Home": Home,
  *       "Settings": Settings,
-    "ServiceDesk": ServiceDesk,
  *   }
  *
  *   export const pagesConfig = {
@@ -54,14 +50,10 @@ import ServiceDesk from './pages/ServiceDesk';
 import AIAgents from './pages/AIAgents';
 import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
-import AuditTrail from './pages/AuditTrail';
-import BidDetail from './pages/BidDetail';
-import BidDiscovery from './pages/BidDiscovery';
 import BidOpportunities from './pages/BidOpportunities';
 import Bids from './pages/Bids';
 import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
-import ClientPortal from './pages/ClientPortal';
 import DailyLog from './pages/DailyLog';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
@@ -76,9 +68,6 @@ import Onboarding from './pages/Onboarding';
 import PMSetupGuide from './pages/PMSetupGuide';
 import Phase2Operations from './pages/Phase2Operations';
 import Phase3Operations from './pages/Phase3Operations';
-import Phase4AIAutomation from './pages/Phase4AIAutomation';
-import Phase5PlatformScale from './pages/Phase5PlatformScale';
-import Phase6ReliabilityOps from './pages/Phase6ReliabilityOps';
 import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
@@ -86,7 +75,6 @@ import PurchaseOrders from './pages/PurchaseOrders';
 import RolePermissions from './pages/RolePermissions';
 import Safety from './pages/Safety';
 import Settings from './pages/Settings';
-import ServiceDesk from './pages/ServiceDesk';
 import Submittals from './pages/Submittals';
 import TaskTracker from './pages/TaskTracker';
 import Tasks from './pages/Tasks';
@@ -96,6 +84,14 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import AuditTrail from './pages/AuditTrail';
+import BidDetail from './pages/BidDetail';
+import BidDiscovery from './pages/BidDiscovery';
+import ClientPortal from './pages/ClientPortal';
+import Phase4AIAutomation from './pages/Phase4AIAutomation';
+import Phase5PlatformScale from './pages/Phase5PlatformScale';
+import Phase6ReliabilityOps from './pages/Phase6ReliabilityOps';
+import ServiceDesk from './pages/ServiceDesk';
 import __Layout from './Layout.jsx';
 
 
@@ -103,14 +99,10 @@ export const PAGES = {
     "AIAgents": AIAgents,
     "AddBid": AddBid,
     "AlertSettings": AlertSettings,
-    "AuditTrail": AuditTrail,
-    "BidDetail": BidDetail,
-    "BidDiscovery": BidDiscovery,
     "BidOpportunities": BidOpportunities,
     "Bids": Bids,
     "Budget": Budget,
     "Calendar": Calendar,
-    "ClientPortal": ClientPortal,
     "DailyLog": DailyLog,
     "Dashboard": Dashboard,
     "Directory": Directory,
@@ -125,9 +117,6 @@ export const PAGES = {
     "PMSetupGuide": PMSetupGuide,
     "Phase2Operations": Phase2Operations,
     "Phase3Operations": Phase3Operations,
-    "Phase4AIAutomation": Phase4AIAutomation,
-    "Phase5PlatformScale": Phase5PlatformScale,
-    "Phase6ReliabilityOps": Phase6ReliabilityOps,
     "Photos": Photos,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
@@ -135,7 +124,6 @@ export const PAGES = {
     "RolePermissions": RolePermissions,
     "Safety": Safety,
     "Settings": Settings,
-    "ServiceDesk": ServiceDesk,
     "Submittals": Submittals,
     "TaskTracker": TaskTracker,
     "Tasks": Tasks,
@@ -145,6 +133,14 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "AuditTrail": AuditTrail,
+    "BidDetail": BidDetail,
+    "BidDiscovery": BidDiscovery,
+    "ClientPortal": ClientPortal,
+    "Phase4AIAutomation": Phase4AIAutomation,
+    "Phase5PlatformScale": Phase5PlatformScale,
+    "Phase6ReliabilityOps": Phase6ReliabilityOps,
+    "ServiceDesk": ServiceDesk,
 }
 
 export const pagesConfig = {
