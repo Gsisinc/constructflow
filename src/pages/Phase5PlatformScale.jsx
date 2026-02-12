@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Link2, ShieldCheck, BarChart3 } from 'lucide-react';
+import { Link2, ShieldCheck, BarChart3, Repeat2 } from 'lucide-react';
 import { createAuditLog } from '@/lib/auditLog';
 import {
   buildExecutiveKpis,
@@ -18,6 +19,12 @@ import {
   getPhase5Providers,
   normalizeTenantPolicy
 } from '@/lib/phase5';
+import {
+  detectReconciliationConflicts,
+  queueIntegrationSync,
+  runSyncJob,
+  saveReconciliationDecision
+} from '@/lib/integrationConnectors';
 
 export default function Phase5PlatformScale() {
   const providers = getPhase5Providers();
@@ -28,6 +35,9 @@ export default function Phase5PlatformScale() {
     }, {})
   );
   const [tenantPolicy, setTenantPolicy] = useState(() => normalizeTenantPolicy({}));
+  const [selectedProvider, setSelectedProvider] = useState('quickbooks');
+  const [syncResults, setSyncResults] = useState([]);
+  const [conflicts, setConflicts] = useState([]);
 
   const { data: user } = useQuery({ queryKey: ['currentUser', 'phase5'], queryFn: () => base44.auth.me() });
   const { data: projects = [] } = useQuery({ queryKey: ['projects', 'phase5'], queryFn: () => base44.entities.Project.list('-created_date') });
@@ -105,25 +115,21 @@ export default function Phase5PlatformScale() {
 
   const saveIntegrations = useMutation({
     mutationFn: async () => {
-      try {
-        const existing = await base44.entities.IntegrationConfig.filter({ organization_id: user.organization_id });
-        await Promise.all(existing.map((row) => base44.entities.IntegrationConfig.delete(row.id)));
-        await Promise.all(
-          Object.entries(providerState).map(([provider, cfg]) =>
-            base44.entities.IntegrationConfig.create({
-              organization_id: user.organization_id,
-              provider,
-              connected: !!cfg.connected,
-              account_name: cfg.account_name || '',
-              webhook_enabled: !!cfg.webhook_enabled,
-              sync_mode: cfg.sync_mode || 'ingest_only',
-              last_sync_at: cfg.connected ? new Date().toISOString() : null
-            })
-          )
-        );
-      } catch (error) {
-        console.warn('Could not persist integration config.', error);
-      }
+      const existing = await base44.entities.IntegrationConfig.filter({ organization_id: user.organization_id });
+      await Promise.all(existing.map((row) => base44.entities.IntegrationConfig.delete(row.id)));
+      await Promise.all(
+        Object.entries(providerState).map(([provider, cfg]) =>
+          base44.entities.IntegrationConfig.create({
+            organization_id: user.organization_id,
+            provider,
+            connected: !!cfg.connected,
+            account_name: cfg.account_name || '',
+            webhook_enabled: !!cfg.webhook_enabled,
+            sync_mode: cfg.sync_mode || 'ingest_only',
+            last_sync_at: cfg.connected ? new Date().toISOString() : null
+          })
+        )
+      );
 
       await createAuditLog({
         organizationId: user?.organization_id,
@@ -140,17 +146,13 @@ export default function Phase5PlatformScale() {
 
   const saveTenantPolicy = useMutation({
     mutationFn: async () => {
-      try {
-        const orgRows = await base44.entities.Organization.filter({ id: user.organization_id });
-        const org = orgRows?.[0];
-        if (org?.id) {
-          await base44.entities.Organization.update(org.id, {
-            tenant_policy: tenantPolicy,
-            platform_policy: tenantPolicy
-          });
-        }
-      } catch (error) {
-        console.warn('Could not save tenant policy.', error);
+      const orgRows = await base44.entities.Organization.filter({ id: user.organization_id });
+      const org = orgRows?.[0];
+      if (org?.id) {
+        await base44.entities.Organization.update(org.id, {
+          tenant_policy: tenantPolicy,
+          platform_policy: tenantPolicy
+        });
       }
 
       await createAuditLog({
@@ -166,6 +168,64 @@ export default function Phase5PlatformScale() {
     onError: () => toast.error('Failed to save tenant policy.')
   });
 
+  const runConnectorSync = useMutation({
+    mutationFn: async () => {
+      const cfg = providerState[selectedProvider] || { sync_mode: 'ingest_only' };
+      const queued = await queueIntegrationSync({
+        organizationId: user?.organization_id,
+        userId: user?.id,
+        provider: selectedProvider,
+        direction: cfg.sync_mode,
+        entity: 'projects',
+        payload: { reason: 'manual_phase5_sync' }
+      });
+      const result = await runSyncJob(queued);
+      const sampleSource = [{ external_id: 'P-100', budget: 250000, status: 'active' }];
+      const sampleTarget = [{ external_id: 'P-100', budget: 245000, status: 'active' }];
+      const nextConflicts = detectReconciliationConflicts({ sourceRecords: sampleSource, targetRecords: sampleTarget });
+
+      setSyncResults((prev) => [result, ...prev].slice(0, 10));
+      setConflicts(nextConflicts);
+
+      await createAuditLog({
+        organizationId: user?.organization_id,
+        userId: user?.id,
+        action: 'phase5_connector_sync_executed',
+        entityType: 'IntegrationSyncJob',
+        entityId: result?.id,
+        after: { provider: selectedProvider, direction: cfg.sync_mode, conflicts: nextConflicts.length }
+      });
+
+      return result;
+    },
+    onSuccess: () => toast.success('Connector sync completed.'),
+    onError: () => toast.error('Connector sync failed.')
+  });
+
+  const resolveConflict = useMutation({
+    mutationFn: async ({ conflict, resolution }) => {
+      await saveReconciliationDecision({
+        organizationId: user?.organization_id,
+        provider: selectedProvider,
+        externalId: conflict.external_id,
+        resolution,
+        resolvedBy: user?.id
+      });
+
+      await createAuditLog({
+        organizationId: user?.organization_id,
+        userId: user?.id,
+        action: 'phase5_reconciliation_resolved',
+        entityType: 'IntegrationReconciliation',
+        entityId: conflict.external_id,
+        after: { resolution, provider: selectedProvider }
+      });
+
+      setConflicts((prev) => prev.filter((item) => item.external_id !== conflict.external_id));
+    },
+    onSuccess: () => toast.success('Reconciliation decision saved.')
+  });
+
   return (
     <div className="space-y-6">
       <div>
@@ -174,8 +234,9 @@ export default function Phase5PlatformScale() {
       </div>
 
       <Tabs defaultValue="marketplace" className="space-y-4">
-        <TabsList className="grid w-full md:grid-cols-3">
+        <TabsList className="grid w-full md:grid-cols-4">
           <TabsTrigger value="marketplace"><Link2 className="h-4 w-4 mr-1" /> Marketplace</TabsTrigger>
+          <TabsTrigger value="connectors"><Repeat2 className="h-4 w-4 mr-1" /> Connectors</TabsTrigger>
           <TabsTrigger value="tenant"><ShieldCheck className="h-4 w-4 mr-1" /> Tenant Admin</TabsTrigger>
           <TabsTrigger value="executive"><BarChart3 className="h-4 w-4 mr-1" /> Executive Center</TabsTrigger>
         </TabsList>
@@ -238,7 +299,6 @@ export default function Phase5PlatformScale() {
                       />
                     </div>
 
-
                     <div className="flex items-center justify-between border rounded-md p-2">
                       <span className="text-sm">Sync direction</span>
                       <Select
@@ -248,7 +308,7 @@ export default function Phase5PlatformScale() {
                           [provider.id]: { ...prev[provider.id], sync_mode: value }
                         }))}
                       >
-                        <SelectTrigger className="w-52"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="w-52" aria-label={`Sync direction for ${provider.name}`}><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="ingest_only">Ingest only</SelectItem>
                           <SelectItem value="push_only">Push only</SelectItem>
@@ -267,6 +327,67 @@ export default function Phase5PlatformScale() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="connectors">
+          <Card>
+            <CardHeader>
+              <CardTitle>Production Connector Operations</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-3">
+                <div>
+                  <Label>Provider</Label>
+                  <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                    <SelectTrigger aria-label="Connector provider"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {providers.map((provider) => (
+                        <SelectItem key={provider.id} value={provider.id}>{provider.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Sync mode</Label>
+                  <Input value={providerState[selectedProvider]?.sync_mode || 'ingest_only'} readOnly />
+                </div>
+                <div className="flex items-end">
+                  <Button className="w-full" onClick={() => runConnectorSync.mutate()} disabled={runConnectorSync.isPending}>
+                    {runConnectorSync.isPending ? 'Running sync...' : 'Run bi-directional sync job'}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-3 space-y-2">
+                <p className="font-medium text-slate-900">Sync run history</p>
+                {syncResults.length === 0 ? (
+                  <p className="text-sm text-slate-500">No sync jobs run yet.</p>
+                ) : syncResults.map((job) => (
+                  <div key={job.id} className="text-sm border rounded-md p-2 flex items-center justify-between">
+                    <span>{job.provider} • {job.direction} • {job.status}</span>
+                    <span className="text-slate-500">Read {job.records_read} / Wrote {job.records_written} / Conflicts {job.conflicts}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border rounded-lg p-3 space-y-2">
+                <p className="font-medium text-slate-900">Reconciliation queue</p>
+                {conflicts.length === 0 ? (
+                  <p className="text-sm text-slate-500">No conflicts detected from latest sync.</p>
+                ) : conflicts.map((conflict) => (
+                  <div key={conflict.external_id} className="border rounded-md p-2 space-y-2">
+                    <p className="text-sm font-medium">External ID: {conflict.external_id}</p>
+                    <p className="text-xs text-slate-600">Changed fields: {conflict.diff_fields.join(', ')}</p>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => resolveConflict.mutate({ conflict, resolution: 'prefer_source' })}>Prefer source</Button>
+                      <Button size="sm" variant="outline" onClick={() => resolveConflict.mutate({ conflict, resolution: 'prefer_target' })}>Prefer target</Button>
+                      <Button size="sm" variant="outline" onClick={() => resolveConflict.mutate({ conflict, resolution: 'manual_review' })}>Manual review</Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="tenant">
           <Card>
             <CardHeader>
@@ -281,28 +402,28 @@ export default function Phase5PlatformScale() {
 
               <div className="grid md:grid-cols-2 gap-3">
                 <div>
-                  <Label>Tenant slug</Label>
-                  <Input value={tenantPolicy.tenant_slug} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, tenant_slug: event.target.value }))} />
+                  <Label htmlFor="tenant-slug">Tenant slug</Label>
+                  <Input id="tenant-slug" value={tenantPolicy.tenant_slug} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, tenant_slug: event.target.value }))} />
                 </div>
                 <div>
-                  <Label>Region</Label>
-                  <Input value={tenantPolicy.region} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, region: event.target.value }))} />
+                  <Label htmlFor="tenant-region">Region</Label>
+                  <Input id="tenant-region" value={tenantPolicy.region} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, region: event.target.value }))} />
                 </div>
                 <div>
-                  <Label>Seat limit</Label>
-                  <Input type="number" value={tenantPolicy.seat_limit} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, seat_limit: Number(event.target.value || prev.seat_limit) }))} />
+                  <Label htmlFor="tenant-seat-limit">Seat limit</Label>
+                  <Input id="tenant-seat-limit" type="number" value={tenantPolicy.seat_limit} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, seat_limit: Number(event.target.value || prev.seat_limit) }))} />
                 </div>
                 <div>
-                  <Label>Storage limit (GB)</Label>
-                  <Input type="number" value={tenantPolicy.storage_limit_gb} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, storage_limit_gb: Number(event.target.value || prev.storage_limit_gb) }))} />
+                  <Label htmlFor="tenant-storage">Storage limit (GB)</Label>
+                  <Input id="tenant-storage" type="number" value={tenantPolicy.storage_limit_gb} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, storage_limit_gb: Number(event.target.value || prev.storage_limit_gb) }))} />
                 </div>
                 <div>
-                  <Label>AI token limit per month</Label>
-                  <Input type="number" value={tenantPolicy.ai_monthly_token_limit} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, ai_monthly_token_limit: Number(event.target.value || prev.ai_monthly_token_limit) }))} />
+                  <Label htmlFor="tenant-ai-limit">AI token limit per month</Label>
+                  <Input id="tenant-ai-limit" type="number" value={tenantPolicy.ai_monthly_token_limit} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, ai_monthly_token_limit: Number(event.target.value || prev.ai_monthly_token_limit) }))} />
                 </div>
                 <div>
-                  <Label>Data retention (days)</Label>
-                  <Input type="number" value={tenantPolicy.retention_days} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, retention_days: Number(event.target.value || prev.retention_days) }))} />
+                  <Label htmlFor="tenant-retention">Data retention (days)</Label>
+                  <Input id="tenant-retention" type="number" value={tenantPolicy.retention_days} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, retention_days: Number(event.target.value || prev.retention_days) }))} />
                 </div>
               </div>
 
@@ -348,7 +469,7 @@ export default function Phase5PlatformScale() {
 
               <div className="border rounded-lg p-3 bg-slate-50">
                 <p className="text-sm text-slate-700">
-                  Phase 5 focus: tenant-level policy controls, integration marketplace depth, and portfolio command center metrics suitable for multi-company SaaS operations.
+                  Phase 5 focus: tenant-level policy controls, production connector ops with reconciliation, and portfolio command center metrics for multi-company SaaS operations.
                 </p>
               </div>
             </CardContent>

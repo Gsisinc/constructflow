@@ -203,6 +203,7 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:px-3 focus:py-2 focus:rounded-md focus:shadow">Skip to main content</a>
       <style>{`
               html {
                 overscroll-behavior: none;
@@ -259,6 +260,7 @@ export default function Layout({ children, currentPageName }) {
                   size="icon"
                   onClick={() => setSidebarOpen(!sidebarOpen)}
                   className="min-h-[44px] min-w-[44px] select-none"
+                  aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
                 >
                   {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </Button>
@@ -284,6 +286,8 @@ export default function Layout({ children, currentPageName }) {
               variant="ghost"
               size="sm"
               onClick={() => setMegaMenuOpen(!megaMenuOpen)}
+              aria-label="Open quick access menu"
+              aria-expanded={megaMenuOpen}
               className="flex items-center gap-1 sm:gap-1.5 text-slate-600 hover:text-amber-600 hover:bg-amber-50/80 dark:hover:bg-amber-950/20 h-9 px-1.5 sm:px-3 text-xs sm:text-sm select-none"
             >
               <Grid3x3 className="h-4 w-4 flex-shrink-0" />
@@ -307,7 +311,7 @@ export default function Layout({ children, currentPageName }) {
       )}
 
       {/* Sidebar */}
-      <aside
+      <aside aria-label="Primary navigation"
         className={cn(
           "fixed top-0 left-0 h-full w-64 bg-white border-r border-amber-100 z-50 transition-transform duration-300 lg:translate-x-0 shadow-sm",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -331,7 +335,7 @@ export default function Layout({ children, currentPageName }) {
               </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto bg-white">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto bg-white" aria-label="Main sections">
             {navItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 const Icon = item.icon;
@@ -397,7 +401,7 @@ export default function Layout({ children, currentPageName }) {
       </aside>
 
       {/* Main Content */}
-              <main className="lg:pl-64 pt-16 min-h-screen pb-20 lg:pb-0" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
+              <main id="main-content" tabIndex={-1} className="lg:pl-64 pt-16 min-h-screen pb-20 lg:pb-0" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={location.pathname}

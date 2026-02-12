@@ -82,6 +82,10 @@ These close part of the "Drawing management" gap.
 - ✅ Security/compliance upgraded with hash-chain audit verification and immutable-style CSV/JSONL export in Audit Trail.
 - ✅ Multi-tenant hardening upgraded with tenant scope helpers and org-scoped automation preview/writes in Phase 4 rules.
 - ✅ Advanced ticketing + client portal requests upgraded with SLA-tagged service desk queue and stakeholder ticket visibility.
+- ✅ Added connector operations tab with sync job execution + reconciliation decision queue in Phase 5.
+- ✅ Added backend migration for append-only audit log enforcement with server-side hash chain + integrity verification function.
+- ✅ Added centralized policy middleware wrapper on entity CRUD with tenant-scoped enforcement defaults.
+- ✅ Added accessibility polish: skip link, dialog keyboard escape handling, ARIA labels on core navigation controls.
 
 ## 3) Remaining Work to Reach 10/10
 

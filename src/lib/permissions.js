@@ -1,4 +1,4 @@
-import { base44 } from '@/api/base44Client';
+import { rawBase44 } from '@/api/rawBase44Client';
 
 export const ROLE_DEFINITIONS = [
   { id: 'owner', label: 'Owner' },
@@ -48,7 +48,7 @@ export async function loadPolicy({ organizationId }) {
   if (!organizationId) return DEFAULT_POLICY;
 
   try {
-    const rows = await base44.entities.RolePermission.filter({ organization_id: organizationId });
+    const rows = await rawBase44.entities.RolePermission.filter({ organization_id: organizationId });
     if (!rows?.length) return DEFAULT_POLICY;
 
     return rows.reduce((acc, row) => {
@@ -73,9 +73,9 @@ export async function savePolicy({ organizationId, policy }) {
   if (!organizationId) return;
 
   try {
-    const existing = await base44.entities.RolePermission.filter({ organization_id: organizationId });
+    const existing = await rawBase44.entities.RolePermission.filter({ organization_id: organizationId });
 
-    await Promise.all(existing.map((row) => base44.entities.RolePermission.delete(row.id)));
+    await Promise.all(existing.map((row) => rawBase44.entities.RolePermission.delete(row.id)));
 
     const records = [];
     for (const role of Object.keys(policy)) {
@@ -89,7 +89,7 @@ export async function savePolicy({ organizationId, policy }) {
       }
     }
 
-    await Promise.all(records.map((record) => base44.entities.RolePermission.create(record)));
+    await Promise.all(records.map((record) => rawBase44.entities.RolePermission.create(record)));
   } catch (error) {
     console.warn('Unable to save role permissions.', error);
     throw error;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { PAGES } from '@/pages.config';
@@ -112,7 +112,17 @@ const menuSections = [
   }
 ];
 
+
 export default function MegaMenu({ isOpen, onClose }) {
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
@@ -120,11 +130,12 @@ export default function MegaMenu({ isOpen, onClose }) {
       {/* Overlay */}
       <div 
         className="fixed inset-0 z-40 bg-black/20"
+        aria-hidden="true"
         onClick={onClose}
       />
       
       {/* Mega Menu */}
-      <div className="fixed left-0 right-0 top-16 z-50 bg-white border-b border-slate-200 shadow-xl lg:left-64 max-h-[80vh] overflow-y-auto">
+      <div className="fixed left-0 right-0 top-16 z-50 bg-white border-b border-slate-200 shadow-xl lg:left-64 max-h-[80vh] overflow-y-auto" role="dialog" aria-modal="true" aria-label="Quick access navigation">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 sm:py-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
             {menuSections.map((section, idx) => (
