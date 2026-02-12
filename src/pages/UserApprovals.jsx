@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, Clock, Mail, Phone, Building2, User } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, Mail, Phone, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -17,7 +17,7 @@ export default function UserApprovals() {
     queryFn: async () => {
       const userData = await base44.auth.me();
       if (userData?.role === 'admin') {
-        return base44.asServiceRole.entities.PendingUser.filter({ status: 'pending' }, '-created_date');
+        return base44.entities.PendingUser.filter({ status: 'pending' }, '-created_date');
       }
       return [];
     }
