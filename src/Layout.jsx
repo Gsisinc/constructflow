@@ -4,13 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard,
   FolderKanban,
   FileText,
   Users,
-  Package,
   AlertTriangle,
   DollarSign,
   FileStack,
@@ -18,8 +16,6 @@ import {
   X,
   LogOut,
   ChevronDown,
-  Building2,
-  Calendar,
   Clock,
   Settings,
   User,
@@ -53,6 +49,10 @@ const navItems = [
                     { name: 'PM Guide', icon: FileText, page: 'PMSetupGuide' },
                     { name: 'Alerts', icon: AlertTriangle, page: 'AlertSettings' },
                     { name: 'Settings', icon: Settings, page: 'Settings' },
+                    { name: 'Role Permissions', icon: Settings, page: 'RolePermissions' },
+                    { name: 'Audit Trail', icon: FileStack, page: 'AuditTrail' },
+                    { name: 'Phase 2 Ops', icon: TrendingUp, page: 'Phase2Operations' },
+                    { name: 'Phase 3 Hub', icon: Building2, page: 'Phase3Operations' },
                   ];
 
 const adminNavItems = [
