@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { 
   CheckCircle2, 
   Circle, 
@@ -14,6 +13,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { loadPolicy, requirePermission } from '@/lib/permissions';
 
 const CATEGORIES = ['technical', 'legal', 'financial', 'compliance', 'timeline', 'deliverable', 'other'];
 const PRIORITIES = ['critical', 'high', 'medium', 'low'];
@@ -27,6 +27,13 @@ export default function BidRequirements({ bidId, organizationId }) {
   });
   const queryClient = useQueryClient();
 
+  const { data: user } = useQuery({ queryKey: ['currentUser', 'bidRequirements'], queryFn: () => base44.auth.me() });
+  const { data: policy } = useQuery({
+    queryKey: ['rolePolicy', organizationId, 'bidRequirements'],
+    queryFn: () => loadPolicy({ organizationId }),
+    enabled: !!organizationId
+  });
+
   const { data: requirements = [] } = useQuery({
     queryKey: ['bidRequirements', bidId],
     queryFn: () => base44.entities.BidRequirement.filter({ 
@@ -36,7 +43,10 @@ export default function BidRequirements({ bidId, organizationId }) {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.BidRequirement.create(data),
+    mutationFn: (data) => {
+      requirePermission({ policy, role: user?.role || 'viewer', module: 'bids', action: 'create', message: 'You do not have permission to add bid requirements.' });
+      return base44.entities.BidRequirement.create(data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidRequirements'] });
       setShowAddForm(false);
@@ -46,7 +56,10 @@ export default function BidRequirements({ bidId, organizationId }) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.BidRequirement.update(id, data),
+    mutationFn: ({ id, data }) => {
+      requirePermission({ policy, role: user?.role || 'viewer', module: 'bids', action: 'edit', message: 'You do not have permission to edit requirements.' });
+      return base44.entities.BidRequirement.update(id, data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidRequirements'] });
       toast.success('Updated');
@@ -54,7 +67,10 @@ export default function BidRequirements({ bidId, organizationId }) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.BidRequirement.delete(id),
+    mutationFn: (id) => {
+      requirePermission({ policy, role: user?.role || 'viewer', module: 'bids', action: 'delete', message: 'You do not have permission to delete requirements.' });
+      return base44.entities.BidRequirement.delete(id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidRequirements'] });
       toast.success('Deleted');

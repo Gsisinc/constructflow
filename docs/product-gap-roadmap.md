@@ -16,9 +16,9 @@ This is the clear list of major product gaps versus top construction platforms (
 | Field collaboration | Mobile-first offline workflows and punch sync | Partial |
 | Cost management | Forecasting, earned value, cost-to-complete | Partial |
 | Scheduling | Baseline vs actual, critical path, delay impact | Partial |
-| Integrations | Accounting (QuickBooks/Sage/NetSuite), BIM, calendars | Missing |
+| Integrations | Accounting (QuickBooks/Sage/NetSuite), BIM, calendars | Partial |
 | Reporting | Portfolio dashboards + export templates | Partial |
-| Security/compliance | SSO, audit exports, data retention policies | Missing |
+| Security/compliance | SSO, audit exports, data retention policies | Partial |
 | AI governance | Prompt logs, model policy, confidence traceability | Partial |
 
 ## 2) What Was Implemented In This Iteration
@@ -50,6 +50,42 @@ These close part of the "Drawing management" gap.
   2. SSO/compliance policy controls (SSO, MFA, SCIM, session timeout, retention).
   3. Portfolio BI summary cards with exportable CSV reporting.
 - ✅ Audit events written for integration and compliance policy updates.
+
+
+### Phase 4 implementation status (in-app)
+- ✅ Phase 4 AI Governance + Automation hub (`Phase4AIAutomation`) with:
+  1. AI governance policy controls (citations, confidence threshold, PII redaction, retention).
+  2. Model routing policy controls (cost-sensitive, standard, high reasoning, compliance review models).
+  3. Prompt traceability table with confidence badges and token estimates from `AgentMessage` history.
+  4. Automation Studio rule preview for risk-threshold and bid-deadline triggers.
+- ✅ Audit events written for policy/rule changes (`phase4_ai_policy_updated`, `phase4_automation_rules_updated`).
+
+
+### Phase 5 implementation status (in-app)
+- ✅ Phase 5 Platform & Scale Hub (`Phase5PlatformScale`) with:
+  1. Integration Marketplace+ controls (accounting/construction/collaboration providers + webhook toggles).
+  2. Tenant Admin Console (seat/storage/token limits, region, retention, data residency policy).
+  3. Executive Command Center (portfolio KPI cards + revenue forecast by project start month).
+- ✅ Audit events written for integration marketplace and tenant policy updates (`phase5_integrations_marketplace_updated`, `phase5_tenant_policy_updated`).
+
+
+### Phase 6 implementation status (in-app)
+- ✅ Phase 6 Reliability & Customer Ops hub (`Phase6ReliabilityOps`) with:
+  1. Incident + SLA reliability console (auto-escalation policy + breach-rate visibility).
+  2. Release quality gate metrics (deployment success rate + change-failure rate).
+  3. Support runbooks and backup-drill log view for disaster-recovery readiness.
+- ✅ Audit events written for reliability policy updates (`phase6_reliability_policy_updated`).
+
+
+### Enterprise hardening upgrade (current iteration)
+- ✅ Integration depth upgraded with sync-direction controls (ingest/push/bi-directional) in Phase 5 marketplace.
+- ✅ Security/compliance upgraded with hash-chain audit verification and immutable-style CSV/JSONL export in Audit Trail.
+- ✅ Multi-tenant hardening upgraded with tenant scope helpers and org-scoped automation preview/writes in Phase 4 rules.
+- ✅ Advanced ticketing + client portal requests upgraded with SLA-tagged service desk queue and stakeholder ticket visibility.
+- ✅ Added connector operations tab with sync job execution + reconciliation decision queue in Phase 5.
+- ✅ Added backend migration for append-only audit log enforcement with server-side hash chain + integrity verification function.
+- ✅ Added centralized policy middleware wrapper on entity CRUD with tenant-scoped enforcement defaults.
+- ✅ Added accessibility polish: skip link, dialog keyboard escape handling, ARIA labels on core navigation controls.
 
 ## 3) Remaining Work to Reach 10/10
 

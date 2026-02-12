@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Upload, FileText, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { loadPolicy, requirePermission } from '@/lib/permissions';
 
 export default function BidUploader({ bidId, organizationId, onUploadComplete }) {
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
+
+  const { data: user } = useQuery({ queryKey: ['currentUser', 'bidUploader'], queryFn: () => base44.auth.me() });
+  const { data: policy } = useQuery({
+    queryKey: ['rolePolicy', organizationId, 'bidUploader'],
+    queryFn: () => loadPolicy({ organizationId }),
+    enabled: !!organizationId
+  });
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -20,6 +28,7 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
     console.log('Starting file upload:', file.name);
     
     try {
+      requirePermission({ policy, role: user?.role || 'viewer', module: 'documents', action: 'create', message: 'You do not have permission to upload bid documents.' });
       // Upload file
       console.log('Uploading file to Core.UploadFile...');
       const { file_url } = await base44.integrations.Core.UploadFile({ file });

@@ -3,7 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
+import { exportAuditAsCsv, exportAuditAsJsonl, buildAuditHashChain, verifyAuditHashChain } from '@/lib/auditExport';
 
 export default function AuditTrail() {
   const { data: user } = useQuery({
@@ -20,11 +22,35 @@ export default function AuditTrail() {
     enabled: !!user?.organization_id
   });
 
+  const chained = React.useMemo(() => buildAuditHashChain(logs), [logs]);
+  const chainStatus = React.useMemo(() => verifyAuditHashChain(chained), [chained]);
+
+  const download = (filename, content, mimeType) => {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Audit Trail</h1>
         <p className="text-sm text-slate-600 mt-1">Immutable-style activity feed for Phase 1 governance.</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Badge className={chainStatus.valid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
+            {chainStatus.valid ? 'Hash chain verified' : `Chain broken at row ${chainStatus.broken_index + 1}`}
+          </Badge>
+          <Button size="sm" variant="outline" onClick={() => download('audit-export.csv', exportAuditAsCsv(chained), 'text/csv;charset=utf-8;')}>
+            Export CSV
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => download('audit-export.jsonl', exportAuditAsJsonl(chained), 'application/x-ndjson;charset=utf-8;')}>
+            Export JSONL
+          </Button>
+        </div>
       </div>
 
       {logs.length === 0 ? (
@@ -33,7 +59,7 @@ export default function AuditTrail() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {logs.map((log) => (
+          {chained.map((log) => (
             <Card key={log.id}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">

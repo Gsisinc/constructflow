@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
 import AgentChat from '../components/agents/AgentChat';
 import { 
   Search, 
@@ -17,7 +18,6 @@ import {
   MapPin, 
   Building2,
   TrendingUp,
-  AlertCircle,
   CheckCircle2,
   Plus,
   ExternalLink,
@@ -29,6 +29,11 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import {
+  detectNewOpportunities,
+  buildDiscoveryFingerprint,
+  fetchDiscoveryFromSources
+} from '@/lib/bidDiscoveryOrchestrator';
 
 const marketIntelligenceAgent = {
   id: 'market_intelligence',
@@ -47,8 +52,12 @@ export default function BidDiscovery() {
   const [searching, setSearching] = useState(false);
   const [state, setState] = useState('California');
   const [cityCounty, setCityCounty] = useState('');
+  const [classification, setClassification] = useState('all');
   const [workType, setWorkType] = useState('all');
   const [autoSearchEnabled, setAutoSearchEnabled] = useState(true);
+  const [autoAlertEnabled, setAutoAlertEnabled] = useState(true);
+  const [autoAlertIntervalMin, setAutoAlertIntervalMin] = useState('15');
+  const [sourceSummary, setSourceSummary] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalAvailable, setTotalAvailable] = useState(0);
@@ -64,6 +73,18 @@ export default function BidDiscovery() {
     'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
     'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
     'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+  ];
+
+  const classifications = [
+    'all',
+    'commercial',
+    'government',
+    'education',
+    'healthcare',
+    'industrial',
+    'residential',
+    'transportation',
+    'utilities'
   ];
 
   const citiesByState = {
@@ -127,105 +148,115 @@ export default function BidDiscovery() {
 
   const { data: bids = [] } = useQuery({
     queryKey: ['bids'],
-    queryFn: () => base44.entities.Bid.list('-created_date', 20)
+    queryFn: () => base44.entities.BidOpportunity.list('-created_date', 100)
   });
 
-  // Auto-search when filters change - AGGRESSIVE MODE
   useEffect(() => {
-    if (workType && workType !== 'all') {
+    const saved = window.localStorage.getItem('bid_discovery_alert_settings');
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved);
+      setAutoAlertEnabled(Boolean(parsed.autoAlertEnabled));
+      setAutoAlertIntervalMin(String(parsed.autoAlertIntervalMin || '15'));
+    } catch {
+      // noop
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      'bid_discovery_alert_settings',
+      JSON.stringify({ autoAlertEnabled, autoAlertIntervalMin })
+    );
+  }, [autoAlertEnabled, autoAlertIntervalMin]);
+
+  // Auto-search when filters change
+  useEffect(() => {
+    if (workType && workType !== 'all' && autoSearchEnabled) {
       setSearchResults([]); // Clear previous results
       setCurrentPage(1); // Reset to page 1
       const timer = setTimeout(() => {
         performAutoSearch();
       }, 500); // Debounce for 500ms
       return () => clearTimeout(timer);
-    } else {
+    }
+
+    if (workType === 'all') {
       setSearchResults([]);
       setCurrentPage(1);
     }
-  }, [workType, state, cityCounty]);
+  }, [workType, state, cityCounty, classification, autoSearchEnabled]);
+
+  useEffect(() => {
+    if (!autoAlertEnabled || !workType || workType === 'all') return;
+
+    const interval = Math.max(5, Number(autoAlertIntervalMin) || 15) * 60_000;
+    const id = setInterval(() => {
+      executeAISearch(1, true);
+    }, interval);
+
+    return () => clearInterval(id);
+  }, [autoAlertEnabled, autoAlertIntervalMin, workType, state, cityCounty, classification]);
 
   const performAutoSearch = async () => {
     if (!workType || workType === 'all' || searching) return;
-    console.log('🔍 AUTO-FETCHING:', workType, state, cityCounty || 'All Cities');
-    
-    // First, load LAUSD bids from database
-    try {
-      const dbBids = await base44.entities.BidOpportunity.filter({ source: 'LAUSD' });
-      if (dbBids.length > 0) {
-        setSearchResults(dbBids);
-        setTotalAvailable(dbBids.length);
-        toast.success(`✓ Loaded ${dbBids.length} opportunities from database`);
-      }
-    } catch (err) {
-      console.error('Failed to load from DB:', err);
-    }
-    
-    // Then try to fetch fresh data
-    await executeAISearch();
+    await executeAISearch(1, true);
   };
 
-  const executeAISearch = async (page = 1) => {
+  const executeAISearch = async (page = 1, silent = false) => {
     setSearching(true);
     const workTypeDisplay = workType.replace('_', ' ');
-    toast.info(`🔍 Fetching ${workTypeDisplay} opportunities in ${state} (page ${page})...`);
+    const filters = { workType, state, cityCounty, classification };
+    const previousFingerprints = searchResults.map((item) => buildDiscoveryFingerprint(item));
+    if (!silent) {
+      toast.info(`🔍 Fetching ${workTypeDisplay} opportunities in ${state} (page ${page})...`);
+    }
 
     try {
-      // Try California counties first if California is selected
-      let response;
-      if (state === 'California') {
-        response = await base44.functions.invoke('scrapeCaCounties', {
-          workType: workType,
-          testMode: false
+      const response = await fetchDiscoveryFromSources({
+        base44Client: base44,
+        filters,
+        page,
+        pageSize: 250
+      });
+      setSourceSummary(response.sourceSummary || []);
+
+      if (response.opportunities.length > 0) {
+        const nextResults =
+          page === 1
+            ? response.opportunities
+            : [...searchResults, ...response.opportunities];
+        const deduped = Array.from(
+          new Map(nextResults.map((item) => [buildDiscoveryFingerprint(item), item])).values()
+        );
+
+        if (page === 1) {
+          setSearchResults(deduped);
+        } else {
+          setSearchResults(deduped);
+        }
+
+        const discoveredNew = detectNewOpportunities({
+          previousFingerprints,
+          opportunities: deduped
         });
 
-        // If CA counties returned results, use those
-        if (response.data.success && response.data.bids?.length > 0) {
-          console.log('✓ Using California county data');
-        } else {
-          // Fall back to general scraper
-          console.log('⚠ CA counties empty, trying general scraper');
-          response = await base44.functions.invoke('scrapeCaliforniaBids', {
-            workType: workType,
-            state: state,
-            city: cityCounty || null,
-            page: page,
-            pageSize: 500
-          });
+        setTotalPages(Math.max(page, totalPages));
+        setTotalAvailable(deduped.length);
+        setHasMore(response.opportunities.length >= 250);
+        setCurrentPage(page);
+        if (!silent) {
+          toast.success(`✓ Found ${deduped.length} ranked ${workTypeDisplay} bids.`);
+        }
+
+        if (silent && discoveredNew.length > 0) {
+          toast.success(`🔔 ${discoveredNew.length} new ${workTypeDisplay} opportunities matched your alerts.`);
         }
       } else {
-        // Use general scraper for other states
-        response = await base44.functions.invoke('scrapeCaliforniaBids', {
-          workType: workType,
-          state: state,
-          city: cityCounty || null,
-          page: page,
-          pageSize: 500
-        });
-      }
-
-      console.log('✅ Scraper response:', response.data);
-
-      // Handle both CA counties response and general scraper response
-      const opportunities = response.data.opportunities || response.data.bids || [];
-
-      if (response.data.success && opportunities.length > 0) {
-        if (page === 1) {
-          setSearchResults(opportunities);
-        } else {
-          setSearchResults(prev => [...prev, ...opportunities]);
-        }
-        setTotalPages(response.data.totalPages || 1);
-        setTotalAvailable(response.data.totalAvailable || response.data.summary?.uniqueBids || opportunities.length);
-        setHasMore(response.data.hasMore || false);
-        setCurrentPage(page);
-        toast.success(`✓ Found ${opportunities.length} ${workTypeDisplay} bids!`);
-      } else if (response.data.success) {
         setSearchResults([]);
+        setSourceSummary([]);
         setHasMore(false);
         toast.info(`No ${workTypeDisplay} opportunities found right now.`);
-      } else {
-        toast.warning('Scraper had issues accessing government sites.');
       }
     } catch (error) {
       console.error('❌ Scraper error:', error);
@@ -247,6 +278,10 @@ export default function BidDiscovery() {
     
     if (workType && workType !== 'all') {
       parts.push(workType);
+    }
+
+    if (classification && classification !== 'all') {
+      parts.push(`${classification} classification`);
     }
     
     const location = [];
@@ -275,7 +310,7 @@ export default function BidDiscovery() {
   });
 
   const createBidMutation = useMutation({
-    mutationFn: (data) => base44.entities.Bid.create(data),
+    mutationFn: (data) => base44.entities.BidOpportunity.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
       toast.success('Bid added to pipeline');
@@ -283,7 +318,7 @@ export default function BidDiscovery() {
   });
 
   const deleteBidMutation = useMutation({
-    mutationFn: (bidId) => base44.entities.Bid.delete(bidId),
+    mutationFn: (bidId) => base44.entities.BidOpportunity.delete(bidId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
       toast.success('Bid removed from pipeline');
@@ -291,7 +326,7 @@ export default function BidDiscovery() {
   });
 
   const updateBidMutation = useMutation({
-    mutationFn: ({ bidId, data }) => base44.entities.Bid.update(bidId, data),
+    mutationFn: ({ bidId, data }) => base44.entities.BidOpportunity.update(bidId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
     }
@@ -313,14 +348,18 @@ export default function BidDiscovery() {
       const checklist = generateChecklist(opportunity);
       
       await createBidMutation.mutateAsync({
-        rfp_name: opportunity.project_name || opportunity.title,
-        client_name: opportunity.agency || opportunity.client,
-        status: 'draft',
-        bid_amount: opportunity.estimated_value || 0,
+        title: opportunity.project_name || opportunity.title,
+        agency: opportunity.agency || opportunity.client,
+        status: 'new',
+        estimated_value: opportunity.estimated_value || 0,
         due_date: opportunity.due_date,
         win_probability: opportunity.win_probability || 50,
-        notes: opportunity.description,
-        documents: checklist
+        description: opportunity.description,
+        source: opportunity.source_name || opportunity.source || 'Bid Discovery',
+        location: opportunity.location,
+        requirements: checklist,
+        classification: classification === 'all' ? null : classification,
+        work_type: workType
       });
       setSelectedBid(null);
     } catch (error) {
@@ -369,7 +408,7 @@ export default function BidDiscovery() {
   };
 
   const handleToggleChecklistItem = async (bid, index) => {
-    const updatedDocuments = [...(bid.documents || [])];
+    const updatedDocuments = [...(bid.requirements || [])];
     const item = updatedDocuments[index];
     
     // Toggle checkbox
@@ -382,7 +421,7 @@ export default function BidDiscovery() {
     try {
       await updateBidMutation.mutateAsync({
         bidId: bid.id,
-        data: { documents: updatedDocuments }
+        data: { requirements: updatedDocuments }
       });
     } catch (error) {
       toast.error('Failed to update checklist');
@@ -390,39 +429,6 @@ export default function BidDiscovery() {
   };
 
   const [analysisPrompt, setAnalysisPrompt] = useState(null);
-
-  const handleAnalyzeBid = (bid) => {
-    const formatDate = (dateStr) => {
-      try {
-        const date = new Date(dateStr);
-        return isNaN(date.getTime()) ? dateStr : format(date, 'MMMM d, yyyy');
-      } catch {
-        return dateStr;
-      }
-    };
-
-    const prompt = `Please provide a comprehensive analysis of this bid opportunity:
-
-**Project:** ${bid.title || bid.project_name}
-**Agency:** ${bid.agency || bid.client_name}
-**Location:** ${bid.location || 'Not specified'}
-**Value:** $${bid.estimated_value?.toLocaleString() || 'TBD'}
-**Due Date:** ${bid.due_date ? formatDate(bid.due_date) : 'Not specified'}
-**Source:** ${bid.url || 'N/A'}
-
-Please analyze and provide:
-1. Detailed scope and requirements
-2. Key contact information
-3. Important dates and milestones
-4. Required documents and attachments
-5. Potential challenges and risks
-6. Win probability assessment
-7. Recommendation on whether to bid`;
-
-    setAnalysisPrompt(prompt);
-    setSelectedBid(null);
-    setShowAgentChat(true);
-  };
 
   const handleCreateProject = async (opportunity) => {
     try {
@@ -439,6 +445,16 @@ Please analyze and provide:
       setSelectedBid(null);
     } catch (error) {
       toast.error('Failed to create project');
+    }
+  };
+
+  const handleMarkWon = async (bid) => {
+    try {
+      await updateBidMutation.mutateAsync({ bidId: bid.id, data: { status: 'won' } });
+      await handleCreateProject(bid);
+      toast.success('Bid marked won and moved to projects.');
+    } catch (error) {
+      toast.error('Failed to mark as won');
     }
   };
 
@@ -657,6 +673,19 @@ Provide:
         {/* Search Filters & Bar */}
         <div className="mt-6 space-y-3">
           <div className="flex gap-3">
+            <Select value={classification} onValueChange={setClassification}>
+              <SelectTrigger className="w-[220px] bg-white text-slate-900 h-12">
+                <SelectValue placeholder="Classification" />
+              </SelectTrigger>
+              <SelectContent>
+                {classifications.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {value === 'all' ? 'All Classifications' : value.charAt(0).toUpperCase() + value.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <Select value={workType} onValueChange={setWorkType}>
               <SelectTrigger className="w-[220px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="Type of Work" />
@@ -719,6 +748,31 @@ Provide:
             </Select>
 
 
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 text-sm text-blue-50">
+            <div className="flex items-center gap-2">
+              <Switch checked={autoSearchEnabled} onCheckedChange={setAutoSearchEnabled} />
+              <span>Auto search</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch checked={autoAlertEnabled} onCheckedChange={setAutoAlertEnabled} />
+              <span>New bid alerts</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>Interval</span>
+              <Select value={autoAlertIntervalMin} onValueChange={setAutoAlertIntervalMin}>
+                <SelectTrigger className="w-[110px] h-9 bg-white text-slate-900">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 min</SelectItem>
+                  <SelectItem value="15">15 min</SelectItem>
+                  <SelectItem value="30">30 min</SelectItem>
+                  <SelectItem value="60">60 min</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Recommended Search Display */}
@@ -832,6 +886,27 @@ Provide:
             </Card>
           ) : (
             <div className="space-y-6">
+              {sourceSummary.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Source health</CardTitle>
+                    <CardDescription>SAM + county + business aggregator status.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                    {sourceSummary.map((entry) => (
+                      <div key={entry.functionName} className="rounded-md border p-3 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{entry.source}</span>
+                          <Badge variant={entry.success ? 'default' : 'outline'}>{entry.success ? 'ok' : 'issue'}</Badge>
+                        </div>
+                        <p className="text-slate-500 mt-1">{entry.count} results</p>
+                        {entry.error && <p className="text-red-500 text-xs mt-1">{entry.error}</p>}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
               {totalAvailable > 0 && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
                   <p className="text-sm text-blue-900">
@@ -890,8 +965,8 @@ Provide:
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle>{bid.rfp_name}</CardTitle>
-                        <CardDescription>{bid.client_name}</CardDescription>
+                        <CardTitle>{bid.title || bid.rfp_name}</CardTitle>
+                        <CardDescription>{bid.agency || bid.client_name}</CardDescription>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge>{bid.status}</Badge>
@@ -908,10 +983,10 @@ Provide:
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="flex gap-6 text-sm">
-                          {bid.bid_amount > 0 && (
+                          {(bid.estimated_value || bid.bid_amount) > 0 && (
                             <div>
                               <span className="text-slate-500">Amount: </span>
-                              <span className="font-medium">${bid.bid_amount?.toLocaleString()}</span>
+                              <span className="font-medium">${(bid.estimated_value || bid.bid_amount)?.toLocaleString()}</span>
                             </div>
                           )}
                           {bid.due_date && (
@@ -937,6 +1012,9 @@ Provide:
                           )}
                         </div>
                         <div className="flex gap-2">
+                          <Button size="sm" onClick={() => handleMarkWon(bid)}>
+                            Mark Won
+                          </Button>
                           <Button size="sm" variant="outline" onClick={() => setSelectedBid(bid)}>
                             View Details
                           </Button>
@@ -951,14 +1029,14 @@ Provide:
                       </div>
 
                       {/* Checklist */}
-                      {bid.documents && bid.documents.length > 0 && (
+                      {bid.requirements && bid.requirements.length > 0 && (
                         <div className="border-t pt-4">
                           <p className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
                             <ListChecks className="h-4 w-4" />
                             Bid Requirements Checklist
                           </p>
                           <div className="space-y-1.5">
-                            {bid.documents.map((item, idx) => (
+                            {bid.requirements.map((item, idx) => (
                               <button
                                 key={idx}
                                 onClick={() => handleToggleChecklistItem(bid, idx)}
@@ -1013,7 +1091,7 @@ Provide:
         <Dialog open={!!selectedBid} onOpenChange={() => setSelectedBid(null)}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl">{selectedBid.project_name || selectedBid.rfp_name}</DialogTitle>
+              <DialogTitle className="text-2xl">{selectedBid.project_name || selectedBid.title || selectedBid.rfp_name}</DialogTitle>
             </DialogHeader>
             
             <div className="space-y-6">
