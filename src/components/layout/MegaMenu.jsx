@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { PAGES } from '@/pages.config';
 import {
   LayoutDashboard,
   Clock,
@@ -51,7 +52,7 @@ const menuSections = [
       { icon: Package, label: 'Purchase Orders', page: 'PurchaseOrders' },
       { icon: FileText, label: 'Invoices', page: 'Invoices' },
       { icon: TrendingUp, label: 'Financial Projections', page: 'Budget' },
-      { icon: FileStack, label: 'Change Orders', page: 'ChangeOrders' },
+      { icon: FileStack, label: 'Change Orders', page: 'Budget' },
     ]
   },
   {
@@ -78,18 +79,18 @@ const menuSections = [
     items: [
       { icon: Camera, label: 'Photos', page: 'Photos' },
       { icon: FolderOpen, label: 'Files', page: 'Documents' },
-      { icon: FileImage, label: 'Plans & Drawings', page: 'Drawings' },
-      { icon: Book, label: 'Reports', page: 'Reports' },
+      { icon: FileImage, label: 'Plans & Drawings', page: 'Documents' },
+      { icon: Book, label: 'Reports', page: 'Dashboard' },
       { icon: FileStack, label: 'Submittals', page: 'Submittals' },
-      { icon: Package, label: 'Equipment Logs', page: 'EquipmentLogs' },
+      { icon: Package, label: 'Equipment Logs', page: 'Materials' },
     ]
   },
   {
     title: 'Settings & Support',
     items: [
-      { icon: HelpCircle, label: 'Help & Support', page: 'Support' },
-      { icon: Radio, label: "What's New", page: 'Changelog' },
-      { icon: MessageSquare, label: 'Make a Suggestion', page: 'Feedback' },
+      { icon: HelpCircle, label: 'Help & Support', page: 'Settings' },
+      { icon: Radio, label: "What's New", page: 'Dashboard' },
+      { icon: MessageSquare, label: 'Make a Suggestion', page: 'Settings' },
       { icon: Bot, label: 'AI Agents', page: 'AIAgents' },
       { icon: Settings, label: 'Role Permissions', page: 'RolePermissions' },
       { icon: FileStack, label: 'Audit Trail', page: 'AuditTrail' },
@@ -104,9 +105,9 @@ const menuSections = [
   {
     title: 'Resources',
     items: [
-      { icon: Video, label: 'Training & Support', page: 'Training' },
-      { icon: Book, label: 'Knowledge Base', page: 'Docs' },
-      { icon: Building2, label: "Who's Behind It", page: 'About' },
+      { icon: Video, label: 'Training & Support', page: 'PMSetupGuide' },
+      { icon: Book, label: 'Knowledge Base', page: 'PMSetupGuide' },
+      { icon: Building2, label: "Who's Behind It", page: 'Home' },
     ]
   }
 ];
@@ -132,7 +133,7 @@ export default function MegaMenu({ isOpen, onClose }) {
                   {section.title}
                 </h3>
                 <ul className="space-y-0.5 sm:space-y-1">
-                  {section.items.map((item, itemIdx) => {
+                  {section.items.filter((item) => Boolean(PAGES[item.page])).map((item, itemIdx) => {
                     const Icon = item.icon;
                     return (
                       <li key={itemIdx}>

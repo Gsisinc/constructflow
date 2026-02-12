@@ -16,9 +16,9 @@ This is the clear list of major product gaps versus top construction platforms (
 | Field collaboration | Mobile-first offline workflows and punch sync | Partial |
 | Cost management | Forecasting, earned value, cost-to-complete | Partial |
 | Scheduling | Baseline vs actual, critical path, delay impact | Partial |
-| Integrations | Accounting (QuickBooks/Sage/NetSuite), BIM, calendars | Missing |
+| Integrations | Accounting (QuickBooks/Sage/NetSuite), BIM, calendars | Partial |
 | Reporting | Portfolio dashboards + export templates | Partial |
-| Security/compliance | SSO, audit exports, data retention policies | Missing |
+| Security/compliance | SSO, audit exports, data retention policies | Partial |
 | AI governance | Prompt logs, model policy, confidence traceability | Partial |
 
 ## 2) What Was Implemented In This Iteration

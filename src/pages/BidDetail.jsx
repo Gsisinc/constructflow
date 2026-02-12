@@ -1,18 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  ArrowLeft, 
-  Trash2, 
-  FileText, 
-  TrendingUp,
-  Calendar,
-  DollarSign
-} from 'lucide-react';
+import { ArrowLeft, Calendar, DollarSign, FileText, Trash2, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -37,11 +30,12 @@ export default function BidDetail() {
   const [user, setUser] = useState(null);
   const [bidId, setBidId] = useState(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     setBidId(urlParams.get('id'));
-    
+
     const loadUser = async () => {
       const userData = await base44.auth.me();
       setUser(userData);
@@ -53,16 +47,14 @@ export default function BidDetail() {
     queryKey: ['bid', bidId],
     queryFn: async () => {
       const bids = await base44.entities.BidOpportunity.filter({ id: bidId });
-      return bids[0];
+      return bids?.[0] || null;
     },
     enabled: !!bidId
   });
 
   const { data: documents = [] } = useQuery({
     queryKey: ['bidDocuments', bidId],
-    queryFn: () => base44.entities.BidDocument.filter({ 
-      bid_opportunity_id: bidId 
-    }),
+    queryFn: () => base44.entities.BidDocument.filter({ bid_opportunity_id: bidId }),
     enabled: !!bidId
   });
 
@@ -71,14 +63,17 @@ export default function BidDetail() {
     onSuccess: () => {
       toast.success('Bid deleted');
       navigate(createPageUrl('Bids'));
-    }
+    },
+    onError: () => toast.error('Unable to delete bid')
   });
+
+  const analysis = useMemo(() => normalizeAiAnalysis(bid?.ai_analysis), [bid?.ai_analysis]);
 
   if (!bid || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto" />
           <p className="mt-4 text-slate-600">Loading...</p>
         </div>
       </div>
@@ -87,34 +82,24 @@ export default function BidDetail() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate(createPageUrl('Bids'))}
-          >
+          <Button variant="outline" size="icon" onClick={() => navigate(createPageUrl('Bids'))}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{bid.title}</h1>
-            <p className="text-sm text-slate-600 mt-1">
-              {bid.agency || bid.client_name}
-            </p>
+            <h1 className="text-2xl font-bold text-slate-900">{bid.title || bid.project_name || 'Untitled Bid'}</h1>
+            <p className="text-sm text-slate-600 mt-1">{bid.agency || bid.client_name || 'Unknown Agency'}</p>
           </div>
         </div>
+
         <div className="flex gap-2">
-          {bid.status === 'won' && (
-            <BidToProject bid={bid} organizationId={user.organization_id} />
-          )}
+          {bid.status === 'won' && <BidToProject bid={bid} organizationId={user.organization_id} />}
           <Button
             variant="outline"
             size="icon"
             onClick={() => {
-              if (confirm('Delete this bid?')) {
-                deleteMutation.mutate(bid.id);
-              }
+              if (confirm('Delete this bid?')) deleteMutation.mutate(bid.id);
             }}
             className="text-red-600"
           >
@@ -123,64 +108,24 @@ export default function BidDetail() {
         </div>
       </div>
 
-      {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-8 w-8 text-amber-600" />
-              <div>
-                <p className="text-xs text-slate-500">Due Date</p>
-                <p className="text-sm font-semibold">
-                  {bid.due_date ? format(new Date(bid.due_date), 'MMM d, yyyy') : 'Not set'}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <DollarSign className="h-8 w-8 text-green-600" />
-              <div>
-                <p className="text-xs text-slate-500">Estimated Value</p>
-                <p className="text-sm font-semibold">
-                  ${(bid.estimated_value || 0).toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="h-8 w-8 text-blue-600" />
-              <div>
-                <p className="text-xs text-slate-500">Win Probability</p>
-                <p className="text-sm font-semibold">
-                  {bid.win_probability || 0}%
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? format(new Date(bid.due_date), 'MMM d, yyyy') : 'Not set'} />
+        <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={`$${Number(bid.estimated_value || bid.value || 0).toLocaleString()}`} />
+        <StatCard icon={<TrendingUp className="h-8 w-8 text-blue-600" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <FileText className="h-8 w-8 text-purple-600" />
               <div>
                 <p className="text-xs text-slate-500">Status</p>
-                <Badge className={statusColors[bid.status]}>
-                  {bid.status}
-                </Badge>
+                <Badge className={statusColors[bid.status] || 'bg-slate-100 text-slate-700'}>{bid.status || 'new'}</Badge>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Content */}
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue="overview" className="w-full">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="requirements">Requirements</TabsTrigger>
@@ -192,40 +137,14 @@ export default function BidDetail() {
 
         <TabsContent value="overview" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Bid Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-semibold text-slate-700">Project Name</label>
-                <p className="text-sm text-slate-900 mt-1">{bid.project_name || 'N/A'}</p>
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-slate-700">Description</label>
-                <p className="text-sm text-slate-900 mt-1">{bid.description || 'No description'}</p>
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-slate-700">Scope of Work</label>
-                <p className="text-sm text-slate-900 mt-1 whitespace-pre-wrap">
-                  {bid.scope_of_work || 'No scope defined'}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-slate-700">Location</label>
-                <p className="text-sm text-slate-900 mt-1">{bid.location || 'Not specified'}</p>
-              </div>
+            <CardHeader><CardTitle>Bid Overview</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-slate-700 whitespace-pre-wrap">{bid.description || 'No description yet.'}</p>
+              {bid.location && <p className="text-sm text-slate-600"><strong>Location:</strong> {bid.location}</p>}
               {bid.url && (
-                <div>
-                  <label className="text-sm font-semibold text-slate-700">Source URL</label>
-                  <a 
-                    href={bid.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm text-amber-600 hover:underline mt-1 block"
-                  >
-                    View original posting →
-                  </a>
-                </div>
+                <a href={bid.url} target="_blank" rel="noopener noreferrer" className="text-sm text-amber-600 hover:underline block">
+                  View original posting →
+                </a>
               )}
             </CardContent>
           </Card>
@@ -236,8 +155,8 @@ export default function BidDetail() {
         </TabsContent>
 
         <TabsContent value="documents" className="space-y-4">
-          <BidUploader 
-            bidId={bid.id} 
+          <BidUploader
+            bidId={bid.id}
             organizationId={user.organization_id}
             onUploadComplete={() => {
               queryClient.invalidateQueries({ queryKey: ['bidDocuments', bidId] });
@@ -245,34 +164,24 @@ export default function BidDetail() {
               refetchBid();
             }}
           />
-          
+
           {documents.length > 0 && (
             <div className="space-y-2">
               <h3 className="text-sm font-semibold text-slate-900">Uploaded Documents</h3>
-              {documents.map(doc => (
+              {documents.map((doc) => (
                 <Card key={doc.id}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <FileText className="h-5 w-5 text-slate-400" />
                         <div>
-                          <p className="text-sm font-medium">{doc.name}</p>
-                          <p className="text-xs text-slate-500">
-                            {(doc.file_size / 1024).toFixed(1)} KB
-                          </p>
+                          <p className="text-sm font-medium">{doc.name || 'Untitled document'}</p>
+                          <p className="text-xs text-slate-500">{formatFileSize(doc.file_size)}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {doc.ai_processed && (
-                          <Badge variant="outline" className="text-xs">
-                            AI Processed
-                          </Badge>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => window.open(doc.file_url, '_blank')}
-                        >
+                        {doc.ai_processed && <Badge variant="outline" className="text-xs">AI Processed</Badge>}
+                        <Button size="sm" variant="outline" onClick={() => doc.file_url && window.open(doc.file_url, '_blank')}>
                           View
                         </Button>
                       </div>
@@ -307,55 +216,47 @@ export default function BidDetail() {
         </TabsContent>
 
         <TabsContent value="analysis" className="space-y-4">
-          {bid.ai_analysis ? (
+          {analysis.hasAnyData ? (
             <div className="space-y-4">
-              {bid.ai_analysis.complexity_score && (
+              {analysis.complexityScore !== null && (
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Complexity Score</CardTitle>
-                  </CardHeader>
+                  <CardHeader><CardTitle className="text-base">Complexity Score</CardTitle></CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-4">
-                      <div className="text-4xl font-bold text-amber-600">
-                        {bid.ai_analysis.complexity_score}/10
-                      </div>
-                      <p className="text-sm text-slate-600">
-                        {bid.ai_analysis.complexity_score > 7 ? 'High complexity' : 
-                         bid.ai_analysis.complexity_score > 4 ? 'Medium complexity' : 
-                         'Low complexity'}
-                      </p>
+                      <div className="text-4xl font-bold text-amber-600">{analysis.complexityScore}/10</div>
+                      <p className="text-sm text-slate-600">{analysis.complexityLabel}</p>
                     </div>
                   </CardContent>
                 </Card>
               )}
-              
-              {bid.ai_analysis.risk_factors?.length > 0 && (
+
+              {analysis.riskFactors.length > 0 && (
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Risk Factors</CardTitle>
-                  </CardHeader>
+                  <CardHeader><CardTitle className="text-base">Risk Factors</CardTitle></CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
-                      {bid.ai_analysis.risk_factors.map((risk, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="text-red-500 mt-0.5">⚠</span>
-                          <span>{risk}</span>
-                        </li>
+                      {analysis.riskFactors.map((risk, idx) => (
+                        <li key={`${risk}-${idx}`} className="flex items-start gap-2 text-sm"><span className="text-red-500 mt-0.5">⚠</span><span>{risk}</span></li>
                       ))}
                     </ul>
                   </CardContent>
                 </Card>
               )}
 
-              {bid.ai_analysis.recommended_markup && (
+              {analysis.recommendedMarkup !== null && (
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Recommended Markup</CardTitle>
-                  </CardHeader>
+                  <CardHeader><CardTitle className="text-base">Recommended Markup</CardTitle></CardHeader>
+                  <CardContent><p className="text-2xl font-bold text-green-600">{analysis.recommendedMarkup}%</p></CardContent>
+                </Card>
+              )}
+
+              {analysis.keyPoints.length > 0 && (
+                <Card>
+                  <CardHeader><CardTitle className="text-base">Key Points</CardTitle></CardHeader>
                   <CardContent>
-                    <p className="text-2xl font-bold text-green-600">
-                      {bid.ai_analysis.recommended_markup}%
-                    </p>
+                    <ul className="space-y-2 text-sm text-slate-700 list-disc ml-5">
+                      {analysis.keyPoints.map((point, idx) => <li key={`${point}-${idx}`}>{point}</li>)}
+                    </ul>
                   </CardContent>
                 </Card>
               )}
@@ -371,5 +272,70 @@ export default function BidDetail() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function formatFileSize(fileSize) {
+  const bytes = Number(fileSize || 0);
+  if (!bytes) return 'Unknown size';
+  if (bytes < 1024) return `${bytes} bytes`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function normalizeAiAnalysis(raw) {
+  const parsed = typeof raw === 'string' ? safeParseJson(raw) : raw;
+  const complexity = asNumber(parsed?.complexity_score);
+  const markup = asNumber(parsed?.recommended_markup);
+  const riskFactors = asArray(parsed?.risk_factors);
+  const keyPoints = asArray(parsed?.key_points);
+
+  return {
+    hasAnyData: Boolean(parsed) && (complexity !== null || markup !== null || riskFactors.length > 0 || keyPoints.length > 0),
+    complexityScore: complexity,
+    complexityLabel: complexity === null
+      ? 'Not scored'
+      : complexity > 7
+        ? 'High complexity'
+        : complexity > 4
+          ? 'Medium complexity'
+          : 'Low complexity',
+    recommendedMarkup: markup,
+    riskFactors,
+    keyPoints
+  };
+}
+
+function safeParseJson(value) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+function asArray(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value.filter(Boolean) : [];
+}
+
+function asNumber(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
+function StatCard({ icon, label, value }) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          {icon}
+          <div>
+            <p className="text-xs text-slate-500">{label}</p>
+            <p className="text-sm font-semibold">{value}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
