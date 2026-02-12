@@ -3,7 +3,6 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Send, X, Paperclip, Bot, User, DollarSign, Calendar, MapPin, ExternalLink, Plus, Sparkles, History, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
@@ -11,6 +10,14 @@ import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { buildAgentSystemPrompt, getAgentWorkflow } from '@/config/agentWorkflows';
+import { shouldInvokeLiveDiscovery } from '@/config/agentRuntimeRules';
+import {
+  buildDiscoverySummary,
+  extractDiscoveryFilters,
+  normalizeOpportunities,
+  rankOpportunities
+} from '@/config/bidDiscoveryEngine';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [conversation, setConversation] = useState(null);
@@ -20,29 +27,42 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [uploading, setUploading] = useState(false);
   const [opportunities, setOpportunities] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-  const scrollRef = useRef(null);
+  const [chatMode, setChatMode] = useState('base44');
+  const workflow = getAgentWorkflow(agent.id);
+  const behavior = workflow || { supportsLiveBidDiscovery: false, showBidOpportunitiesPanel: false };
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
 
   useEffect(() => {
-    initializeConversation();
+    let unsubscribe;
+
+    const run = async () => {
+      unsubscribe = await initializeConversation();
+    };
+
+    run();
+
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, [agent]);
 
   useEffect(() => {
     if (initialPrompt && conversation && !loading) {
-      setInput(initialPrompt);
-      setTimeout(() => handleSend(), 100);
+      setTimeout(() => handleSend(initialPrompt), 100);
     }
-  }, [conversation]);
+  }, [conversation, initialPrompt, loading]);
 
   useEffect(() => {
     // Only fetch opportunities once when we first get messages
-    if (messages.length > 0) {
+    if (behavior.showBidOpportunitiesPanel && messages.length > 0) {
       fetchOpportunities();
     }
-  }, [messages.length]);
+  }, [messages.length, behavior.showBidOpportunitiesPanel]);
 
   useEffect(() => {
     // Scroll to bottom when messages update (bottom = highest scrollTop in normal scroll)
@@ -52,19 +72,20 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   }, [messages.length]);
 
   const initializeConversation = async () => {
+    setLoading(true);
+
     try {
-      // Try to load existing conversation first
       const existingConversations = await base44.agents.listConversations({
-        agent_name: agent.id
+        q: { agent_name: agent.id },
+        agent_name: agent.id,
+        sort: '-updated_date',
+        limit: 1
       });
-      
+
       let conv;
-      if (existingConversations && existingConversations.length > 0) {
-        // Use the most recent conversation
+      if (existingConversations && existingConversations.length > 0 && existingConversations[0]?.agent_name === agent.id) {
         conv = existingConversations[0];
-        console.log('Loading existing conversation:', conv.id);
       } else {
-        // Create new conversation if none exists
         conv = await base44.agents.createConversation({
           agent_name: agent.id,
           metadata: {
@@ -72,47 +93,135 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
             description: `Chat with ${agent.name}`
           }
         });
-        console.log('Created new conversation:', conv.id);
       }
-      
+
+      setChatMode('base44');
       setConversation(conv);
       setMessages(conv.messages || []);
       setLoading(false);
 
-      // Subscribe to real-time updates
       if (conv.id) {
-        const unsubscribe = base44.agents.subscribeToConversation(conv.id, (data) => {
+        return base44.agents.subscribeToConversation(conv.id, (data) => {
           setMessages(data.messages || []);
           setLoading(false);
         });
-
-        return () => {
-          if (unsubscribe) unsubscribe();
-        };
       }
     } catch (error) {
-      toast.error('Failed to start conversation: ' + (error.message || 'Unknown error'));
       console.error('Init conversation error:', error);
+      setChatMode('fallback');
+
+      const localConversation = {
+        id: `local-${agent.id}`,
+        messages: []
+      };
+
+      setConversation(localConversation);
+      setMessages([]);
       setLoading(false);
+
+      toast.warning('Live agent connection failed. Using direct AI fallback mode.');
+      return undefined;
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || !conversation || loading) return;
+  const handleSend = async (overrideMessage) => {
+    const messageText = typeof overrideMessage === 'string' ? overrideMessage.trim() : input.trim();
+    if (!messageText || !conversation || loading) return;
 
-    const userMessage = input.trim();
     setInput('');
     setLoading(true);
 
-    try {
-      await base44.agents.addMessage(conversation, {
+    if (chatMode === 'fallback') {
+      const userLocalMessage = {
+        id: crypto.randomUUID(),
         role: 'user',
-        content: userMessage
+        content: messageText,
+        created_date: new Date().toISOString()
+      };
+
+      setMessages((prev) => [...prev, userLocalMessage]);
+
+      try {
+        const llmResponse = await base44.integrations.Core.InvokeLLM({
+          prompt: `${buildAgentSystemPrompt(agent.id)}
+
+Agent: ${agent.name}
+Description: ${agent.description}
+Capabilities: ${(agent.capabilities || []).join(', ')}
+
+User: ${messageText}`,
+          temperature: 0.2
+        });
+
+        const assistantMessage = {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: llmResponse?.output || llmResponse?.result || 'I am ready to help.',
+          created_date: new Date().toISOString()
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+      } catch (error) {
+        console.error('Fallback send error:', error);
+        toast.error('Failed to send message in fallback mode');
+      } finally {
+        setLoading(false);
+      }
+
+      return;
+    }
+
+    try {
+      if (shouldInvokeLiveDiscovery(agent.id, messageText)) {
+        const filters = extractDiscoveryFilters(messageText);
+
+        let countyResponse = null;
+        let generalResponse = null;
+
+        try {
+          if (filters.state === 'California') {
+            countyResponse = await base44.functions.invoke('scrapeCaCounties', {
+              workType: filters.workType,
+              testMode: false
+            });
+          }
+        } catch (countyError) {
+          console.warn('County scraper unavailable, falling back to general scraper', countyError);
+        }
+
+        generalResponse = await base44.functions.invoke('scrapeCaliforniaBids', {
+          workType: filters.workType,
+          state: filters.state,
+          page: filters.page,
+          pageSize: filters.pageSize
+        });
+
+        const scraped = rankOpportunities(normalizeOpportunities(countyResponse, generalResponse));
+        if (scraped.length > 0) {
+          setOpportunities(scraped);
+          toast.success(buildDiscoverySummary(scraped, filters));
+        } else {
+          toast.info(buildDiscoverySummary(scraped, filters));
+        }
+      }
+
+      const maybeConversation = await base44.agents.addMessage(conversation, {
+        role: 'user',
+        content: messageText
       });
-      // Fetch opportunities after sending message
-      setTimeout(() => fetchOpportunities(), 2000);
+
+      if (maybeConversation?.messages) {
+        setMessages(maybeConversation.messages);
+      }
+
+      if (behavior.showBidOpportunitiesPanel) {
+        setTimeout(() => fetchOpportunities(), 2000);
+      }
     } catch (error) {
-      toast.error('Failed to send message');
+      console.error('Send message error:', error);
+      toast.error('Failed to send message. Switching to fallback AI mode.');
+      setChatMode('fallback');
+    } finally {
       setLoading(false);
     }
   };
@@ -145,24 +254,6 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     }
   };
 
-  const handleAnalyze = async (opportunity) => {
-    if (!conversation || loading) return;
-    
-    const analysisPrompt = `Analyze bid: ${opportunity.title || opportunity.project_name}`;
-
-    setLoading(true);
-    try {
-      await base44.agents.addMessage(conversation, {
-        role: 'user',
-        content: analysisPrompt
-      });
-    } catch (error) {
-      toast.error('Failed to send analysis request');
-      console.error(error);
-      setLoading(false);
-    }
-  };
-
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !conversation) return;
@@ -171,12 +262,16 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       
-      await base44.agents.addMessage(conversation, {
-        role: 'user',
-        content: `I've uploaded a file: ${file.name}`,
-        file_urls: [file_url]
-      });
-      
+      if (chatMode === 'fallback') {
+        await handleSend(`I've uploaded a file: ${file.name}. File URL: ${file_url}`);
+      } else {
+        await base44.agents.addMessage(conversation, {
+          role: 'user',
+          content: `I've uploaded a file: ${file.name}`,
+          file_urls: [file_url]
+        });
+      }
+
       toast.success('File uploaded');
     } catch (error) {
       toast.error('Failed to upload file');
@@ -203,16 +298,13 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         setExpanded(true);
         setAnalyzing(true);
         try {
-          await base44.agents.addMessage(conversation, {
-            role: 'user',
-            content: `Analyze this bid opportunity in detail: ${opportunity.title || opportunity.project_name}. Project: ${opportunity.project_name || opportunity.title}, Agency: ${opportunity.agency || opportunity.client_name}, Value: $${opportunity.estimated_value?.toLocaleString() || 'Unknown'}, Due: ${opportunity.due_date || 'Not specified'}. Provide a comprehensive analysis including feasibility, risks, and recommendations.`
-          });
+          await handleSend(`Analyze this bid opportunity in detail: ${opportunity.title || opportunity.project_name}. Project: ${opportunity.project_name || opportunity.title}, Agency: ${opportunity.agency || opportunity.client_name}, Value: $${opportunity.estimated_value?.toLocaleString() || 'Unknown'}, Due: ${opportunity.due_date || 'Not specified'}. Provide a comprehensive analysis including feasibility, risks, and recommendations.`);
           // The analysis will appear in the main chat, so we just mark it as done
           setTimeout(() => {
             setAnalyzing(false);
             setAnalysis('Analysis complete - see chat above');
           }, 1000);
-        } catch (error) {
+        } catch {
           setAnalyzing(false);
           toast.error('Failed to analyze');
         }
@@ -481,7 +573,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
         {/* Current Conversation */}
         <div>
-          {messages.length === 0 && opportunities.length === 0 && (
+          {messages.length === 0 && (!behavior.showBidOpportunitiesPanel || opportunities.length === 0) && (
             <div className="text-center py-12">
               <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-white mb-4`}>
                 <Bot className="h-8 w-8" />
@@ -504,7 +596,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
           ))}
 
           {/* Opportunities Cards - Show after messages */}
-          {opportunities.length > 0 && (
+          {behavior.showBidOpportunitiesPanel && opportunities.length > 0 && (
             <div className="mt-6">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b">
                 <Sparkles className="h-4 w-4 text-blue-600" />

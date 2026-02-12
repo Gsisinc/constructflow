@@ -7,7 +7,6 @@ import {
   FileText,
   AlertTriangle,
   Package,
-  CheckSquare,
   MessageSquare,
   DollarSign,
   FileStack,
@@ -20,7 +19,6 @@ import {
   Book,
   Settings,
   HelpCircle,
-  CreditCard,
   Smartphone,
   Video,
   Building2,
@@ -92,6 +90,10 @@ const menuSections = [
       { icon: Radio, label: "What's New", page: 'Changelog' },
       { icon: MessageSquare, label: 'Make a Suggestion', page: 'Feedback' },
       { icon: Bot, label: 'AI Agents', page: 'AIAgents' },
+      { icon: Settings, label: 'Role Permissions', page: 'RolePermissions' },
+      { icon: FileStack, label: 'Audit Trail', page: 'AuditTrail' },
+      { icon: TrendingUp, label: 'Phase 2 Ops', page: 'Phase2Operations' },
+      { icon: Building2, label: 'Phase 3 Hub', page: 'Phase3Operations' },
     ]
   },
   {

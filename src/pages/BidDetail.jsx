@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,14 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ArrowLeft, 
-  Edit, 
   Trash2, 
   FileText, 
-  CheckSquare,
   TrendingUp,
   Calendar,
-  DollarSign,
-  Users
+  DollarSign
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -23,6 +20,8 @@ import { format } from 'date-fns';
 import BidUploader from '@/components/bids/BidUploader';
 import BidRequirements from '@/components/bids/BidRequirements';
 import BidToProject from '@/components/bids/BidToProject';
+import DrawingAnalysisTab from '@/components/bids/DrawingAnalysisTab';
+import DrawingDesignerTab from '@/components/bids/DrawingDesignerTab';
 
 const statusColors = {
   new: 'bg-blue-100 text-blue-800',
@@ -38,7 +37,6 @@ export default function BidDetail() {
   const [user, setUser] = useState(null);
   const [bidId, setBidId] = useState(null);
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -66,14 +64,6 @@ export default function BidDetail() {
       bid_opportunity_id: bidId 
     }),
     enabled: !!bidId
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.BidOpportunity.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bid'] });
-      toast.success('Updated');
-    }
   });
 
   const deleteMutation = useMutation({
@@ -195,6 +185,8 @@ export default function BidDetail() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="requirements">Requirements</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="drawings">Drawing Analysis</TabsTrigger>
+          <TabsTrigger value="designer">Designer</TabsTrigger>
           <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
         </TabsList>
 
@@ -290,6 +282,28 @@ export default function BidDetail() {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="drawings" className="space-y-4">
+          <DrawingAnalysisTab
+            bid={bid}
+            organizationId={user.organization_id}
+            onAnalysisSaved={() => {
+              queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+              queryClient.invalidateQueries({ queryKey: ['bidDocuments', bidId] });
+              refetchBid();
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="designer" className="space-y-4">
+          <DrawingDesignerTab
+            bid={bid}
+            onDesignerSaved={() => {
+              queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+              refetchBid();
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="analysis" className="space-y-4">

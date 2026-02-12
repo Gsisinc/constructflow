@@ -50,6 +50,7 @@
 import AIAgents from './pages/AIAgents';
 import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
+import AuditTrail from './pages/AuditTrail';
 import BidDetail from './pages/BidDetail';
 import BidDiscovery from './pages/BidDiscovery';
 import BidOpportunities from './pages/BidOpportunities';
@@ -69,9 +70,12 @@ import JoinRequest from './pages/JoinRequest';
 import Materials from './pages/Materials';
 import Onboarding from './pages/Onboarding';
 import PMSetupGuide from './pages/PMSetupGuide';
+import Phase2Operations from './pages/Phase2Operations';
+import Phase3Operations from './pages/Phase3Operations';
 import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
+import RolePermissions from './pages/RolePermissions';
 import PurchaseOrders from './pages/PurchaseOrders';
 import Safety from './pages/Safety';
 import Settings from './pages/Settings';
@@ -91,6 +95,7 @@ export const PAGES = {
     "AIAgents": AIAgents,
     "AddBid": AddBid,
     "AlertSettings": AlertSettings,
+    "AuditTrail": AuditTrail,
     "BidDetail": BidDetail,
     "BidDiscovery": BidDiscovery,
     "BidOpportunities": BidOpportunities,
@@ -110,9 +115,12 @@ export const PAGES = {
     "Materials": Materials,
     "Onboarding": Onboarding,
     "PMSetupGuide": PMSetupGuide,
+    "Phase2Operations": Phase2Operations,
+    "Phase3Operations": Phase3Operations,
     "Photos": Photos,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
+    "RolePermissions": RolePermissions,
     "PurchaseOrders": PurchaseOrders,
     "Safety": Safety,
     "Settings": Settings,
