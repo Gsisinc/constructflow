@@ -25,7 +25,8 @@ import {
   Search,
   Bot,
   Shield,
-  Radio
+  Radio,
+  Wrench
 } from 'lucide-react';
 
 const menuSections = [
@@ -92,8 +93,12 @@ const menuSections = [
       { icon: Bot, label: 'AI Agents', page: 'AIAgents' },
       { icon: Settings, label: 'Role Permissions', page: 'RolePermissions' },
       { icon: FileStack, label: 'Audit Trail', page: 'AuditTrail' },
+      { icon: Wrench, label: 'Service Desk', page: 'ServiceDesk' },
       { icon: TrendingUp, label: 'Phase 2 Ops', page: 'Phase2Operations' },
       { icon: Building2, label: 'Phase 3 Hub', page: 'Phase3Operations' },
+      { icon: Bot, label: 'Phase 4 AI', page: 'Phase4AIAutomation' },
+      { icon: Building2, label: 'Phase 5 Scale', page: 'Phase5PlatformScale' },
+      { icon: Wrench, label: 'Phase 6 Ops', page: 'Phase6ReliabilityOps' },
     ]
   },
   {

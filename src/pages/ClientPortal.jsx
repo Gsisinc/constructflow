@@ -11,15 +11,17 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, MessageSquare, Image as ImageIcon, FileText, Plus, Send, DollarSign, Clock, CheckCircle, AlertTriangle, Home, Loader2 } from 'lucide-react';
+import { Calendar, MessageSquare, Image as ImageIcon, FileText, Send, Clock, Home, Loader2, Wrench } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import ProjectDeadlines from '../components/calendar/ProjectDeadlines';
+import { buildSlaTag, sortTicketsByUrgency } from '@/lib/serviceDesk';
 
 export default function ClientPortal() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [showCommentDialog, setShowCommentDialog] = useState(false);
   const [showChangeOrderDialog, setShowChangeOrderDialog] = useState(false);
+  const [showServiceDialog, setShowServiceDialog] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
@@ -51,6 +53,19 @@ export default function ClientPortal() {
     enabled: !!selectedProject?.id
   });
 
+  const { data: serviceTickets = [] } = useQuery({
+    queryKey: ['clientServiceTickets', selectedProject?.id],
+    queryFn: async () => {
+      try {
+        return await base44.entities.ServiceTicket.filter({ project_id: selectedProject?.id }, '-created_date');
+      } catch (error) {
+        console.warn('ServiceTicket entity unavailable, using Issue fallback.', error);
+        return base44.entities.Issue.filter({ project_id: selectedProject?.id }, '-created_date');
+      }
+    },
+    enabled: !!selectedProject?.id
+  });
+
   const createCommentMutation = useMutation({
     mutationFn: (data) => base44.entities.ClientUpdate.create(data),
     onSuccess: () => {
@@ -69,11 +84,42 @@ export default function ClientPortal() {
     }
   });
 
+  const createServiceTicketMutation = useMutation({
+    mutationFn: async (data) => {
+      try {
+        return await base44.entities.ServiceTicket.create(data);
+      } catch (error) {
+        console.warn('ServiceTicket entity unavailable, storing as Issue.', error);
+        return base44.entities.Issue.create({
+          project_id: data.project_id,
+          title: data.subject,
+          description: data.description,
+          severity: data.priority,
+          status: 'open',
+          due_date: data.target_date || null,
+          reported_by: data.requested_by
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clientServiceTickets'] });
+      setShowServiceDialog(false);
+      toast.success('Service request submitted');
+    }
+  });
+
   const [commentForm, setCommentForm] = useState({ message: '' });
   const [changeOrderForm, setChangeOrderForm] = useState({
     description: '',
     reason: 'owner_request',
     cost_impact: 0
+  });
+  const [serviceForm, setServiceForm] = useState({
+    subject: '',
+    description: '',
+    priority: 'medium',
+    category: 'service_call',
+    target_date: ''
   });
 
   React.useEffect(() => {
@@ -252,6 +298,59 @@ export default function ClientPortal() {
                       </div>
                     </DialogContent>
                   </Dialog>
+
+                  <Dialog open={showServiceDialog} onOpenChange={setShowServiceDialog}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full mt-2" variant="secondary">
+                        <Wrench className="h-4 w-4 mr-2" />
+                        Request Service/Maintenance
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader><DialogTitle>Service Ticket</DialogTitle></DialogHeader>
+                      <div className="space-y-4">
+                        <div><Label>Subject</Label><Input value={serviceForm.subject} onChange={(e)=>setServiceForm({ ...serviceForm, subject: e.target.value })} /></div>
+                        <div><Label>Description</Label><Textarea rows={4} value={serviceForm.description} onChange={(e)=>setServiceForm({ ...serviceForm, description: e.target.value })} /></div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label>Priority</Label>
+                            <Select value={serviceForm.priority} onValueChange={(value)=>setServiceForm({ ...serviceForm, priority: value })}>
+                              <SelectTrigger><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="low">Low</SelectItem>
+                                <SelectItem value="medium">Medium</SelectItem>
+                                <SelectItem value="high">High</SelectItem>
+                                <SelectItem value="critical">Critical</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label>Category</Label>
+                            <Select value={serviceForm.category} onValueChange={(value)=>setServiceForm({ ...serviceForm, category: value })}>
+                              <SelectTrigger><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="service_call">Service Call</SelectItem>
+                                <SelectItem value="preventive_maintenance">Preventive Maintenance</SelectItem>
+                                <SelectItem value="warranty">Warranty</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div><Label>Requested date</Label><Input type="date" value={serviceForm.target_date} onChange={(e)=>setServiceForm({ ...serviceForm, target_date: e.target.value })} /></div>
+                        <Button className="w-full" onClick={() => createServiceTicketMutation.mutate({
+                          project_id: selectedProject.id,
+                          subject: serviceForm.subject,
+                          description: serviceForm.description,
+                          priority: serviceForm.priority,
+                          category: serviceForm.category,
+                          target_date: serviceForm.target_date || null,
+                          status: 'new',
+                          requested_by: user.email,
+                          sla_due_at: buildSlaTag({ priority: serviceForm.priority }).due_at
+                        })}>Submit Service Ticket</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             </div>
@@ -263,11 +362,12 @@ export default function ClientPortal() {
 
             {/* Tabs */}
             <Tabs defaultValue="updates" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="updates">Updates</TabsTrigger>
                 <TabsTrigger value="photos">Photos</TabsTrigger>
                 <TabsTrigger value="calendar">Calendar</TabsTrigger>
                 <TabsTrigger value="changes">Change Orders</TabsTrigger>
+                <TabsTrigger value="service">Service Tickets</TabsTrigger>
               </TabsList>
 
               <TabsContent value="updates" className="mt-6">
@@ -437,6 +537,48 @@ export default function ClientPortal() {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+              <TabsContent value="service" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Service & Maintenance Tickets</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {serviceTickets.length === 0 ? (
+                      <div className="text-center py-12 text-slate-500">
+                        <Wrench className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+                        <p>No service tickets submitted</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {sortTicketsByUrgency(serviceTickets).map((ticket) => {
+                          const sla = buildSlaTag({ priority: ticket.priority || ticket.severity || 'medium', dueAt: ticket.sla_due_at || ticket.due_date });
+                          return (
+                            <div key={ticket.id} className="border rounded-lg p-4">
+                              <div className="flex items-start justify-between gap-3">
+                                <div>
+                                  <p className="font-semibold">{ticket.subject || ticket.title || 'Service request'}</p>
+                                  <p className="text-sm text-slate-600 mt-1">{ticket.description}</p>
+                                  <div className="flex gap-2 mt-2">
+                                    <Badge variant="outline">{ticket.category || 'service_call'}</Badge>
+                                    <Badge>{ticket.status || 'new'}</Badge>
+                                    <Badge className={sla.badgeClass}>{sla.label}</Badge>
+                                  </div>
+                                </div>
+                                <div className="text-right text-xs text-slate-500">
+                                  <p>Priority: {(ticket.priority || ticket.severity || 'medium').toUpperCase()}</p>
+                                  {(ticket.target_date || ticket.due_date) && <p>Target: {format(new Date(ticket.target_date || ticket.due_date), 'MMM dd, yyyy')}</p>}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
             </Tabs>
           </>
         )}

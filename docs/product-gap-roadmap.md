@@ -51,6 +51,31 @@ These close part of the "Drawing management" gap.
   3. Portfolio BI summary cards with exportable CSV reporting.
 - ✅ Audit events written for integration and compliance policy updates.
 
+
+### Phase 4 implementation status (in-app)
+- ✅ Phase 4 AI Governance + Automation hub (`Phase4AIAutomation`) with:
+  1. AI governance policy controls (citations, confidence threshold, PII redaction, retention).
+  2. Model routing policy controls (cost-sensitive, standard, high reasoning, compliance review models).
+  3. Prompt traceability table with confidence badges and token estimates from `AgentMessage` history.
+  4. Automation Studio rule preview for risk-threshold and bid-deadline triggers.
+- ✅ Audit events written for policy/rule changes (`phase4_ai_policy_updated`, `phase4_automation_rules_updated`).
+
+
+### Phase 5 implementation status (in-app)
+- ✅ Phase 5 Platform & Scale Hub (`Phase5PlatformScale`) with:
+  1. Integration Marketplace+ controls (accounting/construction/collaboration providers + webhook toggles).
+  2. Tenant Admin Console (seat/storage/token limits, region, retention, data residency policy).
+  3. Executive Command Center (portfolio KPI cards + revenue forecast by project start month).
+- ✅ Audit events written for integration marketplace and tenant policy updates (`phase5_integrations_marketplace_updated`, `phase5_tenant_policy_updated`).
+
+
+### Phase 6 implementation status (in-app)
+- ✅ Phase 6 Reliability & Customer Ops hub (`Phase6ReliabilityOps`) with:
+  1. Incident + SLA reliability console (auto-escalation policy + breach-rate visibility).
+  2. Release quality gate metrics (deployment success rate + change-failure rate).
+  3. Support runbooks and backup-drill log view for disaster-recovery readiness.
+- ✅ Audit events written for reliability policy updates (`phase6_reliability_policy_updated`).
+
 ## 3) Remaining Work to Reach 10/10
 
 A realistic 10/10 requires multiple releases, not a single patch.

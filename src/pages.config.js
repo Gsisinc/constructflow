@@ -12,11 +12,13 @@
  *   import HomePage from './pages/HomePage';
  *   import Dashboard from './pages/Dashboard';
  *   import Settings from './pages/Settings';
+import ServiceDesk from './pages/ServiceDesk';
  *   
  *   export const PAGES = {
  *       "HomePage": HomePage,
  *       "Dashboard": Dashboard,
  *       "Settings": Settings,
+    "ServiceDesk": ServiceDesk,
  *   }
  *   
  *   export const pagesConfig = {
@@ -28,11 +30,13 @@
  *
  *   import Home from './pages/Home';
  *   import Settings from './pages/Settings';
+import ServiceDesk from './pages/ServiceDesk';
  *   import __Layout from './Layout.jsx';
  *
  *   export const PAGES = {
  *       "Home": Home,
  *       "Settings": Settings,
+    "ServiceDesk": ServiceDesk,
  *   }
  *
  *   export const pagesConfig = {
@@ -72,6 +76,9 @@ import Onboarding from './pages/Onboarding';
 import PMSetupGuide from './pages/PMSetupGuide';
 import Phase2Operations from './pages/Phase2Operations';
 import Phase3Operations from './pages/Phase3Operations';
+import Phase4AIAutomation from './pages/Phase4AIAutomation';
+import Phase5PlatformScale from './pages/Phase5PlatformScale';
+import Phase6ReliabilityOps from './pages/Phase6ReliabilityOps';
 import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
@@ -79,6 +86,7 @@ import RolePermissions from './pages/RolePermissions';
 import PurchaseOrders from './pages/PurchaseOrders';
 import Safety from './pages/Safety';
 import Settings from './pages/Settings';
+import ServiceDesk from './pages/ServiceDesk';
 import Submittals from './pages/Submittals';
 import TaskTracker from './pages/TaskTracker';
 import Tasks from './pages/Tasks';
@@ -117,6 +125,9 @@ export const PAGES = {
     "PMSetupGuide": PMSetupGuide,
     "Phase2Operations": Phase2Operations,
     "Phase3Operations": Phase3Operations,
+    "Phase4AIAutomation": Phase4AIAutomation,
+    "Phase5PlatformScale": Phase5PlatformScale,
+    "Phase6ReliabilityOps": Phase6ReliabilityOps,
     "Photos": Photos,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
@@ -124,6 +135,7 @@ export const PAGES = {
     "PurchaseOrders": PurchaseOrders,
     "Safety": Safety,
     "Settings": Settings,
+    "ServiceDesk": ServiceDesk,
     "Submittals": Submittals,
     "TaskTracker": TaskTracker,
     "Tasks": Tasks,

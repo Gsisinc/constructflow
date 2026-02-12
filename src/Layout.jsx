@@ -22,7 +22,10 @@ import {
   Bot,
   Search,
   Grid3x3,
-  ArrowLeft
+  ArrowLeft,
+  TrendingUp,
+  Building2,
+  Wrench
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -51,8 +54,12 @@ const navItems = [
                     { name: 'Settings', icon: Settings, page: 'Settings' },
                     { name: 'Role Permissions', icon: Settings, page: 'RolePermissions' },
                     { name: 'Audit Trail', icon: FileStack, page: 'AuditTrail' },
+                    { name: 'Service Desk', icon: Wrench, page: 'ServiceDesk' },
                     { name: 'Phase 2 Ops', icon: TrendingUp, page: 'Phase2Operations' },
                     { name: 'Phase 3 Hub', icon: Building2, page: 'Phase3Operations' },
+                    { name: 'Phase 4 AI', icon: Bot, page: 'Phase4AIAutomation' },
+                    { name: 'Phase 5 Scale', icon: Building2, page: 'Phase5PlatformScale' },
+                    { name: 'Phase 6 Ops', icon: Wrench, page: 'Phase6ReliabilityOps' },
                   ];
 
 const adminNavItems = [
