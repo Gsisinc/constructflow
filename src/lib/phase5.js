@@ -1,13 +1,13 @@
 export function getPhase5Providers() {
   return [
-    { id: 'quickbooks', name: 'QuickBooks', category: 'Accounting', tier: 'core', supports_webhook: true },
-    { id: 'sage', name: 'Sage', category: 'Accounting', tier: 'core', supports_webhook: true },
-    { id: 'netsuite', name: 'NetSuite', category: 'Accounting', tier: 'enterprise', supports_webhook: true },
-    { id: 'procore', name: 'Procore Connector', category: 'Construction', tier: 'enterprise', supports_webhook: false },
-    { id: 'autodesk_acc', name: 'Autodesk ACC', category: 'Construction', tier: 'enterprise', supports_webhook: false },
-    { id: 'google_calendar', name: 'Google Calendar', category: 'Collaboration', tier: 'core', supports_webhook: true },
-    { id: 'microsoft_teams', name: 'Microsoft Teams', category: 'Collaboration', tier: 'core', supports_webhook: true },
-    { id: 'slack', name: 'Slack', category: 'Collaboration', tier: 'core', supports_webhook: true }
+    { id: 'quickbooks', name: 'QuickBooks', category: 'Accounting', tier: 'core', supports_webhook: true, supports_bidirectional: true },
+    { id: 'sage', name: 'Sage', category: 'Accounting', tier: 'core', supports_webhook: true, supports_bidirectional: true },
+    { id: 'netsuite', name: 'NetSuite', category: 'Accounting', tier: 'enterprise', supports_webhook: true, supports_bidirectional: true },
+    { id: 'procore', name: 'Procore Connector', category: 'Construction', tier: 'enterprise', supports_webhook: false, supports_bidirectional: true },
+    { id: 'autodesk_acc', name: 'Autodesk ACC', category: 'Construction', tier: 'enterprise', supports_webhook: false, supports_bidirectional: true },
+    { id: 'google_calendar', name: 'Google Calendar', category: 'Collaboration', tier: 'core', supports_webhook: true, supports_bidirectional: false },
+    { id: 'microsoft_teams', name: 'Microsoft Teams', category: 'Collaboration', tier: 'core', supports_webhook: true, supports_bidirectional: false },
+    { id: 'slack', name: 'Slack', category: 'Collaboration', tier: 'core', supports_webhook: true, supports_bidirectional: false }
   ];
 }
 

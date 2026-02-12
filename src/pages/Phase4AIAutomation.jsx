@@ -20,6 +20,7 @@ import {
   normalizeModelPolicy
 } from '@/lib/phase4';
 import { Bot, ShieldCheck, Sparkles, Workflow } from 'lucide-react';
+import { attachTenantScope, shouldRunAutomationForTenant } from '@/lib/tenantGuard';
 
 const defaultRules = [
   {
@@ -80,10 +81,13 @@ export default function Phase4AIAutomation() {
     }
   });
 
+  const scopedProjects = useMemo(() => projects.filter((row) => shouldRunAutomationForTenant({ row, user })), [projects, user]);
+  const scopedBids = useMemo(() => bids.filter((row) => shouldRunAutomationForTenant({ row, user })), [bids, user]);
+
   const reliabilityStats = useMemo(() => buildAiReliabilityStats(promptTraces), [promptTraces]);
   const automationPreview = useMemo(
-    () => buildAutomationPreview({ rules: automationRules.filter((rule) => rule.enabled), bids, projects }),
-    [automationRules, bids, projects]
+    () => buildAutomationPreview({ rules: automationRules.filter((rule) => rule.enabled), bids: scopedBids, projects: scopedProjects }),
+    [automationRules, scopedBids, scopedProjects]
   );
 
   const savePoliciesMutation = useMutation({
@@ -123,10 +127,9 @@ export default function Phase4AIAutomation() {
         await Promise.all(existing.map((row) => base44.entities.AutomationRule.delete(row.id)));
         await Promise.all(
           automationRules.map((rule) =>
-            base44.entities.AutomationRule.create({
-              organization_id: user.organization_id,
+            base44.entities.AutomationRule.create(attachTenantScope({
               ...rule
-            })
+            }, user))
           )
         );
       } catch (error) {

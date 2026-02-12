@@ -11,12 +11,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Wrench, AlertTriangle, Timer, ClipboardList } from 'lucide-react';
 import { toast } from 'sonner';
 import { buildSlaTag, buildTicketMetrics, sortTicketsByUrgency } from '@/lib/serviceDesk';
+import { loadPolicy, requirePermission } from '@/lib/permissions';
 
 export default function ServiceDesk() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [form, setForm] = useState({ subject: '', description: '', priority: 'medium', category: 'service_call', project_id: '' });
   const queryClient = useQueryClient();
+
+  const { data: user } = useQuery({ queryKey: ['currentUser', 'serviceDesk'], queryFn: () => base44.auth.me() });
+  const { data: policy } = useQuery({
+    queryKey: ['rolePolicy', user?.organization_id, 'serviceDesk'],
+    queryFn: () => loadPolicy({ organizationId: user?.organization_id }),
+    enabled: !!user?.organization_id
+  });
 
   const { data: projects = [] } = useQuery({ queryKey: ['projects', 'serviceDesk'], queryFn: () => base44.entities.Project.list('-created_date') });
 
@@ -34,6 +42,8 @@ export default function ServiceDesk() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
+      requirePermission({ policy, role: user?.role || 'viewer', module: 'projects', action: 'create', message: 'You do not have permission to create service tickets.' });
+
       const payload = {
         ...form,
         status: 'new',
@@ -64,12 +74,14 @@ export default function ServiceDesk() {
 
   const statusMutation = useMutation({
     mutationFn: async ({ ticket, nextStatus }) => {
+      requirePermission({ policy, role: user?.role || 'viewer', module: 'projects', action: 'edit', message: 'You do not have permission to update ticket status.' });
       if (ticket.subject) {
         return base44.entities.ServiceTicket.update(ticket.id, { status: nextStatus });
       }
       return base44.entities.Issue.update(ticket.id, { status: nextStatus });
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['serviceTickets'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['serviceTickets'] }),
+    onError: (error) => toast.error(error?.message || 'Failed to update ticket status')
   });
 
   const filteredTickets = useMemo(() => {

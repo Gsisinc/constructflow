@@ -23,7 +23,7 @@ export default function Phase5PlatformScale() {
   const providers = getPhase5Providers();
   const [providerState, setProviderState] = useState(() =>
     providers.reduce((acc, provider) => {
-      acc[provider.id] = { connected: false, account_name: '', webhook_enabled: false };
+      acc[provider.id] = { connected: false, account_name: '', webhook_enabled: false, sync_mode: 'ingest_only' };
       return acc;
     }, {})
   );
@@ -70,7 +70,8 @@ export default function Phase5PlatformScale() {
           acc[row.provider] = {
             connected: !!row.connected,
             account_name: row.account_name || '',
-            webhook_enabled: !!row.webhook_enabled
+            webhook_enabled: !!row.webhook_enabled,
+            sync_mode: row.sync_mode || 'ingest_only'
           };
           return acc;
         }, {});
@@ -115,6 +116,7 @@ export default function Phase5PlatformScale() {
               connected: !!cfg.connected,
               account_name: cfg.account_name || '',
               webhook_enabled: !!cfg.webhook_enabled,
+              sync_mode: cfg.sync_mode || 'ingest_only',
               last_sync_at: cfg.connected ? new Date().toISOString() : null
             })
           )
@@ -185,7 +187,7 @@ export default function Phase5PlatformScale() {
             </CardHeader>
             <CardContent className="space-y-3">
               {providers.map((provider) => {
-                const cfg = providerState[provider.id] || { connected: false, account_name: '', webhook_enabled: false };
+                const cfg = providerState[provider.id] || { connected: false, account_name: '', webhook_enabled: false, sync_mode: 'ingest_only' };
                 return (
                   <div key={provider.id} className="border rounded-lg p-3 space-y-3">
                     <div className="flex items-center justify-between gap-3">
@@ -234,6 +236,25 @@ export default function Phase5PlatformScale() {
                           [provider.id]: { ...prev[provider.id], webhook_enabled: checked }
                         }))}
                       />
+                    </div>
+
+
+                    <div className="flex items-center justify-between border rounded-md p-2">
+                      <span className="text-sm">Sync direction</span>
+                      <Select
+                        value={cfg.sync_mode || 'ingest_only'}
+                        onValueChange={(value) => setProviderState((prev) => ({
+                          ...prev,
+                          [provider.id]: { ...prev[provider.id], sync_mode: value }
+                        }))}
+                      >
+                        <SelectTrigger className="w-52"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ingest_only">Ingest only</SelectItem>
+                          <SelectItem value="push_only">Push only</SelectItem>
+                          <SelectItem value="bi_directional" disabled={!provider.supports_bidirectional}>Bi-directional</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 );

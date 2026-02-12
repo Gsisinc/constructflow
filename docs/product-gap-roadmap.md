@@ -76,6 +76,13 @@ These close part of the "Drawing management" gap.
   3. Support runbooks and backup-drill log view for disaster-recovery readiness.
 - ✅ Audit events written for reliability policy updates (`phase6_reliability_policy_updated`).
 
+
+### Enterprise hardening upgrade (current iteration)
+- ✅ Integration depth upgraded with sync-direction controls (ingest/push/bi-directional) in Phase 5 marketplace.
+- ✅ Security/compliance upgraded with hash-chain audit verification and immutable-style CSV/JSONL export in Audit Trail.
+- ✅ Multi-tenant hardening upgraded with tenant scope helpers and org-scoped automation preview/writes in Phase 4 rules.
+- ✅ Advanced ticketing + client portal requests upgraded with SLA-tagged service desk queue and stakeholder ticket visibility.
+
 ## 3) Remaining Work to Reach 10/10
 
 A realistic 10/10 requires multiple releases, not a single patch.

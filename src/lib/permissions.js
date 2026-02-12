@@ -102,3 +102,10 @@ export function hasPermission({ policy, role = 'viewer', module, action = 'view'
   if (!modulePolicy) return false;
   return !!modulePolicy[action];
 }
+
+
+export function requirePermission({ policy, role = 'viewer', module, action = 'view', message = 'Permission denied' }) {
+  const allowed = hasPermission({ policy, role, module, action });
+  if (!allowed) throw new Error(message);
+  return true;
+}
