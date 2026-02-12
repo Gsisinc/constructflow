@@ -242,3 +242,7 @@ If Docker commands fail right after install, disconnect and reconnect SSH first 
 - If your SSH session drops (`Connection reset`), reconnect first: `ssh root@YOUR_DROPLET_IP`.
 
 > Note: the current repository still contains Supabase migration scaffolding. On this no-Supabase path, we will replace that runtime backend with VPS-hosted services step-by-step.
+
+## Security quick rule (important)
+- Never paste API keys, GitHub personal access tokens, or server root passwords into chat, tickets, or commits.
+- If a secret is accidentally shared, revoke/rotate it immediately before continuing deployment.
