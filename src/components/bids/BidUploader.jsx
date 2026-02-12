@@ -52,7 +52,6 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
 
       // AI processing - with better error handling
       try {
-      requirePermission({ policy, role: user?.role || 'viewer', module: 'documents', action: 'create', message: 'You do not have permission to upload bid documents.' });
         console.log('Starting AI analysis with file:', file_url);
         const aiResult = await base44.integrations.Core.InvokeLLM({
           prompt: `Analyze this bid/RFP document thoroughly and extract:
