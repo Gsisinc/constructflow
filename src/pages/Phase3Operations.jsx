@@ -162,7 +162,7 @@ export default function Phase3Operations() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Phase 3 Enterprise Hub</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Enterprise Integrations Hub</h1>
         <p className="text-sm text-slate-600 mt-1">Integrations, SSO/compliance controls, and portfolio BI reporting.</p>
       </div>
 
@@ -176,7 +176,7 @@ export default function Phase3Operations() {
         <TabsContent value="integrations">
           <Card>
             <CardHeader>
-              <CardTitle>Integration Marketplace (Phase 3)</CardTitle>
+              <CardTitle>Integration Marketplace</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {providers.map((provider) => {

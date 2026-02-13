@@ -27,7 +27,8 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [uploading, setUploading] = useState(false);
   const [opportunities, setOpportunities] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [chatMode, setChatMode] = useState('base44');
+  const useBase44AgentRuntime = import.meta.env.VITE_ENABLE_BASE44_AGENT_RUNTIME === 'true';
+  const [chatMode, setChatMode] = useState(useBase44AgentRuntime ? 'base44' : 'fallback');
   const workflow = getAgentWorkflow(agent.id);
   const behavior = workflow || { supportsLiveBidDiscovery: false, showBidOpportunitiesPanel: false };
   const fileInputRef = useRef(null);
@@ -74,6 +75,18 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const initializeConversation = async () => {
     setLoading(true);
 
+    if (!useBase44AgentRuntime || !base44?.agents?.listConversations) {
+      const localConversation = {
+        id: `local-${agent.id}`,
+        messages: []
+      };
+      setChatMode('fallback');
+      setConversation(localConversation);
+      setMessages([]);
+      setLoading(false);
+      return undefined;
+    }
+
     try {
       const existingConversations = await base44.agents.listConversations({
         q: { agent_name: agent.id },
@@ -119,7 +132,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
       setMessages([]);
       setLoading(false);
 
-      toast.warning('Live agent connection failed. Using direct AI fallback mode.');
+      toast.warning('Using direct AI mode for reliable responses.');
       return undefined;
     }
   };
@@ -144,6 +157,11 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
       try {
         const llmResponse = await base44.integrations.Core.InvokeLLM({
           prompt: `${buildAgentSystemPrompt(agent.id)}
+
+Runtime instructions:
+- Never ask the user for organization_id, bid_id, or internal database IDs.
+- If IDs are missing, proceed using the provided narrative context and state assumptions clearly.
+- When asked for bid package/proposal output, generate the document content directly first, then suggest next actions.
 
 Agent: ${agent.name}
 Description: ${agent.description}

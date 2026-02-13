@@ -153,10 +153,10 @@ export default function Phase4AIAutomation() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Phase 4 AI Governance + Automation</h1>
+          <h1 className="text-2xl font-bold text-slate-900">AI Governance + Automation Center</h1>
           <p className="text-sm text-slate-500">Model policy, AI traceability, and autonomous workflow previews.</p>
         </div>
-        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">Phase 4</Badge>
+        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">AI Ops</Badge>
       </div>
 
       <div className="grid md:grid-cols-4 gap-3">

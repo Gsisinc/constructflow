@@ -3,9 +3,10 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Upload, Loader2, Ruler, Package, ScanSearch, Calculator } from 'lucide-react';
+import { Upload, Loader2, Ruler, Package, ScanSearch, Calculator, Files } from 'lucide-react';
 import { toast } from 'sonner';
 import { buildDrawingAnalysisPrompt, normalizeDrawingAnalysis } from '@/lib/drawingAnalysis';
+import { parseLlmJsonResponse } from '@/lib/llmResponse';
 
 const CLASSIFICATIONS = [
   'general_construction',
@@ -38,26 +39,39 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
   const [csiDivision, setCsiDivision] = useState('27 Communications');
   const [analysis, setAnalysis] = useState(bid?.ai_analysis?.drawing_analysis || null);
 
-  const analyzeDrawing = async (file) => {
+  const analyzeDrawingSet = async (files) => {
+    if (!files?.length) return;
+
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      const bidDoc = await base44.entities.BidDocument.create({
-        bid_opportunity_id: bid.id,
-        organization_id: organizationId,
-        name: file.name,
-        file_url,
-        file_type: file.type,
-        file_size: file.size,
-        ai_processed: false
-      });
+      const uploadedDocs = [];
+
+      for (const file of files) {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const bidDoc = await base44.entities.BidDocument.create({
+          bid_opportunity_id: bid.id,
+          organization_id: organizationId,
+          name: file.name,
+          file_url,
+          file_type: file.type,
+          file_size: file.size,
+          ai_processed: false
+        });
+
+        uploadedDocs.push({ file, file_url, bidDoc });
+      }
 
       setUploading(false);
       setAnalyzing(true);
 
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: buildDrawingAnalysisPrompt({ bid, classification, csiDivision }),
-        file_urls: [file_url],
+        prompt: buildDrawingAnalysisPrompt({
+          bid,
+          classification,
+          csiDivision,
+          documentCount: uploadedDocs.length
+        }),
+        file_urls: uploadedDocs.map((doc) => doc.file_url),
         response_json_schema: {
           type: 'object',
           properties: {
@@ -128,18 +142,23 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
         }
       });
 
-      const normalized = normalizeDrawingAnalysis(result);
+      const normalized = normalizeDrawingAnalysis(parseLlmJsonResponse(result));
 
-      await base44.entities.BidDocument.update(bidDoc.id, {
-        ai_processed: true,
-        extracted_data: {
-          ...(bidDoc.extracted_data || {}),
-          drawing_analysis: normalized,
-          analyzed_at: new Date().toISOString(),
-          classification,
-          csi_division: csiDivision
-        }
-      });
+      await Promise.all(
+        uploadedDocs.map(({ bidDoc }) =>
+          base44.entities.BidDocument.update(bidDoc.id, {
+            ai_processed: true,
+            extracted_data: {
+              ...(bidDoc.extracted_data || {}),
+              drawing_analysis: normalized,
+              analyzed_at: new Date().toISOString(),
+              classification,
+              csi_division: csiDivision,
+              analysis_scope: uploadedDocs.length > 1 ? 'multi_document' : 'single_document'
+            }
+          })
+        )
+      );
 
       const updatedAiAnalysis = {
         ...(bid.ai_analysis || {}),
@@ -147,8 +166,9 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
         drawing_analysis_meta: {
           classification,
           csi_division: csiDivision,
-          document_name: file.name,
-          analyzed_at: new Date().toISOString()
+          analyzed_at: new Date().toISOString(),
+          document_count: uploadedDocs.length,
+          document_names: uploadedDocs.map((doc) => doc.file.name)
         }
       };
 
@@ -158,7 +178,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
       });
 
       setAnalysis(normalized);
-      toast.success('Drawing analysis complete. Materials and measurements extracted.');
+      toast.success(`Drawing analysis complete (${uploadedDocs.length} file${uploadedDocs.length > 1 ? 's' : ''}).`);
       onAnalysisSaved?.();
     } catch (error) {
       console.error(error);
@@ -173,8 +193,8 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
     if (!analysis) return;
     const contingency = analysis.estimateInputs.recommended_contingency_percent || 10;
     const estimated = analysis.estimateInputs.subtotal * (1 + contingency / 100);
-    await base44.entities.BidOpportunity.update(bid.id, { estimated_value: estimated });
-    toast.success('Estimated value updated from drawing takeoff.');
+    await base44.entities.BidOpportunity.update(bid.id, { estimated_value: Math.round(estimated) });
+    toast.success('Estimate applied to bid value.');
     onAnalysisSaved?.();
   };
 
@@ -182,39 +202,55 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Blueprint / Drawing Analysis</CardTitle>
+          <CardTitle>Drawing Analysis</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm font-medium text-slate-700">Classification Focus</label>
-              <select value={classification} onChange={(e) => setClassification(e.target.value)} className="w-full mt-1 border rounded-md p-2 text-sm">
-                {CLASSIFICATIONS.map((option) => <option key={option} value={option}>{option.replace('_', ' ')}</option>)}
+            <label className="text-sm">
+              <span className="text-slate-600">Classification</span>
+              <select
+                className="mt-1 w-full border rounded px-3 py-2"
+                value={classification}
+                onChange={(e) => setClassification(e.target.value)}
+              >
+                {CLASSIFICATIONS.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-700">CSI Division Focus</label>
-              <select value={csiDivision} onChange={(e) => setCsiDivision(e.target.value)} className="w-full mt-1 border rounded-md p-2 text-sm">
-                {CSI_DIVISIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+            </label>
+            <label className="text-sm">
+              <span className="text-slate-600">CSI Division Focus</span>
+              <select
+                className="mt-1 w-full border rounded px-3 py-2"
+                value={csiDivision}
+                onChange={(e) => setCsiDivision(e.target.value)}
+              >
+                {CSI_DIVISIONS.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
-            </div>
+            </label>
           </div>
 
-          <label className="block">
-            <div className="border-2 border-dashed border-blue-300 rounded-lg p-6 text-center cursor-pointer hover:bg-blue-50 transition">
-              {uploading || analyzing ? <Loader2 className="h-8 w-8 mx-auto text-blue-600 mb-2 animate-spin" /> : <Upload className="h-8 w-8 mx-auto text-blue-600 mb-2" />}
-              <p className="text-sm text-slate-600">
-                {uploading ? 'Uploading drawing...' : analyzing ? 'Analyzing drawing symbols, measurements, and materials...' : 'Upload blueprint/drawing for AI takeoff analysis'}
-              </p>
-              <p className="text-xs text-slate-500 mt-1">PDF / image plans (PNG, JPG)</p>
+          <label className="cursor-pointer block">
+            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-amber-500 transition-colors">
+              {uploading || analyzing ? (
+                <>
+                  <Loader2 className="h-10 w-10 mx-auto text-amber-600 animate-spin" />
+                  <p className="text-sm text-slate-600 mt-2">{uploading ? 'Uploading drawing files...' : 'Analyzing all pages/files...'}</p>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-10 w-10 mx-auto text-amber-600" />
+                  <p className="text-sm text-slate-700 mt-2 font-medium">Upload one or multiple drawing files</p>
+                  <p className="text-xs text-slate-500 mt-1">Supports multi-page PDF or multiple files (.pdf, .png, .jpg)</p>
+                </>
+              )}
               <input
                 type="file"
                 className="hidden"
                 accept=".pdf,.png,.jpg,.jpeg"
+                multiple
                 disabled={uploading || analyzing}
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) analyzeDrawing(file);
+                  const files = Array.from(e.target.files || []);
+                  if (files.length > 0) analyzeDrawingSet(files);
                   e.target.value = '';
                 }}
               />
@@ -237,13 +273,6 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                 <Badge variant="outline">Devices: {analysis.takeoffTotals.device_count}</Badge>
                 <Badge variant="outline">Fixtures: {analysis.takeoffTotals.fixture_count}</Badge>
               </div>
-              {analysis.measurements.length > 0 && (
-                <ul className="space-y-1 text-sm text-slate-600">
-                  {analysis.measurements.slice(0, 10).map((m, idx) => (
-                    <li key={idx}>• {m.name}: {m.value} {m.unit} ({m.confidence})</li>
-                  ))}
-                </ul>
-              )}
             </CardContent>
           </Card>
 
@@ -270,7 +299,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2"><ScanSearch className="h-4 w-4" /> Blueprint Symbol Detection</CardTitle>
+              <CardTitle className="flex items-center gap-2"><ScanSearch className="h-4 w-4" /> Symbol Detection</CardTitle>
             </CardHeader>
             <CardContent>
               {analysis.symbols.length === 0 ? (
@@ -296,17 +325,10 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               <p className="font-semibold">Subtotal: ${analysis.estimateInputs.subtotal.toLocaleString()}</p>
               <p>Recommended contingency: {analysis.estimateInputs.recommended_contingency_percent}%</p>
               <Button onClick={handleApplyEstimate} className="mt-2">Apply This Estimate to Bid</Button>
-              {analysis.proposalNotes.length > 0 && (
-                <div className="pt-2">
-                  <p className="font-medium">Proposal Notes</p>
-                  <ul className="list-disc ml-5">
-                    {analysis.proposalNotes.map((note, idx) => <li key={idx}>{note}</li>)}
-                  </ul>
-                </div>
-              )}
+
               {analysis.missingInformation.length > 0 && (
                 <div className="pt-2">
-                  <p className="font-medium text-amber-700">Missing Information</p>
+                  <p className="font-medium text-amber-700 flex items-center gap-1"><Files className="h-4 w-4" /> Missing Information</p>
                   <ul className="list-disc ml-5 text-amber-700">
                     {analysis.missingInformation.map((note, idx) => <li key={idx}>{note}</li>)}
                   </ul>
