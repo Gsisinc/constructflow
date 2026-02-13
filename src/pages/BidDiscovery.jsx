@@ -256,23 +256,19 @@ export default function BidDiscovery() {
           toast.success(`🔔 ${discoveredNew.length} new ${workTypeDisplay} opportunities matched your alerts.`);
         }
       } else {
-        // Fallback: use already-saved opportunities so the page still returns usable results.
-        const saved = await base44.entities.BidOpportunity.list('-created_date', 250);
-        const filteredSaved = saved.filter((item) => {
-          const haystack = `${item.title || item.project_name || ''} ${item.description || ''} ${item.location || ''}`.toLowerCase();
-          const workMatch = !workType || workType === 'all' || haystack.includes(workType.replace('_', ' '));
-          const stateMatch = !state || haystack.includes(String(state).toLowerCase());
-          const cityMatch = !cityCounty || cityCounty === 'all' || haystack.includes(String(cityCounty).toLowerCase());
-          return workMatch && stateMatch && cityMatch;
-        });
-        setSearchResults(filteredSaved);
+        setSearchResults([]);
         setHasMore(false);
         if (!silent) {
-          toast.info(
-            filteredSaved.length > 0
-              ? `Showing ${filteredSaved.length} saved opportunities while live sources refresh.`
-              : `No ${workTypeDisplay} opportunities found right now.`
-          );
+          const failingSources = (response.sourceSummary || [])
+            .filter((entry) => !entry.success)
+            .map((entry) => entry.source)
+            .join(', ');
+
+          if (failingSources) {
+            toast.error(`No live results. Source issues: ${failingSources}.`);
+          } else {
+            toast.info(`No live ${workTypeDisplay} opportunities found right now.`);
+          }
         }
       }
     } catch (error) {
@@ -897,7 +893,7 @@ Provide:
                 <Search className="h-16 w-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No opportunities yet</h3>
                 <p className="text-slate-600 mb-6">
-                  Start an AI search to discover bid opportunities matching your criteria
+                  Run a live search (SAM/county/business). We do not show saved/fallback opportunities here.
                 </p>
                 <Button onClick={() => setShowAgentChat(true)} className="gap-2">
                   <Sparkles className="h-4 w-4" />
