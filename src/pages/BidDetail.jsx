@@ -67,7 +67,7 @@ export default function BidDetail() {
     onError: () => toast.error('Unable to delete bid')
   });
 
-  const analysis = useMemo(() => normalizeAiAnalysis(bid?.ai_analysis), [bid?.ai_analysis]);
+  const analysis = useMemo(() => normalizeAiAnalysis(bid?.ai_analysis, documents), [bid?.ai_analysis, documents]);
 
   if (!bid || !user) {
     return (
@@ -260,6 +260,28 @@ export default function BidDetail() {
                   </CardContent>
                 </Card>
               )}
+
+              {analysis.deadlines.length > 0 && (
+                <Card>
+                  <CardHeader><CardTitle className="text-base">Deadlines</CardTitle></CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm text-slate-700 list-disc ml-5">
+                      {analysis.deadlines.map((deadline, idx) => <li key={`${deadline}-${idx}`}>{deadline}</li>)}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {analysis.extractedRequirements.length > 0 && (
+                <Card>
+                  <CardHeader><CardTitle className="text-base">Extracted Requirements</CardTitle></CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm text-slate-700 list-disc ml-5">
+                      {analysis.extractedRequirements.map((item, idx) => <li key={`${item}-${idx}`}>{item}</li>)}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           ) : (
             <Card>
@@ -283,15 +305,28 @@ function formatFileSize(fileSize) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function normalizeAiAnalysis(raw) {
-  const parsed = typeof raw === 'string' ? safeParseJson(raw) : raw;
+function normalizeAiAnalysis(raw, documents = []) {
+  const parsed = typeof raw === 'string' ? safeParseJson(raw) : (raw || {});
+
+  const docExtractions = (documents || [])
+    .map((doc) => doc?.extracted_data || {})
+    .filter(Boolean);
+
+  const docRiskFactors = docExtractions.flatMap((data) => asArray(data.risk_factors));
+  const docKeyPoints = docExtractions.flatMap((data) => asArray(data.key_points));
+  const docDeadlines = docExtractions.flatMap((data) => asArray(data.deadlines));
+  const docRequirements = docExtractions.flatMap((data) => asArray(data.requirements));
+
   const complexity = asNumber(parsed?.complexity_score);
   const markup = asNumber(parsed?.recommended_markup);
-  const riskFactors = asArray(parsed?.risk_factors);
-  const keyPoints = asArray(parsed?.key_points);
+
+  const riskFactors = dedupe([...(asArray(parsed?.risk_factors)), ...docRiskFactors]);
+  const keyPoints = dedupe([...(asArray(parsed?.key_points)), ...docKeyPoints]);
+  const deadlines = dedupe([...(asArray(parsed?.deadlines)), ...docDeadlines]);
+  const extractedRequirements = dedupe([...(asArray(parsed?.extracted_requirements)), ...docRequirements]);
 
   return {
-    hasAnyData: Boolean(parsed) && (complexity !== null || markup !== null || riskFactors.length > 0 || keyPoints.length > 0),
+    hasAnyData: riskFactors.length > 0 || keyPoints.length > 0 || deadlines.length > 0 || extractedRequirements.length > 0 || complexity !== null || markup !== null,
     complexityScore: complexity,
     complexityLabel: complexity === null
       ? 'Not scored'
@@ -302,7 +337,9 @@ function normalizeAiAnalysis(raw) {
           : 'Low complexity',
     recommendedMarkup: markup,
     riskFactors,
-    keyPoints
+    keyPoints,
+    deadlines,
+    extractedRequirements
   };
 }
 
@@ -317,6 +354,10 @@ function safeParseJson(value) {
 function asArray(value) {
   if (!value) return [];
   return Array.isArray(value) ? value.filter(Boolean) : [];
+}
+
+function dedupe(values) {
+  return [...new Set((values || []).filter(Boolean))];
 }
 
 function asNumber(value) {

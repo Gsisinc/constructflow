@@ -1,14 +1,15 @@
 const toArray = (value) => (Array.isArray(value) ? value : []);
 
-export const buildDrawingAnalysisPrompt = ({ bid, classification, csiDivision }) => `You are a construction estimating assistant specializing in blueprint and drawing takeoff analysis.
+export const buildDrawingAnalysisPrompt = ({ bid, classification, csiDivision, documentCount = 1 }) => `You are a construction estimating assistant specializing in blueprint and drawing takeoff analysis.
 
-Analyze this uploaded project drawing/blueprint and extract measurable takeoff data.
+Analyze all pages from the uploaded project drawing/blueprint document set and extract measurable takeoff data.
 Context:
 - Bid/project: ${bid?.title || bid?.project_name || 'Unknown'}
 - Agency/client: ${bid?.agency || bid?.client_name || 'Unknown'}
 - Existing scope notes: ${bid?.scope_of_work || bid?.description || 'Not provided'}
 - Classification focus: ${classification}
 - CSI division focus: ${csiDivision}
+- Uploaded drawing files: ${documentCount}
 
 Return strict JSON with:
 1) summary (string)
@@ -26,7 +27,8 @@ Return strict JSON with:
 Rules:
 - Never claim exact certainty when symbols/scale are unclear.
 - If scale or legend is missing, include that in missing_information.
-- Keep numeric fields as numbers where possible.`;
+- Keep numeric fields as numbers where possible.
+- If multiple pages/files are provided, combine them into one consolidated output.`;
 
 export const normalizeDrawingAnalysis = (analysis = {}) => {
   const measurements = toArray(analysis.measurements).map((m) => ({

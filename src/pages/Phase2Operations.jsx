@@ -67,7 +67,7 @@ export default function Phase2Operations() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Phase 2 Operations Center</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Bid Leveling & Forecast Operations</h1>
         <p className="text-sm text-slate-600 mt-1">Bid leveling, change order approvals, and cost-to-complete forecasting.</p>
       </div>
 

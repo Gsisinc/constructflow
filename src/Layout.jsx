@@ -55,11 +55,11 @@ const navItems = [
                     { name: 'Role Permissions', icon: Settings, page: 'RolePermissions' },
                     { name: 'Audit Trail', icon: FileStack, page: 'AuditTrail' },
                     { name: 'Service Desk', icon: Wrench, page: 'ServiceDesk' },
-                    { name: 'Phase 2 Ops', icon: TrendingUp, page: 'Phase2Operations' },
-                    { name: 'Phase 3 Hub', icon: Building2, page: 'Phase3Operations' },
-                    { name: 'Phase 4 AI', icon: Bot, page: 'Phase4AIAutomation' },
-                    { name: 'Phase 5 Scale', icon: Building2, page: 'Phase5PlatformScale' },
-                    { name: 'Phase 6 Ops', icon: Wrench, page: 'Phase6ReliabilityOps' },
+                    { name: 'Bid Leveling & Forecasts', icon: TrendingUp, page: 'Phase2Operations' },
+                    { name: 'Enterprise Integrations', icon: Building2, page: 'Phase3Operations' },
+                    { name: 'AI Governance & Automation', icon: Bot, page: 'Phase4AIAutomation' },
+                    { name: 'Platform & Tenant Control', icon: Building2, page: 'Phase5PlatformScale' },
+                    { name: 'Reliability & Support Ops', icon: Wrench, page: 'Phase6ReliabilityOps' },
                   ];
 
 const adminNavItems = [

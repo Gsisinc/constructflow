@@ -95,11 +95,11 @@ const menuSections = [
       { icon: Settings, label: 'Role Permissions', page: 'RolePermissions' },
       { icon: FileStack, label: 'Audit Trail', page: 'AuditTrail' },
       { icon: Wrench, label: 'Service Desk', page: 'ServiceDesk' },
-      { icon: TrendingUp, label: 'Phase 2 Ops', page: 'Phase2Operations' },
-      { icon: Building2, label: 'Phase 3 Hub', page: 'Phase3Operations' },
-      { icon: Bot, label: 'Phase 4 AI', page: 'Phase4AIAutomation' },
-      { icon: Building2, label: 'Phase 5 Scale', page: 'Phase5PlatformScale' },
-      { icon: Wrench, label: 'Phase 6 Ops', page: 'Phase6ReliabilityOps' },
+      { icon: TrendingUp, label: 'Bid Leveling & Forecasts', page: 'Phase2Operations' },
+      { icon: Building2, label: 'Enterprise Integrations', page: 'Phase3Operations' },
+      { icon: Bot, label: 'AI Governance & Automation', page: 'Phase4AIAutomation' },
+      { icon: Building2, label: 'Platform & Tenant Control', page: 'Phase5PlatformScale' },
+      { icon: Wrench, label: 'Reliability & Support Ops', page: 'Phase6ReliabilityOps' },
     ]
   },
   {

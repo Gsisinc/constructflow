@@ -121,7 +121,7 @@ export default function Phase6ReliabilityOps() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Phase 6 Reliability & Customer Ops</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Reliability & Customer Operations</h1>
         <p className="text-sm text-slate-600 mt-1">Operational excellence for uptime, support SLA, release quality, and disaster-recovery readiness.</p>
       </div>
 

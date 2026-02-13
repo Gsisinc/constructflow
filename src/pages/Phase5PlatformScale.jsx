@@ -140,7 +140,7 @@ export default function Phase5PlatformScale() {
         after: providerState
       });
     },
-    onSuccess: () => toast.success('Phase 5 integration settings saved.'),
+    onSuccess: () => toast.success('Integration settings saved.'),
     onError: () => toast.error('Failed to save integration settings.')
   });
 
@@ -229,7 +229,7 @@ export default function Phase5PlatformScale() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Phase 5 Platform & Scale Hub</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Platform & Tenant Control Hub</h1>
         <p className="text-sm text-slate-600 mt-1">Integration marketplace, tenant administration, and executive reporting command center.</p>
       </div>
 
@@ -469,7 +469,7 @@ export default function Phase5PlatformScale() {
 
               <div className="border rounded-lg p-3 bg-slate-50">
                 <p className="text-sm text-slate-700">
-                  Phase 5 focus: tenant-level policy controls, production connector ops with reconciliation, and portfolio command center metrics for multi-company SaaS operations.
+                  Focus: tenant-level policy controls, production connector ops with reconciliation, and portfolio command center metrics for multi-company SaaS operations.
                 </p>
               </div>
             </CardContent>
