@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,6 +38,10 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
   const [classification, setClassification] = useState('low_voltage');
   const [csiDivision, setCsiDivision] = useState('27 Communications');
   const [analysis, setAnalysis] = useState(bid?.ai_analysis?.drawing_analysis || null);
+
+  useEffect(() => {
+    setAnalysis(bid?.ai_analysis?.drawing_analysis || null);
+  }, [bid?.ai_analysis?.drawing_analysis]);
 
   const analyzeDrawingSet = async (files) => {
     if (!files?.length) return;

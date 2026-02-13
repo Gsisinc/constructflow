@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { parseLlmJsonResponse } from '@/lib/llmResponse';
 import {
   detectNewOpportunities,
   buildDiscoveryFingerprint,
@@ -146,6 +147,8 @@ export default function BidDiscovery() {
 
   const opportunities = searchResults;
 
+  const { data: currentUser } = useQuery({ queryKey: ['currentUser', 'bidDiscovery'], queryFn: () => base44.auth.me() });
+
   const { data: bids = [] } = useQuery({
     queryKey: ['bids'],
     queryFn: () => base44.entities.BidOpportunity.list('-created_date', 100)
@@ -206,7 +209,7 @@ export default function BidDiscovery() {
   const executeAISearch = async (page = 1, silent = false) => {
     setSearching(true);
     const workTypeDisplay = workType.replace('_', ' ');
-    const filters = { workType, state, cityCounty, classification };
+    const filters = { workType, state, cityCounty: cityCounty === 'all' ? '' : cityCounty, classification };
     const previousFingerprints = searchResults.map((item) => buildDiscoveryFingerprint(item));
     if (!silent) {
       toast.info(`🔍 Fetching ${workTypeDisplay} opportunities in ${state} (page ${page})...`);
@@ -253,10 +256,24 @@ export default function BidDiscovery() {
           toast.success(`🔔 ${discoveredNew.length} new ${workTypeDisplay} opportunities matched your alerts.`);
         }
       } else {
-        setSearchResults([]);
-        setSourceSummary([]);
+        // Fallback: use already-saved opportunities so the page still returns usable results.
+        const saved = await base44.entities.BidOpportunity.list('-created_date', 250);
+        const filteredSaved = saved.filter((item) => {
+          const haystack = `${item.title || item.project_name || ''} ${item.description || ''} ${item.location || ''}`.toLowerCase();
+          const workMatch = !workType || workType === 'all' || haystack.includes(workType.replace('_', ' '));
+          const stateMatch = !state || haystack.includes(String(state).toLowerCase());
+          const cityMatch = !cityCounty || cityCounty === 'all' || haystack.includes(String(cityCounty).toLowerCase());
+          return workMatch && stateMatch && cityMatch;
+        });
+        setSearchResults(filteredSaved);
         setHasMore(false);
-        toast.info(`No ${workTypeDisplay} opportunities found right now.`);
+        if (!silent) {
+          toast.info(
+            filteredSaved.length > 0
+              ? `Showing ${filteredSaved.length} saved opportunities while live sources refresh.`
+              : `No ${workTypeDisplay} opportunities found right now.`
+          );
+        }
       }
     } catch (error) {
       console.error('❌ Scraper error:', error);
@@ -285,7 +302,7 @@ export default function BidDiscovery() {
     }
     
     const location = [];
-    if (cityCounty) {
+    if (cityCounty && cityCounty !== 'all') {
       location.push(cityCounty);
     }
     if (state) {
@@ -348,6 +365,7 @@ export default function BidDiscovery() {
       const checklist = generateChecklist(opportunity);
       
       await createBidMutation.mutateAsync({
+        organization_id: currentUser?.organization_id || null,
         title: opportunity.project_name || opportunity.title,
         agency: opportunity.agency || opportunity.client,
         status: 'new',
@@ -433,6 +451,7 @@ export default function BidDiscovery() {
   const handleCreateProject = async (opportunity) => {
     try {
       await createProjectMutation.mutateAsync({
+        organization_id: currentUser?.organization_id || null,
         name: opportunity.project_name || opportunity.title,
         client_name: opportunity.agency || opportunity.client,
         project_type: opportunity.project_type || 'commercial',
@@ -503,7 +522,9 @@ Provide:
             prompt: analysisPrompt,
             add_context_from_internet: false
           });
-          setAnalysis(response);
+          const parsed = parseLlmJsonResponse(response);
+          const text = typeof parsed === 'string' ? parsed : (parsed?.answer || parsed?.response || parsed?.content || parsed?.output || JSON.stringify(parsed, null, 2));
+          setAnalysis(text);
         } catch (error) {
           setAnalysis('Failed to generate analysis. Please try again.');
         } finally {
@@ -740,7 +761,7 @@ Provide:
                 <SelectValue placeholder={`City in ${state} (optional)`} />
               </SelectTrigger>
               <SelectContent className="max-h-[400px]">
-                <SelectItem value={null}>All Cities</SelectItem>
+                <SelectItem value="all">All Cities</SelectItem>
                 {availableCities.map(city => (
                   <SelectItem key={city} value={city}>{city}</SelectItem>
                 ))}

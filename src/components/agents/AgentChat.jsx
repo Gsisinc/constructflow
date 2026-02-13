@@ -12,12 +12,23 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { buildAgentSystemPrompt, getAgentWorkflow } from '@/config/agentWorkflows';
 import { shouldInvokeLiveDiscovery } from '@/config/agentRuntimeRules';
+import { parseLlmJsonResponse } from '@/lib/llmResponse';
 import {
   buildDiscoverySummary,
   extractDiscoveryFilters,
   normalizeOpportunities,
   rankOpportunities
 } from '@/config/bidDiscoveryEngine';
+
+
+function getAssistantText(response) {
+  const parsed = parseLlmJsonResponse(response);
+  if (typeof parsed === 'string') return parsed.trim();
+  if (parsed && typeof parsed === 'object') {
+    return parsed.answer || parsed.response || parsed.content || parsed.text || parsed.output || '';
+  }
+  return '';
+}
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [conversation, setConversation] = useState(null);
@@ -171,10 +182,23 @@ User: ${messageText}`,
           temperature: 0.2
         });
 
+        let content = getAssistantText(llmResponse);
+        if (!content) {
+          try {
+            const functionResponse = await base44.functions.invoke('invoke-llm', {
+              prompt: messageText,
+              temperature: 0.2
+            });
+            content = getAssistantText(functionResponse);
+          } catch {
+            // noop
+          }
+        }
+
         const assistantMessage = {
           id: crypto.randomUUID(),
           role: 'assistant',
-          content: llmResponse?.output || llmResponse?.result || 'I am ready to help.',
+          content: content || 'I could not generate a response right now. Please retry.',
           created_date: new Date().toISOString()
         };
 

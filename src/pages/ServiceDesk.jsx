@@ -46,8 +46,10 @@ export default function ServiceDesk() {
 
       const payload = {
         ...form,
+        project_id: form.project_id || null,
+        organization_id: user?.organization_id || null,
         status: 'new',
-        requested_by: 'internal',
+        requested_by: user?.email || 'internal',
         sla_due_at: buildSlaTag({ priority: form.priority }).due_at
       };
 
@@ -56,6 +58,7 @@ export default function ServiceDesk() {
       } catch {
         await base44.entities.Issue.create({
           project_id: form.project_id || null,
+          organization_id: user?.organization_id || null,
           title: form.subject,
           description: form.description,
           severity: form.priority,
@@ -69,7 +72,7 @@ export default function ServiceDesk() {
       setForm({ subject: '', description: '', priority: 'medium', category: 'service_call', project_id: '' });
       queryClient.invalidateQueries({ queryKey: ['serviceTickets'] });
     },
-    onError: () => toast.error('Failed to create ticket')
+    onError: (error) => toast.error(error?.message || 'Failed to create ticket')
   });
 
   const statusMutation = useMutation({
@@ -224,9 +227,10 @@ export default function ServiceDesk() {
                 </div>
                 <div>
                   <Label>Project</Label>
-                  <Select value={form.project_id} onValueChange={(value) => setForm((prev) => ({ ...prev, project_id: value }))}>
+                  <Select value={form.project_id || 'none'} onValueChange={(value) => setForm((prev) => ({ ...prev, project_id: value === 'none' ? '' : value }))}>
                     <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none">No project</SelectItem>
                       {projects.map((project) => <SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>)}
                     </SelectContent>
                   </Select>

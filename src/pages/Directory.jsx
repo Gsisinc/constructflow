@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, UserPlus, Users, Building2, Mail, Phone, MapPin, Star } from 'lucide-react';
+import { Search, UserPlus, Users, Building2, Star, Trash2 } from 'lucide-react';
 
 export default function Directory() {
   const [searchTerm, setSearchTerm] = useState('');
+  const queryClient = useQueryClient();
 
   const { data: workers = [] } = useQuery({
     queryKey: ['workers'],
@@ -20,6 +21,24 @@ export default function Directory() {
     w.role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     w.company?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.Worker.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
+    }
+  });
+
+  const handleDeleteContact = async (worker) => {
+    if (!window.confirm(`Delete contact ${worker.name || 'this contact'}?`)) return;
+    try {
+      await deleteMutation.mutateAsync(worker.id);
+    } catch (error) {
+      console.error(error);
+      alert(error?.message || 'Failed to delete contact');
+    }
+  };
 
   const contactCounts = {
     users: workers.filter(w => w.role === 'engineer' || w.role === 'supervisor').length,
@@ -142,7 +161,12 @@ export default function Directory() {
                     <p className="font-semibold text-xs text-slate-900 truncate">{worker.name}</p>
                     <p className="text-xs text-slate-600 truncate">{worker.company || 'Direct'}</p>
                   </div>
-                  {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />}
+                  <div className="flex items-center gap-1">
+                    {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />}
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-red-600" onClick={() => handleDeleteContact(worker)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="text-xs text-slate-600 flex gap-2">
                   <span className="flex-1 truncate">{worker.phone || '-'}</span>
@@ -161,7 +185,7 @@ export default function Directory() {
                   <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Name</th>
                   <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Phone</th>
                   <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Type</th>
-                  <th className="text-center py-2.5 px-3 text-xs font-medium text-slate-600"></th>
+                  <th className="text-center py-2.5 px-3 text-xs font-medium text-slate-600">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -186,7 +210,12 @@ export default function Directory() {
                       <Badge variant="outline" className="text-xs">{worker.company ? 'Contractor' : 'Employee'}</Badge>
                     </td>
                     <td className="py-2.5 px-3 text-center">
-                      {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500 inline" />}
+                      <div className="flex items-center justify-center gap-1">
+                        {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500" />}
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-red-600" onClick={() => handleDeleteContact(worker)}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
