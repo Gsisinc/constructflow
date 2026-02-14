@@ -29,6 +29,41 @@ function getAssistantText(response) {
   return '';
 }
 
+function buildLocalFallbackResponse(agent, workflow, messageText) {
+  const title = workflow?.name || agent?.name || 'Assistant';
+  const purpose = workflow?.purpose || agent?.description || 'Provide practical construction guidance.';
+  const outputs = Array.isArray(workflow?.outputs) ? workflow.outputs : [];
+  const workflowSteps = Array.isArray(workflow?.workflow) ? workflow.workflow : [];
+  const sample = workflow?.sampleOutput || '';
+
+  const immediateActions = workflowSteps
+    .slice(0, 3)
+    .map((step, index) => `${index + 1}. ${step}`)
+    .join('\n');
+
+  const deliverables = outputs.length > 0
+    ? outputs.map((item) => `- ${item}`).join('\n')
+    : '- Action plan\n- Risks and mitigations\n- Next steps';
+
+  return [
+    `### ${title} response (local fallback)`,
+    '',
+    `I could not reach the live AI provider, so I generated an immediate in-app response for your request: **"${messageText}"**.`,
+    '',
+    `**Purpose**: ${purpose}`,
+    '',
+    '**Immediate workflow**',
+    immediateActions || '1. Clarify your objective\n2. Build action plan\n3. Recommend next execution steps',
+    '',
+    '**Expected deliverables**',
+    deliverables,
+    '',
+    sample ? `**Reference output style**: ${sample}` : '',
+    '',
+    '**Next step**: Reply with any missing details (deadline, budget range, location, constraints), and I will refine this into final output.'
+  ].filter(Boolean).join('\n');
+}
+
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -95,7 +130,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   };
 
   const callExternalLLM = async (messageText) => {
-    const configuredProviders = (import.meta.env.VITE_AI_PROVIDER_PRIORITY || 'openai,deepseek')
+    const configuredProviders = (import.meta.env.VITE_AI_PROVIDER_PRIORITY || 'openai')
       .split(',')
       .map((provider) => provider.trim().toLowerCase())
       .filter(Boolean);
@@ -108,7 +143,7 @@ Runtime instructions:
 - Never ask the user for organization_id, bid_id, or internal database IDs.
 - If IDs are missing, proceed with assumptions and provide actionable output.`,
       temperature: 0.2,
-      preferredProviders: configuredProviders.length > 0 ? configuredProviders : ['openai', 'deepseek']
+      preferredProviders: configuredProviders.length > 0 ? configuredProviders : ['openai']
     });
 
     const parsed = parseLlmJsonResponse(response);
@@ -150,18 +185,32 @@ Runtime instructions:
 
       try {
         let content = '';
+        let providerErrors = [];
         try {
           content = await callExternalLLM(`Agent: ${agent.name}\nDescription: ${agent.description}\nUser: ${messageText}`);
         } catch (providerError) {
-          console.warn('invokeExternalLLM failed, falling back to Core.InvokeLLM', providerError);
+          providerErrors.push(`invokeExternalLLM: ${providerError?.message || providerError}`);
+          console.warn('invokeExternalLLM failed', providerError);
         }
 
         if (!content) {
-          const coreFallback = await base44.integrations.Core.InvokeLLM({
-            prompt: `${buildAgentSystemPrompt(agent.id)}\n\nUser: ${messageText}`,
-            temperature: 0.2
-          });
-          content = getAssistantText(coreFallback);
+          try {
+            const coreFallback = await base44.integrations.Core.InvokeLLM({
+              prompt: `${buildAgentSystemPrompt(agent.id)}\n\nUser: ${messageText}`,
+              temperature: 0.2
+            });
+            content = getAssistantText(coreFallback);
+          } catch (coreError) {
+            providerErrors.push(`Core.InvokeLLM: ${coreError?.message || coreError}`);
+            console.warn('Core.InvokeLLM fallback failed', coreError);
+          }
+        }
+
+        if (!content) {
+          content = buildLocalFallbackResponse(agent, workflow, messageText);
+          if (providerErrors.length > 0) {
+            toast.warning('Live AI is unavailable. Using local fallback response.');
+          }
         }
 
         const assistantMessage = {
