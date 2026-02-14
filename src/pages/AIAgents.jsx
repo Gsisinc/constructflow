@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Brain,
   Search,
   FileText,
   Shield,
@@ -16,11 +14,8 @@ import {
   Network,
   Sparkles,
   MessageCircle,
-  ArrowRight,
-  Bot,
-  X
+  Bot
 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
 import AgentChat from '../components/agents/AgentChat';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
@@ -143,9 +138,6 @@ export default function AIAgents() {
     ? agents 
     : agents.filter(a => a.category === activeCategory);
 
-  const getWhatsAppURL = (agentId) => {
-    return base44.agents.getWhatsAppConnectURL(agentId);
-  };
 
   return (
     <div className="space-y-4 sm:space-y-6">

@@ -14,7 +14,6 @@ import { buildAgentSystemPrompt, getAgentWorkflow } from '@/config/agentWorkflow
 import { shouldInvokeLiveDiscovery } from '@/config/agentRuntimeRules';
 import { parseLlmJsonResponse } from '@/lib/llmResponse';
 import {
-  buildDiscoverySummary,
   extractDiscoveryFilters,
   normalizeOpportunities,
   rankOpportunities
@@ -38,8 +37,6 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [uploading, setUploading] = useState(false);
   const [opportunities, setOpportunities] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-  const useBase44AgentRuntime = import.meta.env.VITE_ENABLE_BASE44_AGENT_RUNTIME === 'true';
-  const [chatMode, setChatMode] = useState(useBase44AgentRuntime ? 'base44' : 'fallback');
   const workflow = getAgentWorkflow(agent.id);
   const behavior = workflow || { supportsLiveBidDiscovery: false, showBidOpportunitiesPanel: false };
   const fileInputRef = useRef(null);
@@ -86,66 +83,36 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const initializeConversation = async () => {
     setLoading(true);
 
-    if (!useBase44AgentRuntime || !base44?.agents?.listConversations) {
-      const localConversation = {
-        id: `local-${agent.id}`,
-        messages: []
-      };
-      setChatMode('fallback');
-      setConversation(localConversation);
-      setMessages([]);
-      setLoading(false);
-      return undefined;
-    }
+    const localConversation = {
+      id: `local-${agent.id}`,
+      messages: []
+    };
 
-    try {
-      const existingConversations = await base44.agents.listConversations({
-        q: { agent_name: agent.id },
-        agent_name: agent.id,
-        sort: '-updated_date',
-        limit: 1
-      });
+    setConversation(localConversation);
+    setMessages([]);
+    setLoading(false);
+    return undefined;
+  };
 
-      let conv;
-      if (existingConversations && existingConversations.length > 0 && existingConversations[0]?.agent_name === agent.id) {
-        conv = existingConversations[0];
-      } else {
-        conv = await base44.agents.createConversation({
-          agent_name: agent.id,
-          metadata: {
-            name: `${agent.name} Session`,
-            description: `Chat with ${agent.name}`
-          }
-        });
-      }
+  const callExternalLLM = async (messageText) => {
+    const configuredProviders = (import.meta.env.VITE_AI_PROVIDER_PRIORITY || 'openai,deepseek')
+      .split(',')
+      .map((provider) => provider.trim().toLowerCase())
+      .filter(Boolean);
 
-      setChatMode('base44');
-      setConversation(conv);
-      setMessages(conv.messages || []);
-      setLoading(false);
+    const response = await base44.functions.invoke('invokeExternalLLM', {
+      prompt: messageText,
+      systemPrompt: `${buildAgentSystemPrompt(agent.id)}
 
-      if (conv.id) {
-        return base44.agents.subscribeToConversation(conv.id, (data) => {
-          setMessages(data.messages || []);
-          setLoading(false);
-        });
-      }
-    } catch (error) {
-      console.error('Init conversation error:', error);
-      setChatMode('fallback');
+Runtime instructions:
+- Never ask the user for organization_id, bid_id, or internal database IDs.
+- If IDs are missing, proceed with assumptions and provide actionable output.`,
+      temperature: 0.2,
+      preferredProviders: configuredProviders.length > 0 ? configuredProviders : ['openai', 'deepseek']
+    });
 
-      const localConversation = {
-        id: `local-${agent.id}`,
-        messages: []
-      };
-
-      setConversation(localConversation);
-      setMessages([]);
-      setLoading(false);
-
-      toast.warning('Using direct AI mode for reliable responses.');
-      return undefined;
-    }
+    const parsed = parseLlmJsonResponse(response);
+    return parsed?.output || parsed?.response || parsed?.answer || parsed?.content || '';
   };
 
   const handleSend = async (overrideMessage) => {
@@ -155,7 +122,23 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     setInput('');
     setLoading(true);
 
-    if (chatMode === 'fallback') {
+    try {
+      if (shouldInvokeLiveDiscovery(agent.id, messageText)) {
+        const filters = extractDiscoveryFilters(messageText);
+        const discoveryResponse = await base44.functions.invoke('scrapeCaliforniaBids', {
+          workType: filters.workType,
+          state: filters.state,
+          page: filters.page,
+          pageSize: filters.pageSize
+        });
+        const scraped = rankOpportunities(normalizeOpportunities(null, discoveryResponse));
+        setOpportunities(scraped);
+      }
+    } catch (discoveryError) {
+      console.warn('Live discovery failed for this prompt', discoveryError);
+    }
+
+    {
       const userLocalMessage = {
         id: crypto.randomUUID(),
         role: 'user',
@@ -166,33 +149,19 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
       setMessages((prev) => [...prev, userLocalMessage]);
 
       try {
-        const llmResponse = await base44.integrations.Core.InvokeLLM({
-          prompt: `${buildAgentSystemPrompt(agent.id)}
+        let content = '';
+        try {
+          content = await callExternalLLM(`Agent: ${agent.name}\nDescription: ${agent.description}\nUser: ${messageText}`);
+        } catch (providerError) {
+          console.warn('invokeExternalLLM failed, falling back to Core.InvokeLLM', providerError);
+        }
 
-Runtime instructions:
-- Never ask the user for organization_id, bid_id, or internal database IDs.
-- If IDs are missing, proceed using the provided narrative context and state assumptions clearly.
-- When asked for bid package/proposal output, generate the document content directly first, then suggest next actions.
-
-Agent: ${agent.name}
-Description: ${agent.description}
-Capabilities: ${(agent.capabilities || []).join(', ')}
-
-User: ${messageText}`,
-          temperature: 0.2
-        });
-
-        let content = getAssistantText(llmResponse);
         if (!content) {
-          try {
-            const functionResponse = await base44.functions.invoke('invoke-llm', {
-              prompt: messageText,
-              temperature: 0.2
-            });
-            content = getAssistantText(functionResponse);
-          } catch {
-            // noop
-          }
+          const coreFallback = await base44.integrations.Core.InvokeLLM({
+            prompt: `${buildAgentSystemPrompt(agent.id)}\n\nUser: ${messageText}`,
+            temperature: 0.2
+          });
+          content = getAssistantText(coreFallback);
         }
 
         const assistantMessage = {
@@ -211,60 +180,6 @@ User: ${messageText}`,
       }
 
       return;
-    }
-
-    try {
-      if (shouldInvokeLiveDiscovery(agent.id, messageText)) {
-        const filters = extractDiscoveryFilters(messageText);
-
-        let countyResponse = null;
-        let generalResponse = null;
-
-        try {
-          if (filters.state === 'California') {
-            countyResponse = await base44.functions.invoke('scrapeCaCounties', {
-              workType: filters.workType,
-              testMode: false
-            });
-          }
-        } catch (countyError) {
-          console.warn('County scraper unavailable, falling back to general scraper', countyError);
-        }
-
-        generalResponse = await base44.functions.invoke('scrapeCaliforniaBids', {
-          workType: filters.workType,
-          state: filters.state,
-          page: filters.page,
-          pageSize: filters.pageSize
-        });
-
-        const scraped = rankOpportunities(normalizeOpportunities(countyResponse, generalResponse));
-        if (scraped.length > 0) {
-          setOpportunities(scraped);
-          toast.success(buildDiscoverySummary(scraped, filters));
-        } else {
-          toast.info(buildDiscoverySummary(scraped, filters));
-        }
-      }
-
-      const maybeConversation = await base44.agents.addMessage(conversation, {
-        role: 'user',
-        content: messageText
-      });
-
-      if (maybeConversation?.messages) {
-        setMessages(maybeConversation.messages);
-      }
-
-      if (behavior.showBidOpportunitiesPanel) {
-        setTimeout(() => fetchOpportunities(), 2000);
-      }
-    } catch (error) {
-      console.error('Send message error:', error);
-      toast.error('Failed to send message. Switching to fallback AI mode.');
-      setChatMode('fallback');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -304,15 +219,7 @@ User: ${messageText}`,
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       
-      if (chatMode === 'fallback') {
-        await handleSend(`I've uploaded a file: ${file.name}. File URL: ${file_url}`);
-      } else {
-        await base44.agents.addMessage(conversation, {
-          role: 'user',
-          content: `I've uploaded a file: ${file.name}`,
-          file_urls: [file_url]
-        });
-      }
+      await handleSend(`I've uploaded a file: ${file.name}. File URL: ${file_url}`);
 
       toast.success('File uploaded');
     } catch (error) {
