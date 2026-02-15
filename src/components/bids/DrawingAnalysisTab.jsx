@@ -338,7 +338,20 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               <p>Equipment cost: ${analysis.estimateInputs.equipment_cost.toLocaleString()}</p>
               <p className="font-semibold">Subtotal: ${analysis.estimateInputs.subtotal.toLocaleString()}</p>
               <p>Recommended contingency: {analysis.estimateInputs.recommended_contingency_percent}%</p>
-              <Button onClick={handleApplyEstimate} className="mt-2">Apply This Estimate to Bid</Button>
+              <Button 
+                onClick={handleApplyEstimate} 
+                disabled={applyingEstimate}
+                className="mt-2"
+              >
+                {applyingEstimate ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Applying...
+                  </>
+                ) : (
+                  'Apply This Estimate to Bid'
+                )}
+              </Button>
 
               {analysis.missingInformation.length > 0 && (
                 <div className="pt-2">
