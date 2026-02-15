@@ -20,6 +20,11 @@ export default function Estimates() {
     queryFn: () => base44.entities.BidOpportunity.list('-created_date')
   });
 
+  const { data: bidEstimates = [] } = useQuery({
+    queryKey: ['bidEstimates'],
+    queryFn: () => base44.entities.BidEstimate.list('-created_date')
+  });
+
   const stats = {
     estimating: bidOpportunities.filter(b => b.status === 'estimating').length,
     approved: bidOpportunities.filter(b => b.status === 'submitted').length
