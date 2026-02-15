@@ -315,6 +315,11 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
       setAnalysis(normalized);
       toast.success(`Drawing analysis complete (${uploadedDocs.length} file${uploadedDocs.length > 1 ? 's' : ''}).`);
+      
+      // Reload documents list
+      const docs = await base44.entities.BidDocument.filter({ bid_opportunity_id: bid.id });
+      setExistingDocs(docs);
+      
       onAnalysisSaved?.();
     } catch (error) {
       console.error(error);
