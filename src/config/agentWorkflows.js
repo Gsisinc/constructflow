@@ -43,7 +43,7 @@ export const AGENT_WORKFLOWS = {
       'Rank opportunities by fit, value, risk, and due date proximity.',
       'Return shortlist with source URLs and add-to-pipeline recommendations.'
     ],
-    outputs: ['Opportunity shortlist', 'Win-probability notes', 'Recommended next actions'],
+    outputs: ['Opportunities', 'Win-probability notes', 'Recommended next actions'],
     typicalPrompt: 'Find public low-voltage bids in California due in the next 14 days and rank top 10 by fit for a 25-person contractor.',
     sampleOutput:
       'Found 14 opportunities from live sources. Top 3 include LA County courthouse low-voltage upgrade, San Diego school network modernization, and Fresno municipal camera refresh. Recommended action: add first two to pipeline and request mandatory pre-bid meeting details.',
@@ -65,7 +65,7 @@ export const AGENT_WORKFLOWS = {
       'Assemble pricing framework with assumptions and contingency notes.',
       'Produce submission-ready package summary and missing-item list.'
     ],
-    outputs: ['Bid checklist', 'Pricing assumptions sheet', 'Submission readiness report'],
+    outputs: ['Bid checklist', 'Pricing assumptions sheet', 'Submission readiness report', 'Missing items'],
     typicalPrompt: 'Turn this 60-page RFP into a checklist with required forms, insurance limits, and pricing assumptions.',
     sampleOutput:
       'Created 42-item submission checklist. Missing items: signed non-collusion affidavit, subcontractor utilization form, and bond letter. Pricing assumptions include 8% contingency for off-hours work and union wage escalation clause.',
@@ -122,7 +122,7 @@ export const AGENT_WORKFLOWS = {
       'Recommend mitigation actions with owner and trigger points.',
       'Provide monitoring metrics for weekly control.'
     ],
-    outputs: ['Top risk matrix', 'Mitigation action plan', 'Early-warning indicators'],
+    outputs: ['Top risk matrix', 'Mitigation action plan', 'Early warning indicators'],
     typicalPrompt: 'Assess risk of a 12-week deployment with one lead estimator and three parallel submittal deadlines.',
     sampleOutput:
       'Top risks: estimator bottleneck (High), procurement lead-time (Medium-High), permit approval latency (Medium). Mitigation plan includes backup estimator assignment and vendor pre-qualification this week.',
@@ -183,7 +183,7 @@ export const AGENT_WORKFLOWS = {
     typicalPrompt: 'Recommend lower-carbon alternatives for conduit and fixture package while preserving budget.',
     sampleOutput:
       'Suggested three substitution options with cost/impact tradeoff, including recycled-content conduit and high-efficiency fixtures. Mapped likely LEED contribution and payback range.',
-    guardrails: ['State uncertainty when data is missing.', 'Do not claim scraped supplier data unless provided.']
+    guardrails: ['State uncertainty when data is missing.', 'Do not claim scraped supplier data unless provided.', 'Do not claim external scraping capabilities.']
   },
   stakeholder_communication: {
     id: 'stakeholder_communication',
