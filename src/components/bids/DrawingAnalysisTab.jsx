@@ -59,14 +59,15 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
   }, [bid?.id]);
 
   const reanalyzeExistingDocs = async () => {
-    if (!existingDocs?.length) {
-      toast.error('No documents to analyze');
+    if (!selectedDocIds?.length) {
+      toast.error('Please select at least one document to analyze');
       return;
     }
 
     setAnalyzing(true);
     try {
-      const fileUrls = existingDocs.map(doc => doc.file_url);
+      const selectedDocs = existingDocs.filter(doc => selectedDocIds.includes(doc.id));
+      const fileUrls = selectedDocs.map(doc => doc.file_url);
       
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: buildDrawingAnalysisPrompt({
