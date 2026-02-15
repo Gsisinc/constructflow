@@ -39,10 +39,23 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
   const [classification, setClassification] = useState('low_voltage');
   const [csiDivision, setCsiDivision] = useState('27 Communications');
   const [analysis, setAnalysis] = useState(bid?.ai_analysis?.drawing_analysis || null);
+  const [existingDocs, setExistingDocs] = useState([]);
 
   useEffect(() => {
     setAnalysis(bid?.ai_analysis?.drawing_analysis || null);
   }, [bid?.ai_analysis?.drawing_analysis]);
+
+  useEffect(() => {
+    const loadDocs = async () => {
+      try {
+        const docs = await base44.entities.BidDocument.filter({ bid_opportunity_id: bid.id });
+        setExistingDocs(docs);
+      } catch (error) {
+        console.error('Failed to load documents:', error);
+      }
+    };
+    if (bid?.id) loadDocs();
+  }, [bid?.id]);
 
   const analyzeDrawingSet = async (files) => {
     if (!files?.length) return;
