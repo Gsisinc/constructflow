@@ -35,6 +35,7 @@ const CSI_DIVISIONS = [
 export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSaved }) {
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [applyingEstimate, setApplyingEstimate] = useState(false);
   const [classification, setClassification] = useState('low_voltage');
   const [csiDivision, setCsiDivision] = useState('27 Communications');
   const [analysis, setAnalysis] = useState(bid?.ai_analysis?.drawing_analysis || null);
