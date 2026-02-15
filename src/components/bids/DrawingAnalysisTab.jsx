@@ -339,9 +339,44 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
     setApplyingEstimate(true);
     try {
       const contingency = analysis.estimateInputs.recommended_contingency_percent || 10;
-      const estimated = analysis.estimateInputs.subtotal * (1 + contingency / 100);
-      await base44.entities.BidOpportunity.update(bid.id, { estimated_value: Math.round(estimated) });
-      toast.success('Estimate applied to bid value.');
+      const subtotal = analysis.estimateInputs.subtotal;
+      const overheadPercent = 15;
+      const profitPercent = 20;
+      const totalBidAmount = subtotal * (1 + (overheadPercent + profitPercent) / 100);
+
+      // Create BidEstimate record
+      const lineItems = analysis.materials.map(mat => ({
+        description: mat.item,
+        quantity: mat.quantity,
+        unit: mat.unit,
+        unit_cost: 0,
+        total_cost: 0,
+        category: mat.csi_division || classification
+      }));
+
+      await base44.entities.BidEstimate.create({
+        bid_opportunity_id: bid.id,
+        organization_id: organizationId,
+        line_items: lineItems,
+        labor_hours: analysis.estimateInputs.labor_hours,
+        labor_rate: 65,
+        labor_cost: analysis.estimateInputs.labor_hours * 65,
+        material_cost: analysis.estimateInputs.material_cost,
+        equipment_cost: analysis.estimateInputs.equipment_cost,
+        subcontractor_cost: 0,
+        overhead_percent: overheadPercent,
+        profit_margin_percent: profitPercent,
+        subtotal: subtotal,
+        total_bid_amount: Math.round(totalBidAmount),
+        notes: `Generated from drawing analysis on ${new Date().toLocaleDateString()}. Classification: ${classification}, CSI: ${csiDivision}`,
+        version: 1
+      });
+
+      await base44.entities.BidOpportunity.update(bid.id, { 
+        estimated_value: Math.round(totalBidAmount) 
+      });
+
+      toast.success('Estimate created and applied to bid.');
       onAnalysisSaved?.();
     } catch (error) {
       console.error(error);
