@@ -57,6 +57,124 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
     if (bid?.id) loadDocs();
   }, [bid?.id]);
 
+  const reanalyzeExistingDocs = async () => {
+    if (!existingDocs?.length) {
+      toast.error('No documents to analyze');
+      return;
+    }
+
+    setAnalyzing(true);
+    try {
+      const fileUrls = existingDocs.map(doc => doc.file_url);
+      
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: buildDrawingAnalysisPrompt({
+          bid,
+          classification,
+          csiDivision,
+          documentCount: existingDocs.length
+        }),
+        file_urls: fileUrls,
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            summary: { type: 'string' },
+            drawing_type: { type: 'string' },
+            units: { type: 'string' },
+            scale: { type: 'string' },
+            measurements: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  value: { type: 'number' },
+                  unit: { type: 'string' },
+                  confidence: { type: 'string' }
+                }
+              }
+            },
+            materials: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  item: { type: 'string' },
+                  quantity: { type: 'number' },
+                  unit: { type: 'string' },
+                  csi_division: { type: 'string' },
+                  notes: { type: 'string' }
+                }
+              }
+            },
+            symbol_detections: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  symbol: { type: 'string' },
+                  classification: { type: 'string' },
+                  count: { type: 'number' },
+                  confidence: { type: 'string' },
+                  notes: { type: 'string' }
+                }
+              }
+            },
+            takeoff_totals: {
+              type: 'object',
+              properties: {
+                conduit_length_ft: { type: 'number' },
+                cable_length_ft: { type: 'number' },
+                device_count: { type: 'number' },
+                fixture_count: { type: 'number' }
+              }
+            },
+            estimate_inputs: {
+              type: 'object',
+              properties: {
+                labor_hours: { type: 'number' },
+                material_cost: { type: 'number' },
+                equipment_cost: { type: 'number' },
+                subtotal: { type: 'number' },
+                recommended_contingency_percent: { type: 'number' }
+              }
+            },
+            proposal_notes: { type: 'array', items: { type: 'string' } },
+            missing_information: { type: 'array', items: { type: 'string' } }
+          }
+        }
+      });
+
+      const normalized = normalizeDrawingAnalysis(parseLlmJsonResponse(result));
+
+      const updatedAiAnalysis = {
+        ...(bid.ai_analysis || {}),
+        drawing_analysis: normalized,
+        drawing_analysis_meta: {
+          classification,
+          csi_division: csiDivision,
+          analyzed_at: new Date().toISOString(),
+          document_count: existingDocs.length,
+          document_names: existingDocs.map(doc => doc.name)
+        }
+      };
+
+      await base44.entities.BidOpportunity.update(bid.id, {
+        ai_analysis: updatedAiAnalysis,
+        estimated_value: bid.estimated_value || normalized.estimateInputs.subtotal
+      });
+
+      setAnalysis(normalized);
+      toast.success(`Re-analyzed ${existingDocs.length} document${existingDocs.length > 1 ? 's' : ''}`);
+      onAnalysisSaved?.();
+    } catch (error) {
+      console.error(error);
+      toast.error(`Re-analysis failed: ${error.message || 'Unknown error'}`);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const analyzeDrawingSet = async (files) => {
     if (!files?.length) return;
 
