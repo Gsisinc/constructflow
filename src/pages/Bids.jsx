@@ -247,7 +247,7 @@ export default function Bids() {
             <Card 
               key={bid.id} 
               className="hover:shadow-lg transition-all cursor-pointer group border-amber-100"
-              onClick={() => navigate(createPageUrl('BidDetail') + `?id=${bid.id}`)}
+              onClick={() => navigate(createPageUrl('BidDetailPage') + `?id=${bid.id}`)}
             >
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
