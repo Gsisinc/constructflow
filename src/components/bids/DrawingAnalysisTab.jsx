@@ -196,11 +196,20 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
   const handleApplyEstimate = async () => {
     if (!analysis) return;
-    const contingency = analysis.estimateInputs.recommended_contingency_percent || 10;
-    const estimated = analysis.estimateInputs.subtotal * (1 + contingency / 100);
-    await base44.entities.BidOpportunity.update(bid.id, { estimated_value: Math.round(estimated) });
-    toast.success('Estimate applied to bid value.');
-    onAnalysisSaved?.();
+    
+    setApplyingEstimate(true);
+    try {
+      const contingency = analysis.estimateInputs.recommended_contingency_percent || 10;
+      const estimated = analysis.estimateInputs.subtotal * (1 + contingency / 100);
+      await base44.entities.BidOpportunity.update(bid.id, { estimated_value: Math.round(estimated) });
+      toast.success('Estimate applied to bid value.');
+      onAnalysisSaved?.();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to apply estimate: ' + error.message);
+    } finally {
+      setApplyingEstimate(false);
+    }
   };
 
   return (
