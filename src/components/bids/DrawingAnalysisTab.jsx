@@ -156,8 +156,8 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
           classification,
           csi_division: csiDivision,
           analyzed_at: new Date().toISOString(),
-          document_count: existingDocs.length,
-          document_names: existingDocs.map(doc => doc.name)
+          document_count: selectedDocs.length,
+          document_names: selectedDocs.map(doc => doc.name)
         }
       };
 
