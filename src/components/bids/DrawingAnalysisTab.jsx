@@ -40,6 +40,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
   const [csiDivision, setCsiDivision] = useState('27 Communications');
   const [analysis, setAnalysis] = useState(bid?.ai_analysis?.drawing_analysis || null);
   const [existingDocs, setExistingDocs] = useState([]);
+  const [selectedDocIds, setSelectedDocIds] = useState([]);
 
   useEffect(() => {
     setAnalysis(bid?.ai_analysis?.drawing_analysis || null);
