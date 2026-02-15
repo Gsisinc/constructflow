@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Plus, Clock, CheckCircle, XCircle, AlertCircle, DollarSign, Calendar as CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 const statusConfig = {

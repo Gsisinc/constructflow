@@ -7,8 +7,6 @@ import ProjectForm from '../components/projects/ProjectForm';
 import PhaseNavigator from '../components/phases/PhaseNavigator';
 import PhaseManager from '../components/phases/PhaseManager';
 import PhaseGateChecklist from '../components/phases/PhaseGateChecklist';
-import CustomPhaseManager from '../components/phases/CustomPhaseManager';
-import PhaseRequirementManager from '../components/phases/PhaseRequirementManager';
 import OutlookCalendar from '../components/calendar/OutlookCalendar';
 import PermitDashboard from '../components/permits/PermitDashboard';
 import PermitUploader from '../components/permits/PermitUploader';
@@ -32,10 +30,8 @@ import {
   Users,
   FileText,
   AlertTriangle,
-  CheckCircle2,
   Clock,
-  Trash2,
-  Eye
+  Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';

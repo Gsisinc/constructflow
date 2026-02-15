@@ -11,10 +11,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, DollarSign, TrendingUp, TrendingDown, Lock, Unlock, Receipt, AlertTriangle, Trash2, Edit, Code, Activity, FileText, Zap, Target, ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
+import { Plus, DollarSign, TrendingUp, TrendingDown, Lock, Unlock, Receipt, AlertTriangle, Trash2, Edit, Code, Activity, FileText, Zap, Target, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, addDays } from 'date-fns';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
 export default function PhaseBudgetManager({ projectId, phaseName }) {
   const [showExpenseDialog, setShowExpenseDialog] = useState(false);

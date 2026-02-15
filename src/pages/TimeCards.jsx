@@ -4,8 +4,6 @@ import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Badge } from '@/components/ui/badge';
-import { Clock, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function TimeCards() {

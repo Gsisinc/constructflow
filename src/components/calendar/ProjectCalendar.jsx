@@ -25,8 +25,6 @@ import {
   isSameMonth,
   isSameDay,
   isToday,
-  startOfDay,
-  endOfDay,
   startOfYear,
   endOfYear,
   eachMonthOfInterval

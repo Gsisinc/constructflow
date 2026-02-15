@@ -1,7 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { 
   FileText, 
   CheckCircle2, 
@@ -9,7 +8,6 @@ import {
   AlertTriangle, 
   Calendar,
   User,
-  ExternalLink,
   Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

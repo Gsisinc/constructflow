@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle2, Circle, Lock, Unlock, ChevronRight, AlertTriangle, MoreVertical, Trash2, Plus, Target, FileText } from 'lucide-react';
+import { CheckCircle2, Lock, Unlock, ChevronRight, AlertTriangle, MoreVertical, Trash2, Plus, Target, FileText } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import {

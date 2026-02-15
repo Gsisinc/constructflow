@@ -7,11 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import { 
   CheckCircle2, 
   Circle, 
-  AlertTriangle, 
-  User, 
-  Calendar,
+  User,
   FileCheck,
-  Loader2,
   Bot
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

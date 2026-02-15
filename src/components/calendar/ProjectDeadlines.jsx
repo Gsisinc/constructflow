@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, AlertCircle, CheckCircle } from 'lucide-react';
-import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, format } from 'date-fns';
+import { differenceInDays, format } from 'date-fns';
 
 export default function ProjectDeadlines({ projectId }) {
   const { data: project } = useQuery({

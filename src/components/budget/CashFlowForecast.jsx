@@ -1,6 +1,6 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { TrendingUp, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { format, addMonths } from 'date-fns';
 
 export default function CashFlowForecast({ project, expenses = [] }) {

@@ -4,24 +4,14 @@ import { base44 } from '@/api/base44Client';
 import PullToRefresh from '@/components/ui/PullToRefresh';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
-import ProjectCard from '../components/dashboard/ProjectCard';
 import TaskManager from '../components/dashboard/TaskManager';
 import ClockIn from '../components/dashboard/ClockIn';
 import AlertsWidget from '../components/dashboard/AlertsWidget';
 import EmployeeWidget from '../components/dashboard/EmployeeWidget';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  FolderKanban,
-  FileText,
-  Plus,
-  ArrowRight,
-  DollarSign,
-  Calendar,
-  Clock
-} from 'lucide-react';
+
+
 import { format } from 'date-fns';
 
 export default function Dashboard() {

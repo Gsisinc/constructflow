@@ -27,7 +27,6 @@ import {
   Search,
   FileStack,
   Calendar,
-  User,
   Loader2,
   GripVertical
 } from 'lucide-react';

@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Upload, Lock, Unlock, FileText, Image as ImageIcon, CheckCircle, Circle, MoreVertical, Trash2, Edit, GripVertical, Folder } from 'lucide-react';
+import { Plus, Upload, Lock, Unlock, FileText, Image as ImageIcon, CheckCircle, MoreVertical, Trash2, Edit, GripVertical, Folder } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { cn } from '@/lib/utils';
 import {

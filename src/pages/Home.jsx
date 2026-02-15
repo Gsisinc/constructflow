@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Zap, 
   Shield, 
-  TrendingUp, 
   Users,
   CheckCircle2,
   ArrowRight,
@@ -17,7 +16,6 @@ import {
   Radio,
   Video,
   Wifi,
-  Menu,
   Flame,
   FileStack,
   DollarSign

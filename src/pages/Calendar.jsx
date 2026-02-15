@@ -4,7 +4,6 @@ import { base44 } from '@/api/base44Client';
 import ProjectCalendar from '../components/calendar/ProjectCalendar';
 import ProjectDeadlines from '../components/calendar/ProjectDeadlines';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
@@ -24,15 +23,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Plus,
-  Calendar as CalendarIcon,
-  MapPin,
-  Clock,
-  User,
   Loader2,
   AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 
 const EVENT_TYPES = [
   { value: 'task', label: 'Task' },

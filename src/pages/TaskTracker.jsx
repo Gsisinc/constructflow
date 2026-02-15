@@ -3,13 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, CheckCircle2, Circle, AlertCircle, Trash2, Edit } from 'lucide-react';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
 
 const STATUSES = ['pending', 'in_progress', 'completed', 'blocked'];
 const PRIORITIES = ['low', 'medium', 'high', 'critical'];

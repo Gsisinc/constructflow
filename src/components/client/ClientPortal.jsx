@@ -6,9 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
-  TrendingUp, 
   DollarSign, 
-  Calendar, 
   Image,
   MessageSquare,
   ThumbsUp,

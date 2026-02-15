@@ -6,8 +6,7 @@ import { createPageUrl } from '../utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, FileText, Calendar, DollarSign } from 'lucide-react';
-import { format } from 'date-fns';
+import { Plus, Search } from 'lucide-react';
 
 export default function Estimates() {
   const { data: user } = useQuery({

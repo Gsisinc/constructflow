@@ -27,7 +27,6 @@ import {
   Plus,
   Search,
   Users,
-  Phone,
   Mail,
   DollarSign,
   Loader2,
