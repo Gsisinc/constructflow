@@ -378,6 +378,38 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
             </label>
           </div>
 
+          {existingDocs.length > 0 && (
+            <div className="border border-amber-200 bg-amber-50 rounded-lg p-4">
+              <p className="text-sm font-medium text-slate-700 mb-2">
+                {existingDocs.length} document{existingDocs.length > 1 ? 's' : ''} already uploaded
+              </p>
+              <div className="space-y-1 mb-3 max-h-24 overflow-y-auto">
+                {existingDocs.map(doc => (
+                  <p key={doc.id} className="text-xs text-slate-600">• {doc.name}</p>
+                ))}
+              </div>
+              <Button 
+                onClick={reanalyzeExistingDocs}
+                disabled={analyzing}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                {analyzing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <ScanSearch className="h-4 w-4 mr-2" />
+                    Re-analyze All Documents
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
           <label className="cursor-pointer block">
             <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-amber-500 transition-colors">
               {uploading || analyzing ? (
@@ -388,7 +420,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               ) : (
                 <>
                   <Upload className="h-10 w-10 mx-auto text-amber-600" />
-                  <p className="text-sm text-slate-700 mt-2 font-medium">Upload one or multiple drawing files</p>
+                  <p className="text-sm text-slate-700 mt-2 font-medium">Upload {existingDocs.length > 0 ? 'more' : ''} drawing files</p>
                   <p className="text-xs text-slate-500 mt-1">Supports multi-page PDF or multiple files (.pdf, .png, .jpg)</p>
                 </>
               )}
