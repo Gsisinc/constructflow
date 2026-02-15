@@ -52,7 +52,6 @@ import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
 import BidDetail from './pages/BidDetail';
-import BidDetail from './pages/BidDetail';
 import BidDiscovery from './pages/BidDiscovery';
 import BidOpportunities from './pages/BidOpportunities';
 import Bids from './pages/Bids';
@@ -64,6 +63,7 @@ import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Documents from './pages/Documents';
 import Estimates from './pages/Estimates';
+import FeatureTesting from './pages/FeatureTesting';
 import Home from './pages/Home';
 import Invoices from './pages/Invoices';
 import Issues from './pages/Issues';
@@ -93,7 +93,7 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import FeatureTesting from './pages/FeatureTesting';
+import BidDetail from './pages/BidDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -102,7 +102,6 @@ export const PAGES = {
     "AddBid": AddBid,
     "AlertSettings": AlertSettings,
     "AuditTrail": AuditTrail,
-    "BidDetail": BidDetail,
     "BidDetail": BidDetail,
     "BidDiscovery": BidDiscovery,
     "BidOpportunities": BidOpportunities,
@@ -115,6 +114,7 @@ export const PAGES = {
     "Directory": Directory,
     "Documents": Documents,
     "Estimates": Estimates,
+    "FeatureTesting": FeatureTesting,
     "Home": Home,
     "Invoices": Invoices,
     "Issues": Issues,
@@ -144,7 +144,7 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "FeatureTesting": FeatureTesting,
+    "BidDetail": BidDetail,
 }
 
 export const pagesConfig = {
