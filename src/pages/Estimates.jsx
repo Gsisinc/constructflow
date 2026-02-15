@@ -145,12 +145,45 @@ export default function Estimates() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Bid Responses</CardTitle>
+          <CardTitle className="text-base">Your Estimates</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-4 text-slate-400 text-sm">
-            No Records Available
-          </div>
+          {bidEstimates.length === 0 ? (
+            <div className="text-center py-4 text-slate-400 text-sm">
+              No estimates created yet
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {bidEstimates.map(estimate => {
+                const relatedBid = bidOpportunities.find(b => b.id === estimate.bid_opportunity_id);
+                return (
+                  <Link
+                    key={estimate.id}
+                    to={createPageUrl('BidDetailPage') + '?id=' + estimate.bid_opportunity_id}
+                    className="block border rounded-lg p-3 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium text-sm">{relatedBid?.title || 'Untitled Bid'}</p>
+                        <p className="text-xs text-slate-500 mt-1">
+                          {estimate.line_items?.length || 0} line items • {estimate.labor_hours || 0} hrs
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-sm text-slate-900">
+                          ${estimate.total_bid_amount?.toLocaleString() || 0}
+                        </p>
+                        <p className="text-xs text-slate-500">v{estimate.version}</p>
+                      </div>
+                    </div>
+                    {estimate.notes && (
+                      <p className="text-xs text-slate-600 mt-2 truncate">{estimate.notes}</p>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
