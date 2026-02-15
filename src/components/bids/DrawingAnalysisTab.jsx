@@ -167,7 +167,8 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
       });
 
       setAnalysis(normalized);
-      toast.success(`Re-analyzed ${existingDocs.length} document${existingDocs.length > 1 ? 's' : ''}`);
+      toast.success(`Re-analyzed ${selectedDocs.length} document${selectedDocs.length > 1 ? 's' : ''}`);
+      setSelectedDocIds([]);
       onAnalysisSaved?.();
     } catch (error) {
       console.error(error);
