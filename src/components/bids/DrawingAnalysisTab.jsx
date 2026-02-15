@@ -383,17 +383,43 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
           {existingDocs.length > 0 && (
             <div className="border border-amber-200 bg-amber-50 rounded-lg p-4">
-              <p className="text-sm font-medium text-slate-700 mb-2">
-                {existingDocs.length} document{existingDocs.length > 1 ? 's' : ''} already uploaded
-              </p>
-              <div className="space-y-1 mb-3 max-h-24 overflow-y-auto">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-slate-700">
+                  {existingDocs.length} document{existingDocs.length > 1 ? 's' : ''} uploaded
+                </p>
+                <button
+                  onClick={() => setSelectedDocIds(
+                    selectedDocIds.length === existingDocs.length 
+                      ? [] 
+                      : existingDocs.map(d => d.id)
+                  )}
+                  className="text-xs text-amber-700 hover:text-amber-900 font-medium"
+                >
+                  {selectedDocIds.length === existingDocs.length ? 'Deselect All' : 'Select All'}
+                </button>
+              </div>
+              <div className="space-y-2 mb-3 max-h-40 overflow-y-auto">
                 {existingDocs.map(doc => (
-                  <p key={doc.id} className="text-xs text-slate-600">• {doc.name}</p>
+                  <label key={doc.id} className="flex items-start gap-2 text-xs cursor-pointer hover:bg-amber-100 p-1 rounded">
+                    <input
+                      type="checkbox"
+                      checked={selectedDocIds.includes(doc.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedDocIds([...selectedDocIds, doc.id]);
+                        } else {
+                          setSelectedDocIds(selectedDocIds.filter(id => id !== doc.id));
+                        }
+                      }}
+                      className="mt-0.5 flex-shrink-0"
+                    />
+                    <span className="text-slate-700">{doc.name}</span>
+                  </label>
                 ))}
               </div>
               <Button 
                 onClick={reanalyzeExistingDocs}
-                disabled={analyzing}
+                disabled={analyzing || selectedDocIds.length === 0}
                 variant="outline"
                 size="sm"
                 className="w-full"
@@ -406,7 +432,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                 ) : (
                   <>
                     <ScanSearch className="h-4 w-4 mr-2" />
-                    Re-analyze All Documents
+                    Analyze Selected ({selectedDocIds.length})
                   </>
                 )}
               </Button>
