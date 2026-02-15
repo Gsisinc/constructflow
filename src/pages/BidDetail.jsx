@@ -26,7 +26,7 @@ const statusColors = {
   declined: 'bg-slate-100 text-slate-800'
 };
 
-export default function BidDetailView() {
+export default function BidDetail() {
   const [user, setUser] = useState(null);
   const [bidId, setBidId] = useState(null);
   const navigate = useNavigate();
