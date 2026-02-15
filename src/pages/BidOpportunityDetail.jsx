@@ -15,6 +15,7 @@ import BidRequirements from '@/components/bids/BidRequirements';
 import BidToProject from '@/components/bids/BidToProject';
 import DrawingAnalysisTab from '@/components/bids/DrawingAnalysisTab';
 import DrawingDesignerTab from '@/components/bids/DrawingDesignerTab';
+import EstimateEditor from '@/components/bids/EstimateEditor';
 
 const statusColors = {
   new: 'bg-blue-100 text-blue-800',
@@ -128,6 +129,7 @@ export default function BidOpportunityDetail() {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="estimate">Estimate</TabsTrigger>
           <TabsTrigger value="requirements">Requirements</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="drawings">Drawing Analysis</TabsTrigger>
@@ -148,6 +150,10 @@ export default function BidOpportunityDetail() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="estimate" className="space-y-4">
+          <EstimateEditor bidId={bid.id} organizationId={user.organization_id} />
         </TabsContent>
 
         <TabsContent value="requirements" className="space-y-4">

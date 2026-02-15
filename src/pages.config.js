@@ -51,8 +51,10 @@ import AIAgents from './pages/AIAgents';
 import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
+import BidDetail from './pages/BidDetail';
 import BidDiscovery from './pages/BidDiscovery';
 import BidOpportunities from './pages/BidOpportunities';
+import BidOpportunityDetail from './pages/BidOpportunityDetail';
 import Bids from './pages/Bids';
 import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
@@ -92,7 +94,6 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import BidOpportunityDetail from './pages/BidOpportunityDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -101,8 +102,10 @@ export const PAGES = {
     "AddBid": AddBid,
     "AlertSettings": AlertSettings,
     "AuditTrail": AuditTrail,
+    "BidDetail": BidDetail,
     "BidDiscovery": BidDiscovery,
     "BidOpportunities": BidOpportunities,
+    "BidOpportunityDetail": BidOpportunityDetail,
     "Bids": Bids,
     "Budget": Budget,
     "Calendar": Calendar,
@@ -142,7 +145,6 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "BidOpportunityDetail": BidOpportunityDetail,
 }
 
 export const pagesConfig = {
