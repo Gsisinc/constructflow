@@ -52,7 +52,6 @@ import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
 import BidDetail from './pages/BidDetail';
-import BidDetailPage from './pages/BidDetailPage';
 import BidDiscovery from './pages/BidDiscovery';
 import BidOpportunities from './pages/BidOpportunities';
 import Bids from './pages/Bids';
@@ -104,7 +103,6 @@ export const PAGES = {
     "AlertSettings": AlertSettings,
     "AuditTrail": AuditTrail,
     "BidDetail": BidDetail,
-    "BidDetailPage": BidDetailPage,
     "BidDiscovery": BidDiscovery,
     "BidOpportunities": BidOpportunities,
     "Bids": Bids,
