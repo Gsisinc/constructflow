@@ -31,6 +31,7 @@ export default function BidDetailPage() {
   const [bidId, setBidId] = useState(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  // Bid detail page
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
