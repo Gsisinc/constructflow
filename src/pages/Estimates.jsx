@@ -158,7 +158,7 @@ export default function Estimates() {
                 return (
                   <Link
                     key={estimate.id}
-                    to={createPageUrl('BidDetailPage') + '?id=' + estimate.bid_opportunity_id}
+                    to={createPageUrl('BidOpportunityDetail') + '?id=' + estimate.bid_opportunity_id}
                     className="block border rounded-lg p-3 hover:bg-slate-50 transition-colors"
                   >
                     <div className="flex justify-between items-start">

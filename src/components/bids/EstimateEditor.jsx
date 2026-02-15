@@ -4,19 +4,18 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, Save, Calculator } from 'lucide-react';
+import { Plus, Trash2, Save, Calculator, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function EstimateEditor({ bidId, organizationId }) {
   const queryClient = useQueryClient();
+  const [isEditing, setIsEditing] = useState(false);
 
   const { data: estimates = [], isLoading } = useQuery({
     queryKey: ['bidEstimates', bidId],
     queryFn: () => base44.entities.BidEstimate.filter({ bid_opportunity_id: bidId }),
     enabled: !!bidId
   });
-
-  const [editingEstimate, setEditingEstimate] = useState(null);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.BidEstimate.create({
@@ -27,7 +26,7 @@ export default function EstimateEditor({ bidId, organizationId }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidEstimates', bidId] });
       toast.success('Estimate created');
-      setEditingEstimate(null);
+      setIsEditing(false);
     }
   });
 
@@ -36,7 +35,7 @@ export default function EstimateEditor({ bidId, organizationId }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidEstimates', bidId] });
       toast.success('Estimate saved');
-      setEditingEstimate(null);
+      setIsEditing(false);
     }
   });
 
@@ -49,18 +48,18 @@ export default function EstimateEditor({ bidId, organizationId }) {
   });
 
   if (isLoading) {
-    return <div className="text-center py-8 text-slate-500">Loading estimates...</div>;
+    return <div className="text-center py-8 text-slate-500">Loading...</div>;
   }
 
-  const activeEstimate = estimates[0] || editingEstimate;
+  const activeEstimate = estimates[0];
 
-  if (!activeEstimate && !editingEstimate) {
+  if (!activeEstimate && !isEditing) {
     return (
       <Card>
         <CardContent className="py-12 text-center">
           <Calculator className="h-12 w-12 text-slate-400 mx-auto mb-3" />
           <p className="text-slate-600 mb-4">No estimate created yet</p>
-          <Button onClick={() => setEditingEstimate(createBlankEstimate())}>
+          <Button onClick={() => setIsEditing(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Create Estimate
           </Button>
@@ -71,7 +70,10 @@ export default function EstimateEditor({ bidId, organizationId }) {
 
   return (
     <EstimateForm
-      estimate={editingEstimate || activeEstimate}
+      estimate={activeEstimate}
+      isEditing={isEditing}
+      onEdit={() => setIsEditing(true)}
+      onCancel={() => setIsEditing(false)}
       onSave={(data) => {
         if (data.id) {
           updateMutation.mutate({ id: data.id, data });
@@ -79,39 +81,28 @@ export default function EstimateEditor({ bidId, organizationId }) {
           createMutation.mutate(data);
         }
       }}
-      onCancel={() => setEditingEstimate(null)}
-      onEdit={() => setEditingEstimate(activeEstimate)}
       onDelete={() => {
         if (confirm('Delete this estimate?')) {
           deleteMutation.mutate(activeEstimate.id);
+          setIsEditing(false);
         }
       }}
-      isEditing={!!editingEstimate}
       isSaving={createMutation.isPending || updateMutation.isPending}
     />
   );
 }
 
-function createBlankEstimate() {
-  return {
-    line_items: [{ description: '', quantity: 1, unit: 'ea', unit_cost: 0, total_cost: 0, category: 'material' }],
+function EstimateForm({ estimate, isEditing, onEdit, onCancel, onSave, onDelete, isSaving }) {
+  const [formData, setFormData] = useState(estimate || {
+    line_items: [],
     labor_hours: 0,
     labor_rate: 65,
-    labor_cost: 0,
-    material_cost: 0,
     equipment_cost: 0,
     subcontractor_cost: 0,
     overhead_percent: 15,
     profit_margin_percent: 20,
-    subtotal: 0,
-    total_bid_amount: 0,
-    notes: '',
-    version: 1
-  };
-}
-
-function EstimateForm({ estimate, onSave, onCancel, onEdit, onDelete, isEditing, isSaving }) {
-  const [formData, setFormData] = useState(estimate);
+    notes: ''
+  });
 
   const addLineItem = () => {
     setFormData({
@@ -145,7 +136,6 @@ function EstimateForm({ estimate, onSave, onCancel, onEdit, onDelete, isEditing,
   const calculateTotals = () => {
     const laborCost = (parseFloat(formData.labor_hours) || 0) * (parseFloat(formData.labor_rate) || 0);
     const materialCost = (formData.line_items || [])
-      .filter(item => item.category === 'material')
       .reduce((sum, item) => sum + (parseFloat(item.total_cost) || 0), 0);
     
     const subtotal = laborCost + materialCost + (parseFloat(formData.equipment_cost) || 0) + (parseFloat(formData.subcontractor_cost) || 0);
@@ -163,27 +153,33 @@ function EstimateForm({ estimate, onSave, onCancel, onEdit, onDelete, isEditing,
 
   const handleSave = () => {
     const totals = calculateTotals();
-    onSave({ ...formData, ...totals });
+    onSave({ 
+      ...formData, 
+      ...totals,
+      version: (formData.version || 0) + (formData.id ? 1 : 0)
+    });
   };
 
   const totals = calculateTotals();
-  const readOnly = !isEditing;
 
   return (
     <div className="space-y-4">
       {/* Header Actions */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
           <CardTitle>Estimate Details</CardTitle>
           <div className="flex gap-2">
-            {readOnly ? (
+            {!isEditing ? (
               <>
                 <Button variant="outline" size="sm" onClick={onEdit}>
+                  <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </Button>
-                <Button variant="outline" size="sm" onClick={onDelete} className="text-red-600">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {estimate?.id && (
+                  <Button variant="outline" size="sm" onClick={onDelete} className="text-red-600">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </>
             ) : (
               <>
@@ -208,25 +204,25 @@ function EstimateForm({ estimate, onSave, onCancel, onEdit, onDelete, isEditing,
         <CardContent className="space-y-3">
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs text-slate-600">Hours</label>
+              <label className="text-xs text-slate-600 block mb-1">Hours</label>
               <Input
                 type="number"
                 value={formData.labor_hours || 0}
-                onChange={(e) => setFormData({ ...formData, labor_hours: parseFloat(e.target.value) })}
-                disabled={readOnly}
+                onChange={(e) => setFormData({ ...formData, labor_hours: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
               />
             </div>
             <div>
-              <label className="text-xs text-slate-600">Rate ($/hr)</label>
+              <label className="text-xs text-slate-600 block mb-1">Rate ($/hr)</label>
               <Input
                 type="number"
                 value={formData.labor_rate || 0}
-                onChange={(e) => setFormData({ ...formData, labor_rate: parseFloat(e.target.value) })}
-                disabled={readOnly}
+                onChange={(e) => setFormData({ ...formData, labor_rate: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
               />
             </div>
             <div>
-              <label className="text-xs text-slate-600">Total</label>
+              <label className="text-xs text-slate-600 block mb-1">Total</label>
               <Input value={`$${totals.labor_cost.toLocaleString()}`} disabled />
             </div>
           </div>
@@ -235,9 +231,9 @@ function EstimateForm({ estimate, onSave, onCancel, onEdit, onDelete, isEditing,
 
       {/* Materials */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-base">Materials & Line Items</CardTitle>
-          {!readOnly && (
+          {isEditing && (
             <Button size="sm" variant="outline" onClick={addLineItem}>
               <Plus className="h-4 w-4 mr-1" />
               Add Item
@@ -245,57 +241,63 @@ function EstimateForm({ estimate, onSave, onCancel, onEdit, onDelete, isEditing,
           )}
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {(formData.line_items || []).map((item, idx) => (
-              <div key={idx} className="grid grid-cols-12 gap-2 items-start p-2 border rounded">
-                <Input
-                  placeholder="Description"
-                  value={item.description}
-                  onChange={(e) => updateLineItem(idx, 'description', e.target.value)}
-                  disabled={readOnly}
-                  className="col-span-4"
-                />
-                <Input
-                  type="number"
-                  placeholder="Qty"
-                  value={item.quantity}
-                  onChange={(e) => updateLineItem(idx, 'quantity', e.target.value)}
-                  disabled={readOnly}
-                  className="col-span-2"
-                />
-                <Input
-                  placeholder="Unit"
-                  value={item.unit}
-                  onChange={(e) => updateLineItem(idx, 'unit', e.target.value)}
-                  disabled={readOnly}
-                  className="col-span-1"
-                />
-                <Input
-                  type="number"
-                  placeholder="Unit $"
-                  value={item.unit_cost}
-                  onChange={(e) => updateLineItem(idx, 'unit_cost', e.target.value)}
-                  disabled={readOnly}
-                  className="col-span-2"
-                />
-                <Input
-                  value={`$${(item.total_cost || 0).toLocaleString()}`}
-                  disabled
-                  className="col-span-2"
-                />
-                {!readOnly && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => removeLineItem(idx)}
-                    className="col-span-1 text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
+          {(formData.line_items || []).length === 0 ? (
+            <p className="text-center py-6 text-slate-500 text-sm">
+              {isEditing ? 'Click "Add Item" to start adding materials' : 'No items added yet'}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {formData.line_items.map((item, idx) => (
+                <div key={idx} className="grid grid-cols-12 gap-2 items-start p-2 border rounded">
+                  <Input
+                    placeholder="Description"
+                    value={item.description}
+                    onChange={(e) => updateLineItem(idx, 'description', e.target.value)}
+                    disabled={!isEditing}
+                    className="col-span-4"
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Qty"
+                    value={item.quantity}
+                    onChange={(e) => updateLineItem(idx, 'quantity', e.target.value)}
+                    disabled={!isEditing}
+                    className="col-span-2"
+                  />
+                  <Input
+                    placeholder="Unit"
+                    value={item.unit}
+                    onChange={(e) => updateLineItem(idx, 'unit', e.target.value)}
+                    disabled={!isEditing}
+                    className="col-span-1"
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Unit $"
+                    value={item.unit_cost}
+                    onChange={(e) => updateLineItem(idx, 'unit_cost', e.target.value)}
+                    disabled={!isEditing}
+                    className="col-span-2"
+                  />
+                  <Input
+                    value={`$${(item.total_cost || 0).toLocaleString()}`}
+                    disabled
+                    className="col-span-2"
+                  />
+                  {isEditing && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => removeLineItem(idx)}
+                      className="col-span-1 text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -307,21 +309,21 @@ function EstimateForm({ estimate, onSave, onCancel, onEdit, onDelete, isEditing,
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-slate-600">Equipment Cost</label>
+              <label className="text-xs text-slate-600 block mb-1">Equipment Cost</label>
               <Input
                 type="number"
                 value={formData.equipment_cost || 0}
-                onChange={(e) => setFormData({ ...formData, equipment_cost: parseFloat(e.target.value) })}
-                disabled={readOnly}
+                onChange={(e) => setFormData({ ...formData, equipment_cost: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
               />
             </div>
             <div>
-              <label className="text-xs text-slate-600">Subcontractor Cost</label>
+              <label className="text-xs text-slate-600 block mb-1">Subcontractor Cost</label>
               <Input
                 type="number"
                 value={formData.subcontractor_cost || 0}
-                onChange={(e) => setFormData({ ...formData, subcontractor_cost: parseFloat(e.target.value) })}
-                disabled={readOnly}
+                onChange={(e) => setFormData({ ...formData, subcontractor_cost: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
               />
             </div>
           </div>
@@ -336,21 +338,21 @@ function EstimateForm({ estimate, onSave, onCancel, onEdit, onDelete, isEditing,
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-slate-600">Overhead %</label>
+              <label className="text-xs text-slate-600 block mb-1">Overhead %</label>
               <Input
                 type="number"
                 value={formData.overhead_percent || 0}
-                onChange={(e) => setFormData({ ...formData, overhead_percent: parseFloat(e.target.value) })}
-                disabled={readOnly}
+                onChange={(e) => setFormData({ ...formData, overhead_percent: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
               />
             </div>
             <div>
-              <label className="text-xs text-slate-600">Profit Margin %</label>
+              <label className="text-xs text-slate-600 block mb-1">Profit Margin %</label>
               <Input
                 type="number"
                 value={formData.profit_margin_percent || 0}
-                onChange={(e) => setFormData({ ...formData, profit_margin_percent: parseFloat(e.target.value) })}
-                disabled={readOnly}
+                onChange={(e) => setFormData({ ...formData, profit_margin_percent: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
               />
             </div>
           </div>
@@ -379,7 +381,7 @@ function EstimateForm({ estimate, onSave, onCancel, onEdit, onDelete, isEditing,
             rows={3}
             value={formData.notes || ''}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            disabled={readOnly}
+            disabled={!isEditing}
             placeholder="Additional notes..."
           />
         </CardContent>
