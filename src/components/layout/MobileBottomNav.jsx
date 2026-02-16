@@ -11,11 +11,11 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
+  { name: 'Home', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
   { name: 'Bids', icon: FileText, page: 'Bids' },
   { name: 'Tasks', icon: FileStack, page: 'TaskTracker' },
-  { name: 'Settings', icon: Settings, page: 'Settings' }
+  { name: 'More', icon: Settings, page: 'Settings' }
 ];
 
 export default function MobileBottomNav({ currentPageName }) {
@@ -39,23 +39,23 @@ export default function MobileBottomNav({ currentPageName }) {
     setLastTapTime({ ...lastTapTime, [page]: now });
 
     if (currentPageName === page && isDoubleTap) {
-      // Double tap - reset to root
       navigate(createPageUrl(page));
       window.scrollTo(0, 0);
     } else if (currentPageName !== page) {
-      // Save current location before switching
       setSectionHistory({
         ...sectionHistory,
         [currentPageName]: location.pathname,
       });
-      // Navigate to saved location or root
       const savedPath = sectionHistory[page];
       navigate(savedPath || createPageUrl(page));
     }
   };
 
   return (
-    <nav className="flex lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-950 border-t border-amber-100 dark:border-amber-900/30 z-40 select-none" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav 
+      className="flex sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 select-none" 
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <div className="flex items-center justify-around w-full">
         {navItems.map((item) => {
           const isActive = currentPageName === item.page;
@@ -65,14 +65,21 @@ export default function MobileBottomNav({ currentPageName }) {
               key={item.page}
               onClick={() => handleNavClick(item.page)}
               className={cn(
-                'flex flex-col items-center justify-center flex-1 min-h-[56px] gap-0.5 transition-colors select-none',
+                'flex flex-col items-center justify-center flex-1 min-h-16 gap-1 transition-all duration-200 active:bg-slate-100',
                 isActive
-                  ? 'text-amber-600 dark:text-amber-500'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-500'
+                  ? 'text-blue-600 bg-blue-50'
+                  : 'text-slate-600 hover:text-blue-600'
               )}
+              title={item.name}
             >
-              <Icon className="h-5 w-5" />
-              <span className="text-xs font-medium leading-tight">{item.name}</span>
+              <Icon className={cn(
+                "h-5 w-5 transition-colors",
+                isActive && "drop-shadow-sm"
+              )} />
+              <span className="text-xs font-semibold leading-tight">{item.name}</span>
+              {isActive && (
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-blue-700 mx-auto w-8 rounded-t-full" />
+              )}
             </button>
           );
         })}
