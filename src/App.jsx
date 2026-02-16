@@ -10,7 +10,6 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { useEffect, useState } from 'react';
 import './styles/mobile-optimization.css';
 import ErrorBoundary from '@/components/feedback/ErrorBoundary';
-import ErrorBoundary from '@/components/feedback/ErrorBoundary';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
