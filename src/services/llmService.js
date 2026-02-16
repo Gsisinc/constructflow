@@ -1,15 +1,8 @@
 /**
  * LLM Service - Handles all AI agent communication with OpenAI
+ * Uses fetch API for browser compatibility instead of SDK
  * Provides robust error handling, retries, and response parsing
  */
-
-import { OpenAI } from 'openai';
-
-// Initialize OpenAI client
-const client = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true // Allow browser-side requests
-});
 
 /**
  * Call OpenAI API with retry logic
@@ -22,33 +15,62 @@ const client = new OpenAI({
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
   const maxRetries = 3;
   let lastError = null;
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('OpenAI API key not configured. Please set VITE_OPENAI_API_KEY in environment variables.');
+  }
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const response = await client.chat.completions.create({
-        model: 'gpt-4.1-mini',
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          {
-            role: 'user',
-            content: userMessage
-          }
-        ],
-        temperature: temperature,
-        max_tokens: maxTokens,
-        top_p: 0.95,
-        frequency_penalty: 0.0,
-        presence_penalty: 0.0
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4-mini',
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt
+            },
+            {
+              role: 'user',
+              content: userMessage
+            }
+          ],
+          temperature: temperature,
+          max_tokens: maxTokens,
+          top_p: 0.95,
+          frequency_penalty: 0.0,
+          presence_penalty: 0.0
+        })
       });
 
-      if (!response.choices || response.choices.length === 0) {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || `API error: ${response.status}`;
+        
+        if (response.status === 401 || response.status === 403) {
+          throw new Error('Authentication failed. Please check your OpenAI API key.');
+        }
+        
+        if (response.status === 429) {
+          throw new Error('Rate limited. Please wait before trying again.');
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+
+      if (!data.choices || data.choices.length === 0) {
         throw new Error('No response from OpenAI');
       }
 
-      const content = response.choices[0].message.content;
+      const content = data.choices[0].message.content;
       
       if (!content || content.trim().length === 0) {
         throw new Error('Empty response from OpenAI');
@@ -60,8 +82,8 @@ export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, m
       console.error(`LLM call attempt ${attempt}/${maxRetries} failed:`, error.message);
 
       // Don't retry on auth errors
-      if (error.status === 401 || error.status === 403) {
-        throw new Error('Authentication failed. Please check your OpenAI API key.');
+      if (error.message.includes('Authentication failed')) {
+        throw error;
       }
 
       // Wait before retrying (exponential backoff)
@@ -136,31 +158,73 @@ export async function callAgent(agentSystemPrompt, userMessage, options = {}) {
  * @returns {Promise<string>} Full response
  */
 export async function streamAgent(agentSystemPrompt, userMessage, onChunk) {
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('OpenAI API key not configured. Please set VITE_OPENAI_API_KEY in environment variables.');
+  }
+
   try {
-    const stream = await client.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      messages: [
-        {
-          role: 'system',
-          content: agentSystemPrompt
-        },
-        {
-          role: 'user',
-          content: userMessage
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 2000,
-      stream: true
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4-mini',
+        messages: [
+          {
+            role: 'system',
+            content: agentSystemPrompt
+          },
+          {
+            role: 'user',
+            content: userMessage
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000,
+        stream: true
+      })
     });
 
-    let fullResponse = '';
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `API error: ${response.status}`);
+    }
 
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || '';
-      if (content) {
-        fullResponse += content;
-        if (onChunk) onChunk(content);
+    let fullResponse = '';
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          
+          if (data === '[DONE]') {
+            continue;
+          }
+
+          try {
+            const parsed = JSON.parse(data);
+            const content = parsed.choices[0]?.delta?.content || '';
+            
+            if (content) {
+              fullResponse += content;
+              if (onChunk) onChunk(content);
+            }
+          } catch (e) {
+            // Skip parsing errors
+          }
+        }
       }
     }
 
