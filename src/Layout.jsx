@@ -28,7 +28,9 @@ import {
   Sparkles,
   ChevronRight,
   ShieldCheck,
-  Zap
+  Zap,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -99,6 +101,7 @@ function UserMenu({ user, onLogout }) {
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [organization, setOrganization] = useState(null);
@@ -236,7 +239,10 @@ export default function Layout({ children, currentPageName }) {
             `}</style>
 
       {/* Top Header */}
-              <div className="fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-slate-100 shadow-sm z-40 lg:pl-72" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+              <div className={cn(
+                "fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-slate-100 shadow-sm z-40 transition-all duration-300",
+                sidebarCollapsed ? "lg:pl-20" : "lg:pl-72"
+              )} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
                 <div className="h-full flex items-center justify-between px-4 sm:px-6">
                   {/* Mobile menu button & back button */}
                   <div className="lg:hidden flex items-center gap-1 sm:gap-2">
@@ -308,31 +314,46 @@ export default function Layout({ children, currentPageName }) {
       {/* Sidebar */}
       <aside aria-label="Primary navigation"
         className={cn(
-          "fixed top-0 left-0 h-full w-72 bg-slate-900 text-slate-300 z-50 transition-transform duration-300 lg:translate-x-0 shadow-2xl",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed top-0 left-0 h-full bg-slate-950 text-slate-300 z-50 transition-all duration-300 lg:translate-x-0 shadow-2xl border-r border-white/5",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          sidebarCollapsed ? "w-20" : "w-72"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo Section */}
-          <div className="h-24 flex items-center px-8 mb-4">
-            {organization?.logo_url ? (
-              <img src={organization.logo_url} alt={organization.name} className="h-12 w-auto brightness-0 invert" />
+          <div className={cn("h-24 flex items-center px-6 mb-4 relative", sidebarCollapsed ? "justify-center" : "justify-between")}>
+            {!sidebarCollapsed ? (
+              organization?.logo_url ? (
+                <img src={organization.logo_url} alt={organization.name} className="h-10 w-auto brightness-0 invert" />
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gold-gradient flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <Zap className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="sidebar-header-text">
+                    <span className="font-bold text-xl text-white tracking-tight block leading-none">Construct</span>
+                    <span className="text-[10px] font-bold text-amber-500 uppercase tracking-[0.2em]">Flow Pro</span>
+                  </div>
+                </div>
+              )
             ) : (
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                  <Zap className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <span className="font-bold text-xl text-white tracking-tight block leading-none">Construct</span>
-                  <span className="text-xs font-bold text-primary uppercase tracking-widest">Flow Pro</span>
-                </div>
+              <div className="h-10 w-10 rounded-xl bg-gold-gradient flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <Zap className="h-6 w-6 text-white" />
               </div>
             )}
+            
+            {/* Toggle Button (Desktop) */}
+            <button 
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="hidden lg:flex absolute -right-3 top-10 h-6 w-6 rounded-full bg-amber-500 text-slate-950 items-center justify-center shadow-lg hover:scale-110 transition-transform z-50"
+            >
+              {sidebarCollapsed ? <PanelLeftOpen className="h-3.5 w-3.5" /> : <PanelLeftClose className="h-3.5 w-3.5" />}
+            </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar" aria-label="Main sections">
-            <div className="text-[10px] font-bold text-slate-500 px-4 py-2 uppercase tracking-[0.2em] mb-2">Main Menu</div>
+          <nav className="flex-1 px-3 space-y-1 overflow-y-auto no-scrollbar" aria-label="Main sections">
+            {!sidebarCollapsed && <div className="text-[10px] font-bold text-slate-500 px-4 py-2 uppercase tracking-[0.2em] mb-2">Main Menu</div>}
             {navItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 const Icon = item.icon;
@@ -342,24 +363,26 @@ export default function Layout({ children, currentPageName }) {
                     to={createPageUrl(item.page)}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      "group flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 select-none mb-1",
+                      "group flex items-center rounded-xl text-sm font-bold transition-all duration-200 select-none mb-1",
+                      sidebarCollapsed ? "justify-center p-3" : "justify-between px-4 py-3",
                       isActive
-                        ? "bg-primary text-white shadow-lg shadow-primary/20"
+                        ? "bg-gold-gradient text-slate-950 shadow-lg shadow-amber-500/20"
                         : "text-slate-400 hover:bg-white/5 hover:text-white"
                     )}
+                    title={sidebarCollapsed ? item.name : ""}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-primary")} />
-                      {item.name}
+                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-slate-950" : "text-slate-500 group-hover:text-amber-500")} />
+                      {!sidebarCollapsed && <span>{item.name}</span>}
                     </div>
-                    {isActive && <ChevronRight className="h-4 w-4 text-white/50" />}
+                    {!sidebarCollapsed && isActive && <ChevronRight className="h-4 w-4 opacity-50" />}
                   </Link>
                 );
               })}
 
             {user?.role === 'admin' && (
               <div className="mt-8">
-                <div className="text-[10px] font-bold text-slate-500 px-4 py-2 uppercase tracking-[0.2em] mb-2">Administration</div>
+                {!sidebarCollapsed && <div className="text-[10px] font-bold text-slate-500 px-4 py-2 uppercase tracking-[0.2em] mb-2">Administration</div>}
                 {adminNavItems.map((item) => {
                   const isActive = currentPageName === item.page;
                   const Icon = item.icon;
@@ -369,14 +392,16 @@ export default function Layout({ children, currentPageName }) {
                       to={createPageUrl(item.page)}
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 mb-1",
+                        "group flex items-center rounded-xl text-sm font-bold transition-all duration-200 mb-1",
+                        sidebarCollapsed ? "justify-center p-3" : "gap-3 px-4 py-3",
                         isActive
                           ? "bg-slate-800 text-white shadow-md"
                           : "text-slate-400 hover:bg-white/5 hover:text-white"
                       )}
+                      title={sidebarCollapsed ? item.name : ""}
                     >
-                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-primary")} />
-                      {item.name}
+                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-amber-500")} />
+                      {!sidebarCollapsed && <span>{item.name}</span>}
                     </Link>
                   );
                 })}
@@ -385,35 +410,42 @@ export default function Layout({ children, currentPageName }) {
           </nav>
 
           {/* Sidebar Footer */}
-          <div className="p-6 mt-auto">
-            <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+          <div className="p-4 mt-auto">
+            <div className={cn("bg-white/5 rounded-2xl border border-white/10 transition-all", sidebarCollapsed ? "p-2" : "p-4")}>
+              <div className={cn("flex items-center gap-3", sidebarCollapsed ? "justify-center" : "mb-4")}>
+                <div className="h-10 w-10 rounded-xl bg-gold-gradient flex items-center justify-center text-slate-950 font-bold text-sm shadow-lg flex-shrink-0">
                    {organization?.name?.[0] || 'G'}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-white text-sm truncate">{organization?.name || 'GSIS Manager'}</p>
-                  <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
-                    <ShieldCheck className="h-3 w-3" />
-                    Verified Pro
+                {!sidebarCollapsed && (
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-white text-sm truncate">{organization?.name || 'GSIS Manager'}</p>
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-amber-500 uppercase tracking-wider">
+                      <ShieldCheck className="h-3 w-3" />
+                      Verified Pro
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-2 text-slate-400 hover:text-white hover:bg-white/5 h-9 px-2 text-xs font-bold"
-                onClick={handleLogout}
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </Button>
+              {!sidebarCollapsed && (
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-2 text-slate-400 hover:text-white hover:bg-white/5 h-9 px-2 text-xs font-bold"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              )}
             </div>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-              <main id="main-content" tabIndex={-1} className="lg:pl-72 pt-16 min-h-screen pb-20 lg:pb-0" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
+              <main id="main-content" tabIndex={-1} className={cn(
+                "pt-16 min-h-screen pb-20 lg:pb-0 transition-all duration-300",
+                sidebarCollapsed ? "lg:pl-20" : "lg:pl-72"
+              )} style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={location.pathname}
