@@ -100,8 +100,7 @@ export default function PurchaseOrders() {
       </div>
 
       {/* PO List */}
-      <>{
-isLoading ? <TableSkeleton />:
+      {isLoading ? (
         <div className="space-y-3 sm:space-y-4">
           {Array(3).fill(0).map((_, i) => (
             <div key={i} className="h-20 sm:h-16 bg-slate-100 rounded-lg animate-pulse" />

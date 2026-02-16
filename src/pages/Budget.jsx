@@ -149,8 +149,7 @@ export default function Budget() {
       </div>
 
       {/* Living Budget Tracker */}
-      <>{
-isLoading ? <DashboardSkeleton />:
+      {isLoading ? (
         <Skeleton className="h-64 rounded-2xl" />
       ) : (
         <LiveBudgetTracker 

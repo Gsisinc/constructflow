@@ -212,8 +212,7 @@ export default function Calendar() {
       )}
 
       {/* Calendar */}
-      <>{
-isLoading ? <TableSkeleton />:
+      {isLoading ? (
         <Skeleton className="h-[600px] rounded-2xl" />
       ) : (
         <ProjectCalendar

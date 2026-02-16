@@ -16,9 +16,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Kbd } from '@/components/ui/kbd';
 
-// Icons
+// Inline Kbd component
 import {
   LayoutDashboard,
   Briefcase,
@@ -268,7 +267,7 @@ function QuickAction({ icon: Icon, label, description, color, onClick, badge, sh
             </Badge>
           )}
           {shortcut && (
-            <Kbd className="text-xs hidden group-hover:inline-flex">{shortcut}</Kbd>
+            <span className="text-xs hidden group-hover:inline-flex px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">{shortcut}</span>
           )}
         </div>
       </div>

@@ -185,8 +185,7 @@ export default function Issues() {
       </div>
 
       {/* Issues List */}
-      <>{
-isLoading ? <TableSkeleton />:
+      {isLoading ? (
         <div className="space-y-4">
           {Array(5).fill(0).map((_, i) => (
             <Skeleton key={i} className="h-32 rounded-xl" />
