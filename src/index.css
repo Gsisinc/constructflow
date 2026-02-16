@@ -1,4 +1,5 @@
 @import './styles/enhanced-theme.css';
+@import './styles/professional-theme.css';
 
 @tailwind base;
 @tailwind components;

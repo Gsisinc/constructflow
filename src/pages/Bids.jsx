@@ -114,114 +114,95 @@ export default function Bids() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-2">
+    <div className="max-w-[1600px] mx-auto space-y-8 animate-slide-up">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-8">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 flex items-center gap-3 tracking-tight">
-            <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg">
-              <FileText className="h-7 w-7 text-amber-700" />
-            </div>
-            Bid Intelligence Center
+          <div className="flex items-center gap-2 text-primary font-semibold text-sm mb-2 uppercase tracking-wider">
+            <Sparkles className="h-4 w-4" />
+            Intelligence Center
+          </div>
+          <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
+            Bid Opportunities
           </h1>
-          <p className="text-slate-600 mt-2">AI-powered bid management & conversion</p>
+          <p className="text-slate-500 mt-2 text-lg">
+            Manage, analyze, and track your construction bids with AI-powered insights.
+          </p>
         </div>
-        <Dialog open={showDialog} onOpenChange={setShowDialog}>
-          <DialogTrigger asChild>
-            <Button 
-              onClick={() => setEditingBid(null)}
-              className="gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
-            >
-              <Plus className="h-5 w-5" />
-              New Bid
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <BidForm 
-              bid={editingBid} 
-              onSubmit={(data) => {
-                if (editingBid) {
-                  updateBidMutation.mutate({ id: editingBid.id, data });
-                } else {
-                  createBidMutation.mutate(data);
-                }
-              }} 
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-3">
+          <Dialog open={showDialog} onOpenChange={setShowDialog}>
+            <DialogTrigger asChild>
+              <Button 
+                onClick={() => setEditingBid(null)}
+                className="btn-premium-primary h-12 px-6 gap-2"
+              >
+                <Plus className="h-5 w-5" />
+                Create New Bid
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <BidForm 
+                bid={editingBid} 
+                onSubmit={(data) => {
+                  if (editingBid) {
+                    updateBidMutation.mutate({ id: editingBid.id, data });
+                  } else {
+                    createBidMutation.mutate(data);
+                  }
+                }} 
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Card className="border-amber-100">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Total Bids</p>
-                <p className="text-2xl font-bold mt-1">{stats.total}</p>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Bids', value: stats.total, icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Won Bids', value: stats.won, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Active Bids', value: stats.active, icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Pipeline Value', value: `$${(stats.value / 1000000).toFixed(1)}M`, icon: DollarSign, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+        ].map((stat, i) => (
+          <Card key={i} className="premium-card border-none">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className={`p-3 rounded-xl ${stat.bg} ${stat.color}`}>
+                <stat.icon className="h-6 w-6" />
               </div>
-              <FileText className="h-10 w-10 text-amber-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-green-100">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Won</p>
-                <p className="text-2xl font-bold mt-1 text-green-600">{stats.won}</p>
+                <p className="text-sm font-medium text-slate-500">{stat.label}</p>
+                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
               </div>
-              <TrendingUp className="h-10 w-10 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-blue-100">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Active</p>
-                <p className="text-2xl font-bold mt-1 text-blue-600">{stats.active}</p>
-              </div>
-              <Calendar className="h-10 w-10 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-purple-100">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Total Value</p>
-                <p className="text-xl font-bold mt-1 text-purple-600">
-                  ${(stats.value / 1000000).toFixed(1)}M
-                </p>
-              </div>
-              <DollarSign className="h-10 w-10 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Filters */}
-      <Card className="border-amber-100">
+      {/* Search and Filters */}
+      <Card className="premium-card border-none shadow-sm">
         <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <div className="flex flex-col lg:flex-row gap-6 items-center">
+            <div className="relative w-full lg:w-96">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
               <Input
-                placeholder="Search bids..."
+                placeholder="Search by title, client, or agency..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-12 h-12 bg-slate-50 border-none focus-visible:ring-primary/20 rounded-xl"
               />
             </div>
-            <div className="flex gap-2 overflow-x-auto">
+            <div className="h-8 w-px bg-slate-200 hidden lg:block" />
+            <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 w-full lg:w-auto no-scrollbar">
               {bidStatuses.map((status) => (
                 <Button
                   key={status}
-                  variant={statusFilter === status ? 'default' : 'outline'}
+                  variant={statusFilter === status ? 'default' : 'ghost'}
                   onClick={() => setStatusFilter(status)}
-                  className={statusFilter === status ? 'bg-amber-600 hover:bg-amber-700' : ''}
-                  size="sm"
+                  className={`h-10 px-4 rounded-xl capitalize font-medium transition-all ${
+                    statusFilter === status 
+                      ? 'bg-slate-900 text-white shadow-md' 
+                      : 'text-slate-500 hover:bg-slate-100'
+                  }`}
                 >
                   {status}
                 </Button>
@@ -232,76 +213,96 @@ export default function Bids() {
       </Card>
 
       {/* Bids List */}
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 gap-4">
         {filteredBids.length === 0 ? (
-          <EmptyState
-            icon={FileText}
-            title="No bids found"
-            description={statusFilter === 'All' ? 'Create your first bid to get started' : `No ${statusFilter} bids`}
-            actionLabel="Create Bid"
-            onAction={() => {
-              setEditingBid(null);
-              setShowDialog(true);
-            }}
-          />
+          <div className="py-20">
+            <EmptyState
+              icon={FileText}
+              title="No bids found"
+              description={statusFilter === 'All' ? 'Create your first bid to get started' : `No ${statusFilter} bids found matching your criteria.`}
+              actionLabel="Create Bid"
+              onAction={() => {
+                setEditingBid(null);
+                setShowDialog(true);
+              }}
+            />
+          </div>
         ) : (
           filteredBids.map((bid) => (
             <Card 
               key={bid.id} 
-              className="hover:shadow-lg transition-all cursor-pointer group border-amber-100"
+              className="premium-card border-none group cursor-pointer"
               onClick={() => navigate(createPageUrl('BidOpportunityDetail') + `?id=${bid.id}`)}
             >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-start gap-2 mb-2">
-                      <h3 className="font-semibold text-lg text-slate-900 group-hover:text-amber-600 transition-colors">
-                        {bid.title || bid.project_name}
-                      </h3>
-                      {bid.ai_analysis && (
-                        <Sparkles className="h-4 w-4 text-purple-600 mt-1" />
-                      )}
+              <CardContent className="p-0">
+                <div className="flex flex-col md:flex-row md:items-center justify-between p-6 gap-6">
+                  <div className="flex items-start gap-5 flex-1">
+                    <div className={`h-14 w-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                      bid.status === 'won' ? 'bg-emerald-50 text-emerald-600' : 
+                      bid.status === 'lost' ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-500'
+                    } group-hover:bg-primary group-hover:text-white`}>
+                      <FileText className="h-7 w-7" />
                     </div>
-                    <p className="text-sm text-slate-600">
-                      {bid.client_name || bid.agency}
-                    </p>
-                    {bid.description && (
-                      <p className="text-sm text-slate-500 mt-2 line-clamp-2">
-                        {bid.description}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-bold text-xl text-slate-900 group-hover:text-primary transition-colors">
+                          {bid.title || bid.project_name}
+                        </h3>
+                        {bid.ai_analysis && (
+                          <Badge className="bg-purple-50 text-purple-700 border-purple-100 px-2 py-0.5 flex items-center gap-1">
+                            <Sparkles className="h-3 w-3" /> AI Analyzed
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-slate-500 font-medium flex items-center gap-2">
+                        {bid.client_name || bid.agency}
+                        <span className="h-1 w-1 rounded-full bg-slate-300" />
+                        {bid.location || 'No location set'}
                       </p>
-                    )}
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      <Badge className={statusColors[bid.status]}>
-                        {bid.status}
-                      </Badge>
-                      {bid.due_date && (
-                        <Badge variant="outline">
-                          Due: {format(new Date(bid.due_date), 'MMM d')}
+                      <div className="flex flex-wrap gap-3 mt-4">
+                        <Badge className={`${statusColors[bid.status]} px-3 py-1 rounded-lg font-semibold uppercase text-[10px] tracking-wider`}>
+                          {bid.status.replace('_', ' ')}
                         </Badge>
-                      )}
-                      {bid.estimated_value && (
-                        <Badge variant="outline" className="bg-green-50">
-                          ${(bid.estimated_value / 1000).toFixed(0)}K
-                        </Badge>
-                      )}
-                      {bid.win_probability && (
-                        <Badge variant="outline" className="bg-blue-50">
-                          {bid.win_probability}% win
-                        </Badge>
-                      )}
+                        {bid.estimated_value && (
+                          <div className="flex items-center gap-1.5 text-sm font-bold text-slate-700 bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
+                            <DollarSign className="h-4 w-4 text-slate-400" />
+                            {bid.estimated_value.toLocaleString()}
+                          </div>
+                        )}
+                        {bid.due_date && (
+                          <div className="flex items-center gap-1.5 text-sm font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
+                            <Calendar className="h-4 w-4 text-slate-400" />
+                            Due {format(new Date(bid.due_date), 'MMM d, yyyy')}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex gap-2 ml-4">
+                  <div className="flex items-center gap-4 border-t md:border-t-0 pt-4 md:pt-0">
+                    <div className="hidden lg:flex flex-col items-end mr-4">
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Probability</p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary" style={{ width: '65%' }} />
+                        </div>
+                        <span className="text-sm font-bold text-slate-900">65%</span>
+                      </div>
+                    </div>
                     <Button
-                      size="sm"
                       variant="ghost"
-                      className="group-hover:opacity-100 opacity-0 transition-opacity"
+                      size="icon"
+                      className="h-12 w-12 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-900"
                       onClick={(e) => {
                         e.stopPropagation();
+                        setEditingBid(bid);
+                        setShowDialog(true);
                       }}
                     >
-                      <ArrowRight className="h-4 w-4" />
+                      <Plus className="h-5 w-5" />
                     </Button>
+                    <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-primary/10 group-hover:text-primary transition-all">
+                      <ChevronRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
                 </div>
               </CardContent>

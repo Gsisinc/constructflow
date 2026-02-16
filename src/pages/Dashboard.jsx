@@ -10,7 +10,18 @@ import AlertsWidget from '../components/dashboard/AlertsWidget';
 import EmployeeWidget from '../components/dashboard/EmployeeWidget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-
+import { 
+  Cloud, 
+  Clock, 
+  Calendar as CalendarIcon, 
+  ChevronRight, 
+  LayoutDashboard, 
+  Briefcase, 
+  CheckCircle2,
+  TrendingUp,
+  Users as UsersIcon,
+  Bell
+} from 'lucide-react';
 
 import { format } from 'date-fns';
 
@@ -69,96 +80,204 @@ export default function Dashboard() {
   };
 
   return (
-        <PullToRefresh onRefresh={handleRefresh}>
-          <div className="space-y-6">
-      {/* Header */}
-      <div className="pb-2">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-          {isProjectManager ? 'Dashboard' : isAdmin ? 'Admin' : 'Team'}
-        </h1>
-        <p className="text-sm text-slate-600 mt-1">Welcome back, <span className="font-semibold text-slate-900">{user?.full_name?.split(' ')[0] || 'User'}</span></p>
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="max-w-[1600px] mx-auto space-y-8 animate-slide-up">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+          <div>
+            <div className="flex items-center gap-2 text-primary font-semibold text-sm mb-1 uppercase tracking-wider">
+              <LayoutDashboard className="h-4 w-4" />
+              Overview
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+              {isProjectManager ? 'Project Dashboard' : isAdmin ? 'Admin Console' : 'Team Workspace'}
+            </h1>
+            <p className="text-slate-500 mt-2 text-lg">
+              Welcome back, <span className="font-bold text-slate-900">{user?.full_name || 'User'}</span>. Here's what's happening today.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex flex-col items-end">
+              <span className="text-sm font-semibold text-slate-900">{format(currentTime, 'EEEE, MMMM do')}</span>
+              <span className="text-xs text-slate-500">{format(currentTime, 'h:mm:ss a')}</span>
+            </div>
+            <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-slate-200 shadow-sm">
+              <Bell className="h-5 w-5 text-slate-600" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: 'Active Projects', value: activeProjects.length, icon: Briefcase, color: 'text-blue-600', bg: 'bg-blue-50' },
+            { label: 'New Bids', value: newBids.length, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            { label: 'Team Members', value: '12', icon: UsersIcon, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+            { label: 'Pending Tasks', value: '8', icon: CheckCircle2, color: 'text-amber-600', bg: 'bg-amber-50' },
+          ].map((stat, i) => (
+            <Card key={i} className="premium-card border-none">
+              <CardContent className="p-6 flex items-center gap-4">
+                <div className={`p-3 rounded-xl ${stat.bg} ${stat.color}`}>
+                  <stat.icon className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-500">{stat.label}</p>
+                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Main Content Area */}
+          <div className="lg:col-span-8 space-y-8">
+            {/* Weather & Time Integration */}
+            <Card className="premium-card border-none overflow-hidden">
+              <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-8 text-white">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+                  <div className="flex items-center gap-6">
+                    <div className="text-6xl md:text-7xl animate-pulse-soft">{weeklyForecast[0].condition}</div>
+                    <div>
+                      <div className="text-4xl md:text-5xl font-bold">{weeklyForecast[0].temp}°</div>
+                      <p className="text-slate-400 font-medium mt-1">Sunny in San Francisco</p>
+                      <div className="flex gap-3 mt-2 text-sm text-slate-300">
+                        <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3" /> H: {weeklyForecast[0].high}°</span>
+                        <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 rotate-180" /> L: {weeklyForecast[0].low}°</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-px md:h-16 w-full md:w-px bg-slate-700" />
+                  <div className="text-center md:text-right">
+                    <div className="text-5xl font-black tracking-tighter">{format(currentTime, 'h:mm')} <span className="text-2xl font-light text-slate-400">{format(currentTime, 'a')}</span></div>
+                    <p className="text-slate-400 font-medium mt-1 uppercase tracking-widest text-xs">{format(currentTime, 'EEEE, MMMM d')}</p>
+                  </div>
+                </div>
+              </div>
+              <CardContent className="p-6 bg-white">
+                <div className="grid grid-cols-7 gap-2">
+                  {weeklyForecast.map((day, i) => (
+                    <div key={day.day} className={`flex flex-col items-center p-3 rounded-xl transition-colors ${i === 0 ? 'bg-slate-50 border border-slate-100' : 'hover:bg-slate-50'}`}>
+                      <span className="text-xs font-bold text-slate-400 uppercase mb-2">{day.day}</span>
+                      <span className="text-2xl mb-2">{day.condition}</span>
+                      <span className="text-sm font-bold text-slate-900">{day.high}°</span>
+                      <span className="text-xs text-slate-400">{day.low}°</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Clock In Section */}
+            <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              <ClockIn />
+            </div>
+
+            {/* Tasks Section */}
+            <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <TaskManager />
+            </div>
+
+            {/* Active Projects Section */}
+            <Card className="premium-card border-none animate-slide-up" style={{ animationDelay: '0.3s' }}>
+              <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 pb-4">
+                <div>
+                  <CardTitle className="text-xl font-bold text-slate-900">Active Projects</CardTitle>
+                  <p className="text-sm text-slate-500">Currently in progress</p>
+                </div>
+                <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 px-3 py-1">
+                  {activeProjects.length} Total
+                </Badge>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-slate-50">
+                  {activeProjects.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="bg-slate-50 h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Briefcase className="h-6 w-6 text-slate-300" />
+                      </div>
+                      <p className="text-slate-400 text-sm">No active projects found</p>
+                    </div>
+                  ) : (
+                    activeProjects.slice(0, 5).map(proj => (
+                      <Link key={proj.id} to={createPageUrl('ProjectDetail') + '?id=' + proj.id} className="block group">
+                        <div className="flex items-center justify-between p-6 hover:bg-slate-50 transition-all">
+                          <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-primary group-hover:text-white transition-colors">
+                              <Briefcase className="h-6 w-6" />
+                            </div>
+                            <div>
+                              <p className="text-base font-bold text-slate-900 group-hover:text-primary transition-colors">{proj.name}</p>
+                              <p className="text-sm text-slate-500 flex items-center gap-1">
+                                <UsersIcon className="h-3 w-3" /> {proj.client_name}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="hidden sm:flex flex-col items-end">
+                              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 mb-1">
+                                {proj.status.replace('_', ' ')}
+                              </Badge>
+                              <span className="text-xs text-slate-400">Updated 2h ago</span>
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  )}
+                </div>
+                {activeProjects.length > 5 && (
+                  <div className="p-4 bg-slate-50/50 text-center">
+                    <Link to={createPageUrl('Projects')} className="text-sm font-bold text-primary hover:underline">
+                      View All Projects
+                    </Link>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar Area */}
+          <div className="lg:col-span-4 space-y-8">
+            {/* Alerts Section */}
+            <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
+              <AlertsWidget />
+            </div>
+
+            {/* Team Members Section */}
+            <div className="animate-slide-up" style={{ animationDelay: '0.5s' }}>
+              <EmployeeWidget />
+            </div>
+
+            {/* Quick Actions / Calendar Mini */}
+            <Card className="premium-card border-none bg-primary text-white overflow-hidden animate-slide-up" style={{ animationDelay: '0.6s' }}>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-white/20 rounded-lg">
+                    <CalendarIcon className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-lg">Quick Actions</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Link to={createPageUrl('AddBid')} className="bg-white/10 hover:bg-white/20 p-3 rounded-xl transition-colors text-center">
+                    <p className="text-xs font-medium opacity-80">New Bid</p>
+                  </Link>
+                  <Link to={createPageUrl('DailyLog')} className="bg-white/10 hover:bg-white/20 p-3 rounded-xl transition-colors text-center">
+                    <p className="text-xs font-medium opacity-80">Daily Log</p>
+                  </Link>
+                  <Link to={createPageUrl('Photos')} className="bg-white/10 hover:bg-white/20 p-3 rounded-xl transition-colors text-center">
+                    <p className="text-xs font-medium opacity-80">Upload Photos</p>
+                  </Link>
+                  <Link to={createPageUrl('TimeCards')} className="bg-white/10 hover:bg-white/20 p-3 rounded-xl transition-colors text-center">
+                    <p className="text-xs font-medium opacity-80">Time Cards</p>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-         {/* Left Column */}
-         <div className="lg:col-span-2 space-y-6">
-           {/* Weather & Time */}
-           <Card>
-             <CardHeader>
-               <CardTitle className="text-base">Current Time & Weekly Forecast</CardTitle>
-             </CardHeader>
-             <CardContent className="space-y-4">
-               <div className="flex items-center justify-between pb-4 border-b">
-                 <div className="text-center">
-                   <div className="text-4xl">{weeklyForecast[0].condition}</div>
-                   <p className="text-sm text-slate-600 mt-2">{weeklyForecast[0].temp}°</p>
-                   <p className="text-xs text-slate-500">H: {weeklyForecast[0].high}° L: {weeklyForecast[0].low}°</p>
-                 </div>
-                 <div className="text-right">
-                   <div className="text-3xl font-bold text-slate-900">{format(currentTime, 'h:mm')}</div>
-                   <div className="text-sm text-slate-600">{format(currentTime, 'a')}</div>
-                   <div className="text-sm text-slate-500 mt-1">{format(currentTime, 'EEEE')}</div>
-                   <div className="text-sm text-slate-500">{format(currentTime, 'MMMM d, yyyy')}</div>
-                 </div>
-               </div>
-               <div className="grid grid-cols-7 gap-1 text-center text-xs">
-                 {weeklyForecast.map((day, i) => (
-                   <div key={day.day} className={i === 0 ? 'font-bold' : ''}>
-                     <div className="font-medium text-slate-700">{day.day}</div>
-                     <div className="text-lg mt-1">{day.condition}</div>
-                     <div className="text-slate-700 font-semibold">{day.high}°</div>
-                     <div className="text-slate-500 text-xs">{day.low}°</div>
-                   </div>
-                 ))}
-               </div>
-             </CardContent>
-           </Card>
-
-           {/* Clock In Card */}
-           <ClockIn />
-
-           {/* Tasks */}
-           <TaskManager />
-
-           {/* Active Projects */}
-           <Card>
-             <CardHeader>
-               <CardTitle className="text-base">Active Projects ({activeProjects.length})</CardTitle>
-             </CardHeader>
-             <CardContent>
-               <div className="space-y-2">
-                 {activeProjects.length === 0 ? (
-                   <div className="text-center py-6 text-slate-400 text-sm">No active projects</div>
-                 ) : (
-                   activeProjects.slice(0, 3).map(proj => (
-                     <Link key={proj.id} to={createPageUrl('ProjectDetail') + '?id=' + proj.id}>
-                       <div className="flex items-center justify-between p-2 rounded hover:bg-slate-50 cursor-pointer">
-                         <div className="flex-1">
-                           <p className="text-sm font-medium">{proj.name}</p>
-                           <p className="text-xs text-slate-500">{proj.client_name}</p>
-                         </div>
-                         <Badge>{proj.status}</Badge>
-                       </div>
-                     </Link>
-                   ))
-                 )}
-               </div>
-             </CardContent>
-           </Card>
-         </div>
-
-         {/* Right Column */}
-         <div className="space-y-6">
-           {/* Alerts */}
-           <AlertsWidget />
-
-           {/* Team Members */}
-           <EmployeeWidget />
-         </div>
-         </div>
-
-
-         </div>
-         </PullToRefresh>
+    </PullToRefresh>
          );
          }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Calendar, DollarSign, FileText, Trash2, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Calendar, DollarSign, FileText, Trash2, TrendingUp, ChevronRight, Sparkles, MapPin, ExternalLink, ShieldAlert, Target, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -81,59 +81,130 @@ export default function BidDetail() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <Button variant="outline" size="icon" onClick={() => navigate(createPageUrl('Bids'))}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">{bid.title || bid.project_name || 'Untitled Bid'}</h1>
-            <p className="text-sm text-slate-600 mt-1">{bid.agency || bid.client_name || 'Unknown Agency'}</p>
+    <div className="max-w-[1600px] mx-auto space-y-8 animate-slide-up">
+      {/* Breadcrumbs & Navigation */}
+      <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+        <button onClick={() => navigate(createPageUrl('Bids'))} className="hover:text-primary transition-colors">Bids</button>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-slate-900 truncate max-w-[200px]">{bid.title || 'Bid Detail'}</span>
+      </div>
+
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex items-start gap-6">
+          <div className={`h-16 w-16 rounded-2xl flex items-center justify-center flex-shrink-0 ${statusColors[bid.status] || 'bg-slate-100 text-slate-500'}`}>
+            <FileText className="h-8 w-8" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{bid.title || bid.project_name || 'Untitled Bid'}</h1>
+              <Badge className={`${statusColors[bid.status] || 'bg-slate-100 text-slate-700'} px-3 py-1 rounded-lg font-bold uppercase text-[10px] tracking-widest`}>
+                {bid.status || 'new'}
+              </Badge>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 text-slate-500 font-medium">
+              <p className="flex items-center gap-1.5">
+                <Target className="h-4 w-4 text-slate-400" />
+                {bid.agency || bid.client_name || 'Unknown Agency'}
+              </p>
+              {bid.location && (
+                <p className="flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 text-slate-400" />
+                  {bid.location}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
           {bid.status === 'won' && <BidToProject bid={bid} organizationId={user.organization_id} />}
           <Button
             variant="outline"
-            size="icon"
+            className="h-12 px-5 border-slate-200 text-slate-600 hover:bg-slate-50 gap-2"
             onClick={() => {
               if (confirm('Delete this bid?')) deleteMutation.mutate(bid.id);
             }}
-            className="text-red-600"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-4 w-4 text-red-500" />
+            Delete Bid
+          </Button>
+          <Button className="btn-premium-primary h-12 px-6">
+            Edit Details
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? format(new Date(bid.due_date), 'MMM d, yyyy') : 'Not set'} />
-        <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={`$${Number(bid.estimated_value || bid.value || 0).toLocaleString()}`} />
-        <StatCard icon={<TrendingUp className="h-8 w-8 text-blue-600" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <FileText className="h-8 w-8 text-purple-600" />
-              <div>
-                <p className="text-xs text-slate-500">Status</p>
-                <Badge className={statusColors[bid.status] || 'bg-slate-100 text-slate-700'}>{bid.status || 'new'}</Badge>
-              </div>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="premium-card border-none">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-amber-50 text-amber-600">
+              <Calendar className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Due Date</p>
+              <p className="text-xl font-bold text-slate-900">{bid.due_date ? format(new Date(bid.due_date), 'MMM d, yyyy') : 'Not set'}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="premium-card border-none">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600">
+              <DollarSign className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Estimated Value</p>
+              <p className="text-xl font-bold text-slate-900">${Number(bid.estimated_value || bid.value || 0).toLocaleString()}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="premium-card border-none">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-blue-50 text-blue-600">
+              <TrendingUp className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Win Probability</p>
+              <p className="text-xl font-bold text-slate-900">{Number(bid.win_probability || 0)}%</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="premium-card border-none">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-purple-50 text-purple-600">
+              <BarChart3 className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Complexity</p>
+              <p className="text-xl font-bold text-slate-900">{analysis.complexityScore || 'N/A'}/10</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="requirements">Requirements</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="drawings">Drawing Analysis</TabsTrigger>
-          <TabsTrigger value="designer">Designer</TabsTrigger>
-          <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="overview" className="w-full space-y-6">
+        <div className="bg-white p-1.5 rounded-xl border border-slate-200 inline-flex w-full lg:w-auto overflow-x-auto no-scrollbar">
+          <TabsList className="bg-transparent h-auto gap-1">
+            {[
+              { value: 'overview', label: 'Overview', icon: FileText },
+              { value: 'requirements', label: 'Requirements', icon: ShieldAlert },
+              { value: 'documents', label: 'Documents', icon: FileText },
+              { value: 'drawings', label: 'Drawing Analysis', icon: BarChart3 },
+              { value: 'designer', label: 'Designer', icon: Target },
+              { value: 'analysis', label: 'AI Analysis', icon: Sparkles },
+            ].map((tab) => (
+              <TabsTrigger 
+                key={tab.value}
+                value={tab.value} 
+                className="data-[state=active]:bg-slate-900 data-[state=active]:text-white rounded-lg px-6 py-2.5 text-sm font-bold transition-all flex items-center gap-2"
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
         <TabsContent value="overview" className="space-y-4">
           <Card>
