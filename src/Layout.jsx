@@ -176,8 +176,12 @@ export default function Layout({ children, currentPageName }) {
     return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
   };
 
-  const handleLogout = async () => {
-    await base44.auth.logout(createPageUrl('Home'));
+  const handleLogout = () => {
+    // Clear stored user data and session
+    localStorage.clear();
+    sessionStorage.clear();
+    // Redirect to home with logout
+    window.location.href = createPageUrl('Home');
   };
 
   const isRootPage = ['Bids', 'Dashboard', 'Projects', 'TaskTracker', 'Settings'].includes(currentPageName);

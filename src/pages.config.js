@@ -53,7 +53,6 @@ import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
 import BidDetail from './pages/BidDetail';
 import BidDiscovery from './pages/BidDiscovery';
-import BidIntelligence from './pages/BidIntelligence';
 import BidOpportunities from './pages/BidOpportunities';
 import BidOpportunityDetail from './pages/BidOpportunityDetail';
 import Bids from './pages/Bids';
@@ -68,9 +67,9 @@ import Estimates from './pages/Estimates';
 import FeatureTesting from './pages/FeatureTesting';
 import Home from './pages/Home';
 import Invoices from './pages/Invoices';
+import Landing from './pages/Landing';
 import Issues from './pages/Issues';
 import JoinRequest from './pages/JoinRequest';
-import Landing from './pages/Landing';
 import Materials from './pages/Materials';
 import Onboarding from './pages/Onboarding';
 import PMSetupGuide from './pages/PMSetupGuide';
@@ -96,7 +95,6 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import BidDetail from './pages/BidDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -107,7 +105,6 @@ export const PAGES = {
     "AuditTrail": AuditTrail,
     "BidDetail": BidDetail,
     "BidDiscovery": BidDiscovery,
-    "BidIntelligence": BidIntelligence,
     "BidOpportunities": BidOpportunities,
     "BidOpportunityDetail": BidOpportunityDetail,
     "Bids": Bids,
@@ -122,9 +119,9 @@ export const PAGES = {
     "FeatureTesting": FeatureTesting,
     "Home": Home,
     "Invoices": Invoices,
+    "Landing": Landing,
     "Issues": Issues,
     "JoinRequest": JoinRequest,
-    "Landing": Landing,
     "Materials": Materials,
     "Onboarding": Onboarding,
     "PMSetupGuide": PMSetupGuide,
@@ -150,7 +147,6 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "BidDetail": BidDetail,
 }
 
 export const pagesConfig = {
