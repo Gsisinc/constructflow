@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles } from 'lucide-react';
+import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import EmptyState from '@/components/ui/EmptyState';
 import { useNavigate } from 'react-router-dom';

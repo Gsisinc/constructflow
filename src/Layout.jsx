@@ -24,7 +24,11 @@ import {
   Search,
   Grid3x3,
   ArrowLeft,
-  Wrench
+  Wrench,
+  Sparkles,
+  ChevronRight,
+  ShieldCheck,
+  Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -232,7 +236,7 @@ export default function Layout({ children, currentPageName }) {
             `}</style>
 
       {/* Top Header */}
-              <div className="fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-slate-100 shadow-sm z-40 lg:pl-64" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+              <div className="fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-slate-100 shadow-sm z-40 lg:pl-72" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
                 <div className="h-full flex items-center justify-between px-4 sm:px-6">
                   {/* Mobile menu button & back button */}
                   <div className="lg:hidden flex items-center gap-1 sm:gap-2">
@@ -304,29 +308,31 @@ export default function Layout({ children, currentPageName }) {
       {/* Sidebar */}
       <aside aria-label="Primary navigation"
         className={cn(
-          "fixed top-0 left-0 h-full w-64 bg-white border-r border-amber-100 z-50 transition-transform duration-300 lg:translate-x-0 shadow-sm",
+          "fixed top-0 left-0 h-full w-72 bg-slate-900 text-slate-300 z-50 transition-transform duration-300 lg:translate-x-0 shadow-2xl",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
-              <div className="h-16 flex items-center gap-3 px-6 border-b border-amber-100/50 bg-gradient-to-r from-white to-amber-50/30">
-                {organization?.logo_url ? (
-                  <img src={organization.logo_url} alt={organization.name} className="h-32 w-auto" />
-                ) : (
-                  <>
-                    <img 
-                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
-                      alt="GSIS Manager" 
-                      className="h-24 w-auto"
-                    />
-                    <span className="font-bold text-lg text-slate-900 tracking-tight hidden sm:inline">{organization?.name || 'GSIS'}</span>
-                  </>
-                )}
+          {/* Logo Section */}
+          <div className="h-24 flex items-center px-8 mb-4">
+            {organization?.logo_url ? (
+              <img src={organization.logo_url} alt={organization.name} className="h-12 w-auto brightness-0 invert" />
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Zap className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <span className="font-bold text-xl text-white tracking-tight block leading-none">Construct</span>
+                  <span className="text-xs font-bold text-primary uppercase tracking-widest">Flow Pro</span>
+                </div>
               </div>
+            )}
+          </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto bg-white" aria-label="Main sections">
+          <nav className="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar" aria-label="Main sections">
+            <div className="text-[10px] font-bold text-slate-500 px-4 py-2 uppercase tracking-[0.2em] mb-2">Main Menu</div>
             {navItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 const Icon = item.icon;
@@ -336,22 +342,24 @@ export default function Layout({ children, currentPageName }) {
                     to={createPageUrl(item.page)}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] select-none",
+                      "group flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 select-none mb-1",
                       isActive
-                        ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/20"
-                        : "text-slate-600 hover:bg-amber-50 hover:text-amber-700"
+                        ? "bg-primary text-white shadow-lg shadow-primary/20"
+                        : "text-slate-400 hover:bg-white/5 hover:text-white"
                     )}
                   >
-                    <Icon className={cn("h-4.5 w-4.5", isActive ? "text-white" : "text-slate-400 group-hover:text-amber-600")} />
-                    {item.name}
+                    <div className="flex items-center gap-3">
+                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-primary")} />
+                      {item.name}
+                    </div>
+                    {isActive && <ChevronRight className="h-4 w-4 text-white/50" />}
                   </Link>
                 );
               })}
 
             {user?.role === 'admin' && (
-              <>
-                <div className="h-px bg-slate-100 my-4 mx-2" />
-                <div className="text-xs font-semibold text-slate-400 px-3 py-2 uppercase tracking-wider">Administration</div>
+              <div className="mt-8">
+                <div className="text-[10px] font-bold text-slate-500 px-4 py-2 uppercase tracking-[0.2em] mb-2">Administration</div>
                 {adminNavItems.map((item) => {
                   const isActive = currentPageName === item.page;
                   const Icon = item.icon;
@@ -361,38 +369,51 @@ export default function Layout({ children, currentPageName }) {
                       to={createPageUrl(item.page)}
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+                        "group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 mb-1",
                         isActive
-                          ? "bg-slate-900 text-white shadow-md"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-slate-800 text-white shadow-md"
+                          : "text-slate-400 hover:bg-white/5 hover:text-white"
                       )}
                     >
-                      <Icon className={cn("h-4.5 w-4.5", isActive ? "text-white" : "text-slate-400")} />
+                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-primary")} />
                       {item.name}
                     </Link>
                   );
                 })}
-              </>
+              </div>
             )}
-            </nav>
+          </nav>
 
-            {/* Footer */}
-            <div className="p-4 border-t border-amber-100 bg-amber-50/30">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                 {organization?.name?.[0] || 'G'}
+          {/* Sidebar Footer */}
+          <div className="p-6 mt-auto">
+            <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                   {organization?.name?.[0] || 'G'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-white text-sm truncate">{organization?.name || 'GSIS Manager'}</p>
+                  <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                    <ShieldCheck className="h-3 w-3" />
+                    Verified Pro
+                  </div>
+                </div>
               </div>
-              <div className="text-xs text-slate-500">
-                <p className="font-semibold text-slate-900">{organization?.name || 'GSIS Manager'}</p>
-                <p className="opacity-70 text-amber-600">Pro Plan</p>
-              </div>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start gap-2 text-slate-400 hover:text-white hover:bg-white/5 h-9 px-2 text-xs font-bold"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             </div>
-            </div>
+          </div>
         </div>
       </aside>
 
       {/* Main Content */}
-              <main id="main-content" tabIndex={-1} className="lg:pl-64 pt-16 min-h-screen pb-20 lg:pb-0" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
+              <main id="main-content" tabIndex={-1} className="lg:pl-72 pt-16 min-h-screen pb-20 lg:pb-0" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={location.pathname}
