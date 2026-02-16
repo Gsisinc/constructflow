@@ -10,6 +10,7 @@ import AlertsWidget from '../components/dashboard/AlertsWidget';
 import EmployeeWidget from '../components/dashboard/EmployeeWidget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   Cloud, 
   Clock, 
