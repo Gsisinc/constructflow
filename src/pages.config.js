@@ -52,7 +52,6 @@ import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
 import BidDetail from './pages/BidDetail';
-import BidDetail from './pages/BidDetail';
 import BidDiscovery from './pages/BidDiscovery';
 import BidIntelligence from './pages/BidIntelligence';
 import BidOpportunities from './pages/BidOpportunities';
@@ -97,6 +96,7 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import BidDetail from './pages/BidDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -105,7 +105,6 @@ export const PAGES = {
     "AddBid": AddBid,
     "AlertSettings": AlertSettings,
     "AuditTrail": AuditTrail,
-    "BidDetail": BidDetail,
     "BidDetail": BidDetail,
     "BidDiscovery": BidDiscovery,
     "BidIntelligence": BidIntelligence,
@@ -151,6 +150,7 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "BidDetail": BidDetail,
 }
 
 export const pagesConfig = {
