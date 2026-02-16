@@ -131,50 +131,45 @@ export default function MegaMenu({ isOpen, onClose }) {
     <>
       {/* Overlay */}
       <div 
-        className="fixed inset-0 z-40 bg-amber-100/40 backdrop-blur-sm"
+        className="fixed inset-0 z-40 bg-black/50"
         aria-hidden="true"
         onClick={onClose}
       />
       
-      {/* Mega Menu */}
-      <div className="fixed left-4 right-4 top-20 z-50 bg-gold-sidebar/95 backdrop-blur-xl border border-black/10 rounded-3xl shadow-2xl lg:left-80 max-h-[calc(100vh-120px)] overflow-y-auto no-scrollbar animate-slide-up" role="dialog" aria-modal="true" aria-label="Quick access navigation">
-        <div className="p-8 sm:p-10">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Quick Access</h2>
-              <p className="text-sm text-slate-800 font-bold opacity-70">Navigate through all ConstructFlow Pro modules</p>
-            </div>
-            <button onClick={onClose} className="h-10 w-10 rounded-full bg-black/10 flex items-center justify-center text-slate-900 hover:bg-black/20 transition-colors">
-              <X className="h-5 w-5" />
+      {/* Mega Menu - Mobile optimized */}
+      <div className="fixed left-0 right-0 top-14 sm:top-16 lg:left-64 lg:right-auto z-50 bg-white border-b lg:border-r border-slate-200 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto" role="dialog" aria-modal="true" aria-label="Quick access navigation">
+        <div className="p-2 sm:p-3 lg:p-4">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-2 sm:mb-3 pb-2 sm:pb-3 border-b border-slate-200 lg:mb-4">
+            <h2 className="text-sm sm:text-base lg:text-lg font-bold text-slate-900">Quick Access</h2>
+            <button onClick={onClose} className="h-8 w-8 lg:hidden rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-600">
+              <X className="h-4 w-4" />
             </button>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-12">
+          {/* Menu Grid - Responsive columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-1 sm:gap-1.5">
             {menuSections.map((section, idx) => (
               <div key={idx} className="min-w-0">
-                <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-slate-900" />
-                  {section.title}
-                </h3>
-                <ul className="space-y-1">
+                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 pl-1 hidden sm:block lg:block">{section.title}</h3>
+                <div className="space-y-0.5">
                   {section.items.map((item, itemIdx) => {
                     const Icon = item.icon;
                     return (
-                      <li key={itemIdx}>
-                        <Link
-                          to={createPageUrl(item.page)}
-                          onClick={onClose}
-                          className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:text-slate-950 hover:bg-black/5 rounded-xl transition-all group"
-                        >
-                          <div className="h-8 w-8 rounded-lg bg-black/5 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-amber-400 transition-colors">
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <span className="truncate">{item.label}</span>
-                        </Link>
-                      </li>
+                      <Link
+                        key={itemIdx}
+                        to={createPageUrl(item.page)}
+                        onClick={onClose}
+                        className="flex flex-col sm:flex-row lg:flex-row items-center sm:items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all group"
+                      >
+                        <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-md bg-slate-100 flex items-center justify-center group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors flex-shrink-0">
+                          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </div>
+                        <span className="text-center sm:text-left truncate text-xs sm:text-sm">{item.label}</span>
+                      </Link>
                     );
                   })}
-                </ul>
+                </div>
               </div>
             ))}
           </div>

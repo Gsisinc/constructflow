@@ -251,40 +251,40 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Top Header */}
       <header className="fixed top-0 left-0 right-0 h-14 sm:h-16 bg-white border-b border-slate-200 z-40 lg:pl-64">
-        <div className="h-full flex items-center justify-between px-3 sm:px-4 md:px-6">
+        <div className="h-full flex items-center justify-between px-2 sm:px-3 md:px-4 lg:px-6">
           {/* Left section: Menu & Logo */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="lg:hidden flex items-center gap-1">
+          <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
+            <div className="lg:hidden flex items-center gap-0.5">
               {!isRootPage && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleBack}
-                  className="h-9 w-9 sm:h-10 sm:w-10 p-0 flex-shrink-0"
+                  className="h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0"
                 >
-                  <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               )}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="h-9 w-9 sm:h-10 sm:w-10 p-0 flex-shrink-0"
+                className="h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0"
               >
-                {sidebarOpen ? <X className="h-4 w-4 sm:h-5 sm:w-5" /> : <Menu className="h-4 w-4 sm:h-5 sm:w-5" />}
+                {sidebarOpen ? <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Menu className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
               </Button>
             </div>
 
             {/* Logo/Org Name */}
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
               {organization?.logo_url ? (
-                <img src={organization.logo_url} alt={organization.name} className="h-6 sm:h-7 w-auto flex-shrink-0" />
+                <img src={organization.logo_url} alt={organization.name} className="h-5 sm:h-6 w-auto flex-shrink-0" />
               ) : (
                 <>
                   <img 
                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
                     alt="GSIS Manager" 
-                    className="h-5 sm:h-6 w-auto flex-shrink-0"
+                    className="h-4 sm:h-5 w-auto flex-shrink-0"
                   />
                   <span className="font-bold text-xs sm:text-sm text-slate-900 hidden sm:inline truncate">{organization?.name || 'GSIS'}</span>
                 </>
@@ -293,14 +293,15 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           {/* Right section: Menu & User */}
-          <div className="flex items-center gap-1.5 sm:gap-2 ml-auto">
+          <div className="flex items-center gap-1 sm:gap-1.5 ml-auto flex-shrink-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setMegaMenuOpen(!megaMenuOpen)}
-              className="h-9 sm:h-10 px-2 sm:px-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 flex-shrink-0"
+              className="h-8 sm:h-9 px-1.5 sm:px-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 flex-shrink-0"
+              title="Quick Access"
             >
-              <Grid3x3 className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Grid3x3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
             {user && <UserMenu user={user} onLogout={handleLogout} />}
           </div>
@@ -410,7 +411,7 @@ export default function Layout({ children, currentPageName }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full"
+            className="p-2 sm:p-3 md:p-4 lg:p-6 max-w-7xl mx-auto w-full"
           >
             {children}
           </motion.div>

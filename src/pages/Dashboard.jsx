@@ -82,34 +82,34 @@ export default function Dashboard() {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="max-w-[1600px] mx-auto space-y-8 animate-slide-up">
+      <div className="max-w-[1600px] mx-auto space-y-4 sm:space-y-6 lg:space-y-8 animate-slide-up">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
-          <div>
-            <div className="flex items-center gap-2 text-primary font-semibold text-sm mb-1 uppercase tracking-wider">
-              <LayoutDashboard className="h-4 w-4" />
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 sm:gap-4 border-b border-slate-200 pb-3 sm:pb-6">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-primary font-semibold text-xs sm:text-sm mb-1 uppercase tracking-wider">
+              <LayoutDashboard className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Overview
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">
               {isProjectManager ? 'Project Dashboard' : isAdmin ? 'Admin Console' : 'Team Workspace'}
             </h1>
-            <p className="text-slate-500 mt-2 text-lg">
+            <p className="text-slate-500 mt-1 sm:mt-2 text-xs sm:text-sm lg:text-base">
               Welcome back, <span className="font-bold text-slate-900">{user?.full_name || 'User'}</span>. Here's what's happening today.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <div className="hidden sm:flex flex-col items-end">
-              <span className="text-sm font-semibold text-slate-900">{format(currentTime, 'EEEE, MMMM do')}</span>
+              <span className="text-xs sm:text-sm font-semibold text-slate-900">{format(currentTime, 'EEEE, MMMM do')}</span>
               <span className="text-xs text-slate-500">{format(currentTime, 'h:mm:ss a')}</span>
             </div>
-            <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-slate-200 shadow-sm">
-              <Bell className="h-5 w-5 text-slate-600" />
+            <Button variant="outline" size="icon" className="rounded-full h-8 w-8 sm:h-10 sm:w-10 border-slate-200 shadow-sm flex-shrink-0">
+              <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600" />
             </Button>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
           {[
             { label: 'Active Projects', value: activeProjects.length, icon: Briefcase, color: 'text-blue-600', bg: 'bg-blue-50' },
             { label: 'New Bids', value: newBids.length, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
@@ -117,20 +117,20 @@ export default function Dashboard() {
             { label: 'Pending Tasks', value: '8', icon: CheckCircle2, color: 'text-amber-600', bg: 'bg-amber-50' },
           ].map((stat, i) => (
             <Card key={i} className="premium-card border-none">
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${stat.bg} ${stat.color}`}>
-                  <stat.icon className="h-6 w-6" />
+              <CardContent className="p-2 sm:p-4 lg:p-6 flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl ${stat.bg} ${stat.color} flex-shrink-0`}>
+                  <stat.icon className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-500">{stat.label}</p>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                <div className="text-center sm:text-left">
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">{stat.label}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-slate-900">{stat.value}</p>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           {/* Main Content Area */}
           <div className="lg:col-span-8 space-y-8">
             {/* Weather & Time Integration */}
