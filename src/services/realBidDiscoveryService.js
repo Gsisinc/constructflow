@@ -1,11 +1,18 @@
 /**
  * Real Bid Discovery Service
  * Unified service that fetches real bids from SAM.GOV and county websites
- * Replaces fake/mock data with actual live opportunities
+ * NEVER returns fake data - returns empty results with error message if sources fail
  */
 
 import { fetchSamGovOpportunities } from './samGovService';
 import { fetchCountyBidOpportunities } from './countyBidScraper';
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  handleApiError,
+  validateResponseHasRealData,
+  ERROR_TYPES
+} from './errorHandlingService';
 
 /**
  * Deduplicate opportunities by external ID and title
@@ -102,6 +109,7 @@ function rankOpportunities(opportunities, filters = {}) {
 
 /**
  * Fetch real bid opportunities from all sources
+ * NEVER returns fake data - returns empty results with error if sources fail
  */
 export async function fetchRealBidOpportunities(filters = {}) {
   const results = {
@@ -111,6 +119,8 @@ export async function fetchRealBidOpportunities(filters = {}) {
     errors: []
   };
 
+  let hasAnySuccess = false;
+
   // Fetch from SAM.GOV
   console.log('🔍 Fetching from SAM.GOV...');
   try {
@@ -118,16 +128,25 @@ export async function fetchRealBidOpportunities(filters = {}) {
     results.sources.push({
       name: 'SAM.GOV',
       source: 'sam_gov',
-      count: samGovResult.opportunities.length,
+      count: samGovResult.opportunities?.length || 0,
       success: samGovResult.success !== false,
       error: samGovResult.error || null
     });
     
     if (samGovResult.opportunities && samGovResult.opportunities.length > 0) {
-      results.opportunities.push(...samGovResult.opportunities);
-      console.log(`✅ Found ${samGovResult.opportunities.length} opportunities from SAM.GOV`);
+      // Validate data is real (not fake)
+      const validation = validateResponseHasRealData(samGovResult);
+      if (validation.valid) {
+        results.opportunities.push(...samGovResult.opportunities);
+        hasAnySuccess = true;
+        console.log(`✅ Found ${samGovResult.opportunities.length} real opportunities from SAM.GOV`);
+      } else {
+        console.warn(`⚠️ SAM.GOV data validation failed: ${validation.reason}`);
+        results.errors.push({ source: 'sam_gov', error: `Data validation failed: ${validation.reason}` });
+      }
     } else if (samGovResult.error) {
       console.warn(`⚠️ SAM.GOV error: ${samGovResult.error}`);
+      results.errors.push({ source: 'sam_gov', error: samGovResult.error });
     } else {
       console.log('ℹ️ No opportunities found from SAM.GOV for these filters');
     }
@@ -144,16 +163,25 @@ export async function fetchRealBidOpportunities(filters = {}) {
       results.sources.push({
         name: 'County Portals',
         source: 'county_portal',
-        count: countyResult.opportunities.length,
+        count: countyResult.opportunities?.length || 0,
         success: countyResult.success !== false,
         error: countyResult.error || null
       });
       
       if (countyResult.opportunities && countyResult.opportunities.length > 0) {
-        results.opportunities.push(...countyResult.opportunities);
-        console.log(`✅ Found ${countyResult.opportunities.length} opportunities from county portals`);
+        // Validate data is real (not fake)
+        const validation = validateResponseHasRealData(countyResult);
+        if (validation.valid) {
+          results.opportunities.push(...countyResult.opportunities);
+          hasAnySuccess = true;
+          console.log(`✅ Found ${countyResult.opportunities.length} real opportunities from county portals`);
+        } else {
+          console.warn(`⚠️ County portal data validation failed: ${validation.reason}`);
+          results.errors.push({ source: 'county_portal', error: `Data validation failed: ${validation.reason}` });
+        }
       } else if (countyResult.error) {
         console.warn(`⚠️ County portal error: ${countyResult.error}`);
+        results.errors.push({ source: 'county_portal', error: countyResult.error });
       } else {
         console.log('ℹ️ No opportunities found from county portals');
       }
@@ -163,29 +191,42 @@ export async function fetchRealBidOpportunities(filters = {}) {
     }
   }
 
-  // Deduplicate
-  const deduped = deduplicateOpportunities(results.opportunities);
-  
-  // Rank by relevance
-  const ranked = rankOpportunities(deduped, filters);
-  
-  results.opportunities = ranked;
-  results.totalFound = ranked.length;
+  // If we have real data, deduplicate and rank
+  if (results.opportunities.length > 0) {
+    const deduped = deduplicateOpportunities(results.opportunities);
+    const ranked = rankOpportunities(deduped, filters);
+    results.opportunities = ranked;
+    results.totalFound = ranked.length;
+    results.success = true;
+  } else {
+    // NO FAKE DATA - return empty with clear message
+    results.opportunities = [];
+    results.totalFound = 0;
+    results.success = false;
+    results.message = 'No real opportunities found. Try different filters or check back later.';
+    console.log('⚠️ No real opportunities found from any source');
+  }
 
   return results;
 }
 
 /**
- * Search for specific bid opportunities
+ * Search for specific bid opportunities (REAL DATA ONLY)
  */
 export async function searchBidOpportunities(searchTerm, filters = {}) {
+  if (!searchTerm || searchTerm.trim().length === 0) {
+    return createErrorResponse(ERROR_TYPES.INVALID_FILTERS, {
+      technicalMessage: 'Search term cannot be empty'
+    });
+  }
+
   const results = await fetchRealBidOpportunities({
     ...filters,
     searchTerm
   });
 
   // Filter by search term if provided
-  if (searchTerm) {
+  if (searchTerm && results.opportunities.length > 0) {
     const searchLower = searchTerm.toLowerCase();
     results.opportunities = results.opportunities.filter(opp =>
       opp.title.toLowerCase().includes(searchLower) ||
@@ -194,13 +235,23 @@ export async function searchBidOpportunities(searchTerm, filters = {}) {
     );
   }
 
+  // If no results after filtering, return empty (not fake data)
+  if (results.opportunities.length === 0) {
+    results.message = `No opportunities found matching "${searchTerm}". Try different keywords.`;
+  }
+
   return results;
 }
 
 /**
- * Get bid opportunities for a specific work type
+ * Get bid opportunities for a specific work type (REAL DATA ONLY)
  */
 export async function getBidsForWorkType(workType, filters = {}) {
+  if (!workType || workType === 'all') {
+    return createErrorResponse(ERROR_TYPES.INVALID_FILTERS, {
+      technicalMessage: 'Work type must be specified'
+    });
+  }
   return fetchRealBidOpportunities({
     ...filters,
     workType
@@ -208,9 +259,14 @@ export async function getBidsForWorkType(workType, filters = {}) {
 }
 
 /**
- * Get bid opportunities for a specific state
+ * Get bid opportunities for a specific state (REAL DATA ONLY)
  */
 export async function getBidsForState(state, filters = {}) {
+  if (!state) {
+    return createErrorResponse(ERROR_TYPES.INVALID_FILTERS, {
+      technicalMessage: 'State must be specified'
+    });
+  }
   return fetchRealBidOpportunities({
     ...filters,
     state
@@ -218,9 +274,14 @@ export async function getBidsForState(state, filters = {}) {
 }
 
 /**
- * Get bid opportunities for a specific county
+ * Get bid opportunities for a specific county (REAL DATA ONLY)
  */
 export async function getBidsForCounty(county, state = 'California', filters = {}) {
+  if (!county) {
+    return createErrorResponse(ERROR_TYPES.INVALID_FILTERS, {
+      technicalMessage: 'County must be specified'
+    });
+  }
   return fetchRealBidOpportunities({
     ...filters,
     state,

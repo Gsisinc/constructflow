@@ -46,10 +46,12 @@ export const AGENT_WORKFLOWS = {
     outputs: ['Opportunities', 'Win-probability notes', 'Recommended next actions'],
     typicalPrompt: 'Find public low-voltage bids in California due in the next 14 days and rank top 10 by fit for a 25-person contractor.',
     sampleOutput:
-      'Found 14 opportunities from live sources. Top 3 include LA County courthouse low-voltage upgrade, San Diego school network modernization, and Fresno municipal camera refresh. Recommended action: add first two to pipeline and request mandatory pre-bid meeting details.',
+      'Found 8 opportunities from live sources (SAM.GOV and California county portals). Top 3 ranked by relevance: (1) Federal low-voltage upgrade opportunity, (2) County school network project, (3) Municipal camera system refresh. Each includes direct link to official posting. Recommended action: review details and add qualified opportunities to pipeline.',
     guardrails: [
       'Clearly distinguish scraped/live data from AI inference.',
-      'If no live data is returned, state that explicitly instead of fabricating results.'
+      'If no live data is returned, state that explicitly instead of fabricating results.',
+      'NEVER return fake or mock opportunities as fallback.',
+      'Return empty results with helpful error message if sources fail.'
     ]
   },
   bid_package_assembly: {
