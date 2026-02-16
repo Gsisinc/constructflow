@@ -62,6 +62,7 @@ import Calendar from './pages/Calendar';
 import ClientPortal from './pages/ClientPortal';
 import DailyLog from './pages/DailyLog';
 import Dashboard from './pages/Dashboard';
+import DashboardV2 from './pages/Dashboard-v2';
 import Directory from './pages/Directory';
 import Documents from './pages/Documents';
 import Estimates from './pages/Estimates';
@@ -115,6 +116,7 @@ export const PAGES = {
     "ClientPortal": ClientPortal,
     "DailyLog": DailyLog,
     "Dashboard": Dashboard,
+    "DashboardV2": DashboardV2,
     "Directory": Directory,
     "Documents": Documents,
     "Estimates": Estimates,
