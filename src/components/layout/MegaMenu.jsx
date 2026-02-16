@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { PAGES } from '@/pages.config';
+import { pagesConfig } from '@/pages.config';
+const PAGES = pagesConfig.Pages;
 import {
   LayoutDashboard,
   Clock,
@@ -135,14 +136,14 @@ export default function MegaMenu({ isOpen, onClose }) {
       />
       
       {/* Mega Menu */}
-      <div className="fixed left-4 right-4 top-20 z-50 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-3xl shadow-2xl lg:left-80 max-h-[calc(100vh-120px)] overflow-y-auto no-scrollbar animate-slide-up" role="dialog" aria-modal="true" aria-label="Quick access navigation">
+      <div className="fixed left-4 right-4 top-20 z-50 bg-gold-sidebar/95 backdrop-blur-xl border border-black/10 rounded-3xl shadow-2xl lg:left-80 max-h-[calc(100vh-120px)] overflow-y-auto no-scrollbar animate-slide-up" role="dialog" aria-modal="true" aria-label="Quick access navigation">
         <div className="p-8 sm:p-10">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Quick Access</h2>
-              <p className="text-sm text-slate-500 font-medium">Navigate through all ConstructFlow Pro modules</p>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Quick Access</h2>
+              <p className="text-sm text-slate-800 font-bold opacity-70">Navigate through all ConstructFlow Pro modules</p>
             </div>
-            <button onClick={onClose} className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors">
+            <button onClick={onClose} className="h-10 w-10 rounded-full bg-black/10 flex items-center justify-center text-slate-900 hover:bg-black/20 transition-colors">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -150,8 +151,8 @@ export default function MegaMenu({ isOpen, onClose }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-10 gap-y-12">
             {menuSections.map((section, idx) => (
               <div key={idx} className="min-w-0">
-                <h3 className="text-[10px] font-bold text-amber-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                  <span className="h-1 w-1 rounded-full bg-amber-500" />
+                <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate-900" />
                   {section.title}
                 </h3>
                 <ul className="space-y-1">
@@ -162,9 +163,9 @@ export default function MegaMenu({ isOpen, onClose }) {
                         <Link
                           to={createPageUrl(item.page)}
                           onClick={onClose}
-                          className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all group"
+                          className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:text-slate-950 hover:bg-black/5 rounded-xl transition-all group"
                         >
-                          <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                          <div className="h-8 w-8 rounded-lg bg-black/5 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-amber-400 transition-colors">
                             <Icon className="h-4 w-4" />
                           </div>
                           <span className="truncate">{item.label}</span>

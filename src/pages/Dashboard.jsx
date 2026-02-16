@@ -135,34 +135,34 @@ export default function Dashboard() {
           <div className="lg:col-span-8 space-y-8">
             {/* Weather & Time Integration */}
             <Card className="premium-card border-none overflow-hidden">
-              <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-8 text-white">
+              <div className="bg-gold-sidebar p-8 text-slate-900">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                   <div className="flex items-center gap-6">
                     <div className="text-6xl md:text-7xl animate-pulse-soft">{weeklyForecast[0].condition}</div>
                     <div>
-                      <div className="text-4xl md:text-5xl font-bold">{weeklyForecast[0].temp}°</div>
-                      <p className="text-slate-400 font-medium mt-1">Sunny in San Francisco</p>
-                      <div className="flex gap-3 mt-2 text-sm text-slate-300">
-                        <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3" /> H: {weeklyForecast[0].high}°</span>
-                        <span className="flex items-center gap-1"><TrendingUp className="h-3 w-3 rotate-180" /> L: {weeklyForecast[0].low}°</span>
+                      <div className="text-4xl md:text-5xl font-black">{weeklyForecast[0].temp}°</div>
+                      <p className="text-slate-800 font-bold mt-1">Sunny in San Francisco</p>
+                      <div className="flex gap-3 mt-2 text-sm text-slate-700">
+                        <span className="flex items-center gap-1 font-bold"><TrendingUp className="h-3 w-3" /> H: {weeklyForecast[0].high}°</span>
+                        <span className="flex items-center gap-1 font-bold"><TrendingUp className="h-3 w-3 rotate-180" /> L: {weeklyForecast[0].low}°</span>
                       </div>
                     </div>
                   </div>
-                  <div className="h-px md:h-16 w-full md:w-px bg-slate-700" />
+                  <div className="h-px md:h-16 w-full md:w-px bg-black/10" />
                   <div className="text-center md:text-right">
-                    <div className="text-5xl font-black tracking-tighter">{format(currentTime, 'h:mm')} <span className="text-2xl font-light text-slate-400">{format(currentTime, 'a')}</span></div>
-                    <p className="text-slate-400 font-medium mt-1 uppercase tracking-widest text-xs">{format(currentTime, 'EEEE, MMMM d')}</p>
+                    <div className="text-5xl font-black tracking-tighter">{format(currentTime, 'h:mm')} <span className="text-2xl font-bold text-slate-700">{format(currentTime, 'a')}</span></div>
+                    <p className="text-slate-800 font-bold mt-1 uppercase tracking-widest text-xs">{format(currentTime, 'EEEE, MMMM d')}</p>
                   </div>
                 </div>
               </div>
-              <CardContent className="p-6 bg-white">
+              <CardContent className="p-6 bg-gold-sidebar/30">
                 <div className="grid grid-cols-7 gap-2">
                   {weeklyForecast.map((day, i) => (
-                    <div key={day.day} className={`flex flex-col items-center p-3 rounded-xl transition-colors ${i === 0 ? 'bg-slate-50 border border-slate-100' : 'hover:bg-slate-50'}`}>
-                      <span className="text-xs font-bold text-slate-400 uppercase mb-2">{day.day}</span>
+                    <div key={day.day} className={`flex flex-col items-center p-3 rounded-xl transition-colors ${i === 0 ? 'bg-black/5 border border-black/5' : 'hover:bg-black/5'}`}>
+                      <span className="text-xs font-black text-slate-600 uppercase mb-2">{day.day}</span>
                       <span className="text-2xl mb-2">{day.condition}</span>
-                      <span className="text-sm font-bold text-slate-900">{day.high}°</span>
-                      <span className="text-xs text-slate-400">{day.low}°</span>
+                      <span className="text-sm font-black text-slate-900">{day.high}°</span>
+                      <span className="text-xs text-slate-700 font-bold">{day.low}°</span>
                     </div>
                   ))}
                 </div>
