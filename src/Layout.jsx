@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from './utils';
-import { pagesConfig } from '@/pages.config';
-const PAGES = pagesConfig.Pages;
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/AuthContext';
@@ -304,7 +302,7 @@ export default function Layout({ children, currentPageName }) {
       </div>
 
       {/* Mega Menu */}
-      <MegaMenu isOpen={megaMenuOpen} onClose={() => setMegaMenuOpen(false)} pages={PAGES} />
+      <MegaMenu isOpen={megaMenuOpen} onClose={() => setMegaMenuOpen(false)} />
 
       {/* Sidebar Overlay */}
       {sidebarOpen && (

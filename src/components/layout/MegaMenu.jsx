@@ -114,7 +114,7 @@ const menuSections = [
 ];
 
 
-export default function MegaMenu({ isOpen, onClose, pages: PAGES = {} }) {
+export default function MegaMenu({ isOpen, onClose }) {
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (event) => {
@@ -156,7 +156,7 @@ export default function MegaMenu({ isOpen, onClose, pages: PAGES = {} }) {
                   {section.title}
                 </h3>
                 <ul className="space-y-1">
-                  {section.items.filter((item) => Boolean(PAGES && PAGES[item.page])).map((item, itemIdx) => {
+                  {section.items.map((item, itemIdx) => {
                     const Icon = item.icon;
                     return (
                       <li key={itemIdx}>
