@@ -67,6 +67,7 @@ import Estimates from './pages/Estimates';
 import FeatureTesting from './pages/FeatureTesting';
 import Home from './pages/Home';
 import Invoices from './pages/Invoices';
+import Landing from './pages/Landing';
 import Issues from './pages/Issues';
 import JoinRequest from './pages/JoinRequest';
 import Materials from './pages/Materials';
@@ -118,6 +119,7 @@ export const PAGES = {
     "FeatureTesting": FeatureTesting,
     "Home": Home,
     "Invoices": Invoices,
+    "Landing": Landing,
     "Issues": Issues,
     "JoinRequest": JoinRequest,
     "Materials": Materials,
