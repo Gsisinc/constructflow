@@ -317,20 +317,20 @@ export default function Layout({ children, currentPageName }) {
         className={cn(
           "fixed top-0 left-0 h-full bg-gold-sidebar text-slate-900 z-50 transition-all duration-300 lg:translate-x-0 shadow-2xl border-r border-black/5",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
-          sidebarCollapsed ? "w-20" : "w-72"
+          sidebarCollapsed ? "w-20" : "w-80 lg:w-72"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo Section */}
-          <div className={cn("flex flex-col items-center px-4 py-8 relative", sidebarCollapsed ? "justify-center" : "justify-start")}>
-            <div className={cn("transition-all duration-300 flex items-center justify-center", sidebarCollapsed ? "h-12 w-12" : "h-32 w-full mb-4")}>
-              <img src={logo} alt="GSIS Logo" className={cn("object-contain transition-all", sidebarCollapsed ? "h-10 w-10" : "h-full w-auto")} />
+          <div className={cn("flex flex-col items-center px-6 py-6 lg:px-4 lg:py-8 relative", sidebarCollapsed ? "justify-center" : "justify-start")}>
+            <div className={cn("transition-all duration-300 flex items-center justify-center", sidebarCollapsed ? "h-12 w-12" : "h-28 w-full mb-3 lg:h-32 lg:mb-4")}>
+              <img src={logo} alt="GSIS Logo" className={cn("object-contain transition-all drop-shadow-lg", sidebarCollapsed ? "h-10 w-10" : "h-full w-auto")} />
             </div>
-            
+
             {!sidebarCollapsed && (
               <div className="text-center sidebar-header-text">
-                <span className="font-black text-xl text-slate-900 tracking-tight block leading-none uppercase">ConstructFlow</span>
-                <span className="text-[10px] font-bold text-slate-800 uppercase tracking-[0.3em]">Premium Edition</span>
+                <span className="font-black text-2xl lg:text-xl text-slate-900 tracking-tight block leading-none uppercase drop-shadow-sm">ConstructFlow</span>
+                <span className="text-xs lg:text-[10px] font-bold text-slate-800 uppercase tracking-[0.3em] mt-1 block">Premium Edition</span>
               </div>
             )}
             
@@ -344,8 +344,8 @@ export default function Layout({ children, currentPageName }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 space-y-1 overflow-y-auto no-scrollbar" aria-label="Main sections">
-            {!sidebarCollapsed && <div className="text-[10px] font-black text-slate-800/50 px-4 py-2 uppercase tracking-[0.2em] mb-2">Main Menu</div>}
+          <nav className="flex-1 px-4 lg:px-3 space-y-1 overflow-y-auto no-scrollbar pb-4" aria-label="Main sections">
+            {!sidebarCollapsed && <div className="text-xs lg:text-[10px] font-black text-slate-800/50 px-4 py-3 lg:py-2 uppercase tracking-[0.2em] mb-2">Main Menu</div>}
             {navItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 const Icon = item.icon;
@@ -355,26 +355,26 @@ export default function Layout({ children, currentPageName }) {
                     to={createPageUrl(item.page)}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      "group flex items-center rounded-xl text-sm font-bold transition-all duration-200 select-none mb-1",
-                      sidebarCollapsed ? "justify-center p-3" : "justify-between px-4 py-3",
+                      "group flex items-center rounded-xl font-bold transition-all duration-200 select-none mb-1.5 min-h-[48px]",
+                      sidebarCollapsed ? "justify-center p-3 text-sm" : "justify-between px-5 py-4 lg:px-4 lg:py-3 text-base lg:text-sm",
                       isActive
                         ? "sidebar-item-active shadow-lg shadow-black/5"
                         : "text-slate-800/70 hover:sidebar-item-hover hover:text-slate-900"
                     )}
                     title={sidebarCollapsed ? item.name : ""}
                   >
-                    <div className="flex items-center gap-3">
-                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-slate-900" : "text-slate-800/50 group-hover:text-slate-900")} />
-                      {!sidebarCollapsed && <span>{item.name}</span>}
+                    <div className="flex items-center gap-4 lg:gap-3">
+                      <Icon className={cn("h-6 w-6 lg:h-5 lg:w-5 transition-colors flex-shrink-0", isActive ? "text-slate-900" : "text-slate-800/50 group-hover:text-slate-900")} />
+                      {!sidebarCollapsed && <span className="leading-tight">{item.name}</span>}
                     </div>
-                    {!sidebarCollapsed && isActive && <ChevronRight className="h-4 w-4 opacity-50" />}
+                    {!sidebarCollapsed && isActive && <ChevronRight className="h-5 w-5 lg:h-4 lg:w-4 opacity-50 flex-shrink-0" />}
                   </Link>
                 );
               })}
 
             {user?.role === 'admin' && (
-              <div className="mt-8">
-                {!sidebarCollapsed && <div className="text-[10px] font-black text-slate-800/50 px-4 py-2 uppercase tracking-[0.2em] mb-2">Administration</div>}
+              <div className="mt-6 lg:mt-8">
+                {!sidebarCollapsed && <div className="text-xs lg:text-[10px] font-black text-slate-800/50 px-4 py-3 lg:py-2 uppercase tracking-[0.2em] mb-2">Administration</div>}
                 {adminNavItems.map((item) => {
                   const isActive = currentPageName === item.page;
                   const Icon = item.icon;
@@ -384,16 +384,16 @@ export default function Layout({ children, currentPageName }) {
                       to={createPageUrl(item.page)}
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "group flex items-center rounded-xl text-sm font-bold transition-all duration-200 mb-1",
-                        sidebarCollapsed ? "justify-center p-3" : "gap-3 px-4 py-3",
+                        "group flex items-center rounded-xl font-bold transition-all duration-200 mb-1.5 min-h-[48px]",
+                        sidebarCollapsed ? "justify-center p-3 text-sm" : "gap-4 lg:gap-3 px-5 py-4 lg:px-4 lg:py-3 text-base lg:text-sm",
                         isActive
                           ? "bg-slate-900 text-amber-400 shadow-md"
                           : "text-slate-800/70 hover:sidebar-item-hover hover:text-slate-900"
                       )}
                       title={sidebarCollapsed ? item.name : ""}
                     >
-                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-amber-400" : "text-slate-800/50 group-hover:text-slate-900")} />
-                      {!sidebarCollapsed && <span>{item.name}</span>}
+                      <Icon className={cn("h-6 w-6 lg:h-5 lg:w-5 transition-colors flex-shrink-0", isActive ? "text-amber-400" : "text-slate-800/50 group-hover:text-slate-900")} />
+                      {!sidebarCollapsed && <span className="leading-tight">{item.name}</span>}
                     </Link>
                   );
                 })}
@@ -402,17 +402,17 @@ export default function Layout({ children, currentPageName }) {
           </nav>
 
           {/* Sidebar Footer */}
-          <div className="p-4 mt-auto">
-            <div className={cn("bg-black/5 rounded-2xl border border-black/5 transition-all", sidebarCollapsed ? "p-2" : "p-4")}>
-              <div className={cn("flex items-center gap-3", sidebarCollapsed ? "justify-center" : "mb-4")}>
-                <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-amber-400 font-bold text-sm shadow-lg flex-shrink-0">
+          <div className="p-5 lg:p-4 mt-auto border-t border-black/10">
+            <div className={cn("bg-black/5 rounded-2xl border border-black/5 transition-all", sidebarCollapsed ? "p-2" : "p-5 lg:p-4")}>
+              <div className={cn("flex items-center gap-4 lg:gap-3", sidebarCollapsed ? "justify-center" : "mb-4")}>
+                <div className="h-12 w-12 lg:h-10 lg:w-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-amber-400 font-bold text-base lg:text-sm shadow-lg flex-shrink-0">
                    {organization?.name?.[0] || 'G'}
                 </div>
                 {!sidebarCollapsed && (
                   <div className="flex-1 min-w-0">
-                    <p className="font-black text-slate-900 text-sm truncate">{organization?.name || 'GSIS Manager'}</p>
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-800 uppercase tracking-wider">
-                      <ShieldCheck className="h-3 w-3" />
+                    <p className="font-black text-slate-900 text-base lg:text-sm truncate">{organization?.name || 'GSIS Manager'}</p>
+                    <div className="flex items-center gap-1.5 text-xs lg:text-[10px] font-bold text-slate-800 uppercase tracking-wider mt-0.5">
+                      <ShieldCheck className="h-4 w-4 lg:h-3 lg:w-3" />
                       Verified Pro
                     </div>
                   </div>
@@ -421,10 +421,10 @@ export default function Layout({ children, currentPageName }) {
               {!sidebarCollapsed && (
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start gap-2 text-slate-800/70 hover:text-slate-900 hover:bg-black/5 h-9 px-2 text-xs font-bold"
+                  className="w-full justify-start gap-3 lg:gap-2 text-slate-800/70 hover:text-slate-900 hover:bg-black/5 h-12 lg:h-9 px-3 lg:px-2 text-sm lg:text-xs font-bold rounded-xl min-h-[48px] lg:min-h-0"
                   onClick={handleLogout}
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="h-5 w-5 lg:h-4 lg:w-4" />
                   Sign Out
                 </Button>
               )}
