@@ -72,11 +72,11 @@ export default function Dashboard() {
         <PullToRefresh onRefresh={handleRefresh}>
           <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-lg sm:text-2xl font-semibold text-slate-900">
+      <div className="pb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
           {isProjectManager ? 'Dashboard' : isAdmin ? 'Admin' : 'Team'}
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Welcome back, {user?.full_name?.split(' ')[0] || 'User'}</p>
+        <p className="text-sm text-slate-600 mt-1">Welcome back, <span className="font-semibold text-slate-900">{user?.full_name?.split(' ')[0] || 'User'}</span></p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

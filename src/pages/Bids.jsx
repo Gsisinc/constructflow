@@ -116,13 +116,15 @@ export default function Bids() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pb-2">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
-            <FileText className="h-8 w-8 text-amber-600" />
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 flex items-center gap-3 tracking-tight">
+            <div className="p-2 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg">
+              <FileText className="h-7 w-7 text-amber-700" />
+            </div>
             Bid Intelligence Center
           </h1>
-          <p className="text-slate-600 mt-1">AI-powered bid management & conversion</p>
+          <p className="text-slate-600 mt-2">AI-powered bid management & conversion</p>
         </div>
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogTrigger asChild>

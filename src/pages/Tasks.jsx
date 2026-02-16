@@ -116,12 +116,12 @@ export default function Tasks() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Tasks</h1>
-          <p className="text-slate-500 mt-1">Manage project tasks and workflow</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Tasks</h1>
+          <p className="text-slate-600 mt-1">Manage project tasks and workflow</p>
         </div>
-        <Button onClick={() => { setEditingTask(null); setShowForm(true); }} className="bg-slate-900 hover:bg-slate-800">
+        <Button onClick={() => { setEditingTask(null); setShowForm(true); }} className="bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 shadow-lg hover:shadow-xl">
           <Plus className="h-4 w-4 mr-2" />
           New Task
         </Button>

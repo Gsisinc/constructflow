@@ -234,7 +234,7 @@ export default function Layout({ children, currentPageName }) {
             `}</style>
 
       {/* Top Header */}
-              <div className="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 z-40 lg:pl-64" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+              <div className="fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-slate-100 shadow-sm z-40 lg:pl-64" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
                 <div className="h-full flex items-center justify-between px-4 sm:px-6">
                   {/* Mobile menu button & back button */}
                   <div className="lg:hidden flex items-center gap-1 sm:gap-2">

@@ -45,19 +45,19 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-white/10 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 lg:py-3 flex items-center justify-between">
           <div className="relative flex-shrink-0 h-40 w-40 sm:h-56 sm:w-56 lg:h-40 lg:w-40">
             <img 
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/d9a9b4af8_ChatGPT_Image_Jan_20__2026__08_11_07_PM-removebg.png"
               alt="Golden State Integrated Systems"
-              className="h-full w-auto"
+              className="h-full w-auto hover:scale-105 transition-transform duration-300"
             />
           </div>
           <Button 
             onClick={handleLogin}
             variant="outline"
-            className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400 text-sm h-9"
+            className="border-amber-400/60 text-amber-300 hover:bg-amber-400/20 hover:border-amber-300 text-sm h-10 font-semibold shadow-lg hover:shadow-xl transition-all"
           >
             Sign In
           </Button>
@@ -95,7 +95,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6 sm:mb-8">
               <Button 
                 onClick={handleGetStarted}
-                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm px-8 py-2.5 shadow-xl shadow-amber-500/50 w-full sm:w-auto"
+                className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm px-8 py-3 shadow-2xl shadow-amber-500/40 w-full sm:w-auto font-semibold hover:shadow-amber-500/60 transition-all"
               >
                 Get Started Free
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -103,7 +103,7 @@ export default function Home() {
               <Button 
                 variant="outline"
                 onClick={handleLogin}
-                className="border-amber-400/40 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400 text-sm px-8 py-2.5 w-full sm:w-auto"
+                className="border-amber-400/60 text-amber-300 hover:bg-amber-400/20 hover:border-amber-300 text-sm px-8 py-3 w-full sm:w-auto font-semibold shadow-lg hover:shadow-xl transition-all"
               >
                 Watch Demo
               </Button>
@@ -221,15 +221,15 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.1),transparent_70%)]"></div>
 
         <div className="relative max-w-3xl mx-auto text-center px-2">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 sm:mb-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 mb-4 sm:mb-6">
+          <p className="text-sm text-slate-300 mb-6 sm:mb-8">
             Join leading contractors transforming their business
           </p>
           <Button 
             onClick={handleGetStarted}
-            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm px-8 py-2.5 shadow-xl shadow-amber-500/50 w-full sm:w-auto"
+            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm px-8 py-3 shadow-2xl shadow-amber-500/40 w-full sm:w-auto font-semibold hover:shadow-amber-500/60 transition-all"
           >
             Start Your Free Trial
             <ArrowRight className="ml-2 h-4 w-4" />

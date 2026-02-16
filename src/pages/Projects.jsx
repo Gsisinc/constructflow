@@ -70,12 +70,12 @@ export default function Projects() {
     <PullToRefresh onRefresh={handleRefresh}>
       <div className="space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-2">
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Projects</h1>
-            <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Manage your construction work</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Projects</h1>
+            <p className="text-sm text-slate-600 mt-1">Manage your construction work efficiently</p>
           </div>
-        <Button onClick={() => setShowForm(true)} className="bg-amber-600 hover:bg-amber-700 min-h-[44px] select-none text-sm sm:text-base">
+        <Button onClick={() => setShowForm(true)} className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 shadow-lg hover:shadow-xl min-h-[44px] select-none text-sm sm:text-base">
           <Plus className="h-4 w-4 mr-1.5 sm:mr-2" />
           <span className="hidden sm:inline">New Project</span>
           <span className="sm:hidden">New</span>
@@ -104,12 +104,12 @@ export default function Projects() {
             <SelectItem value="completed">Completed ({statusCounts.completed})</SelectItem>
           </SelectContent>
         </Select>
-        <div className="flex border border-slate-200 rounded-lg overflow-hidden">
+        <div className="flex border border-slate-200 rounded-lg overflow-hidden shadow-sm">
           <button
             onClick={() => setViewMode('grid')}
             className={cn(
-              "p-2.5 transition-colors min-h-[44px] select-none",
-              viewMode === 'grid' ? 'bg-slate-100 text-slate-900' : 'text-slate-400 hover:text-slate-600'
+              "p-2.5 transition-all min-h-[44px] select-none",
+              viewMode === 'grid' ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
             )}
           >
             <LayoutGrid className="h-4 w-4" />
@@ -117,8 +117,8 @@ export default function Projects() {
           <button
             onClick={() => setViewMode('list')}
             className={cn(
-              "p-2.5 transition-colors min-h-[44px] select-none",
-              viewMode === 'list' ? 'bg-slate-100 text-slate-900' : 'text-slate-400 hover:text-slate-600'
+              "p-2.5 transition-all min-h-[44px] select-none",
+              viewMode === 'list' ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
             )}
           >
             <List className="h-4 w-4" />
