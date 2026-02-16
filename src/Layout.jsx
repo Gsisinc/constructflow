@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
+import CommandPalette from '@/components/layout/CommandPalette';
 import {
   LayoutDashboard,
   FolderKanban,
