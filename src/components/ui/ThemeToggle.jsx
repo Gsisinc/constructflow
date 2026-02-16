@@ -16,15 +16,13 @@ import { toast } from 'sonner';
 
 const THEME_KEY = 'constructflow-theme';
 
-type Theme = 'light' | 'dark' | 'system';
-
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>('system');
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState('system');
+  const [resolvedTheme, setResolvedTheme] = useState('light');
 
   useEffect(() => {
     // Load theme from localStorage
-    const savedTheme = localStorage.getItem(THEME_KEY) as Theme;
+    const savedTheme = localStorage.getItem(THEME_KEY);
     if (savedTheme) {
       setTheme(savedTheme);
     }
@@ -34,7 +32,7 @@ export function useTheme() {
     const root = window.document.documentElement;
     
     const applyTheme = () => {
-      let resolved: 'light' | 'dark';
+      let resolved;
       
       if (theme === 'system') {
         resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -65,7 +63,7 @@ export function useTheme() {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
 
-  const setThemeValue = (newTheme: Theme) => {
+  const setThemeValue = (newTheme) => {
     setTheme(newTheme);
     localStorage.setItem(THEME_KEY, newTheme);
     

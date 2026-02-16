@@ -5,6 +5,7 @@ import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 import CommandPalette from '@/components/layout/CommandPalette';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -305,6 +306,7 @@ export default function Layout({ children, currentPageName }) {
             >
               <Grid3x3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
+            <ThemeToggle />
             {user && <UserMenu user={user} onLogout={handleLogout} />}
           </div>
         </div>
