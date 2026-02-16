@@ -28,7 +28,8 @@ import {
   Bot,
   Shield,
   Radio,
-  Wrench
+  Wrench,
+  X
 } from 'lucide-react';
 
 const menuSections = [
@@ -148,7 +149,7 @@ export default function MegaMenu({ isOpen, onClose }) {
             </button>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-10 gap-y-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-12">
             {menuSections.map((section, idx) => (
               <div key={idx} className="min-w-0">
                 <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
