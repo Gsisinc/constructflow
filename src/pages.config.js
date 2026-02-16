@@ -52,7 +52,9 @@ import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
 import BidDetail from './pages/BidDetail';
+import BidDetail from './pages/BidDetail';
 import BidDiscovery from './pages/BidDiscovery';
+import BidIntelligence from './pages/BidIntelligence';
 import BidOpportunities from './pages/BidOpportunities';
 import BidOpportunityDetail from './pages/BidOpportunityDetail';
 import Bids from './pages/Bids';
@@ -67,9 +69,9 @@ import Estimates from './pages/Estimates';
 import FeatureTesting from './pages/FeatureTesting';
 import Home from './pages/Home';
 import Invoices from './pages/Invoices';
-import Landing from './pages/Landing';
 import Issues from './pages/Issues';
 import JoinRequest from './pages/JoinRequest';
+import Landing from './pages/Landing';
 import Materials from './pages/Materials';
 import Onboarding from './pages/Onboarding';
 import PMSetupGuide from './pages/PMSetupGuide';
@@ -104,7 +106,9 @@ export const PAGES = {
     "AlertSettings": AlertSettings,
     "AuditTrail": AuditTrail,
     "BidDetail": BidDetail,
+    "BidDetail": BidDetail,
     "BidDiscovery": BidDiscovery,
+    "BidIntelligence": BidIntelligence,
     "BidOpportunities": BidOpportunities,
     "BidOpportunityDetail": BidOpportunityDetail,
     "Bids": Bids,
@@ -119,9 +123,9 @@ export const PAGES = {
     "FeatureTesting": FeatureTesting,
     "Home": Home,
     "Invoices": Invoices,
-    "Landing": Landing,
     "Issues": Issues,
     "JoinRequest": JoinRequest,
+    "Landing": Landing,
     "Materials": Materials,
     "Onboarding": Onboarding,
     "PMSetupGuide": PMSetupGuide,
