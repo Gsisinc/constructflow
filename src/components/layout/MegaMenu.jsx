@@ -131,7 +131,7 @@ export default function MegaMenu({ isOpen, onClose }) {
     <>
       {/* Overlay */}
       <div 
-        className="fixed inset-0 z-40 bg-black/20"
+        className="fixed inset-0 z-40 bg-amber-100/40 backdrop-blur-sm"
         aria-hidden="true"
         onClick={onClose}
       />
