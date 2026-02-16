@@ -116,9 +116,10 @@ export const AuthProvider = ({ children }) => {
     
     if (shouldRedirect) {
       // Use the SDK's logout method which handles token cleanup and redirect
-      // Redirect to the landing page (Home) after logout to avoid sign-out loops
-      const homeUrl = window.location.origin + appParams.basePath + '/Home';
-      base44.auth.logout(homeUrl);
+      // Redirect to the full website (Landing) after logout
+      const landingUrl = window.location.origin + appParams.basePath + '/Landing';
+      window.location.href = landingUrl;
+      base44.auth.logout(landingUrl);
     } else {
       // Just remove the token without redirect
       base44.auth.logout();
