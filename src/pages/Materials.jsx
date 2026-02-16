@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import EmptyState from '../components/ui/EmptyState';
+import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -188,7 +189,8 @@ export default function Materials() {
       </div>
 
       {/* Materials Table */}
-      {isLoading ? (
+      <>{
+isLoading ? <TableSkeleton />:
         <div className="space-y-4">
           {Array(5).fill(0).map((_, i) => (
             <Skeleton key={i} className="h-16 rounded-xl" />

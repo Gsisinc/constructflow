@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { ProjectCardSkeleton } from '@/components/skeleton/SkeletonComponents';
 import ProjectCard from '../components/dashboard/ProjectCard';
 import ProjectForm from '../components/projects/ProjectForm';
 import PullToRefresh from '@/components/ui/PullToRefresh';
@@ -133,7 +134,7 @@ export default function Projects() {
           viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
         )}>
           {Array(6).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-64 rounded-2xl" />
+            <ProjectCardSkeleton key={i} />
           ))}
         </div>
       ) : filteredProjects.length === 0 ? (

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import LiveBudgetTracker from '../components/budget/LiveBudgetTracker';
+import { DashboardSkeleton } from '@/components/skeleton/SkeletonComponents';
 import CashFlowForecast from '../components/budget/CashFlowForecast';
 import ChangeOrderImpact from '../components/budget/ChangeOrderImpact';
 import EmptyState from '../components/ui/EmptyState';
@@ -148,7 +149,8 @@ export default function Budget() {
       </div>
 
       {/* Living Budget Tracker */}
-      {isLoading ? (
+      <>{
+isLoading ? <DashboardSkeleton />:
         <Skeleton className="h-64 rounded-2xl" />
       ) : (
         <LiveBudgetTracker 

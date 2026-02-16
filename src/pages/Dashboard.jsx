@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import PullToRefresh from '@/components/ui/PullToRefresh';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
+import { DashboardSkeleton } from '@/components/skeleton/SkeletonComponents';
 import TaskManager from '../components/dashboard/TaskManager';
 import ClockIn from '../components/dashboard/ClockIn';
 import AlertsWidget from '../components/dashboard/AlertsWidget';
@@ -79,6 +80,10 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
     ]);
   };
+
+  if (isLoading) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import ProjectCalendar from '../components/calendar/ProjectCalendar';
+import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import ProjectDeadlines from '../components/calendar/ProjectDeadlines';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -211,7 +212,8 @@ export default function Calendar() {
       )}
 
       {/* Calendar */}
-      {isLoading ? (
+      <>{
+isLoading ? <TableSkeleton />:
         <Skeleton className="h-[600px] rounded-2xl" />
       ) : (
         <ProjectCalendar

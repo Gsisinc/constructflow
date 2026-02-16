@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
+import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -99,7 +100,8 @@ export default function PurchaseOrders() {
       </div>
 
       {/* PO List */}
-      {isLoading ? (
+      <>{
+isLoading ? <TableSkeleton />:
         <div className="space-y-3 sm:space-y-4">
           {Array(3).fill(0).map((_, i) => (
             <div key={i} className="h-20 sm:h-16 bg-slate-100 rounded-lg animate-pulse" />
