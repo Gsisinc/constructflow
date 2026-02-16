@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/AuthContext';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -99,6 +100,7 @@ export default function Layout({ children, currentPageName }) {
   const [organization, setOrganization] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // Don't show layout on Home page
   const isHomePage = currentPageName === 'Home';
@@ -177,7 +179,7 @@ export default function Layout({ children, currentPageName }) {
   };
 
   const handleLogout = () => {
-    base44.auth.logout(createPageUrl('Home'));
+    logout(true);
   };
 
   const isRootPage = ['Bids', 'Dashboard', 'Projects', 'TaskTracker', 'Settings'].includes(currentPageName);

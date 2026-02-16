@@ -116,7 +116,9 @@ export const AuthProvider = ({ children }) => {
     
     if (shouldRedirect) {
       // Use the SDK's logout method which handles token cleanup and redirect
-      base44.auth.logout(window.location.href);
+      // Redirect to the landing page (Home) after logout to avoid sign-out loops
+      const homeUrl = window.location.origin + appParams.basePath + '/Home';
+      base44.auth.logout(homeUrl);
     } else {
       // Just remove the token without redirect
       base44.auth.logout();
@@ -125,7 +127,9 @@ export const AuthProvider = ({ children }) => {
 
   const navigateToLogin = () => {
     // Use the SDK's redirectToLogin method
-    base44.auth.redirectToLogin(window.location.href);
+    // Redirect back to the landing page (Home) after login if we were on a protected page
+    const homeUrl = window.location.origin + appParams.basePath + '/Home';
+    base44.auth.redirectToLogin(homeUrl);
   };
 
   return (

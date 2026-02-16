@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { 
   FileText, Upload, Sparkles, Loader, AlertCircle, CheckCircle2, 
-  Download, Copy, Trash2, Eye, Settings, Plus, X, Grid3x3, Type, Line, Square
+  Download, Copy, Trash2, Eye, Settings, Plus, X, Grid3x3, Type, Minus, Square as SquareIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { analyzeBidDocument, analyzeDrawing } from '@/services/bidDocumentAnalysisService';
@@ -689,7 +689,7 @@ function DesignerTab() {
                 onClick={() => setTool('draw-line')}
                 className="w-full justify-start"
               >
-                <Line className="h-4 w-4 mr-2" />
+                <Minus className="h-4 w-4 mr-2" />
                 Line
               </Button>
               <Button
@@ -698,7 +698,7 @@ function DesignerTab() {
                 onClick={() => setTool('draw-rect')}
                 className="w-full justify-start"
               >
-                <Square className="h-4 w-4 mr-2" />
+                <SquareIcon className="h-4 w-4 mr-2" />
                 Rectangle
               </Button>
               <Button
