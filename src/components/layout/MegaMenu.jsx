@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { pagesConfig } from '@/pages.config';
-const PAGES = pagesConfig.Pages;
+// PAGES will be passed as a prop or handled via a different mechanism to avoid circular dependency
+// For now, we'll assume the pages are available or use a safer way to access them
 import {
   LayoutDashboard,
   Clock,
@@ -114,7 +114,7 @@ const menuSections = [
 ];
 
 
-export default function MegaMenu({ isOpen, onClose }) {
+export default function MegaMenu({ isOpen, onClose, pages: PAGES = {} }) {
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (event) => {
@@ -156,7 +156,7 @@ export default function MegaMenu({ isOpen, onClose }) {
                   {section.title}
                 </h3>
                 <ul className="space-y-1">
-                  {section.items.filter((item) => Boolean(PAGES[item.page])).map((item, itemIdx) => {
+                  {section.items.filter((item) => Boolean(PAGES && PAGES[item.page])).map((item, itemIdx) => {
                     const Icon = item.icon;
                     return (
                       <li key={itemIdx}>

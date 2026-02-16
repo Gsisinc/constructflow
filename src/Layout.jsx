@@ -302,7 +302,7 @@ export default function Layout({ children, currentPageName }) {
       </div>
 
       {/* Mega Menu */}
-      <MegaMenu isOpen={megaMenuOpen} onClose={() => setMegaMenuOpen(false)} />
+      <MegaMenu isOpen={megaMenuOpen} onClose={() => setMegaMenuOpen(false)} pages={PAGES} />
 
       {/* Sidebar Overlay */}
       {sidebarOpen && (
