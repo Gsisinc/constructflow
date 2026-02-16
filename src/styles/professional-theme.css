@@ -137,16 +137,29 @@ body {
 }
 
 /* Golden Theme Specifics */
+.bg-gold-sidebar {
+  background: linear-gradient(180deg, #FFD700 0%, #FDB931 100%);
+}
+
 .bg-gold-gradient {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
 }
 
 .text-gold {
-  color: #f59e0b;
+  color: #B8860B;
 }
 
 .border-gold {
-  border-color: rgba(245, 158, 11, 0.3);
+  border-color: rgba(184, 134, 11, 0.3);
+}
+
+.sidebar-item-active {
+  background: rgba(0, 0, 0, 0.1);
+  color: #000000 !important;
+}
+
+.sidebar-item-hover:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 /* Custom Scrollbar */

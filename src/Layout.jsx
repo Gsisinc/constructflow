@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import MegaMenu from '@/components/layout/MegaMenu';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import logo from '@/assets/logo.png';
 const navItems = [
                     { name: 'Bids', icon: FileText, page: 'Bids' },
                     { name: 'Projects', icon: FolderKanban, page: 'Projects' },
@@ -314,38 +315,29 @@ export default function Layout({ children, currentPageName }) {
       {/* Sidebar */}
       <aside aria-label="Primary navigation"
         className={cn(
-          "fixed top-0 left-0 h-full bg-slate-950 text-slate-300 z-50 transition-all duration-300 lg:translate-x-0 shadow-2xl border-r border-white/5",
+          "fixed top-0 left-0 h-full bg-gold-sidebar text-slate-900 z-50 transition-all duration-300 lg:translate-x-0 shadow-2xl border-r border-black/5",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
           sidebarCollapsed ? "w-20" : "w-72"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo Section */}
-          <div className={cn("h-24 flex items-center px-6 mb-4 relative", sidebarCollapsed ? "justify-center" : "justify-between")}>
-            {!sidebarCollapsed ? (
-              organization?.logo_url ? (
-                <img src={organization.logo_url} alt={organization.name} className="h-10 w-auto brightness-0 invert" />
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-gold-gradient flex items-center justify-center shadow-lg shadow-amber-500/20">
-                    <Zap className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="sidebar-header-text">
-                    <span className="font-bold text-xl text-white tracking-tight block leading-none">Construct</span>
-                    <span className="text-[10px] font-bold text-amber-500 uppercase tracking-[0.2em]">Flow Pro</span>
-                  </div>
-                </div>
-              )
-            ) : (
-              <div className="h-10 w-10 rounded-xl bg-gold-gradient flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <Zap className="h-6 w-6 text-white" />
+          <div className={cn("flex flex-col items-center px-4 py-8 relative", sidebarCollapsed ? "justify-center" : "justify-start")}>
+            <div className={cn("transition-all duration-300 flex items-center justify-center", sidebarCollapsed ? "h-12 w-12" : "h-32 w-full mb-4")}>
+              <img src={logo} alt="GSIS Logo" className={cn("object-contain transition-all", sidebarCollapsed ? "h-10 w-10" : "h-full w-auto")} />
+            </div>
+            
+            {!sidebarCollapsed && (
+              <div className="text-center sidebar-header-text">
+                <span className="font-black text-xl text-slate-900 tracking-tight block leading-none uppercase">ConstructFlow</span>
+                <span className="text-[10px] font-bold text-slate-800 uppercase tracking-[0.3em]">Premium Edition</span>
               </div>
             )}
             
             {/* Toggle Button (Desktop) */}
             <button 
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="hidden lg:flex absolute -right-3 top-10 h-6 w-6 rounded-full bg-amber-500 text-slate-950 items-center justify-center shadow-lg hover:scale-110 transition-transform z-50"
+              className="hidden lg:flex absolute -right-3 top-12 h-6 w-6 rounded-full bg-slate-900 text-amber-400 items-center justify-center shadow-lg hover:scale-110 transition-transform z-50"
             >
               {sidebarCollapsed ? <PanelLeftOpen className="h-3.5 w-3.5" /> : <PanelLeftClose className="h-3.5 w-3.5" />}
             </button>
@@ -353,7 +345,7 @@ export default function Layout({ children, currentPageName }) {
 
           {/* Navigation */}
           <nav className="flex-1 px-3 space-y-1 overflow-y-auto no-scrollbar" aria-label="Main sections">
-            {!sidebarCollapsed && <div className="text-[10px] font-bold text-slate-500 px-4 py-2 uppercase tracking-[0.2em] mb-2">Main Menu</div>}
+            {!sidebarCollapsed && <div className="text-[10px] font-black text-slate-800/50 px-4 py-2 uppercase tracking-[0.2em] mb-2">Main Menu</div>}
             {navItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 const Icon = item.icon;
@@ -366,13 +358,13 @@ export default function Layout({ children, currentPageName }) {
                       "group flex items-center rounded-xl text-sm font-bold transition-all duration-200 select-none mb-1",
                       sidebarCollapsed ? "justify-center p-3" : "justify-between px-4 py-3",
                       isActive
-                        ? "bg-gold-gradient text-slate-950 shadow-lg shadow-amber-500/20"
-                        : "text-slate-400 hover:bg-white/5 hover:text-white"
+                        ? "sidebar-item-active shadow-lg shadow-black/5"
+                        : "text-slate-800/70 hover:sidebar-item-hover hover:text-slate-900"
                     )}
                     title={sidebarCollapsed ? item.name : ""}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-slate-950" : "text-slate-500 group-hover:text-amber-500")} />
+                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-slate-900" : "text-slate-800/50 group-hover:text-slate-900")} />
                       {!sidebarCollapsed && <span>{item.name}</span>}
                     </div>
                     {!sidebarCollapsed && isActive && <ChevronRight className="h-4 w-4 opacity-50" />}
@@ -382,7 +374,7 @@ export default function Layout({ children, currentPageName }) {
 
             {user?.role === 'admin' && (
               <div className="mt-8">
-                {!sidebarCollapsed && <div className="text-[10px] font-bold text-slate-500 px-4 py-2 uppercase tracking-[0.2em] mb-2">Administration</div>}
+                {!sidebarCollapsed && <div className="text-[10px] font-black text-slate-800/50 px-4 py-2 uppercase tracking-[0.2em] mb-2">Administration</div>}
                 {adminNavItems.map((item) => {
                   const isActive = currentPageName === item.page;
                   const Icon = item.icon;
@@ -395,12 +387,12 @@ export default function Layout({ children, currentPageName }) {
                         "group flex items-center rounded-xl text-sm font-bold transition-all duration-200 mb-1",
                         sidebarCollapsed ? "justify-center p-3" : "gap-3 px-4 py-3",
                         isActive
-                          ? "bg-slate-800 text-white shadow-md"
-                          : "text-slate-400 hover:bg-white/5 hover:text-white"
+                          ? "bg-slate-900 text-amber-400 shadow-md"
+                          : "text-slate-800/70 hover:sidebar-item-hover hover:text-slate-900"
                       )}
                       title={sidebarCollapsed ? item.name : ""}
                     >
-                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-amber-500")} />
+                      <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-amber-400" : "text-slate-800/50 group-hover:text-slate-900")} />
                       {!sidebarCollapsed && <span>{item.name}</span>}
                     </Link>
                   );
@@ -411,15 +403,15 @@ export default function Layout({ children, currentPageName }) {
 
           {/* Sidebar Footer */}
           <div className="p-4 mt-auto">
-            <div className={cn("bg-white/5 rounded-2xl border border-white/10 transition-all", sidebarCollapsed ? "p-2" : "p-4")}>
+            <div className={cn("bg-black/5 rounded-2xl border border-black/5 transition-all", sidebarCollapsed ? "p-2" : "p-4")}>
               <div className={cn("flex items-center gap-3", sidebarCollapsed ? "justify-center" : "mb-4")}>
-                <div className="h-10 w-10 rounded-xl bg-gold-gradient flex items-center justify-center text-slate-950 font-bold text-sm shadow-lg flex-shrink-0">
+                <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-amber-400 font-bold text-sm shadow-lg flex-shrink-0">
                    {organization?.name?.[0] || 'G'}
                 </div>
                 {!sidebarCollapsed && (
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-white text-sm truncate">{organization?.name || 'GSIS Manager'}</p>
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-amber-500 uppercase tracking-wider">
+                    <p className="font-black text-slate-900 text-sm truncate">{organization?.name || 'GSIS Manager'}</p>
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-800 uppercase tracking-wider">
                       <ShieldCheck className="h-3 w-3" />
                       Verified Pro
                     </div>
@@ -429,7 +421,7 @@ export default function Layout({ children, currentPageName }) {
               {!sidebarCollapsed && (
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start gap-2 text-slate-400 hover:text-white hover:bg-white/5 h-9 px-2 text-xs font-bold"
+                  className="w-full justify-start gap-2 text-slate-800/70 hover:text-slate-900 hover:bg-black/5 h-9 px-2 text-xs font-bold"
                   onClick={handleLogout}
                 >
                   <LogOut className="h-4 w-4" />
