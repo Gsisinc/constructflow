@@ -1,12 +1,13 @@
-@import './styles/enhanced-theme.css';
-@import './styles/professional-theme.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@import './styles/enhanced-theme.css';
+@import './styles/professional-theme.css';
+
 @layer base {
   :root {
+    /* Default variables - will be overridden by professional-theme.css */
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
