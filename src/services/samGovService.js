@@ -5,6 +5,8 @@
  * API Documentation: https://open.sam.gov/api/opportunities/v2/search
  */
 
+import { fetchWithRetry, buildBotAvoidanceHeaders } from './botBypassService';
+
 const SAM_GOV_API_BASE = 'https://api.sam.gov/opportunities/v2/search';
 const SAM_GOV_API_KEY = import.meta.env.VITE_SAM_GOV_API_KEY || process.env.SAM_GOV_API_KEY;
 
@@ -93,11 +95,11 @@ function buildSamGovQuery(filters = {}) {
     query.keyword.push(filters.workType.replace('_', ' '));
   }
 
-  // Add state
+  // Add state - CRITICAL: Must be properly formatted
   if (filters.state) {
     const stateCode = STATE_CODES[filters.state];
     if (stateCode) {
-      query.state.push(stateCode);
+      query.state = [stateCode]; // Use array with single state
     }
   }
 
@@ -110,7 +112,7 @@ function buildSamGovQuery(filters = {}) {
 }
 
 /**
- * Fetch opportunities from SAM.GOV
+ * Fetch opportunities from SAM.GOV with bot avoidance
  */
 export async function fetchSamGovOpportunities(filters = {}) {
   if (!SAM_GOV_API_KEY) {
@@ -125,7 +127,7 @@ export async function fetchSamGovOpportunities(filters = {}) {
   try {
     const query = buildSamGovQuery(filters);
     
-    // Build query string
+    // Build query string with proper state filtering
     const params = new URLSearchParams();
     params.append('api_key', SAM_GOV_API_KEY);
     params.append('limit', query.limit);
@@ -139,18 +141,20 @@ export async function fetchSamGovOpportunities(filters = {}) {
       params.append('ncode', query.ncode.join(','));
     }
     
+    // CRITICAL: Ensure state filter is applied
     if (query.state.length > 0) {
       params.append('state', query.state.join(','));
+      console.log(`🔍 Filtering by state: ${query.state.join(', ')}`);
     }
 
     const url = `${SAM_GOV_API_BASE}?${params.toString()}`;
+    console.log(`📡 SAM.GOV Request: ${url.substring(0, 100)}...`);
     
-    const response = await fetch(url, {
+    // Use retry logic with bot avoidance
+    const response = await fetchWithRetry(url, {
       method: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
+      headers: buildBotAvoidanceHeaders()
+    }, 3);
 
     if (!response.ok) {
       throw new Error(`SAM.GOV API error: ${response.status} ${response.statusText}`);
@@ -158,9 +162,18 @@ export async function fetchSamGovOpportunities(filters = {}) {
 
     const data = await response.json();
     
-    const opportunities = (data.opportunitiesData || data.results || [])
+    let opportunities = (data.opportunitiesData || data.results || [])
       .map(normalizeSamGovOpportunity)
       .filter(opp => opp.id && opp.title);
+
+    // Double-check state filtering on client side
+    if (filters.state && query.state.length > 0) {
+      const stateCode = STATE_CODES[filters.state];
+      opportunities = opportunities.filter(opp => 
+        opp.state === stateCode || opp.state === filters.state
+      );
+      console.log(`✅ Filtered ${opportunities.length} opportunities for ${filters.state}`);
+    }
 
     return {
       opportunities,
@@ -169,7 +182,7 @@ export async function fetchSamGovOpportunities(filters = {}) {
       success: true
     };
   } catch (error) {
-    console.error('SAM.GOV fetch error:', error);
+    console.error('❌ SAM.GOV fetch error:', error);
     return {
       opportunities: [],
       error: error.message,
@@ -180,7 +193,7 @@ export async function fetchSamGovOpportunities(filters = {}) {
 }
 
 /**
- * Search SAM.GOV with custom query
+ * Search SAM.GOV with custom query and bot avoidance
  */
 export async function searchSamGov(searchTerm = '', filters = {}) {
   if (!SAM_GOV_API_KEY) {
@@ -201,19 +214,30 @@ export async function searchSamGov(searchTerm = '', filters = {}) {
     }
 
     const url = `${SAM_GOV_API_BASE}?${params.toString()}`;
-    const response = await fetch(url);
+    const response = await fetchWithRetry(url, {
+      method: 'GET',
+      headers: buildBotAvoidanceHeaders()
+    }, 3);
 
     if (!response.ok) {
       throw new Error(`SAM.GOV API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const opportunities = (data.opportunitiesData || [])
+    let opportunities = (data.opportunitiesData || [])
       .map(normalizeSamGovOpportunity);
+
+    // Double-check state filtering
+    if (filters.state) {
+      const stateCode = STATE_CODES[filters.state];
+      opportunities = opportunities.filter(opp => 
+        opp.state === stateCode || opp.state === filters.state
+      );
+    }
 
     return { opportunities, total: data.totalRecords || 0 };
   } catch (error) {
-    console.error('SAM.GOV search error:', error);
+    console.error('❌ SAM.GOV search error:', error);
     return { opportunities: [], error: error.message };
   }
 }
