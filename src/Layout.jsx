@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import MegaMenu from '@/components/layout/MegaMenu';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import CommandPalette from '@/components/layout/CommandPalette';
 
 // Primary navigation items (shown in sidebar and mobile bottom nav)
 const primaryNavItems = [
@@ -215,6 +216,7 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="flex flex-col h-screen bg-slate-50">
+      <CommandPalette />
       <style>{`
         html {
           overscroll-behavior: none;
