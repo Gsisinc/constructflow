@@ -253,7 +253,7 @@ export default function Layout({ children, currentPageName }) {
         }
       `}</style>
 
-      {/* Top Header */}
+      {/* Header */}
       <header className="fixed top-0 left-0 right-0 h-16 sm:h-16 bg-white border-b border-slate-200 z-40 lg:pl-64">
         <div className="h-full flex items-center justify-between px-2 sm:px-3 md:px-4 lg:px-6">
           {/* Left section: Menu & Logo */}
