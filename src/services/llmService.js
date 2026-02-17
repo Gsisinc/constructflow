@@ -1,10 +1,13 @@
 /**
  * LLM Service - Handles all AI agent communication
- * Falls back to structured local responses when external APIs are unavailable
- * Uses Base44's invokeExternalLLM when possible, with intelligent fallback
+ * Uses Claude API for real AI responses
+ * Falls back to structured responses only when API is unavailable
  */
 
 import { base44 } from '@/api/base44Client';
+
+const CLAUDE_API_KEY = process.env.REACT_APP_CLAUDE_API_KEY;
+const CLAUDE_API_BASE = 'https://api.anthropic.com/v1';
 
 /**
  * Generate intelligent, dynamic responses based on user input
@@ -708,38 +711,65 @@ Phase 3: Finalization (Week 9-10)`;
  * Falls back to local response if APIs unavailable
  */
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
+  const claudeApiKey = CLAUDE_API_KEY;
+  
+  if (!claudeApiKey) {
+    console.warn('Claude API key not configured, falling back to dynamic response');
+    return generateDynamicResponse(systemPrompt, userMessage);
+  }
+
   const maxRetries = 2;
   let lastError = null;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      // Try to call Base44's invokeExternalLLM function
-      const response = await base44.functions.invoke('invokeExternalLLM', {
-        prompt: userMessage,
-        systemPrompt: systemPrompt,
-        temperature: temperature,
-        preferredProviders: ['openai', 'deepseek']
+      console.log('Calling Claude API...');
+      
+      // Call Claude API directly
+      const response = await fetch(`${CLAUDE_API_BASE}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': claudeApiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-3-opus-20240229',
+          max_tokens: maxTokens,
+          temperature: temperature,
+          system: systemPrompt,
+          messages: [
+            { role: 'user', content: userMessage }
+          ]
+        })
       });
 
-      if (!response) {
-        throw new Error('No response from invokeExternalLLM function');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Claude API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
       }
 
-      // Extract output from response
-      let content = response.output || response.content || response.text || response.message;
+      const data = await response.json();
       
-      if (!content) {
-        throw new Error('Empty response from invokeExternalLLM function');
+      if (!data.content || data.content.length === 0) {
+        throw new Error('Empty response from Claude API');
       }
 
-      return content.toString().trim();
+      const content = data.content[0]?.text;
+      if (!content) {
+        throw new Error('No text content in Claude response');
+      }
+
+      console.log('Claude API response received successfully');
+      return content.trim();
+      
     } catch (error) {
       lastError = error;
-      console.warn(`External LLM attempt ${attempt}/${maxRetries} failed:`, error.message);
+      console.warn(`Claude API attempt ${attempt}/${maxRetries} failed:`, error.message);
 
       // On last attempt, fall back to dynamic local response
       if (attempt === maxRetries) {
-        console.log('Falling back to dynamic agent response based on user input');
+        console.log('Falling back to dynamic agent response');
         return generateDynamicResponse(systemPrompt, userMessage);
       }
 
@@ -750,7 +780,7 @@ export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, m
   }
 
   // Final fallback
-  console.log('All attempts failed, using dynamic agent response');
+  console.log('All Claude API attempts failed, using dynamic agent response');
   return generateDynamicResponse(systemPrompt, userMessage);
 }
 
