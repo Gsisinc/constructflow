@@ -68,7 +68,6 @@ import dashboardOld from './pages/Dashboard-old';
 import dashboardV2 from './pages/Dashboard-v2';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
 import Dashboard from './pages/Dashboard';
-import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Documents from './pages/Documents';
 import Estimates from './pages/Estimates';
@@ -127,7 +126,6 @@ export const PAGES = {
     "Dashboard-old": dashboardOld,
     "Dashboard-v2": dashboardV2,
     "Dashboard.ImprovedVersion": dashboardImprovedversion,
-    "Dashboard": Dashboard,
     "Dashboard": Dashboard,
     "Directory": Directory,
     "Documents": Documents,
