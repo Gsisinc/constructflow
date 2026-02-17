@@ -259,15 +259,14 @@ export default function Layout({ children, currentPageName }) {
           {/* Left section: Menu & Logo */}
           <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
             {/* Mobile menu toggle - ALWAYS VISIBLE on small screens */}
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="!h-10 !w-10 !p-0 flex-shrink-0 md:hidden hover:bg-slate-100 active:bg-slate-200 text-slate-700"
+              className="md:hidden h-10 w-10 p-2 flex items-center justify-center hover:bg-slate-100 active:bg-slate-200 text-slate-700 rounded-lg transition-colors"
               title="Toggle menu"
+              type="button"
             >
               {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
+            </button>
             
             <div className="flex items-center gap-0.5">
               {!isRootPage && (
