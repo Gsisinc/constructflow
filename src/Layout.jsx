@@ -254,7 +254,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Top Header */}
-      <header className="fixed top-0 left-0 right-0 h-14 sm:h-16 bg-white border-b border-slate-200 z-40 lg:pl-64">
+      <header className="fixed top-0 left-0 right-0 h-16 sm:h-16 bg-white border-b border-slate-200 z-40 lg:pl-64">
         <div className="h-full flex items-center justify-between px-2 sm:px-3 md:px-4 lg:px-6">
           {/* Left section: Menu & Logo */}
           <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
@@ -283,17 +283,17 @@ export default function Layout({ children, currentPageName }) {
             </div>
 
             {/* Logo/Org Name */}
-            <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
               {organization?.logo_url ? (
-                <img src={organization.logo_url} alt={organization.name} className="h-5 sm:h-6 w-auto flex-shrink-0" />
+                <img src={organization.logo_url} alt={organization.name} className="h-8 sm:h-8 w-auto flex-shrink-0" />
               ) : (
                 <>
                   <img 
                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
                     alt="GSIS Manager" 
-                    className="h-4 sm:h-5 w-auto flex-shrink-0"
+                    className="h-7 sm:h-8 w-auto flex-shrink-0"
                   />
-                  <span className="font-bold text-xs sm:text-sm text-slate-900 hidden sm:inline truncate">{organization?.name || 'GSIS'}</span>
+                  <span className="font-bold text-sm sm:text-base text-slate-900 hidden sm:inline truncate">{organization?.name || 'GSIS'}</span>
                 </>
               )}
             </div>
