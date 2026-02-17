@@ -1,5 +1,5 @@
 /**
- * LLM Service - Handles all AI agent communication with Base44's built-in agent
+ * LLM Service - Handles all AI agent communication with Base44's invokeExternalLLM function
  * Uses Base44 serverless functions for AI operations
  * Provides robust error handling, retries, and response parsing
  */
@@ -7,11 +7,11 @@
 import { base44 } from '@/api/base44Client';
 
 /**
- * Call Base44's built-in agent via serverless function
+ * Call Base44's invokeExternalLLM function
  * @param {string} systemPrompt - The system prompt for the agent
  * @param {string} userMessage - The user's message
  * @param {number} temperature - Temperature for response generation (0-1)
- * @param {number} maxTokens - Maximum tokens in response
+ * @param {number} maxTokens - Maximum tokens in response (not used by Base44 function)
  * @returns {Promise<string>} The agent's response
  */
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
@@ -20,36 +20,33 @@ export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, m
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      // Use Base44's invokeExternalLLM function (server-side)
+      // Call Base44's invokeExternalLLM function with correct parameter names
+      // The function expects: prompt, systemPrompt, temperature, preferredProviders
       const response = await base44.functions.invoke('invokeExternalLLM', {
-        systemPrompt,
-        userMessage,
-        temperature,
-        maxTokens,
-        model: 'base44-agent' // Use Base44's built-in agent
+        prompt: userMessage,           // User's message (required)
+        systemPrompt: systemPrompt,    // System prompt for agent role
+        temperature: temperature,      // 0.7 is good for balanced responses
+        preferredProviders: ['openai', 'deepseek'] // Try OpenAI first, fallback to DeepSeek
       });
 
       if (!response) {
-        throw new Error('No response from Base44 agent');
+        throw new Error('No response from invokeExternalLLM function');
       }
 
       // Handle different response formats
-      let content = response;
-      if (typeof response === 'object') {
-        content = response.content || response.text || response.message || JSON.stringify(response);
-      }
-
-      if (!content || content.toString().trim().length === 0) {
-        throw new Error('Empty response from Base44 agent');
+      let content = response.output || response.content || response.text || response.message;
+      
+      if (!content) {
+        throw new Error('Empty response from invokeExternalLLM function');
       }
 
       return content.toString().trim();
     } catch (error) {
       lastError = error;
-      console.error(`Base44 agent call attempt ${attempt}/${maxRetries} failed:`, error.message);
+      console.error(`invokeExternalLLM attempt ${attempt}/${maxRetries} failed:`, error.message);
 
       // Don't retry on auth errors
-      if (error.message && (error.message.includes('Authentication failed') || error.message.includes('Unauthorized'))) {
+      if (error.message && (error.message.includes('Unauthorized') || error.message.includes('Authentication'))) {
         throw error;
       }
 
@@ -61,7 +58,8 @@ export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, m
     }
   }
 
-  throw new Error(`Base44 agent call failed after ${maxRetries} attempts: ${lastError?.message || 'Unknown error'}`);
+  throw new Error(`invokeExternalLLM call failed after ${maxRetries} attempts: ${lastError?.message || 'Unknown error'}`);
+}
 }
 
 /**
@@ -126,19 +124,18 @@ export async function callAgent(agentSystemPrompt, userMessage, options = {}) {
  */
 export async function streamAgent(agentSystemPrompt, userMessage, onChunk) {
   try {
-    // Call Base44's agent function
+    // Call Base44's invokeExternalLLM function with correct parameters
     const response = await base44.functions.invoke('invokeExternalLLM', {
+      prompt: userMessage,
       systemPrompt: agentSystemPrompt,
-      userMessage: userMessage,
       temperature: 0.7,
-      maxTokens: 2000,
-      model: 'base44-agent',
-      stream: false // Base44 handles streaming internally if needed
+      preferredProviders: ['openai', 'deepseek']
     });
 
-    let fullResponse = response;
-    if (typeof response === 'object') {
-      fullResponse = response.content || response.text || response.message || JSON.stringify(response);
+    let fullResponse = response.output || response.content || response.text || response.message;
+    
+    if (!fullResponse) {
+      throw new Error('Empty response from invokeExternalLLM');
     }
 
     fullResponse = fullResponse.toString().trim();
