@@ -47,11 +47,14 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import aiagentsFixed from './pages/AIAgents-Fixed';
+import aiagentsOpenaiClaude from './pages/AIAgents-OpenAI-Claude';
 import AIAgents from './pages/AIAgents';
 import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
 import BidDetail from './pages/BidDetail';
+import biddiscoveryMobile from './pages/BidDiscovery-Mobile';
 import BidDiscovery from './pages/BidDiscovery';
 import BidIntelligence from './pages/BidIntelligence';
 import BidOpportunities from './pages/BidOpportunities';
@@ -61,8 +64,11 @@ import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
 import ClientPortal from './pages/ClientPortal';
 import DailyLog from './pages/DailyLog';
+import dashboardOld from './pages/Dashboard-old';
+import dashboardV2 from './pages/Dashboard-v2';
+import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
 import Dashboard from './pages/Dashboard';
-import DashboardV2 from './pages/Dashboard-v2';
+import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Documents from './pages/Documents';
 import Estimates from './pages/Estimates';
@@ -101,11 +107,14 @@ import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AIAgents-Fixed": aiagentsFixed,
+    "AIAgents-OpenAI-Claude": aiagentsOpenaiClaude,
     "AIAgents": AIAgents,
     "AddBid": AddBid,
     "AlertSettings": AlertSettings,
     "AuditTrail": AuditTrail,
     "BidDetail": BidDetail,
+    "BidDiscovery-Mobile": biddiscoveryMobile,
     "BidDiscovery": BidDiscovery,
     "BidIntelligence": BidIntelligence,
     "BidOpportunities": BidOpportunities,
@@ -115,8 +124,11 @@ export const PAGES = {
     "Calendar": Calendar,
     "ClientPortal": ClientPortal,
     "DailyLog": DailyLog,
+    "Dashboard-old": dashboardOld,
+    "Dashboard-v2": dashboardV2,
+    "Dashboard.ImprovedVersion": dashboardImprovedversion,
     "Dashboard": Dashboard,
-    "DashboardV2": DashboardV2,
+    "Dashboard": Dashboard,
     "Directory": Directory,
     "Documents": Documents,
     "Estimates": Estimates,

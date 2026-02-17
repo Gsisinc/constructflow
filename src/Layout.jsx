@@ -257,13 +257,13 @@ export default function Layout({ children, currentPageName }) {
         <div className="h-full flex items-center justify-between px-2 sm:px-3 md:px-4 lg:px-6">
           {/* Left section: Menu & Logo */}
           <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
-            <div className="lg:hidden flex items-center gap-0.5">
+            <div className="flex items-center gap-0.5">
               {!isRootPage && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleBack}
-                  className="h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0"
+                  className="lg:hidden h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0"
                 >
                   <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
@@ -272,7 +272,7 @@ export default function Layout({ children, currentPageName }) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0"
+                className="lg:hidden h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0"
               >
                 {sidebarOpen ? <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Menu className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
               </Button>
