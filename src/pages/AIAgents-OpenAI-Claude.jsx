@@ -175,10 +175,21 @@ export default function AIAgentsOpenAIClaude() {
 
       setResponse(result);
     } catch (error) {
+      console.error('Agent error:', error);
       setResponse(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatResponse = (result) => {
+    if (typeof result === 'string') {
+      return result;
+    }
+    if (result.message && typeof result.message === 'string') {
+      return result.message;
+    }
+    return JSON.stringify(result, null, 2);
   };
 
   return (
@@ -284,9 +295,9 @@ export default function AIAgentsOpenAIClaude() {
                     </Button>
 
                     {response && (
-                      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                      <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <p className="text-sm font-medium mb-2">Response:</p>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{response}</p>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap font-mono text-xs">{formatResponse(response)}</p>
                       </div>
                     )}
                   </div>

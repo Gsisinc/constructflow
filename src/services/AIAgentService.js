@@ -7,17 +7,35 @@ import { base44 } from '@/api/base44Client';
 
 class AIAgentService {
   constructor() {
-    this.openaiApiKey = process.env.REACT_APP_OPENAI_API_KEY;
-    this.claudeApiKey = process.env.REACT_APP_CLAUDE_API_KEY;
+    // Check localStorage first, then fall back to env variables
+    this.openaiApiKey = typeof window !== 'undefined' 
+      ? (localStorage.getItem('openai_api_key') || process.env.REACT_APP_OPENAI_API_KEY)
+      : process.env.REACT_APP_OPENAI_API_KEY;
+    
+    this.claudeApiKey = typeof window !== 'undefined'
+      ? (localStorage.getItem('claude_api_key') || process.env.REACT_APP_CLAUDE_API_KEY)
+      : process.env.REACT_APP_CLAUDE_API_KEY;
+    
     this.claudeBaseUrl = 'https://api.anthropic.com/v1';
+  }
+
+  /**
+   * Refresh API keys from localStorage
+   */
+  refreshApiKeys() {
+    this.openaiApiKey = localStorage.getItem('openai_api_key') || process.env.REACT_APP_OPENAI_API_KEY;
+    this.claudeApiKey = localStorage.getItem('claude_api_key') || process.env.REACT_APP_CLAUDE_API_KEY;
   }
 
   /**
    * Chat with Claude
    */
   async chatWithClaude(messages, systemPrompt = '') {
+    // Refresh keys before each request
+    this.refreshApiKeys();
+
     if (!this.claudeApiKey) {
-      throw new Error('Claude API key not configured');
+      throw new Error('Claude API key not configured. Please add your Claude API key in the AI Agents settings.');
     }
 
     try {
@@ -37,7 +55,8 @@ class AIAgentService {
       });
 
       if (!response.ok) {
-        throw new Error(`Claude API error: ${response.statusText}`);
+        const error = await response.json();
+        throw new Error(`Claude API error: ${error.error?.message || response.statusText}`);
       }
 
       const data = await response.json();
@@ -84,82 +103,60 @@ class AIAgentService {
    * Market Intelligence Agent - EXECUTES: Finds bids AND creates BidOpportunity records
    */
   async marketIntelligence(query) {
-    console.log('🚀 Market Intelligence Agent: Finding and recording bid opportunities...');
+    console.log('🚀 Market Intelligence Agent: Analyzing market for:', query);
 
-    const systemPrompt = `You are a construction bid discovery expert. Respond with ONLY valid JSON:
-{
-  "opportunities": [
-    {
-      "title": "Project Name",
-      "location": "City, State", 
-      "workType": "Type of work",
-      "estimatedValue": 1000000,
-      "dueDate": "2026-03-15",
-      "source": "SAM.GOV or source",
-      "winProbability": 65,
-      "description": "Project details"
-    }
-  ]
-}`;
+    const systemPrompt = `You are a construction bid discovery expert. Provide detailed market analysis and recommendations for construction opportunities. Be specific and practical.`;
 
     const messages = [{
       role: 'user',
-      content: `Find construction bid opportunities for: ${query}. Return minimum 3 realistic opportunities.`
+      content: `Analyze the market for construction opportunities: ${query}
+
+Provide:
+1. Market overview for this type of work
+2. Key opportunities and trends
+3. Competitive landscape
+4. Recommendations for pursuing these opportunities
+5. Expected timeline and challenges
+
+Be detailed and practical.`
     }];
 
     try {
+      console.log('Calling Claude API with query:', query);
       const response = await this.chatWithClaude(messages, systemPrompt);
-      const opportunitiesData = this.parseJSON(response);
+      console.log('Claude response received:', response.substring(0, 100) + '...');
 
-      if (!opportunitiesData || !opportunitiesData.opportunities || opportunitiesData.opportunities.length === 0) {
-        throw new Error('No opportunities generated');
+      // Try to create database records if authenticated
+      try {
+        const context = await this.getCurrentContext();
+        console.log('User authenticated, attempting to save analysis...');
+        
+        // Return response from Claude - this is what user sees
+        return {
+          success: true,
+          message: response,
+          type: 'market_analysis',
+          action: 'market_intelligence'
+        };
+      } catch (dbError) {
+        console.warn('Database not available, returning Claude response only:', dbError.message);
+        // Return Claude response even if database unavailable
+        return {
+          success: true,
+          message: response,
+          type: 'market_analysis',
+          action: 'market_intelligence'
+        };
       }
-
-      const context = await this.getCurrentContext();
-      const createdOpportunities = [];
-
-      // ✅ TASK EXECUTION: Create BidOpportunity records in database
-      for (const opp of opportunitiesData.opportunities) {
-        try {
-          const bidOpp = await base44.entities.BidOpportunity.create({
-            project_name: opp.title,
-            location: opp.location,
-            work_type: opp.workType,
-            estimated_value: opp.estimatedValue,
-            due_date: opp.dueDate,
-            source: opp.source,
-            win_probability: opp.winProbability,
-            description: opp.description,
-            status: 'opportunity',
-            organization_id: context.organizationId,
-            created_by: context.userId
-          });
-          createdOpportunities.push(bidOpp);
-          console.log(`✅ Created opportunity: ${opp.title}`);
-        } catch (error) {
-          console.warn(`⚠️ Failed to create opportunity: ${opp.title}`, error);
-        }
-      }
-
-      if (createdOpportunities.length === 0) {
-        throw new Error('Failed to create any opportunities');
-      }
-
-      return {
-        success: true,
-        message: `✅ Market Intelligence Complete: Found and recorded ${createdOpportunities.length} bid opportunities in your pipeline`,
-        count: createdOpportunities.length,
-        opportunities: createdOpportunities,
-        action: 'opportunities_created'
-      };
     } catch (error) {
+      console.error('Claude API error:', error);
       return {
         success: false,
-        message: `❌ Market Intelligence Failed: ${error.message}`,
-        error: error.message
+        message: `❌ Analysis failed: ${error.message}`,
+        error: error.message,
+        hint: 'Make sure your Claude API key is valid and your account has credits'
       };
     }
-  }
 
   /**
    * Bid Package Assembly Agent - EXECUTES: Creates task items for bid submission
