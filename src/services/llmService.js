@@ -1,11 +1,13 @@
 /**
- * LLM Service - Handles all AI agent communication with OpenAI
- * Uses fetch API for browser compatibility instead of SDK
+ * LLM Service - Handles all AI agent communication with Base44's built-in agent
+ * Uses Base44 serverless functions for AI operations
  * Provides robust error handling, retries, and response parsing
  */
 
+import { base44 } from '@/api/base44Client';
+
 /**
- * Call OpenAI API with retry logic
+ * Call Base44's built-in agent via serverless function
  * @param {string} systemPrompt - The system prompt for the agent
  * @param {string} userMessage - The user's message
  * @param {number} temperature - Temperature for response generation (0-1)
@@ -15,74 +17,39 @@
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
   const maxRetries = 3;
   let lastError = null;
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('OpenAI API key not configured. Please set VITE_OPENAI_API_KEY in environment variables.');
-  }
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4-mini',
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt
-            },
-            {
-              role: 'user',
-              content: userMessage
-            }
-          ],
-          temperature: temperature,
-          max_tokens: maxTokens,
-          top_p: 0.95,
-          frequency_penalty: 0.0,
-          presence_penalty: 0.0
-        })
+      // Use Base44's invokeExternalLLM function (server-side)
+      const response = await base44.functions.invoke('invokeExternalLLM', {
+        systemPrompt,
+        userMessage,
+        temperature,
+        maxTokens,
+        model: 'base44-agent' // Use Base44's built-in agent
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error?.message || `API error: ${response.status}`;
-        
-        if (response.status === 401 || response.status === 403) {
-          throw new Error('Authentication failed. Please check your OpenAI API key.');
-        }
-        
-        if (response.status === 429) {
-          throw new Error('Rate limited. Please wait before trying again.');
-        }
-        
-        throw new Error(errorMessage);
+      if (!response) {
+        throw new Error('No response from Base44 agent');
       }
 
-      const data = await response.json();
-
-      if (!data.choices || data.choices.length === 0) {
-        throw new Error('No response from OpenAI');
+      // Handle different response formats
+      let content = response;
+      if (typeof response === 'object') {
+        content = response.content || response.text || response.message || JSON.stringify(response);
       }
 
-      const content = data.choices[0].message.content;
-      
-      if (!content || content.trim().length === 0) {
-        throw new Error('Empty response from OpenAI');
+      if (!content || content.toString().trim().length === 0) {
+        throw new Error('Empty response from Base44 agent');
       }
 
-      return content.trim();
+      return content.toString().trim();
     } catch (error) {
       lastError = error;
-      console.error(`LLM call attempt ${attempt}/${maxRetries} failed:`, error.message);
+      console.error(`Base44 agent call attempt ${attempt}/${maxRetries} failed:`, error.message);
 
       // Don't retry on auth errors
-      if (error.message.includes('Authentication failed')) {
+      if (error.message && (error.message.includes('Authentication failed') || error.message.includes('Unauthorized'))) {
         throw error;
       }
 
@@ -94,7 +61,7 @@ export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, m
     }
   }
 
-  throw new Error(`LLM call failed after ${maxRetries} attempts: ${lastError?.message || 'Unknown error'}`);
+  throw new Error(`Base44 agent call failed after ${maxRetries} attempts: ${lastError?.message || 'Unknown error'}`);
 }
 
 /**
@@ -158,74 +125,27 @@ export async function callAgent(agentSystemPrompt, userMessage, options = {}) {
  * @returns {Promise<string>} Full response
  */
 export async function streamAgent(agentSystemPrompt, userMessage, onChunk) {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('OpenAI API key not configured. Please set VITE_OPENAI_API_KEY in environment variables.');
-  }
-
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4-mini',
-        messages: [
-          {
-            role: 'system',
-            content: agentSystemPrompt
-          },
-          {
-            role: 'user',
-            content: userMessage
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
-        stream: true
-      })
+    // Call Base44's agent function
+    const response = await base44.functions.invoke('invokeExternalLLM', {
+      systemPrompt: agentSystemPrompt,
+      userMessage: userMessage,
+      temperature: 0.7,
+      maxTokens: 2000,
+      model: 'base44-agent',
+      stream: false // Base44 handles streaming internally if needed
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `API error: ${response.status}`);
+    let fullResponse = response;
+    if (typeof response === 'object') {
+      fullResponse = response.content || response.text || response.message || JSON.stringify(response);
     }
 
-    let fullResponse = '';
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+    fullResponse = fullResponse.toString().trim();
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const chunk = decoder.decode(value);
-      const lines = chunk.split('\n');
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          
-          if (data === '[DONE]') {
-            continue;
-          }
-
-          try {
-            const parsed = JSON.parse(data);
-            const content = parsed.choices[0]?.delta?.content || '';
-            
-            if (content) {
-              fullResponse += content;
-              if (onChunk) onChunk(content);
-            }
-          } catch (e) {
-            // Skip parsing errors
-          }
-        }
-      }
+    // Simulate streaming by calling onChunk with the full response
+    if (onChunk && fullResponse) {
+      onChunk(fullResponse);
     }
 
     return parseLLMResponse(fullResponse);
