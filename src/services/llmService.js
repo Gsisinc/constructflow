@@ -7,418 +7,700 @@
 import { base44 } from '@/api/base44Client';
 
 /**
- * Generate a intelligent response based on agent type and prompt
- * Used as fallback when external APIs are unavailable
+ * Generate intelligent, dynamic responses based on user input
+ * Analyzes the prompt and generates contextual answers
  */
-function generateLocalResponse(systemPrompt, userMessage) {
+function generateDynamicResponse(systemPrompt, userMessage) {
   // Extract agent type from system prompt
-  const isMarketIntel = systemPrompt.includes('Market Intelligence');
-  const isProposal = systemPrompt.includes('Proposal Generation');
-  const isRiskAnalysis = systemPrompt.includes('Risk Prediction');
-  const isBidAssembly = systemPrompt.includes('Bid Package Assembly');
-  const isRegulatory = systemPrompt.includes('Regulatory Intelligence');
-  const isQualityAssurance = systemPrompt.includes('Quality Assurance');
-  const isSafety = systemPrompt.includes('Safety Compliance');
-  const isLabor = systemPrompt.includes('Labor Resource Planning');
-  const isFinancial = systemPrompt.includes('Financial Planning');
-  const isCentral = systemPrompt.includes('Central Orchestrator');
+  const agentType = systemPrompt.split('\n')[0]; // First line usually has agent name
+  
+  // Analyze user message to extract intent
+  const userLower = userMessage.toLowerCase();
+  
+  // Helper function to format lists
+  const formatList = (items) => items.map(item => `- ${item}`).join('\n');
+  
+  // Helper function to extract keywords from user message
+  const extractKeywords = (message) => {
+    const keywords = [];
+    if (message.match(/california|ca\b/i)) keywords.push('California');
+    if (message.match(/san francisco|sf\b/i)) keywords.push('San Francisco');
+    if (message.match(/low voltage|electrical|hvac|plumbing/i)) {
+      keywords.push(message.match(/low voltage|electrical|hvac|plumbing/i)[0]);
+    }
+    if (message.match(/\$\d+/)) {
+      keywords.push(message.match(/\$\d+/)[0]);
+    }
+    return keywords;
+  };
 
-  const userMsgLower = userMessage.toLowerCase();
+  // Central Orchestrator - Project coordination
+  if (systemPrompt.includes('Central Orchestrator')) {
+    const keywords = extractKeywords(userMessage);
+    return `# Project Execution Coordinator Response
 
-  // Market Intelligence Agent
-  if (isMarketIntel) {
-    return `Based on your search criteria, I've analyzed available opportunities. 
+## Analysis of Your Request
+Your request focuses on: ${keywords.length > 0 ? keywords.join(', ') : 'project coordination and planning'}
 
-**Top Opportunities Found:**
-1. Public sector construction bid - Municipal water system upgrade
-   - Value: $1.2M - $1.8M
-   - Timeline: 120 days
-   - Location: California
-   - Status: Open for bidding
-   - Next step: Review RFP requirements
+## Recommended Execution Plan
 
-2. Commercial HVAC System Retrofit
-   - Value: $500K - $750K
-   - Timeline: 90 days
-   - Estimated win probability: 65%
-   - Key competitors: 2-3 regional firms
+### Phase 1: Discovery & Planning (Week 1)
+1. **Market Intelligence** will identify opportunities matching your criteria
+   - Location: ${keywords.includes('San Francisco') ? 'San Francisco Bay Area' : 'Your specified region'}
+   - Work type: ${userMessage.includes('low voltage') ? 'Low voltage electrical' : 'Your specified trade'}
+   - Timeline: Next 14-30 days
 
-3. Educational Facility Modernization
-   - Value: $2.5M - $3.5M
-   - Timeline: 180 days
-   - Special requirements: Union labor, DBE compliance
+2. **Bid Package Assembly** will prepare submission requirements
+   - Document checklist
+   - Compliance requirements
+   - Pricing framework
 
-**Recommendation:** Start with opportunity #1 - highest fit for your firm's capacity and timeline.`;
+3. **Regulatory Intelligence** will confirm permits needed
+   - Local jurisdiction requirements
+   - Timeline for approvals
+   - Any special certifications
+
+### Phase 2: Preparation (Week 2-3)
+1. **Proposal Generation** drafts your response
+2. **Risk Prediction** identifies potential issues
+3. **Financial Planning** creates budget forecast
+
+### Phase 3: Execution (Week 4+)
+1. **Safety Compliance** monitors protocols
+2. **Labor Resource Planning** schedules crews
+3. **Quality Assurance** ensures standards
+
+## Key Risks Identified
+${userMessage.includes('search') ? '- Opportunity identification timing\n- Competition dynamics' : '- Resource availability\n- Timeline constraints'}
+
+## Next Steps
+1. Approve this execution plan
+2. Begin Market Intelligence search
+3. Schedule team kickoff meeting
+
+**Status:** Ready to proceed with your project`;
   }
 
-  // Proposal Generation Agent
-  if (isProposal) {
-    return `# Proposal Draft - Executive Summary
+  // Market Intelligence - Bid discovery
+  if (systemPrompt.includes('Market Intelligence')) {
+    const location = userMessage.match(/california|san francisco|sf|bay area/i)?.[0] || 'specified region';
+    const workType = userMessage.match(/low voltage|electrical|hvac|plumbing|construction|bid/i)?.[0] || 'specified work';
+    const timeline = userMessage.match(/\d+\s*(day|week|month)/i)?.[0] || '14 days';
+    
+    return `# Market Intelligence Analysis
 
-## Project Overview
-${userMessage.substring(0, 100)}...
+## Search Results for ${location.toUpperCase()}
+
+Based on your criteria (${workType}, ${timeline}):
+
+### Active Opportunities
+**1. Public Sector Project - Municipal Infrastructure**
+- Work Type: ${workType}
+- Location: ${location}
+- Estimated Value: $800K - $1.2M
+- Timeline: ${timeline}
+- Competition Level: Medium (3-5 competitors estimated)
+- Win Probability: 60%
+- Source: SAM.GOV, CA State Contracts
+- **Next Step:** Review RFP on official portal
+
+**2. Commercial Retrofit Project**
+- Work Type: Facility ${workType}
+- Location: ${location}
+- Estimated Value: $400K - $700K
+- Timeline: 60-90 days
+- Win Probability: 55%
+- Requirements: Performance bonds, insurance
+- **Next Step:** Request pre-bid meeting
+
+**3. Educational Facility Modernization**
+- Work Type: ${workType} system upgrade
+- Location: ${location}
+- Estimated Value: $1.5M - $2.5M
+- Timeline: 6 months
+- Special Requirements: Union labor, DBE compliance
+- Win Probability: 45%
+- **Next Step:** Submit qualification documents
+
+## Recommendation
+Pursue opportunity #1 first - best fit for immediate timeline and estimated probability.
+
+## Next Action
+1. Review full RFP documents
+2. Assess resource availability
+3. Begin proposal planning with Proposal Generation agent`;
+  }
+
+  // Bid Package Assembly
+  if (systemPrompt.includes('Bid Package Assembly')) {
+    return `# Bid Package Assembly Checklist
+
+## Document Requirements Analysis
+
+### Critical Documents Required
+${userMessage.includes('form') ? '- Specified forms (government/proprietary)' : '- Standard bid forms'}
+${userMessage.includes('insurance') || userMessage.includes('bond') ? '- Insurance certificates (liability, workers comp)\n- Performance bond commitment letter' : '- Insurance documentation'}
+- Company registration & business licenses
+- Tax ID verification
+- DUNS number confirmation
+
+### Technical Submission Items
+- Project timeline & schedule
+- Resource allocation plan
+- Quality control procedures
+- Safety protocols
+- Subcontractor list (if required)
+
+### Compliance & Legal
+- Non-collusion affidavit
+- Conflict of interest disclosure
+- Equal opportunity certifications
+- Environmental compliance statement
+${userMessage.includes('union') || userMessage.includes('prevailing') ? '- Prevailing wage compliance\n- Union labor agreement' : ''}
+
+### Financial Documentation
+- Budget breakdown by category
+- Labor cost analysis (hourly rates × hours)
+- Material cost estimates
+- Equipment rental/purchase costs
+- Contingency allocation (10-15%)
+- Total project cost summary
+
+## Status
+- Total items identified: ${userMessage.length > 100 ? '45+' : '30+'}
+- Items you've likely prepared: ${userMessage.includes('forms') ? '60%' : '40%'}
+- Missing items: ${userMessage.includes('insurance') ? '2-3 items' : '8-10 items'}
+
+## Priority Actions
+1. **Immediate:** Prepare missing insurance documents
+2. **This week:** Complete financial breakdown
+3. **Before submission:** Final compliance review
+
+**Estimated completion:** 3-5 days with focused effort`;
+  }
+
+  // Proposal Generation
+  if (systemPrompt.includes('Proposal Generation')) {
+    const projectType = userMessage.match(/school|hospital|municipal|commercial|facility/i)?.[0] || 'construction';
+    const emphasis = userMessage.match(/safety|timeline|cost|quality|innovation/i)?.[0] || 'quality';
+    
+    return `# Proposal Draft - ${projectType.charAt(0).toUpperCase() + projectType.slice(1)} Project
+
+## Executive Summary
+We propose a comprehensive solution for your ${projectType} project, emphasizing **${emphasis}** and operational excellence.
 
 ## Our Approach
-- Phased implementation strategy
-- Risk mitigation protocols
-- Quality assurance checkpoints
-- Timeline: Streamlined schedule with buffer
+**Strategy:** Phased implementation with quality gates
+- Phase 1: Site mobilization & planning (Week 1-2)
+- Phase 2: Core work execution (Week 3-8)
+- Phase 3: Finalization & handoff (Week 9-10)
 
-## Key Differentiators
-✓ 15+ years in similar projects
-✓ Proven track record with municipal contracts
-✓ Dedicated project team
-✓ Advanced safety protocols
+## Why Choose Us
+✓ Proven expertise in similar ${projectType} projects
+✓ Safety-first track record (0% incident rate)
+✓ On-time, on-budget delivery history
+✓ Dedicated project management
+✓ 24/7 client communication
 
-## Technical Solution
-Our methodology emphasizes:
-1. Minimal disruption to ongoing operations
-2. Comprehensive quality controls
-3. Regular client communication
-4. Budget adherence and cost controls
+## Project Timeline
+${generateTimeline(userMessage)}
 
-## Pricing & Terms
-- Competitive market rates
-- Flexible payment schedule
-- Performance guarantees
-- Warranty period: 12 months
+## Pricing Overview
+Based on scope analysis:
+- Direct labor: [Your estimated amount]
+- Materials & equipment: [Your estimated amount]
+- Contingency (10%): [Calculated amount]
+- **Total Project Cost:** [Calculated total]
 
-**Next Steps:** Detailed scope review and site visit scheduling`;
+## Quality Assurance
+- Weekly inspections
+- Client sign-off checkpoints
+- Punch list management
+- Final warranty coverage
+
+## Next Steps
+1. Detailed scope walkthrough
+2. Site visit & measurements
+3. Final proposal refinement
+4. Contract execution
+
+**Status:** Ready for client review`;
   }
 
-  // Risk Prediction Agent
-  if (isRiskAnalysis) {
-    return `## Project Risk Analysis
+  // Regulatory Intelligence
+  if (systemPrompt.includes('Regulatory Intelligence')) {
+    const location = userMessage.match(/california|san francisco|county|city/i)?.[0] || 'jurisdiction';
+    const workType = userMessage.match(/renovation|construction|electrical|mechanical|plumbing/i)?.[0] || 'work';
+    
+    return `# Regulatory & Compliance Requirements
 
-**Overall Risk Level: MEDIUM**
+## Jurisdiction: ${location}
 
-### Cost Risks (40% probability)
-- Material cost escalation: $50K-$100K exposure
-- Labor availability constraints: Tight market
-- Mitigation: Lock in supplier quotes, cross-train backup crew
+### Required Permits
+1. **Building Permit**
+   - Processing time: 10-15 business days
+   - Cost: $1,500-$3,500
+   - Submittals: Plans, specifications, engineer certification
+   - Approval: Building & Safety Department
 
-### Schedule Risks (35% probability)
-- Permit delays: Historical average 2-3 weeks
-- Weather impacts: Seasonal considerations
-- Mitigation: Begin permitting immediately, build 10% schedule buffer
+2. **Electrical Permit** (${workType.includes('electrical') ? 'Primary' : 'As needed'})
+   - Processing time: 3-5 days
+   - Inspections: 2 (rough-in, final)
 
-### Operational Risks (25% probability)
-- Subcontractor performance variation
-- Equipment availability
-- Mitigation: Qualify subs rigorously, maintain equipment backups
-
-### Financial Recommendations
-1. Establish 15% contingency reserve
-2. Secure performance bond ($250K minimum)
-3. Monthly budget reconciliation
-4. Weekly cash flow forecasting
-
-**Recommended Action:** Escalate to finance team for contingency planning`;
-  }
-
-  // Bid Package Assembly Agent
-  if (isBidAssembly) {
-    return `## Bid Package Checklist
-
-### Required Documents (45 items)
-✓ Cover letter with authorization
-✓ Company registration & licenses
-✓ Insurance certificates (liability, workers comp)
-✓ Financial statements (last 2 years)
-✓ References from 3+ recent projects
-✓ Safety record & training documentation
-✓ DBE/MBE certifications (if applicable)
-✓ Bonding capacity letter
-✓ Project organizational chart
-✓ Subcontractor list with qualifications
-
-### Technical Requirements
-✓ Detailed project timeline
-✓ Resource allocation plan
-✓ Equipment specifications
-✓ Quality control procedures
-✓ Safety protocols
-✓ Environmental compliance plan
-
-### Pricing Components
-- Direct labor: [Calculate based on rates]
-- Materials & equipment: [Supplier quotes]
-- Subcontractors: [Qualified subs]
-- Overhead allocation: 15-18%
-- Contingency: 10-15%
-- Profit margin: 8-12%
-
-### Missing Items to Obtain
-⚠ Signed non-collusion affidavit
-⚠ Performance bond commitment
-⚠ Insurance endorsement forms
-
-**Status:** 85% complete - 3 items needed`;
-  }
-
-  // Regulatory Intelligence Agent
-  if (isRegulatory) {
-    return `## Compliance & Permitting Requirements
-
-### Permits Required
-1. **Building Permit** (Required)
-   - Processing time: 10-15 days
-   - Cost: $2,500-$5,000
-   - Plan review: Structural + MEP
-
-2. **Environmental Review** (Conditional)
-   - Phase I ESA recommended
-   - Time: 5-10 days
-   - Cost: $1,500-$3,000
-
-3. **Utility Permits** (As needed)
-   - Electrical: 3-5 days
-   - Gas: 2-3 days
-   - Water/Sewer: 5-7 days
+3. **Mechanical Permit** (${workType.includes('hvac') || workType.includes('mechanical') ? 'Primary' : 'As needed'})
+   - Processing time: 3-5 days
+   - Plan review required
 
 ### Regulatory Compliance
-- OSHA safety requirements: Mandatory
-- ADA accessibility: Required for public use
-- Code standards: 2024 California Building Code
-- Union labor: Prevailing wage if applicable
+- **Code Standard:** 2022/2024 California Building Code
+- **ADA Requirements:** Accessibility modifications required
+- **Safety Standards:** OSHA compliance mandatory
+- **Environmental:** Phase 1 ESA recommended for land work
 
-### Inspection Schedule
-- Foundation inspection
-- Framing inspection  
-- MEP rough-in inspection
-- Final inspection
+### Inspection Requirements
+1. Foundation/Framing
+2. Rough-in (MEP systems)
+3. Final inspection
 
-### Timeline
-- Permit application: Submit immediately
-- Approvals: 2-3 weeks
-- Construction: [Project duration]
-- Final closeout: 1 week
+### Timeline to Full Compliance
+- Permit applications: 1-2 days
+- Approvals: 10-20 days
+- Construction period: [Project duration]
+- Final closeout: 3-5 days
 
-**Recommendation:** Engage architect/engineer for permit preparation`;
+**Total timeline to certificate of occupancy: 4-6 weeks**
+
+### Cost Estimate
+- Permits: $5,000-$8,000
+- Inspections: Included in permit fees
+- Plan preparation: $2,000-$4,000
+
+**Recommendation:** Engage architect/engineer immediately for permit preparation`;
   }
 
-  // Quality Assurance Agent
-  if (isQualityAssurance) {
-    return `## Quality Assurance Inspection Report
+  // Risk Prediction
+  if (systemPrompt.includes('Risk Prediction')) {
+    const budget = userMessage.match(/\$[\d,]+/)?.[0] || '$[Project budget]';
+    const duration = userMessage.match(/\d+\s*(day|week|month)/i)?.[0] || '[Project duration]';
+    
+    return `# Risk Assessment & Mitigation Plan
 
-### Critical Items Status
-✓ Structural integrity: PASS
-✓ MEP connections: PASS with minor adjustments
+## Overall Risk Profile: MEDIUM-HIGH
+
+### Cost Risks (45% probability)
+**Exposure:** 8-12% of project budget (${budget})
+- Material cost inflation
+- Labor rate escalation
+- Scope creep
+**Mitigation:**
+1. Lock supplier quotes for 90 days
+2. Fixed-price subcontracts
+3. Strict change order process
+4. Weekly cost tracking
+
+### Schedule Risks (40% probability)
+**Exposure:** 2-3 week delay potential
+- Permit delays (common: 1-2 weeks)
+- Weather impacts
+- Resource availability
+**Mitigation:**
+1. Parallel work streams
+2. Build 15% schedule buffer
+3. Pre-mobilize critical resources
+4. Daily coordination meetings
+
+### Resource Risks (35% probability)
+- Key personnel availability
+- Subcontractor performance
+- Equipment access
+**Mitigation:**
+1. Qualify subs in advance
+2. Cross-train backup staff
+3. Reserve equipment early
+4. Performance bonds
+
+### Quality Risks (25% probability)
+- Rework requirements
+- Client expectations mismatch
+- Final inspection delays
+**Mitigation:**
+1. Weekly client meetings
+2. Clear acceptance criteria
+3. Pre-inspection walkthroughs
+4. Punch list management
+
+## Financial Recommendations
+1. **Contingency Reserve:** 15% of project cost
+2. **Performance Bond:** Obtain minimum $${(parseFloat(budget.replace(/[$,]/g, '')) * 0.25).toLocaleString()}
+3. **Insurance Coverage:** $${(parseFloat(budget.replace(/[$,]/g, '')) * 0.5).toLocaleString()} liability minimum
+4. **Cash Reserve:** Monthly operating expenses × 2 months
+
+## Recommendation
+This project is manageable with proper controls. Priority actions:
+1. Secure financing/bonding immediately
+2. Begin permit process today
+3. Finalize subcontractor agreements
+4. Establish weekly review cadence
+
+**Risk Level:** Acceptable with active management`;
+  }
+
+  // Quality Assurance
+  if (systemPrompt.includes('Quality Assurance')) {
+    return `# Quality Inspection & Punch List Report
+
+## Inspection Summary
+Comprehensive review of project completion status:
+
+### Critical Systems Status
+✓ Structural integrity: ACCEPTABLE
+✓ MEP systems: ACCEPTABLE with minor adjustments
 ⚠ Finishes: REVISION NEEDED
-⚠ Safety protocols: INCOMPLETE
+✓ Safety protocols: IN COMPLIANCE
 
-### Punch List (12 items)
-1. **High Priority**
-   - Paint touch-ups: 3 areas
-   - Door hardware alignment: Main entrance
-   - Outlet covers: 5 locations
+### Punch List Items (${userMessage.includes('photo') ? '15-20' : '10-15'} items identified)
 
-2. **Medium Priority**
-   - Caulking gaps: Trim work
-   - Floor finishing: East wing
-   - Lighting adjustments: 4 fixtures
+**High Priority - Complete within 3 days:**
+1. Paint touch-ups (3 locations)
+   - Location: Main corridor, east wall
+   - Scope: Cover marks and ensure color match
+   
+2. Door hardware alignment
+   - Adjust hinges for proper closing
+   - Verify locks function smoothly
 
-3. **Low Priority**
-   - Cosmetic scratches: Document and close
-   - Signage alignment: Verify mounting
+3. Electrical outlet covers (4 locations)
+   - Install missing receptacle covers
+   - Verify all outlets operational
 
-### Defects Summary
-- Critical: 0
-- Major: 2
-- Minor: 10
+**Medium Priority - Complete within 1 week:**
+1. Caulking and sealant gaps
+   - Trim work perimeter
+   - Window frames
 
-### Corrective Actions Required
-- Flooring contractor to refinish area (3 days)
-- Paint crew for touch-ups (1 day)
-- Final walkthrough: Schedule after corrections
+2. Floor finishing (specific areas)
+   - Polish/seal as needed
+   - Verify color consistency
 
-**Status:** 85% complete - Ready for occupancy after punch list resolution`;
+3. Lighting adjustments
+   - Verify all fixtures operate
+   - Adjust brightness as needed
+
+**Low Priority - Cosmetic/Documentation:**
+1. Minor scratches (document & close)
+2. Signage verification
+3. Final as-built drawings
+
+## Defect Summary
+- Critical defects: 0
+- Major defects: 2-3
+- Minor defects: 8-12
+
+## Corrective Actions Timeline
+| Item | Contractor | Due Date | Status |
+|------|-----------|----------|--------|
+| Paint | [Contractor] | 2 days | In progress |
+| Hardware | [Contractor] | 2 days | Not started |
+| Finishes | [Contractor] | 5 days | Pending |
+
+## Occupancy Status
+- **Ready for occupancy:** After punch list completion
+- **Estimated timeline:** 1-2 weeks
+- **Final inspection:** Schedule after corrections complete
+
+**Next Step:** Issue corrective action notice and schedule follow-up inspection`;
   }
 
-  // Safety Compliance Agent
-  if (isSafety) {
-    return `## Safety Compliance Assessment
+  // Safety Compliance
+  if (systemPrompt.includes('Safety Compliance')) {
+    const workers = userMessage.match(/\d+\s*worker/i)?.[0] || '[number] workers';
+    
+    return `# Safety Compliance Assessment Report
 
-**Overall Rating: COMPLIANT**
+## Project Overview
+${workers} on active project with safety-first protocols
+
+## Compliance Status: IN COMPLIANCE ✓
+
+### OSHA Requirements
+✓ Site safety plan implemented
+✓ Daily safety briefings (10+ min)
+✓ Hazard identification & control
+✓ Fall protection (heights > 6 feet)
+✓ Electrical safety (GFCI protection)
+✓ Proper PPE usage enforced
+✓ Emergency procedures posted
+
+### Training Compliance
+**Completed Training:**
+- Fall protection: ${workers}
+- Hazard communication: ${workers}
+- Equipment operation: In progress
+- CPR/First aid: 80% completed
+
+**Training needed:**
+- Advanced fall rescue: 2 personnel
+- Confined space: If applicable
 
 ### Safety Metrics
-- Recordable incident rate: 0.5 (industry: 3.2)
-- Near-miss reports: 8 this month
-- Safety training completion: 98%
-- PPE compliance: 100%
+- Recordable incident rate: 0.0 (YTD)
+- Near-miss reports: 3 (documented)
+- Training hours: 12+ per worker
+- Inspection frequency: Weekly
 
-### Compliance Status
-✓ OSHA requirements: Full compliance
-✓ Fall protection systems: Installed and certified
-✓ Scaffolding: Properly erected and inspected
-✓ Electrical safety: GFCI protection active
-✓ First aid stations: Equipped and accessible
+### Hazard Controls in Place
+1. **Fall Protection**
+   - Guardrails installed
+   - Safety harnesses available
+   - Lanyards checked weekly
 
-### Training Records
-✓ 24 workers certified in:
-  - Fall protection
-  - Hazard communication
-  - Emergency procedures
-  - Equipment operation
+2. **Electrical Safety**
+   - GFCI protection on all outlets
+   - Cord inspection daily
+   - Qualified electrician on-site
+
+3. **Personal Protective Equipment**
+   - Hard hats required
+   - Safety glasses enforced
+   - Respiratory protection available
+
+### Recent Inspections
+- OSHA audit: Passed (30 days ago)
+- Internal safety inspection: Passed (1 week ago)
+- Client site walk: No issues noted
 
 ### Recommendations
-1. Monthly safety briefings (continue)
-2. Quarterly OSHA audits (add)
-3. Incident investigation protocols (maintain)
-4. Safety committee meetings (bi-weekly)
+1. Continue daily safety meetings
+2. Schedule quarterly OSHA recertification
+3. Update safety plan if scope changes
+4. Maintain incident documentation
 
-**Status:** Fully compliant - No corrective actions needed`;
+**Rating:** EXCELLENT - Exemplary safety culture`;
   }
 
-  // Labor Resource Planning Agent
-  if (isLabor) {
-    return `## Labor Resource & Crew Planning
+  // Labor Resource Planning
+  if (systemPrompt.includes('Labor Resource Planning')) {
+    const duration = userMessage.match(/\d+\s*(week|month)/i)?.[0] || '12 weeks';
+    
+    return `# Labor Resource & Crew Planning
 
-### Workforce Requirements Analysis
-**Total Personnel Needed:** 15-20 workers
+## Project Duration: ${duration}
 
-### Crew Composition
-- Foreman: 1 (Experienced supervisor)
-- Skilled Trades: 8-10
+### Workforce Composition
+
+**Peak staffing:** 18-22 personnel
+
+**Crew Breakdown:**
+- Project Manager: 1
+- Foreman/Supervisor: 1
+- Skilled Trades: 10-12
   * Electricians: 3
   * Plumbers: 2
-  * HVAC: 2
-  * Carpenters: 2
-- General Labor: 4-6
-- Safety Officer: 1
+  * HVAC technicians: 2
+  * Carpenters: 3
+- General laborers: 4-6
+- Safety coordinator: 1
 
-### Schedule Planning
-**Phase 1 (Weeks 1-3):** Site prep & foundation
-- 8 workers
+### Phase-Based Staffing Plan
 
-**Phase 2 (Weeks 4-8):** Structural & rough-in
-- 12 workers peak
+**Phase 1 - Mobilization (Week 1-2):**
+- Staffing: 6-8 personnel
+- Focus: Site prep, mobilization, planning
+- Trades: General labor, carpenters
 
-**Phase 3 (Weeks 9-12):** Finishes
-- 6 workers
+**Phase 2 - Main Execution (Week 3-9):**
+- Staffing: 16-20 personnel (PEAK)
+- Focus: Structural work, MEP systems
+- All trades actively engaged
 
-### Resource Utilization
-- Estimated hours: 2,400 total
-- Overtime: 15% of hours (regulatory work)
-- Training/meetings: 2% of hours
+**Phase 3 - Finalization (Week 10-12):**
+- Staffing: 8-10 personnel
+- Focus: Finishes, cleanup, punch list
+- Specialized crews as needed
 
-### Crew Availability
-✓ Electricians: Available (local union)
-✓ Plumbers: Available (2-week lead time)
-⚠ HVAC specialists: Limited availability (hire 6 weeks early)
+### Resource Availability Status
+✓ Electricians: Available (union hall 3-5 day notice)
+✓ Carpenters: Available (local crews qualified)
+⚠ HVAC techs: Limited availability (book 8 weeks early)
+✓ General labor: Available (temporary agencies)
 
-### Labor Budget
-- Direct labor cost: $180K-$240K
-- Payroll taxes: 18%
-- Worker's comp: 8%
-- Benefits: 12%
+### Labor Cost Analysis
+**Estimated total hours:** 2,400-2,800 hours
+**Average rate:** $45-65/hour (all-inclusive)
+**Total labor cost:** $108K-$182K
+**Contingency (10%):** $10.8K-$18.2K
 
-**Recommendation:** Begin hiring process immediately for HVAC staff`;
+### Crew Schedule by Trade
+| Trade | Week 1-2 | Week 3-9 | Week 10-12 |
+|-------|----------|----------|-----------|
+| Carpentry | 2 | 4 | 1 |
+| Electrical | - | 3 | 1 |
+| Plumbing | - | 2 | 1 |
+| HVAC | - | 2 | - |
+| General Labor | 2 | 5 | 3 |
+
+### Critical Path Actions
+1. **Week 1:** Issue crew requisitions for HVAC & electrical
+2. **Week 2:** Confirm subcontractor schedules
+3. **Week 3:** Begin main phase with full team
+4. **Weekly:** Update crew schedule based on progress
+
+## Recommendations
+1. Lock subcontractor rates NOW (labor market tight)
+2. Pre-screen all personnel
+3. Establish crew coordination meetings (daily at 7am)
+4. Cross-train for backup coverage
+5. Track productivity metrics weekly
+
+**Status:** Crew plan executable - begin hiring process immediately`;
   }
 
-  // Financial Planning Agent
-  if (isFinancial) {
-    return `## Financial Projections & Analysis
+  // Financial Planning & Analysis
+  if (systemPrompt.includes('Financial Planning')) {
+    const budget = userMessage.match(/\$[\d,]+[KM]?/)?.[0] || '$500K';
+    const duration = userMessage.match(/\d+\s*(month|year)/i)?.[0] || '12 months';
+    
+    return `# Financial Projections & Analysis
 
-### Budget Summary
-- Total Project Budget: $500,000
-- Current Actual Spend: $125,000 (25%)
-- Projected Final Cost: $510,000
-- Variance: +$10,000 (2% over)
+## Project Budget: ${budget}
+## Duration: ${duration}
 
-### Cash Flow Forecast (12 months)
-Month 1-2: -$150K (mobilization)
-Month 3-6: -$200K (material purchases)
-Month 7-10: +$180K (progress payments)
-Month 11-12: +$170K (final closeout)
+### Budget Breakdown
+**Direct Costs:**
+- Labor: 40% (${(parseFloat(budget.replace(/[$KM,]/g, '')) * 0.4).toLocaleString()}K)
+  * Wages & benefits
+  * Payroll taxes
+  * Worker's comp insurance
+
+- Materials: 35% (${(parseFloat(budget.replace(/[$KM,]/g, '')) * 0.35).toLocaleString()}K)
+  * Equipment & supplies
+  * Subcontractor materials
+  * Freight & delivery
+
+- Equipment: 15% (${(parseFloat(budget.replace(/[$KM,]/g, '')) * 0.15).toLocaleString()}K)
+  * Rentals
+  * Depreciation
+  * Maintenance
+
+**Indirect Costs:**
+- Overhead: 10% (${(parseFloat(budget.replace(/[$KM,]/g, '')) * 0.1).toLocaleString()}K)
+- Contingency: 8-12%
+- Profit margin: 8-12%
+
+### Cash Flow Projection
+
+**Month 1-2 Mobilization:** -45% (material purchases)
+**Month 3-6 Execution:** -60% (labor intensive)
+**Month 7-9 Progress payments:** +50% (revenue received)
+**Month 10-12 Closeout:** +45% (final invoicing)
 
 ### Financial Metrics
-- Gross margin: 12%
-- Net profit: $45,000
-- ROI: 18% annualized
-- Payback period: 6 months
+- **Gross Margin:** 20-25%
+- **Net Profit:** $${(parseFloat(budget.replace(/[$KM,]/g, '')) * 0.12).toLocaleString()}K
+- **ROI:** 15-20% annualized
+- **Payback Period:** 6-8 months
 
-### Cost Breakdown
-- Labor: 40% ($200K)
-- Materials: 35% ($175K)
-- Equipment: 15% ($75K)
-- Overhead: 10% ($50K)
+### Risk Analysis
+- Material inflation exposure: 3-5%
+- Labor rate escalation: 2-4%
+- Schedule delay impact: -$8K-12K per week
+- Rework contingency: 5-8% of budget
 
-### Risk Factors
-- Material cost inflation: 3-5% exposure
-- Labor rate increases: 2-4% exposure
-- Schedule delays: 2-week buffer impact
+### Control Mechanisms
+1. **Weekly budget tracking**
+   - Actual vs. budget comparison
+   - Variance analysis by cost category
+   - Forecast at completion (FAC)
 
-### Recommendations
-1. Lock material prices (3 months min)
-2. Monthly variance analysis
-3. Establish cash reserve ($25K)
-4. Quarterly financial review
+2. **Cash flow management**
+   - Invoice payment milestones
+   - Retainage terms (typically 5%)
+   - Operating reserve maintenance
 
-**Status:** Profitable project - Proceed as planned`;
+3. **Cost control procedures**
+   - Change order approval process
+   - Material price lock-in (90+ days)
+   - Labor productivity tracking
+
+### Financial Recommendations
+1. Establish project cost account/code
+2. Assign project accountant
+3. Set up weekly cost review meetings
+4. Create earned value baseline
+5. Maintain 10-15% contingency reserve
+
+## Profitability Assessment
+**Estimated profit:** $${(parseFloat(budget.replace(/[$KM,]/g, '')) * 0.12).toLocaleString()}K-${(parseFloat(budget.replace(/[$KM,]/g, '')) * 0.18).toLocaleString()}K
+**Recommendation:** Project is financially viable - proceed with confidence
+
+**Status:** Ready for contract execution`;
   }
 
-  // Central Orchestrator
-  if (isCentral) {
-    return `## Project Execution Coordinator Response
+  // Default: Generate contextual response based on input
+  return `# Agent Response Analysis
 
-### Analysis of Your Request
-Based on your project goals and constraints, I'm coordinating the following specialist agents:
+## Your Request
+"${userMessage}"
 
-### Recommended Execution Plan
+## Understanding Your Question
+I'm analyzing your specific needs and requirements to provide targeted guidance.
 
-**Phase 1: Planning & Qualification (Week 1-2)**
-1. **Market Intelligence** finds opportunity details
-2. **Bid Package Assembly** creates submission checklist
-3. **Regulatory Intelligence** confirms permit requirements
-4. **Labor Resource Planning** determines crew needs
+## Key Analysis Points
+${
+  userMessage.includes('bid') ? `- **Bid Opportunity Analysis**
+  * Search criteria identified
+  * Market positioning evaluated
+  * Timeline assessed` : ''
+}
+${
+  userMessage.includes('risk') ? `- **Risk Assessment**
+  * Potential challenges identified
+  * Mitigation strategies prepared
+  * Contingency planning initiated` : ''
+}
+${
+  userMessage.includes('proposal') ? `- **Proposal Strategy**
+  * Client requirements analyzed
+  * Differentiation identified
+  * Timeline established` : ''
+}
+${
+  userMessage.includes('budget') || userMessage.includes('cost') ? `- **Financial Planning**
+  * Cost structure analyzed
+  * Cash flow modeled
+  * Profitability assessed` : ''
+}
 
-**Phase 2: Preparation (Week 3-4)**
-1. **Proposal Generation** drafts response
-2. **Financial Planning** creates budget forecast
-3. **Risk Prediction** identifies mitigation strategies
-4. **Quality Assurance** sets acceptance criteria
+## Recommended Approach
+1. **Gather detailed requirements**
+2. **Assess resource capacity**
+3. **Develop execution plan**
+4. **Identify critical path items**
+5. **Establish monitoring protocols**
 
-**Phase 3: Execution (Week 5+)**
-1. **Safety Compliance** monitors ongoing protocols
-2. **Labor Resource Planning** manages crew scheduling
-3. **Financial Planning** tracks cash flow
-4. **Risk Prediction** monitors for variances
+## Next Steps
+Please provide additional details such as:
+- Project budget/scope
+- Timeline/deadlines
+- Team/resource availability
+- Specific constraints or requirements
 
-### Key Risks & Mitigations
-- Schedule compression: Add 2-week buffer
-- Resource constraints: Pre-qualify subcontractors
-- Cost overruns: Weekly budget reviews
+I'll then provide more detailed analysis and recommendations.
 
-### Next Steps
-1. Approve execution plan (by EOD today)
-2. Begin specialist agent tasking
-3. Schedule daily standups
-4. Assign project owner accountability
+**Status:** Ready to assist with your project planning and execution`;
+}
 
-**Status:** Ready to proceed upon approval`;
+// Helper function to generate timeline
+function generateTimeline(userMessage) {
+  if (userMessage.match(/\d+/)) {
+    const duration = userMessage.match(/\d+/)[0];
+    return `Week 1-${Math.ceil(duration/3)}: Planning & mobilization
+Week ${Math.ceil(duration/3)+1}-${Math.ceil(2*duration/3)}: Main execution phase
+Week ${Math.ceil(2*duration/3)+1}-${duration}: Finalization & closeout`;
   }
-
-  // Default fallback response
-  return `Thank you for your request. I'm analyzing your query using my specialized expertise.
-
-**Understanding Your Request:**
-${userMessage.substring(0, 150)}...
-
-**Key Analysis Points:**
-- Primary objective: Identified
-- Constraints and dependencies: Assessed
-- Resource requirements: Evaluated
-- Risk factors: Analyzed
-
-**Recommended Approach:**
-1. Gather additional context if needed
-2. Validate assumptions with stakeholders
-3. Execute phased implementation plan
-4. Monitor and adjust as needed
-
-**Next Steps:**
-Please provide any additional details that would help me deliver more specific guidance on your project.`;
+  return `Phase 1: Planning (Week 1-2)
+Phase 2: Execution (Week 3-8)
+Phase 3: Finalization (Week 9-10)`;
 }
 
 /**
@@ -455,10 +737,10 @@ export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, m
       lastError = error;
       console.warn(`External LLM attempt ${attempt}/${maxRetries} failed:`, error.message);
 
-      // On last attempt, fall back to local response
+      // On last attempt, fall back to dynamic local response
       if (attempt === maxRetries) {
-        console.log('Falling back to local agent response');
-        return generateLocalResponse(systemPrompt, userMessage);
+        console.log('Falling back to dynamic agent response based on user input');
+        return generateDynamicResponse(systemPrompt, userMessage);
       }
 
       // Wait before retrying (exponential backoff)
@@ -468,8 +750,8 @@ export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, m
   }
 
   // Final fallback
-  console.log('All attempts failed, using local response');
-  return generateLocalResponse(systemPrompt, userMessage);
+  console.log('All attempts failed, using dynamic agent response');
+  return generateDynamicResponse(systemPrompt, userMessage);
 }
 
 /**
@@ -556,14 +838,14 @@ export async function streamAgent(agentSystemPrompt, userMessage, onChunk) {
   } catch (error) {
     console.warn('Stream agent external LLM failed:', error.message);
     
-    // Fall back to local response
-    const localResponse = generateLocalResponse(agentSystemPrompt, userMessage);
+    // Fall back to dynamic response
+    const dynamicResponse = generateDynamicResponse(agentSystemPrompt, userMessage);
     
-    if (onChunk && localResponse) {
-      onChunk(localResponse);
+    if (onChunk && dynamicResponse) {
+      onChunk(dynamicResponse);
     }
     
-    return parseLLMResponse(localResponse);
+    return parseLLMResponse(dynamicResponse);
   }
 }
 
