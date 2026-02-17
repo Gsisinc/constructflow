@@ -60,7 +60,6 @@ export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, m
 
   throw new Error(`invokeExternalLLM call failed after ${maxRetries} attempts: ${lastError?.message || 'Unknown error'}`);
 }
-}
 
 /**
  * Parse LLM response to extract structured data
