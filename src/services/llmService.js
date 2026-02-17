@@ -1,13 +1,9 @@
 /**
- * LLM Service - Handles all AI agent communication
- * Uses Claude API for real AI responses
- * Falls back to structured responses only when API is unavailable
+ * LLM Service - Routes all agent calls to Claude AI
+ * Uses dedicated ClaudeAIService for all agent functionalities
  */
 
-import { base44 } from '@/api/base44Client';
-
-const CLAUDE_API_KEY = process.env.REACT_APP_CLAUDE_API_KEY;
-const CLAUDE_API_BASE = 'https://api.anthropic.com/v1';
+import * as ClaudeAI from './ClaudeAIService';
 
 /**
  * Generate intelligent, dynamic responses based on user input
@@ -711,77 +707,14 @@ Phase 3: Finalization (Week 9-10)`;
  * Falls back to local response if APIs unavailable
  */
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
-  const claudeApiKey = CLAUDE_API_KEY;
-  
-  if (!claudeApiKey) {
-    console.warn('Claude API key not configured, falling back to dynamic response');
-    return generateDynamicResponse(systemPrompt, userMessage);
+  try {
+    // Directly call Claude API via ClaudeAIService
+    const response = await ClaudeAI.callClaudeAPI(systemPrompt, userMessage);
+    return response;
+  } catch (error) {
+    console.error('Claude API call failed:', error);
+    throw error;
   }
-
-  const maxRetries = 2;
-  let lastError = null;
-
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      console.log('Calling Claude API...');
-      
-      // Call Claude API directly
-      const response = await fetch(`${CLAUDE_API_BASE}/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': claudeApiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-3-opus-20240229',
-          max_tokens: maxTokens,
-          temperature: temperature,
-          system: systemPrompt,
-          messages: [
-            { role: 'user', content: userMessage }
-          ]
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Claude API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
-      }
-
-      const data = await response.json();
-      
-      if (!data.content || data.content.length === 0) {
-        throw new Error('Empty response from Claude API');
-      }
-
-      const content = data.content[0]?.text;
-      if (!content) {
-        throw new Error('No text content in Claude response');
-      }
-
-      console.log('Claude API response received successfully');
-      return content.trim();
-      
-    } catch (error) {
-      lastError = error;
-      console.warn(`Claude API attempt ${attempt}/${maxRetries} failed:`, error.message);
-
-      // On last attempt, fall back to dynamic local response
-      if (attempt === maxRetries) {
-        console.log('Falling back to dynamic agent response');
-        return generateDynamicResponse(systemPrompt, userMessage);
-      }
-
-      // Wait before retrying (exponential backoff)
-      const waitTime = Math.pow(2, attempt - 1) * 1000;
-      await new Promise(resolve => setTimeout(resolve, waitTime));
-    }
-  }
-
-  // Final fallback
-  console.log('All Claude API attempts failed, using dynamic agent response');
-  return generateDynamicResponse(systemPrompt, userMessage);
 }
 
 /**
@@ -816,20 +749,9 @@ export function parseLLMResponse(response) {
  * @returns {Promise<string>} Agent's response
  */
 export async function callAgent(agentSystemPrompt, userMessage, options = {}) {
-  const {
-    temperature = 0.7,
-    maxTokens = 2000,
-    retries = 3
-  } = options;
-
   try {
-    const response = await callOpenAI(
-      agentSystemPrompt,
-      userMessage,
-      temperature,
-      maxTokens
-    );
-
+    // Route through Claude AI Service for real intelligence
+    const response = await ClaudeAI.callClaudeAPI(agentSystemPrompt, userMessage);
     return parseLLMResponse(response);
   } catch (error) {
     console.error('Agent call failed:', error);
