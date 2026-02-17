@@ -263,10 +263,10 @@ export default function Layout({ children, currentPageName }) {
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="h-9 w-9 p-0 flex-shrink-0 md:hidden"
+              className="!h-10 !w-10 !p-0 flex-shrink-0 md:hidden hover:bg-slate-100 active:bg-slate-200 text-slate-700"
               title="Toggle menu"
             >
-              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
             
             <div className="flex items-center gap-0.5">
