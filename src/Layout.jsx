@@ -219,12 +219,13 @@ export default function Layout({ children, currentPageName }) {
     <div className="flex flex-col h-screen bg-slate-50">
       <CommandPalette />
       <style>{`
-        html {
-          overscroll-behavior: none;
-        }
-        body {
-          overscroll-behavior: none;
-        }
+              html {
+                overscroll-behavior: none;
+              }
+              body {
+                overscroll-behavior: none;
+                -webkit-overflow-scrolling: touch;
+              }
         input, textarea, select {
           font-size: 16px !important;
         }
