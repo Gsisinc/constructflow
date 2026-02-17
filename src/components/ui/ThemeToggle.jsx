@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon, Monitor } from 'lucide-react';
+import { Sun, Moon, Monitor, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeContext } from '@/lib/ThemeContext';
 import {
@@ -20,7 +20,7 @@ export function ThemeToggle({
   size = 'icon',
   className = '' 
 }) {
-  const context = useContext(ThemeContext);
+  const context = React.useContext(ThemeContext);
   
   if (!context) {
     // Fallback if context not available
@@ -56,7 +56,8 @@ export function ThemeToggle({
         <Button 
           variant={variant} 
           size={size} 
-          className={`relative overflow-hidden ${className}`}
+          className={`relative overflow-hidden h-8 sm:h-9 px-1.5 sm:px-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 ${className}`}
+          title="Change theme"
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -72,50 +73,35 @@ export function ThemeToggle({
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem 
           onClick={() => handleThemeChange('light')}
-          className={theme === 'light' ? 'bg-slate-100 dark:bg-slate-800' : ''}
+          className="cursor-pointer"
         >
           <Sun className="h-4 w-4 mr-2" />
-          <span>Light</span>
+          <span className="flex-1">Light</span>
           {theme === 'light' && (
-            <motion.div 
-              layoutId="check"
-              className="ml-auto h-4 w-4 text-blue-500"
-            >
-              ✓
-            </motion.div>
+            <Check className="h-4 w-4 ml-auto text-blue-600" />
           )}
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange('dark')}
-          className={theme === 'dark' ? 'bg-slate-100 dark:bg-slate-800' : ''}
+          className="cursor-pointer"
         >
           <Moon className="h-4 w-4 mr-2" />
-          <span>Dark</span>
+          <span className="flex-1">Dark</span>
           {theme === 'dark' && (
-            <motion.div 
-              layoutId="check"
-              className="ml-auto h-4 w-4 text-blue-500"
-            >
-              ✓
-            </motion.div>
+            <Check className="h-4 w-4 ml-auto text-blue-600" />
           )}
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange('system')}
-          className={theme === 'system' ? 'bg-slate-100 dark:bg-slate-800' : ''}
+          className="cursor-pointer"
         >
           <Monitor className="h-4 w-4 mr-2" />
-          <span>System</span>
+          <span className="flex-1">System</span>
           {theme === 'system' && (
-            <motion.div 
-              layoutId="check"
-              className="ml-auto h-4 w-4 text-blue-500"
-            >
-              ✓
-            </motion.div>
+            <Check className="h-4 w-4 ml-auto text-blue-600" />
           )}
         </DropdownMenuItem>
       </DropdownMenuContent>

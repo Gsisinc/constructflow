@@ -11,34 +11,64 @@ export function ThemeProvider({ children }) {
     const savedTheme = localStorage.getItem('constructflow-theme') || 'system';
     setThemeState(savedTheme);
     setMounted(true);
+    applyTheme(savedTheme);
   }, []);
 
   // Apply theme to document
   useEffect(() => {
     if (!mounted) return;
+    applyTheme(theme);
+  }, [theme, mounted]);
 
+  const applyTheme = (themeValue) => {
     const root = document.documentElement;
-    let resolvedTheme = theme;
+    let resolvedTheme = themeValue;
 
-    if (theme === 'system') {
+    if (themeValue === 'system') {
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       resolvedTheme = isDark ? 'dark' : 'light';
     }
 
+    // Remove both classes first
+    root.classList.remove('dark', 'light');
+    
+    // Add the resolved theme class
     if (resolvedTheme === 'dark') {
       root.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
     } else {
-      root.classList.remove('dark');
+      root.classList.add('light');
+      document.documentElement.style.colorScheme = 'light';
     }
-  }, [theme, mounted]);
+
+    console.log('Theme applied:', resolvedTheme);
+  };
 
   const setTheme = (newTheme) => {
     setThemeState(newTheme);
     localStorage.setItem('constructflow-theme', newTheme);
+    applyTheme(newTheme);
   };
 
+  // Listen for system theme changes
+  useEffect(() => {
+    if (theme !== 'system') return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      applyTheme('system');
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [theme]);
+
+  if (!mounted) {
+    return <>{children}</>;
+  }
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, mounted }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -51,3 +81,5 @@ export function useThemeContext() {
   }
   return context;
 }
+
+export { ThemeContext };
