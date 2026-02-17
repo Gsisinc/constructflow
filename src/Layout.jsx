@@ -325,7 +325,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-14 sm:top-16 left-0 w-64 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-white border-r border-slate-200 z-40 transition-transform duration-300 lg:translate-x-0 lg:top-16 lg:h-[calc(100vh-4rem)] overflow-y-auto",
+        "fixed top-14 sm:top-16 left-0 w-64 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-white border-r border-slate-200 z-40 transition-transform duration-300 lg:translate-x-0 lg:top-16 lg:h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <nav className="p-3 sm:p-4 space-y-1">

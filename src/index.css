@@ -162,3 +162,62 @@
     display: none !important;
   }
 }
+/* Mobile View Optimizations */
+@media (max-width: 640px) {
+  /* Fix heading sizes */
+  h1 { font-size: 1.25rem !important; line-height: 1.4; }
+  h2 { font-size: 1.1rem !important; line-height: 1.4; }
+  h3 { font-size: 1rem !important; line-height: 1.4; }
+  h4, h5, h6 { font-size: 0.9rem !important; line-height: 1.4; }
+  
+  /* Fix body text */
+  body, p { font-size: 0.875rem !important; }
+  span, label { font-size: 0.8rem !important; }
+  
+  /* Table heading styles */
+  th { font-size: 0.75rem !important; padding: 0.5rem !important; }
+  td { font-size: 0.8rem !important; padding: 0.5rem !important; }
+  
+  /* Fix button sizes */
+  button, [role="button"] { padding: 0.5rem 1rem !important; font-size: 0.875rem !important; }
+  
+  /* Fix form elements */
+  input, select, textarea { font-size: 16px !important; padding: 0.5rem !important; }
+  
+  /* Fix card padding */
+  .card, [role="card"] { padding: 1rem !important; }
+  
+  /* Fix sidebar */
+  [role="navigation"] { width: 60vw !important; max-width: 280px !important; }
+  
+  /* Chat box full width */
+  [role="chatbox"], .chatbox, .chat-container { width: 100vw !important; max-width: 100% !important; }
+  
+  /* Megamenu fixes */
+  .megamenu { width: 100vw !important; left: 0 !important; }
+}
+
+/* Scrollbar styling for mobile */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Disable pull-to-refresh on mobile */
+body, html {
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+}
