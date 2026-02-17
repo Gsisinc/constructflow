@@ -162,39 +162,33 @@
     display: none !important;
   }
 }
-/* Mobile View Optimizations */
-@media (max-width: 640px) {
-  /* Fix heading sizes */
-  h1 { font-size: 1.25rem !important; line-height: 1.4; }
-  h2 { font-size: 1.1rem !important; line-height: 1.4; }
-  h3 { font-size: 1rem !important; line-height: 1.4; }
-  h4, h5, h6 { font-size: 0.9rem !important; line-height: 1.4; }
+/* Mobile View Optimizations - BALANCED */
+@media (max-width: 768px) {
+  /* Fix heading sizes - maintain hierarchy */
+  h1 { font-size: 1.75rem; line-height: 2rem; }
+  h2 { font-size: 1.5rem; line-height: 1.875rem; }
+  h3 { font-size: 1.25rem; line-height: 1.5rem; }
+  h4, h5, h6 { font-size: 1.125rem; line-height: 1.5rem; }
   
-  /* Fix body text */
-  body, p { font-size: 0.875rem !important; }
-  span, label { font-size: 0.8rem !important; }
+  /* Fix body text - readable size */
+  body, p { font-size: 1rem; }
+  span, label { font-size: 0.9375rem; }
   
   /* Table heading styles */
-  th { font-size: 0.75rem !important; padding: 0.5rem !important; }
-  td { font-size: 0.8rem !important; padding: 0.5rem !important; }
+  th { font-size: 0.875rem; padding: 0.75rem; }
+  td { font-size: 0.9375rem; padding: 0.75rem; }
   
-  /* Fix button sizes */
-  button, [role="button"] { padding: 0.5rem 1rem !important; font-size: 0.875rem !important; }
+  /* Fix button sizes - touch-friendly */
+  button, [role="button"] { padding: 0.75rem 1.25rem; font-size: 1rem; min-height: 2.75rem; }
   
   /* Fix form elements */
-  input, select, textarea { font-size: 16px !important; padding: 0.5rem !important; }
+  input, select, textarea { font-size: 16px; padding: 0.75rem; min-height: 2.75rem; }
   
   /* Fix card padding */
-  .card, [role="card"] { padding: 1rem !important; }
+  .card, [role="card"] { padding: 1.25rem; }
   
   /* Fix sidebar */
-  [role="navigation"] { width: 60vw !important; max-width: 280px !important; }
-  
-  /* Chat box full width */
-  [role="chatbox"], .chatbox, .chat-container { width: 100vw !important; max-width: 100% !important; }
-  
-  /* Megamenu fixes */
-  .megamenu { width: 100vw !important; left: 0 !important; }
+  [role="navigation"] { width: 100%; max-width: 280px; }
 }
 
 /* Scrollbar styling for mobile */
