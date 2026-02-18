@@ -1,9 +1,6 @@
 /**
- * LLM Service - Routes all agent calls to Claude AI
- * Uses dedicated ClaudeAIService for all agent functionalities
+ * LLM Service - Handles all AI agent communication
  */
-
-import * as ClaudeAI from './ClaudeAIService';
 
 /**
  * Generate intelligent, dynamic responses based on user input
@@ -707,14 +704,7 @@ Phase 3: Finalization (Week 9-10)`;
  * Falls back to local response if APIs unavailable
  */
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
-  try {
-    // Directly call Claude API via ClaudeAIService
-    const response = await ClaudeAI.callClaudeAPI(systemPrompt, userMessage);
-    return response;
-  } catch (error) {
-    console.error('Claude API call failed:', error);
-    throw error;
-  }
+  return generateDynamicResponse(systemPrompt, userMessage);
 }
 
 /**
@@ -750,8 +740,7 @@ export function parseLLMResponse(response) {
  */
 export async function callAgent(agentSystemPrompt, userMessage, options = {}) {
   try {
-    // Route through Claude AI Service for real intelligence
-    const response = await ClaudeAI.callClaudeAPI(agentSystemPrompt, userMessage);
+    const response = generateDynamicResponse(agentSystemPrompt, userMessage);
     return parseLLMResponse(response);
   } catch (error) {
     console.error('Agent call failed:', error);

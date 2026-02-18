@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Bot, CheckCircle2, AlertCircle, Zap, MessageSquare } from 'lucide-react';
-import AIAgentService from '@/services/AIAgentService';
 
 export default function AIAgentsOpenAIClaude() {
   const [openaiKey, setOpenaiKey] = useState(localStorage.getItem('openai_api_key') || '');

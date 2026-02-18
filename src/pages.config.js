@@ -50,6 +50,7 @@
 import aiagentsFixed from './pages/AIAgents-Fixed';
 import aiagentsOpenaiClaude from './pages/AIAgents-OpenAI-Claude';
 import AIAgents from './pages/AIAgents';
+import AIAgentsMultiPlatform from './pages/AIAgentsMultiPlatform';
 import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
@@ -109,6 +110,7 @@ export const PAGES = {
     "AIAgents-Fixed": aiagentsFixed,
     "AIAgents-OpenAI-Claude": aiagentsOpenaiClaude,
     "AIAgents": AIAgents,
+    "AIAgentsMultiPlatform": AIAgentsMultiPlatform,
     "AddBid": AddBid,
     "AlertSettings": AlertSettings,
     "AuditTrail": AuditTrail,
