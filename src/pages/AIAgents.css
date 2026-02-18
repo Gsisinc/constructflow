@@ -1,0 +1,50 @@
+/* AI Agents Page Styles */
+
+.drag-handle {
+  cursor: move !important;
+}
+
+.drag-handle:active {
+  opacity: 0.9;
+}
+
+/* Responsive window sizing */
+@media (max-width: 768px) {
+  /* Mobile adjustments */
+  .floating-window {
+    position: absolute !important;
+  }
+}
+
+/* Dark mode scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Smooth transitions */
+* {
+  transition: box-shadow 0.2s ease;
+}
+
+/* Custom scrollbar for cards */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.dark .overflow-y-auto {
+  scrollbar-color: #475569 #1e293b;
+}
