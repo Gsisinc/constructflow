@@ -1,371 +1,281 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { X, Maximize2, Minimize2, Maximize } from 'lucide-react';
+import { ExternalLink, RefreshCw } from 'lucide-react';
 
 export default function AIAgents() {
-  const [windows, setWindows] = useState({
-    deepseek: { width: 900, height: 600, visible: true, maximized: false, x: 20, y: 100 },
-    grok: { width: 900, height: 600, visible: true, maximized: false, x: 950, y: 100 },
-    chatgpt: { width: 900, height: 600, visible: true, maximized: false, x: 1880, y: 100 },
-    claude: { width: 900, height: 600, visible: true, maximized: false, x: 20, y: 750 },
-    manus: { width: 900, height: 600, visible: true, maximized: false, x: 950, y: 750 },
-    custom: { width: 900, height: 600, visible: true, maximized: false, x: 1880, y: 750 },
-  });
+  const [selectedAgent, setSelectedAgent] = useState(null);
+  const [iframeKey, setIframeKey] = useState({});
 
-  const [activeTab, setActiveTab] = useState('deepseek');
-  const [dragging, setDragging] = useState(null);
-  const [resizing, setResizing] = useState(null);
-
-  const agentConfigs = {
+  const agents = {
     deepseek: {
       name: 'DeepSeek',
-      color: 'from-purple-500 to-blue-600',
       url: 'https://chat.deepseek.com/',
-      icon: '🧠',
-    },
-    grok: {
-      name: 'Grok',
-      color: 'from-yellow-500 to-orange-600',
-      url: 'https://grok.com/',
-      icon: '⚡',
+      color: 'bg-purple-600',
+      description: 'Advanced reasoning and code generation',
+      icon: '🟣',
     },
     chatgpt: {
       name: 'ChatGPT',
-      color: 'from-green-500 to-emerald-600',
       url: 'https://chat.openai.com/',
-      icon: '💬',
+      color: 'bg-green-600',
+      description: 'OpenAI GPT-4 powered assistant',
+      icon: '🟢',
+    },
+    grok: {
+      name: 'Grok',
+      url: 'https://grok.com/',
+      color: 'bg-yellow-600',
+      description: 'Real-time AI with web knowledge',
+      icon: '🟡',
     },
     claude: {
       name: 'Claude',
-      color: 'from-blue-500 to-cyan-600',
       url: 'https://claude.ai/',
-      icon: '🤖',
+      color: 'bg-blue-600',
+      description: 'Anthropic Claude AI assistant',
+      icon: '🔵',
     },
     manus: {
       name: 'Manus AMS',
-      color: 'from-red-500 to-pink-600',
-      url: 'https://www.manusams.com/',
-      icon: '🏗️',
+      url: 'https://www.manus.ai/',
+      color: 'bg-red-600',
+      description: 'Manus AI management system',
+      icon: '🔴',
     },
     custom: {
       name: 'Custom Agents',
-      color: 'from-indigo-500 to-purple-600',
       url: null,
+      color: 'bg-slate-600',
+      description: 'ConstructFlow built-in agents',
       icon: '⚙️',
     },
   };
 
-  const constructflowAgents = [
-    { id: 'central-orchestrator', title: 'Central Orchestrator', desc: 'Project CEO coordinating all specialist agents', icon: '🎯' },
-    { id: 'market-intel', title: 'Market Intelligence', desc: 'Proactive bid opportunity searcher', icon: '📊' },
-    { id: 'bid-assembly', title: 'Bid Package Assembly', desc: 'Intelligent document synthesis and pricing', icon: '📋' },
-    { id: 'proposal-gen', title: 'Proposal Generation', desc: 'Client-specific personalized proposals', icon: '✍️' },
-    { id: 'risk-predict', title: 'Risk Prediction', desc: 'Cost overruns and schedule risks prediction', icon: '⚠️' },
-    { id: 'regulatory-intel', title: 'Regulatory Intelligence', desc: 'Permit automation and compliance expert', icon: '⚖️' },
-    { id: 'quality-assure', title: 'Quality Assurance', desc: 'Quality control and inspection planning', icon: '✅' },
-    { id: 'safety-comply', title: 'Safety Compliance', desc: 'OSHA compliance and safety planning', icon: '🛡️' },
-    { id: 'sustainability', title: 'Sustainability', desc: 'Green building and eco-friendly strategies', icon: '🌱' },
-    { id: 'stakeholder', title: 'Stakeholder Communication', desc: 'Message tailoring for audiences', icon: '💼' },
+  const customAgents = [
+    {
+      id: 'central-orchestrator',
+      name: 'Central Orchestrator',
+      desc: 'Project CEO coordinating all specialist agents',
+      icon: '👔',
+    },
+    {
+      id: 'market-intelligence',
+      name: 'Market Intelligence',
+      desc: 'Proactive bid opportunity searcher',
+      icon: '📊',
+    },
+    {
+      id: 'bid-package',
+      name: 'Bid Package Assembly',
+      desc: 'Intelligent document synthesis',
+      icon: '📋',
+    },
+    {
+      id: 'proposal-generation',
+      name: 'Proposal Generation',
+      desc: 'Client-specific proposals',
+      icon: '✍️',
+    },
+    {
+      id: 'risk-prediction',
+      name: 'Risk Prediction',
+      desc: 'Cost overruns and schedule risks',
+      icon: '⚠️',
+    },
+    {
+      id: 'regulatory',
+      name: 'Regulatory Intelligence',
+      desc: 'Permit automation and compliance',
+      icon: '⚖️',
+    },
+    {
+      id: 'qa',
+      name: 'Quality Assurance',
+      desc: 'QA planning and inspections',
+      icon: '✅',
+    },
+    {
+      id: 'safety',
+      name: 'Safety Compliance',
+      desc: 'Safety planning and OSHA compliance',
+      icon: '🛡️',
+    },
+    {
+      id: 'sustainability',
+      name: 'Sustainability Optimization',
+      desc: 'Green building strategies',
+      icon: '🌱',
+    },
+    {
+      id: 'stakeholder',
+      name: 'Stakeholder Communication',
+      desc: 'Message tailoring for audiences',
+      icon: '💬',
+    },
   ];
 
-  const handleDragStart = (e, id) => {
-    if (e.target.closest('.window-header')) {
-      setDragging({
-        id,
-        startX: e.clientX,
-        startY: e.clientY,
-        startWindowX: windows[id].x,
-        startWindowY: windows[id].y,
-      });
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (dragging) {
-      const dx = e.clientX - dragging.startX;
-      const dy = e.clientY - dragging.startY;
-      setWindows(prev => ({
-        ...prev,
-        [dragging.id]: {
-          ...prev[dragging.id],
-          x: Math.max(0, dragging.startWindowX + dx),
-          y: Math.max(0, dragging.startWindowY + dy),
-        }
-      }));
-    }
-
-    if (resizing) {
-      const dw = e.clientX - resizing.startX;
-      const dh = e.clientY - resizing.startY;
-      setWindows(prev => ({
-        ...prev,
-        [resizing.id]: {
-          ...prev[resizing.id],
-          width: Math.max(300, resizing.startWidth + dw),
-          height: Math.max(300, resizing.startHeight + dh),
-        }
-      }));
-    }
-  };
-
-  const handleMouseUp = () => {
-    setDragging(null);
-    setResizing(null);
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [dragging, resizing]);
-
-  const toggleMaximize = (id) => {
-    setWindows(prev => ({
+  const reloadIframe = (agentKey) => {
+    setIframeKey(prev => ({
       ...prev,
-      [id]: {
-        ...prev[id],
-        maximized: !prev[id].maximized,
-        width: !prev[id].maximized ? window.innerWidth - 40 : 900,
-        height: !prev[id].maximized ? window.innerHeight - 200 : 600,
-      }
+      [agentKey]: !prev[agentKey],
     }));
-  };
-
-  const toggleVisibility = (id) => {
-    setWindows(prev => ({
-      ...prev,
-      [id]: { ...prev[id], visible: !prev[id].visible }
-    }));
-  };
-
-  const CustomAgentsPanel = () => (
-    <div className="space-y-4 p-4 overflow-y-auto h-full bg-slate-50 dark:bg-slate-900">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {constructflowAgents.map((agent) => (
-          <Card key={agent.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <span className="text-xl">{agent.icon}</span>
-                {agent.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <p className="text-xs text-slate-600 dark:text-slate-400">{agent.desc}</p>
-              <Button size="sm" className="w-full h-8 text-xs">
-                Use Agent
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-
-  const EmbeddedWindow = ({ id, config }) => {
-    const windowState = windows[id];
-    if (!windowState.visible) return null;
-
-    return (
-      <div
-        onMouseDown={(e) => {
-          if (e.target.closest('.window-header')) {
-            handleDragStart(e, id);
-          }
-        }}
-        className="fixed border-2 border-slate-300 dark:border-slate-600 rounded-lg shadow-2xl bg-white dark:bg-slate-900 flex flex-col overflow-hidden"
-        style={{
-          left: `${windowState.maximized ? 0 : windowState.x}px`,
-          top: `${windowState.maximized ? 0 : windowState.y}px`,
-          width: windowState.maximized ? '100%' : `${windowState.width}px`,
-          height: windowState.maximized ? '100%' : `${windowState.height}px`,
-          minWidth: '300px',
-          minHeight: '300px',
-          zIndex: dragging?.id === id ? 1000 : 50,
-        }}
-      >
-        {/* Title Bar */}
-        <div 
-          className={`window-header bg-gradient-to-r ${config.color} text-white p-3 rounded-t-md flex items-center justify-between cursor-move select-none`}
-        >
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-sm flex items-center gap-2">
-              <span>{config.icon}</span>
-              {config.name}
-            </h3>
-          </div>
-          <div className="flex gap-1 ml-2 flex-shrink-0">
-            <button
-              onClick={() => toggleMaximize(id)}
-              className="hover:bg-white hover:bg-opacity-20 p-1 rounded transition"
-              title={windowState.maximized ? 'Restore' : 'Maximize'}
-            >
-              {windowState.maximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-            </button>
-            <button
-              onClick={() => toggleVisibility(id)}
-              className="hover:bg-white hover:bg-opacity-20 p-1 rounded transition"
-              title="Close"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-hidden bg-white dark:bg-slate-800">
-          {id === 'custom' ? (
-            <CustomAgentsPanel />
-          ) : (
-            <iframe
-              src={config.url}
-              className="w-full h-full border-0"
-              title={config.name}
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-presentation allow-downloads"
-            />
-          )}
-        </div>
-
-        {/* Resize Handle */}
-        {!windowState.maximized && (
-          <div
-            className="absolute bottom-0 right-0 w-4 h-4 bg-blue-500 dark:bg-blue-400 cursor-se-resize rounded-tl hover:bg-blue-600 transition"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setResizing({
-                id,
-                startX: e.clientX,
-                startY: e.clientY,
-                startWidth: windowState.width,
-                startHeight: windowState.height,
-              });
-            }}
-            title="Drag to resize"
-          />
-        )}
-      </div>
-    );
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-2 sm:p-4">
-      <div className="max-w-full mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 sm:p-6">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-4 sm:mb-6">
-          <h1 className="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-2">AI Agent Platform</h1>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Access 5 major AI services and 10 ConstructFlow custom agents</p>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+            AI Agent Platform
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 text-lg">
+            Access multiple AI services and ConstructFlow custom agents
+          </p>
         </div>
 
-        {/* Tab Navigation */}
-        <Card className="mb-4 sm:mb-6">
-          <CardContent className="pt-4 sm:pt-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-2">
-                <TabsTrigger value="deepseek" className="text-xs sm:text-sm">
-                  <span className="hidden sm:inline">DeepSeek</span>
-                  <span className="sm:hidden">🧠</span>
-                </TabsTrigger>
-                <TabsTrigger value="grok" className="text-xs sm:text-sm">
-                  <span className="hidden sm:inline">Grok</span>
-                  <span className="sm:hidden">⚡</span>
-                </TabsTrigger>
-                <TabsTrigger value="chatgpt" className="text-xs sm:text-sm">
-                  <span className="hidden sm:inline">ChatGPT</span>
-                  <span className="sm:hidden">💬</span>
-                </TabsTrigger>
-                <TabsTrigger value="claude" className="text-xs sm:text-sm">
-                  <span className="hidden sm:inline">Claude</span>
-                  <span className="sm:hidden">🤖</span>
-                </TabsTrigger>
-                <TabsTrigger value="manus" className="text-xs sm:text-sm">
-                  <span className="hidden sm:inline">Manus</span>
-                  <span className="sm:hidden">🏗️</span>
-                </TabsTrigger>
-                <TabsTrigger value="custom" className="text-xs sm:text-sm">
-                  <span className="hidden sm:inline">Custom</span>
-                  <span className="sm:hidden">⚙️</span>
-                </TabsTrigger>
-              </TabsList>
+        {/* Main Tabs */}
+        <Tabs defaultValue="deepseek" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 p-1 bg-slate-200 dark:bg-slate-800 rounded-lg mb-6">
+            {Object.entries(agents).map(([key, agent]) => (
+              <TabsTrigger
+                key={key}
+                value={key}
+                className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white rounded text-xs sm:text-sm font-medium"
+              >
+                <span className="mr-1">{agent.icon}</span>
+                <span className="hidden sm:inline">{agent.name}</span>
+                <span className="sm:hidden">{agent.name.split(' ')[0]}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-              {/* Tab Contents */}
-              {Object.entries(agentConfigs).map(([key, config]) => (
-                <TabsContent key={key} value={key} className="space-y-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <span className="text-2xl">{config.icon}</span>
-                        {config.name}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Button
-                        onClick={() => setWindows(prev => ({...prev, [key]: {...prev[key], visible: true}}))}
-                        className="w-full sm:w-auto"
+          {/* Tab Contents */}
+          {Object.entries(agents).map(([key, agent]) => (
+            <TabsContent key={key} value={key} className="space-y-4">
+              {/* Info Card */}
+              <Card className="border-2 border-slate-200 dark:border-slate-700">
+                <CardHeader className={`${agent.color} text-white rounded-t-lg`}>
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    <span className="text-3xl">{agent.icon}</span>
+                    {agent.name}
+                  </CardTitle>
+                  <p className="text-white/80 mt-2">{agent.description}</p>
+                </CardHeader>
+              </Card>
+
+              {/* Content */}
+              {key === 'custom' ? (
+                // Custom Agents Grid
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {customAgents.map((agent) => (
+                      <Card
+                        key={agent.id}
+                        className="hover:shadow-lg dark:hover:shadow-slate-700 transition-shadow cursor-pointer border-slate-200 dark:border-slate-700"
+                        onClick={() => setSelectedAgent(agent.id)}
                       >
-                        {windows[key].visible ? 'Window Visible' : `Open ${config.name}`}
-                      </Button>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mt-3">
-                        {key === 'custom' 
-                          ? 'Access 10 specialized ConstructFlow AI agents for construction project management'
-                          : `Access the official ${config.name} interface directly`
-                        }
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <span className="text-2xl">{agent.icon}</span>
+                            {agent.name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                            {agent.desc}
+                          </p>
+                          <Button
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded"
+                            onClick={() => {
+                              setSelectedAgent(agent.id);
+                            }}
+                          >
+                            Use Agent →
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+
+                  {/* Selected Agent Info */}
+                  {selectedAgent && (
+                    <Card className="border-2 border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                      <CardHeader>
+                        <CardTitle>
+                          {customAgents.find(a => a.id === selectedAgent)?.name} Selected
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm">
+                          This agent will be used for your next interaction. 
+                          Configuration and advanced options coming soon.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              ) : (
+                // External AI Service Embedded
+                <div className="space-y-4">
+                  {/* Controls */}
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => reloadIframe(key)}
+                      className="gap-2"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      Reload
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                    >
+                      <a
+                        href={agent.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Open Full Site
+                      </a>
+                    </Button>
+                  </div>
+
+                  {/* Embedded Iframe */}
+                  <Card className="overflow-hidden border-2 border-slate-200 dark:border-slate-700">
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+                      <iframe
+                        key={iframeKey[key]}
+                        src={agent.url}
+                        className="w-full h-full border-0"
+                        title={agent.name}
+                        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-presentation allow-top-navigation allow-top-navigation-by-user-activation"
+                        allow="camera; microphone; clipboard-read; clipboard-write"
+                      />
+                    </div>
+                  </Card>
+
+                  {/* Info */}
+                  <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                    <CardContent className="pt-6">
+                      <p className="text-sm text-slate-700 dark:text-slate-300">
+                        💡 <strong>Tip:</strong> Click "Open Full Site" to use {agent.name} in full screen, 
+                        or use the embedded preview below. The reload button refreshes the preview.
                       </p>
                     </CardContent>
                   </Card>
-                </TabsContent>
-              ))}
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Window Status Panel */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base sm:text-lg">Active Windows</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-              {Object.entries(windows).map(([id, state]) => (
-                <Button
-                  key={id}
-                  variant={state.visible ? 'default' : 'outline'}
-                  onClick={() => toggleVisibility(id)}
-                  className="text-xs py-1 h-8"
-                  size="sm"
-                >
-                  {agentConfigs[id].icon} {agentConfigs[id].name}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Instructions */}
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle className="text-base">How to Use</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm space-y-2">
-            <p>📌 <strong>Drag Title Bar:</strong> Click and drag the colored header to move windows around</p>
-            <p>🔲 <strong>Resize:</strong> Drag the blue corner at bottom-right to resize</p>
-            <p>⬜ <strong>Maximize:</strong> Click the maximize button to go fullscreen</p>
-            <p>❌ <strong>Close:</strong> Click X to hide window (toggle above to show)</p>
-            <p>📱 <strong>Mobile:</strong> Same features work great on mobile with touch controls</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Floating Windows Container */}
-      <div className="fixed inset-0 pointer-events-none">
-        {Object.entries(agentConfigs).map(([key, config]) => (
-          <div key={key} className="pointer-events-auto">
-            <EmbeddedWindow id={key} config={config} />
-          </div>
-        ))}
+                </div>
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     </div>
   );
