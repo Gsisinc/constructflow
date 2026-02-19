@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ExternalLink, RefreshCw } from 'lucide-react';
+import { ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
 
 export default function AIAgents() {
   const [activeTab, setActiveTab] = useState('deepseek');
@@ -14,6 +14,7 @@ export default function AIAgents() {
     claude: 'https://claude.ai/',
     manus: 'https://www.manus.ai/',
   });
+  const [iframeError, setIframeError] = useState({});
 
   const agents = {
     deepseek: { 
@@ -78,6 +79,10 @@ export default function AIAgents() {
         ...prev,
         [activeTab]: url
       }));
+      setIframeError(prev => ({
+        ...prev,
+        [activeTab]: false
+      }));
     }
   };
 
@@ -85,6 +90,17 @@ export default function AIAgents() {
     setUrlInput(prev => ({
       ...prev,
       [activeTab]: currentAgent.url
+    }));
+    setIframeError(prev => ({
+      ...prev,
+      [activeTab]: false
+    }));
+  };
+
+  const handleIframeError = () => {
+    setIframeError(prev => ({
+      ...prev,
+      [activeTab]: true
     }));
   };
 
@@ -98,7 +114,7 @@ export default function AIAgents() {
             🌐 AI Agent Web Browser
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
-            Access AI services directly in your app with a built-in web browser
+            Access AI services directly - click a service to start
           </p>
         </div>
 
@@ -113,7 +129,7 @@ export default function AIAgents() {
                 : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300'
             }`}
           >
-            <span>⚙️ Custom</span>
+            ⚙️ Custom
           </button>
           {Object.entries(agents).map(([key, agent]) => (
             <button
@@ -127,7 +143,6 @@ export default function AIAgents() {
             >
               <span className="mr-1">{agent.icon}</span>
               <span className="hidden sm:inline">{agent.name}</span>
-              <span className="sm:hidden">{agent.name.split(' ')[0]}</span>
             </button>
           ))}
         </div>
@@ -181,7 +196,7 @@ export default function AIAgents() {
                     {customAgents.find(a => a.id === selectedAgent)?.name} Selected ✓
                   </h3>
                   <p className="text-sm">
-                    This agent will be used for your next interaction. Configuration and advanced options coming soon.
+                    This agent will be used for your next interaction.
                   </p>
                 </CardContent>
               </Card>
@@ -204,12 +219,11 @@ export default function AIAgents() {
             {/* Browser Toolbar */}
             <Card>
               <CardContent className="p-4 space-y-3">
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 items-center">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={goHome}
-                    className="gap-2"
                   >
                     🏠 Home
                   </Button>
@@ -217,25 +231,20 @@ export default function AIAgents() {
                     value={urlInput[activeTab]}
                     onChange={(e) => setUrlInput(prev => ({ ...prev, [activeTab]: e.target.value }))}
                     onKeyPress={handleNavigate}
-                    placeholder="Enter URL or search..."
-                    className="flex-1"
+                    placeholder="Enter URL..."
+                    className="flex-1 min-w-[200px]"
                   />
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      let url = urlInput[activeTab];
-                      if (!url.startsWith('http')) url = 'https://' + url;
-                      setUrlInput(prev => ({ ...prev, [activeTab]: url }));
-                    }}
+                    onClick={goHome}
                   >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Go
+                    <RefreshCw className="w-4 h-4" />
                   </Button>
                   <Button
-                    variant="outline"
                     size="sm"
                     asChild
+                    className="bg-blue-600 hover:bg-blue-700"
                   >
                     <a
                       href={urlInput[activeTab]}
@@ -244,43 +253,88 @@ export default function AIAgents() {
                       className="gap-2 flex items-center"
                     >
                       <ExternalLink className="w-4 h-4" />
-                      Open
+                      <span className="hidden sm:inline">Open Site</span>
+                      <span className="sm:hidden">↗</span>
                     </a>
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Connection Error Banner */}
+            {iframeError[activeTab] && (
+              <Card className="border-2 border-amber-200 bg-amber-50 dark:bg-amber-900/20">
+                <CardContent className="p-4 flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-amber-800 dark:text-amber-200">Connection Issue</p>
+                    <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                      {currentAgent.name} blocks embedding in iframes for security. Click <strong>"Open Site"</strong> button above to open it in your browser, or try another service.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Web Browser Window */}
             <Card className="overflow-hidden border-2">
-              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden" style={{ height: '700px' }}>
-                <iframe
-                  key={urlInput[activeTab]}
-                  src={urlInput[activeTab]}
-                  className="w-full h-full border-0"
-                  title={currentAgent.name}
-                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-presentation allow-downloads"
-                  allow="camera; microphone; clipboard-read; clipboard-write; payment; geolocation"
-                  referrerPolicy="no-referrer"
-                />
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden relative" style={{ height: '700px' }}>
+                {!iframeError[activeTab] && (
+                  <iframe
+                    key={urlInput[activeTab]}
+                    src={urlInput[activeTab]}
+                    className="w-full h-full border-0"
+                    title={currentAgent.name}
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-presentation allow-downloads allow-top-navigation allow-top-navigation-by-user-activation"
+                    allow="camera; microphone; clipboard-read; clipboard-write; payment; geolocation; accelerometer; gyroscope; magnetometer"
+                    referrerPolicy="no-referrer"
+                    onError={handleIframeError}
+                    style={{ display: iframeError[activeTab] ? 'none' : 'block' }}
+                  />
+                )}
+                
+                {iframeError[activeTab] && (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
+                    <div className="text-6xl mb-4">🔒</div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                      Website Blocked Embedding
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md">
+                      {currentAgent.name} doesn't allow being displayed inside another website (X-Frame-Options restriction).
+                    </p>
+                    <Button
+                      asChild
+                      className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+                    >
+                      <a
+                        href={urlInput[activeTab]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Open {currentAgent.name} in New Tab
+                      </a>
+                    </Button>
+                  </div>
+                )}
               </div>
             </Card>
 
-            {/* Info & Instructions */}
+            {/* Instructions */}
             <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
               <CardContent className="pt-6">
                 <div className="space-y-2">
-                  <p className="text-sm text-slate-700 dark:text-slate-300">
-                    <strong>💡 Instructions:</strong>
+                  <p className="text-sm font-semibold text-blue-900 dark:text-blue-200">
+                    📌 How to Use:
                   </p>
-                  <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-                    <li>✓ Type any URL in the address bar and press Enter</li>
-                    <li>✓ Click "Home" to return to {currentAgent.name}</li>
-                    <li>✓ Click "Go" to refresh the page</li>
-                    <li>✓ Click "Open" to open in a new browser tab if the embed doesn't work</li>
+                  <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 ml-4">
+                    <li>✓ Website loads automatically when you click a tab</li>
+                    <li>✓ Click <strong>"Open Site"</strong> button to use in your main browser</li>
+                    <li>✓ Click <strong>"Home"</strong> to refresh and return to service</li>
+                    <li>✓ If you see "Website Blocked", use the "Open in New Tab" button</li>
                   </ul>
-                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-3">
-                    ⚠️ Note: Some websites block embedding (X-Frame-Options). Use "Open" button to view in your browser.
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
+                    💡 Tip: Most AI websites block embedding for security. This is normal. Click "Open Site" to use them fully.
                   </p>
                 </div>
               </CardContent>
