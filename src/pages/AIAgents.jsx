@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ExternalLink, RefreshCw } from 'lucide-react';
 
 export default function AIAgents() {
   const [activeTab, setActiveTab] = useState('deepseek');
@@ -68,10 +66,10 @@ export default function AIAgents() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-2">
-            🌐 AI Platform Hub
+            🤖 AI Agents Hub
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
-            Access all AI services and construction agents
+            Access AI services and custom construction agents
           </p>
         </div>
 
@@ -113,7 +111,7 @@ export default function AIAgents() {
                   <span>⚙️</span>
                   Custom Agents
                 </CardTitle>
-                <p className="text-white/80 text-sm mt-2">ConstructFlow AI agents</p>
+                <p className="text-white/80 text-sm mt-2">ConstructFlow AI agents for construction management</p>
               </CardHeader>
             </Card>
 
@@ -149,7 +147,7 @@ export default function AIAgents() {
               <Card className="border-2 border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
                 <CardContent className="pt-6">
                   <h3 className="font-bold text-lg mb-2">
-                    {customAgents.find(a => a.id === selectedAgent)?.name} ✓
+                    {customAgents.find(a => a.id === selectedAgent)?.name} Selected ✓
                   </h3>
                   <p className="text-sm">Agent selected and ready for use.</p>
                 </CardContent>
@@ -157,7 +155,7 @@ export default function AIAgents() {
             )}
           </div>
         ) : (
-          // AI Service with Full Link
+          // AI Service - Embedded via Iframe
           <div className="space-y-4">
             {/* Info Card */}
             <Card className={`border-2 bg-gradient-to-r ${currentAgent.color}`}>
@@ -170,48 +168,30 @@ export default function AIAgents() {
               </CardHeader>
             </Card>
 
-            {/* Direct Link Card */}
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 text-center">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                    Click to Access {currentAgent.name}
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-6">
-                    Click the button below to open {currentAgent.name} in a new tab for full access to all features.
-                  </p>
-                  <Button
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white gap-2 text-lg px-8 py-6"
-                    asChild
-                  >
-                    <a
-                      href={currentAgent.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <ExternalLink className="w-6 h-6" />
-                      Open {currentAgent.name} Now →
-                    </a>
-                  </Button>
-                </div>
+            {/* Embedded Iframe */}
+            <Card className="overflow-hidden border-2">
+              <div style={{ height: '800px', width: '100%' }} className="bg-white dark:bg-slate-800">
+                <iframe
+                  src={currentAgent.url}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none'
+                  }}
+                  title={currentAgent.name}
+                  allowFullScreen
+                  allow="camera; microphone; clipboard-read; clipboard-write; payment; geolocation"
+                />
+              </div>
+            </Card>
 
-                {/* Embedded Iframe as fallback */}
-                <div className="mt-8 border-t pt-8">
-                  <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-4">
-                    📱 Embedded View (Limited Functionality)
-                  </h4>
-                  <div className="border-2 border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden" style={{ height: '700px' }}>
-                    <iframe
-                      src={currentAgent.url}
-                      className="w-full h-full border-0"
-                      title={currentAgent.name}
-                      sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-presentation allow-downloads allow-top-navigation allow-top-navigation-by-user-activation"
-                      allow="camera; microphone; clipboard-read; clipboard-write; payment; geolocation; accelerometer; gyroscope; magnetometer"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                </div>
+            {/* Info */}
+            <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+              <CardContent className="pt-6">
+                <p className="text-sm text-slate-700 dark:text-slate-300">
+                  ✓ {currentAgent.name} is now embedded and ready to use. 
+                  You can interact with it directly in this window.
+                </p>
               </CardContent>
             </Card>
           </div>
