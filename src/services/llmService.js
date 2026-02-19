@@ -704,7 +704,51 @@ Phase 3: Finalization (Week 9-10)`;
  * Falls back to local response if APIs unavailable
  */
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
-  return generateDynamicResponse(systemPrompt, userMessage);
+  const CLAUDE_API_KEY = process.env.REACT_APP_CLAUDE_API_KEY;
+  const CLAUDE_API_BASE = 'https://api.anthropic.com/v1';
+
+  if (!CLAUDE_API_KEY) {
+    console.warn('Claude API key not configured, using fallback');
+    return generateDynamicResponse(systemPrompt, userMessage);
+  }
+
+  try {
+    const response = await fetch(`${CLAUDE_API_BASE}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CLAUDE_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-opus-20240229',
+        max_tokens: maxTokens,
+        temperature: temperature,
+        system: systemPrompt,
+        messages: [
+          { role: 'user', content: userMessage }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.warn('Claude API error:', response.status, errorData);
+      return generateDynamicResponse(systemPrompt, userMessage);
+    }
+
+    const data = await response.json();
+    
+    if (!data.content || data.content.length === 0) {
+      console.warn('Empty response from Claude API');
+      return generateDynamicResponse(systemPrompt, userMessage);
+    }
+
+    return data.content[0].text;
+  } catch (error) {
+    console.warn('Claude API call failed:', error.message);
+    return generateDynamicResponse(systemPrompt, userMessage);
+  }
 }
 
 /**
@@ -740,11 +784,14 @@ export function parseLLMResponse(response) {
  */
 export async function callAgent(agentSystemPrompt, userMessage, options = {}) {
   try {
-    const response = generateDynamicResponse(agentSystemPrompt, userMessage);
+    // Try to call Claude API first
+    const response = await callOpenAI(agentSystemPrompt, userMessage, 0.7, 2000);
     return parseLLMResponse(response);
   } catch (error) {
-    console.error('Agent call failed:', error);
-    throw error;
+    console.warn('Claude API failed, falling back to dynamic response:', error.message);
+    // Fall back to dynamic response if API fails
+    const dynamicResponse = generateDynamicResponse(agentSystemPrompt, userMessage);
+    return parseLLMResponse(dynamicResponse);
   }
 }
 
