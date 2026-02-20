@@ -65,8 +65,6 @@ import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
 import ClientPortal from './pages/ClientPortal';
 import DailyLog from './pages/DailyLog';
-import dashboardOld from './pages/Dashboard-old';
-import dashboardV2 from './pages/Dashboard-v2';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
@@ -127,8 +125,6 @@ export const PAGES = {
     "Calendar": Calendar,
     "ClientPortal": ClientPortal,
     "DailyLog": DailyLog,
-    "Dashboard-old": dashboardOld,
-    "Dashboard-v2": dashboardV2,
     "Dashboard.ImprovedVersion": dashboardImprovedversion,
     "Dashboard": Dashboard,
     "Directory": Directory,
