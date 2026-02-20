@@ -71,7 +71,6 @@ import Directory from './pages/Directory';
 import Documents from './pages/Documents';
 import EstimateGenerator from './pages/EstimateGenerator';
 import Estimates from './pages/Estimates';
-import Estimator from './pages/Estimator';
 import FeatureTesting from './pages/FeatureTesting';
 import Home from './pages/Home';
 import Invoices from './pages/Invoices';
@@ -132,7 +131,6 @@ export const PAGES = {
     "Documents": Documents,
     "EstimateGenerator": EstimateGenerator,
     "Estimates": Estimates,
-    "Estimator": Estimator,
     "FeatureTesting": FeatureTesting,
     "Home": Home,
     "Invoices": Invoices,
