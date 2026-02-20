@@ -69,11 +69,11 @@ import dashboardOld from './pages/Dashboard-old';
 import dashboardV2 from './pages/Dashboard-v2';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
 import Dashboard from './pages/Dashboard';
-import EstimateGenerator from './pages/EstimateGenerator';
-import Estimator from './pages/Estimator';
 import Directory from './pages/Directory';
 import Documents from './pages/Documents';
+import EstimateGenerator from './pages/EstimateGenerator';
 import Estimates from './pages/Estimates';
+import Estimator from './pages/Estimator';
 import FeatureTesting from './pages/FeatureTesting';
 import Home from './pages/Home';
 import Invoices from './pages/Invoices';
@@ -105,7 +105,6 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import Estimator from './pages/Estimator';
 import __Layout from './Layout.jsx';
 
 
@@ -134,8 +133,8 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "Directory": Directory,
     "Documents": Documents,
-    "Estimates": Estimates,
     "EstimateGenerator": EstimateGenerator,
+    "Estimates": Estimates,
     "Estimator": Estimator,
     "FeatureTesting": FeatureTesting,
     "Home": Home,
@@ -168,8 +167,6 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "Estimator": Estimator,
-    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {
