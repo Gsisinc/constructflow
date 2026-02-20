@@ -136,27 +136,30 @@ export default function AIAgents() {
             </div>
           </div>
         ) : (
-          // AI Service Launch Cards
           <div className="space-y-4">
-            {/* Launch Card */}
-            <div className={`rounded-2xl p-8 bg-gradient-to-br ${currentAgent.color} text-white text-center shadow-xl`}>
-              <div className="text-6xl mb-4">{currentAgent.icon}</div>
-              <h2 className="text-3xl font-bold mb-2">{currentAgent.name}</h2>
-              <p className="text-white/80 text-lg mb-6">{currentAgent.desc}</p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a
-                  href={currentAgent.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-white/90 transition-all shadow-lg text-base"
-                >
-                  🚀 Open {currentAgent.name}
-                </a>
+            {/* Hero launch card */}
+            <div className={`rounded-2xl bg-gradient-to-br ${currentAgent.color} text-white shadow-xl overflow-hidden`}>
+              <div className="flex flex-col md:flex-row items-center gap-6 p-8">
+                <div className="text-7xl">{currentAgent.icon}</div>
+                <div className="flex-1 text-center md:text-left">
+                  <h2 className="text-3xl font-bold mb-1">{currentAgent.name}</h2>
+                  <p className="text-white/80 text-base mb-4">{currentAgent.desc}</p>
+                  <a
+                    href={currentAgent.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-8 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-white/90 transition-all shadow-lg text-base"
+                  >
+                    🚀 Open {currentAgent.name} <span className="text-slate-400">↗</span>
+                  </a>
+                </div>
               </div>
-              <p className="text-white/60 text-sm mt-4">Opens in a new tab — AI sites block embedding for security</p>
+              <div className="bg-black/20 px-8 py-3 text-white/60 text-xs">
+                ⚠️ These AI services enforce security policies that prevent embedding — clicking the button opens them in a new tab for the best experience.
+              </div>
             </div>
 
-            {/* Quick Links to all agents */}
+            {/* All AI services grid */}
             <div>
               <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">All AI Services</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -166,14 +169,15 @@ export default function AIAgents() {
                     href={agent.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r ${agent.color} text-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200`}
+                    onClick={() => setActiveTab(key)}
+                    className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r ${agent.color} text-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 ${activeTab === key ? 'ring-4 ring-white/50' : ''}`}
                   >
                     <span className="text-2xl">{agent.icon}</span>
-                    <div>
+                    <div className="flex-1">
                       <p className="font-semibold">{agent.name}</p>
                       <p className="text-white/70 text-xs">{agent.desc}</p>
                     </div>
-                    <span className="ml-auto text-white/70">↗</span>
+                    <span className="text-white/70 text-lg">↗</span>
                   </a>
                 ))}
               </div>
