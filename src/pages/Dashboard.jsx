@@ -100,7 +100,7 @@ function ProjectCard({ project, onClick }) {
                 <p className="text-sm text-slate-500 truncate">{project.client_name || 'No client'}</p>
               </div>
             </div>
-            <Badge className={`${status.color} text-xs border-0`}>
+            <Badge className={`${status.color} text-xs border-0 flex-shrink-0 ml-2`}>
               <StatusIcon className="h-3 w-3 mr-1" />{status.label}
             </Badge>
           </div>
