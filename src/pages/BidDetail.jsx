@@ -5,7 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Calendar, DollarSign, FileText, Trash2, TrendingUp } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, Calendar, DollarSign, FileText, Trash2, TrendingUp, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -29,6 +32,8 @@ const statusColors = {
 export default function BidDetail() {
   const [user, setUser] = useState(null);
   const [bidId, setBidId] = useState(null);
+  const [showRfqDialog, setShowRfqDialog] = useState(false);
+  const [rfqEmails, setRfqEmails] = useState('');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -55,6 +60,12 @@ export default function BidDetail() {
   const { data: documents = [] } = useQuery({
     queryKey: ['bidDocuments', bidId],
     queryFn: () => base44.entities.BidDocument.filter({ bid_opportunity_id: bidId }),
+    enabled: !!bidId
+  });
+
+  const { data: bidEstimates = [] } = useQuery({
+    queryKey: ['bidEstimates', bidId],
+    queryFn: () => base44.entities.BidEstimate.filter({ bid_opportunity_id: bidId }),
     enabled: !!bidId
   });
 
@@ -128,6 +139,7 @@ export default function BidDetail() {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="boq">BOQ</TabsTrigger>
           <TabsTrigger value="requirements">Requirements</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="drawings">Drawing Analysis</TabsTrigger>
@@ -145,6 +157,62 @@ export default function BidDetail() {
                 <a href={bid.url} target="_blank" rel="noopener noreferrer" className="text-sm text-amber-600 hover:underline block">
                   View original posting →
                 </a>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="boq" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <CardTitle>Bill of Quantities</CardTitle>
+                  <p className="text-sm text-slate-500 mt-1">Estimate line items for this bid. Apply takeoff from Drawing Analysis to populate.</p>
+                </div>
+                {bidEstimates.length > 0 && (
+                  <Button variant="outline" size="sm" onClick={() => setShowRfqDialog(true)}>
+                    <Send className="h-4 w-4 mr-2" />
+                    Send RFQ
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {bidEstimates.length === 0 ? (
+                <p className="text-sm text-slate-500">No estimates yet. Run Drawing Analysis and click &quot;Apply this takeoff to bid estimate&quot;, or add an estimate from the Estimates page.</p>
+              ) : (
+                <div className="space-y-4">
+                  {bidEstimates
+                    .sort((a, b) => (b.version || 0) - (a.version || 0))
+                    .map((est) => (
+                      <div key={est.id} className="border rounded-lg overflow-hidden">
+                        <div className="bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                          Version {est.version ?? 1} · Subtotal ${Number(est.subtotal || 0).toLocaleString()} · Total bid ${Number(est.total_bid_amount || 0).toLocaleString()}
+                        </div>
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b bg-slate-100 dark:bg-slate-800">
+                              <th className="text-left p-2">Description</th>
+                              <th className="text-right p-2">Qty</th>
+                              <th className="text-right p-2">Unit</th>
+                              <th className="text-right p-2">Category</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {(est.line_items || []).map((line, idx) => (
+                              <tr key={idx} className="border-b border-slate-100">
+                                <td className="p-2">{line.description}</td>
+                                <td className="p-2 text-right">{line.quantity}</td>
+                                <td className="p-2 text-right">{line.unit || 'ea'}</td>
+                                <td className="p-2 text-right text-slate-500">{line.category || '—'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ))}
+                </div>
               )}
             </CardContent>
           </Card>
@@ -293,6 +361,41 @@ export default function BidDetail() {
           )}
         </TabsContent>
       </Tabs>
+
+      <Dialog open={showRfqDialog} onOpenChange={setShowRfqDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send RFQ to vendors</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-600">Enter vendor email addresses (one per line). They will receive a request for quote for this bid.</p>
+          <Label className="sr-only">Vendor emails</Label>
+          <Textarea
+            placeholder="vendor1@example.com&#10;vendor2@example.com"
+            value={rfqEmails}
+            onChange={(e) => setRfqEmails(e.target.value)}
+            rows={4}
+            className="font-mono text-sm"
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowRfqDialog(false)}>Cancel</Button>
+            <Button
+              onClick={() => {
+                const emails = rfqEmails.split(/[\n,;]+/).map((e) => e.trim()).filter(Boolean);
+                if (emails.length === 0) {
+                  toast.error('Enter at least one email');
+                  return;
+                }
+                toast.success(`RFQ sent to ${emails.length} vendor${emails.length === 1 ? '' : 's'}. (In production this would email the BOQ.)`);
+                setRfqEmails('');
+                setShowRfqDialog(false);
+              }}
+            >
+              <Send className="h-4 w-4 mr-2" />
+              Send RFQ
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

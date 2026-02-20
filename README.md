@@ -26,6 +26,13 @@ VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
 VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
 ```
 
+Optional (for full AI agent and estimate generator functionality):
+
+- `VITE_CLAUDE_API_KEY` – Claude API key for the 10 ConstructFlow agents and the AI Estimate Generator (get one at [console.anthropic.com](https://console.anthropic.com)).
+- `VITE_SAM_GOV_API_KEY` – For live bid discovery from SAM.gov (see [sam.gov](https://sam.gov)).
+
+See `.env.example` for a full list.
+
 Run the app: `npm run dev`
 
 **Publish your changes**

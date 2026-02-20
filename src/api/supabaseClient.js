@@ -40,6 +40,17 @@ const request = async ({ path, method = 'GET', body = null, accessToken = null, 
   return data;
 };
 
+const getProjectRef = () => {
+  try {
+    const u = new URL(supabaseUrl);
+    return u.hostname.split('.')[0] || 'local';
+  } catch {
+    return 'local';
+  }
+};
+
+const authStorageKey = () => `sb-${getProjectRef()}-auth-token`;
+
 const auth = {
   async getUser() {
     const token = getAccessToken();
@@ -59,6 +70,34 @@ const auth = {
     return { data: { session: { access_token: token } }, error: null };
   },
 
+  async signInWithPassword({ email, password }) {
+    const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseAnonKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const err = new Error(data?.error_description || data?.msg || 'Login failed');
+      err.status = response.status;
+      err.data = data;
+      throw err;
+    }
+    const payload = {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      expires_at: data.expires_at,
+      user: data.user
+    };
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(authStorageKey(), JSON.stringify(payload));
+    }
+    return { data: { user: data.user, session: payload }, error: null };
+  },
+
   async signOut() {
     const token = getAccessToken();
     if (!token) return { error: null };
@@ -69,6 +108,9 @@ const auth = {
       accessToken: token
     });
 
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(authStorageKey());
+    }
     return { error: null };
   }
 };

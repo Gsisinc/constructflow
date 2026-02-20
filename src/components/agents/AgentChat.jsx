@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Loader2, Send, X, Paperclip, Bot, User, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
+import { getAgentWorkflow, buildAgentSystemPrompt } from '@/config/agentWorkflows';
+import { callAgent } from '@/services/llmService';
+import { shouldInvokeLiveDiscovery } from '@/config/agentRuntimeRules';
+import { fetchDiscoveryFromSources } from '@/lib/bidDiscoveryOrchestrator';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [messages, setMessages] = useState([]);
@@ -40,22 +44,66 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     setMessages(prev => [...prev, userMsg]);
 
     try {
-      const systemPrompt = `You are ${agent.name}, a specialized AI assistant for construction project management.
+      const workflow = getAgentWorkflow(agent.id);
+      let userMessageForLLM = text;
+      let discoverySummary = '';
+
+      // Market Intelligence: trigger live discovery when user asks for opportunities
+      if (agent.id === 'market_intelligence' && shouldInvokeLiveDiscovery(agent.id, text)) {
+        try {
+          const lower = text.toLowerCase();
+          const stateMatch = lower.match(/\b(california|ca|texas|florida|new york|washington)\b/);
+          const filters = {
+            state: stateMatch ? (stateMatch[1] === 'ca' ? 'California' : stateMatch[1].replace(/\b\w/g, c => c.toUpperCase())) : 'California',
+            workType: 'all',
+            classification: 'all'
+          };
+          const { opportunities = [] } = await fetchDiscoveryFromSources({
+            base44Client: base44,
+            filters,
+            page: 1,
+            pageSize: 25
+          });
+          if (opportunities.length > 0) {
+            discoverySummary = opportunities.slice(0, 15).map((opp, i) =>
+              `${i + 1}. ${opp.title || 'Untitled'} | ${opp.agency || 'N/A'} | ${opp.location || 'N/A'} | Due: ${opp.due_date || 'N/A'} | ${opp.url ? opp.url : ''}`
+            ).join('\n');
+            userMessageForLLM = `${text}\n\n[Live discovery results from SAM.gov and county portals - use these real opportunities in your response. Do not fabricate; only reference these.]\n${discoverySummary}`;
+          } else {
+            userMessageForLLM = `${text}\n\n[Live discovery was run but no opportunities were returned from sources. State this clearly and suggest checking filters or SAM.gov API key.]`;
+          }
+        } catch (discoveryErr) {
+          console.warn('Live discovery failed:', discoveryErr);
+          userMessageForLLM = `${text}\n\n[Live discovery could not be completed (${discoveryErr.message}). Answer from your workflow and advise the user to try the Bid Discovery page or check API configuration.]`;
+        }
+      }
+
+      if (workflow) {
+        const systemPrompt = buildAgentSystemPrompt(agent.id);
+        const content = await callAgent(systemPrompt, userMessageForLLM);
+        setMessages(prev => [...prev, {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: content || 'I could not generate a response. Please try again.'
+        }]);
+      } else {
+        const systemPrompt = `You are ${agent.name}, a specialized AI assistant for construction project management.
 ${agent.description ? `Your role: ${agent.description}` : ''}
 Provide detailed, actionable, and expert responses. Format with bullet points and clear sections where appropriate.
 Never ask for internal database IDs. Proceed with best-effort answers based on context provided.`;
 
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `${systemPrompt}\n\nUser: ${text}`,
-      });
+        const result = await base44.integrations.Core.InvokeLLM({
+          prompt: `${systemPrompt}\n\nUser: ${userMessageForLLM}`,
+        });
 
-      const content = typeof result === 'string' ? result : (result?.text || result?.output || JSON.stringify(result));
+        const content = typeof result === 'string' ? result : (result?.text || result?.output || JSON.stringify(result));
 
-      setMessages(prev => [...prev, {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: content || 'I could not generate a response. Please try again.'
-      }]);
+        setMessages(prev => [...prev, {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: content || 'I could not generate a response. Please try again.'
+        }]);
+      }
     } catch (err) {
       console.error('LLM error:', err);
       setMessages(prev => [...prev, {

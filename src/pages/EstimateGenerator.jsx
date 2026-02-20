@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertCircle, Upload, Loader2, FileText, X } from 'lucide-react';
+import { AlertCircle, Upload, Loader2, FileText, X, Copy } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function EstimateGenerator() {
   const [scopeOfWork, setScopeOfWork] = useState('');
@@ -42,10 +43,10 @@ export default function EstimateGenerator() {
     setError(null);
 
     try {
-      const apiKey = process.env.REACT_APP_CLAUDE_API_KEY;
+      const apiKey = import.meta.env.VITE_CLAUDE_API_KEY ?? process.env.REACT_APP_CLAUDE_API_KEY;
       
       if (!apiKey) {
-        throw new Error('Claude API key not configured');
+        throw new Error('Claude API key not configured. Add VITE_CLAUDE_API_KEY to .env.local and restart the dev server. See Settings → Preferences → API status.');
       }
 
       const prompt = `Generate a detailed construction estimate based on the following scope of work:
@@ -237,7 +238,7 @@ Format as a professional estimate document.`;
             </Card>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3">
               <Button
                 onClick={() => {
                   setEstimateResult(null);
@@ -245,9 +246,22 @@ Format as a professional estimate document.`;
                   setAttachedFile(null);
                 }}
                 variant="outline"
-                className="flex-1"
               >
                 Create Another Estimate
+              </Button>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(estimateResult.content);
+                    toast.success('Estimate copied to clipboard');
+                  } catch {
+                    toast.error('Copy failed');
+                  }
+                }}
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy to clipboard
               </Button>
               <Button
                 onClick={() => {
@@ -260,7 +274,7 @@ Format as a professional estimate document.`;
                   element.click();
                   document.body.removeChild(element);
                 }}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700"
               >
                 Download Estimate
               </Button>

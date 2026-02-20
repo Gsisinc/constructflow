@@ -276,7 +276,26 @@ export const appClient = {
     async me() {
       const { data, error } = await supabase.auth.getUser();
       if (error) throw error;
-      return data.user;
+      const user = data?.user;
+      if (!user) return null;
+      try {
+        const profiles = await supabase.request({
+          path: `/rest/v1/profiles?id=eq.${user.id}&select=full_name,organization_id,role&limit=1`,
+          headers: {
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${supabase.getAccessToken() || import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          }
+        });
+        const profile = Array.isArray(profiles) ? profiles[0] : profiles;
+        return {
+          ...user,
+          full_name: profile?.full_name ?? user.email,
+          organization_id: profile?.organization_id ?? null,
+          role: profile?.role ?? null
+        };
+      } catch {
+        return { ...user, full_name: user.email, organization_id: null, role: null };
+      }
     },
     async isAuthenticated() {
       const { data, error } = await supabase.auth.getSession();

@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import './styles/mobile-optimization.css';
 import './styles/design-system.css';
 import ErrorBoundary from '@/components/feedback/ErrorBoundary';
@@ -46,35 +47,34 @@ const FullPageStatus = ({ title, description, actionLabel, onAction, showSpinner
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   const [hasStartedLoginRedirect, setHasStartedLoginRedirect] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    if (authError?.type === 'auth_required' && !hasStartedLoginRedirect) {
+    if (authError?.type === 'auth_required' && !hasStartedLoginRedirect && location.pathname !== '/Login') {
       setHasStartedLoginRedirect(true);
       navigateToLogin();
     }
-  }, [authError, hasStartedLoginRedirect, navigateToLogin]);
+  }, [authError, hasStartedLoginRedirect, navigateToLogin, location.pathname]);
 
-  // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return <FullPageStatus title="Loading your workspace" description="Please wait while we check authentication and project settings." showSpinner />;
   }
 
-  // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
+    }
+    if (authError.type === 'auth_required') {
       return (
         <FullPageStatus
-          title="Signing you in"
-          description="Redirecting you to the login page. If nothing happens, click below."
+          title="Sign in"
+          description="Redirecting to the login page. If nothing happens, click below."
           actionLabel="Go to login"
           onAction={navigateToLogin}
           showSpinner
         />
       );
     }
-
     return (
       <FullPageStatus
         title="We couldn't load the app"

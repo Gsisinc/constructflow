@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Upload, Loader2, Ruler, Package, ScanSearch, Calculator, Files } from 'lucide-react';
+import { Upload, Loader2, Ruler, Package, ScanSearch, Calculator, Files, Download, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { buildDrawingAnalysisPrompt, normalizeDrawingAnalysis } from '@/lib/drawingAnalysis';
 import { parseLlmJsonResponse } from '@/lib/llmResponse';
@@ -333,18 +333,46 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
     }
   };
 
+  const handleExportTakeoffCsv = () => {
+    if (!analysis) return;
+    const headers = ['Item', 'Quantity', 'Unit', 'CSI Division', 'Notes'];
+    const rows = analysis.materials.map(m => [m.item, m.quantity, m.unit, m.csi_division || '', m.notes || '']);
+    const totals = [
+      [],
+      ['Takeoff totals', '', '', '', ''],
+      ['Conduit (ft)', analysis.takeoffTotals.conduit_length_ft, '', '', ''],
+      ['Cable (ft)', analysis.takeoffTotals.cable_length_ft, '', '', ''],
+      ['Devices', analysis.takeoffTotals.device_count, '', '', ''],
+      ['Fixtures', analysis.takeoffTotals.fixture_count, '', '', '']
+    ];
+    const csv = [headers, ...rows, ...totals]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `takeoff-${bid?.title || 'bid'}-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success('Takeoff exported as CSV');
+  };
+
   const handleApplyEstimate = async () => {
     if (!analysis) return;
     
     setApplyingEstimate(true);
     try {
+      const existingEstimates = await base44.entities.BidEstimate.filter({ bid_opportunity_id: bid.id }).catch(() => []);
+      const nextVersion = existingEstimates.length > 0
+        ? Math.max(...existingEstimates.map(e => (e.version || 1)), 0) + 1
+        : 1;
+
       const contingency = analysis.estimateInputs.recommended_contingency_percent || 10;
       const subtotal = analysis.estimateInputs.subtotal;
       const overheadPercent = 15;
       const profitPercent = 20;
       const totalBidAmount = subtotal * (1 + (overheadPercent + profitPercent) / 100);
 
-      // Create BidEstimate record
       const lineItems = analysis.materials.map(mat => ({
         description: mat.item,
         quantity: mat.quantity,
@@ -368,8 +396,8 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
         profit_margin_percent: profitPercent,
         subtotal: subtotal,
         total_bid_amount: Math.round(totalBidAmount),
-        notes: `Generated from drawing analysis on ${new Date().toLocaleDateString()}. Classification: ${classification}, CSI: ${csiDivision}`,
-        version: 1
+        notes: `Generated from drawing takeoff on ${new Date().toLocaleDateString()}. Classification: ${classification}, CSI: ${csiDivision}. Version ${nextVersion}.`,
+        version: nextVersion
       });
 
       await base44.entities.BidOpportunity.update(bid.id, { 
@@ -507,6 +535,41 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
       {analysis && (
         <>
+          {/* One-click Apply takeoff to bid estimate – default path */}
+          <Card className="border-2 border-amber-200 bg-amber-50/50 dark:bg-amber-950/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><Calculator className="h-4 w-4" /> Apply takeoff to bid estimate</CardTitle>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Create an estimate from this takeoff and set the bid&apos;s estimated value. Each apply creates a new estimate version.
+              </p>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              <Button
+                onClick={handleApplyEstimate}
+                disabled={applyingEstimate}
+                className="bg-amber-600 hover:bg-amber-700"
+              >
+                {applyingEstimate ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Applying...
+                  </>
+                ) : (
+                  'Apply this takeoff to bid estimate'
+                )}
+              </Button>
+              <Button variant="outline" onClick={handleExportTakeoffCsv}>
+                <Download className="h-4 w-4 mr-2" />
+                Export takeoff (CSV)
+              </Button>
+            </CardContent>
+          </Card>
+
+          <div className="rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-900/50 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
+            <RefreshCw className="h-4 w-4 flex-shrink-0" />
+            <span>Plans changed? Re-run analysis above (select documents and click &quot;Analyze Selected&quot;) to update quantities and totals.</span>
+          </div>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><Ruler className="h-4 w-4" /> Measurements & Takeoff</CardTitle>

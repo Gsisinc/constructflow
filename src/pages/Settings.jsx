@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Upload, Palette, Building2, Save, Loader2, AlertTriangle } from 'lucide-react';
+import ApiStatusCard from '@/components/settings/ApiStatusCard';
 import { toast } from 'sonner';
 import { createPageUrl } from '../utils';
 
@@ -353,6 +354,10 @@ export default function Settings() {
               </div>
             </CardContent>
           </Card>
+
+          <div className="mt-6">
+            <ApiStatusCard />
+          </div>
         </TabsContent>
       </Tabs>
 

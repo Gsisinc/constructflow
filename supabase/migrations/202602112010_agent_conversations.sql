@@ -22,20 +22,24 @@ create table if not exists public.agent_messages (
 alter table public.agent_conversations enable row level security;
 alter table public.agent_messages enable row level security;
 
-create policy if not exists "users can view own conversations"
+drop policy if exists "users can view own conversations" on public.agent_conversations;
+create policy "users can view own conversations"
   on public.agent_conversations for select
   using (user_id = auth.uid());
 
-create policy if not exists "users can create own conversations"
+drop policy if exists "users can create own conversations" on public.agent_conversations;
+create policy "users can create own conversations"
   on public.agent_conversations for insert
   with check (user_id = auth.uid());
 
-create policy if not exists "users can update own conversations"
+drop policy if exists "users can update own conversations" on public.agent_conversations;
+create policy "users can update own conversations"
   on public.agent_conversations for update
   using (user_id = auth.uid())
   with check (user_id = auth.uid());
 
-create policy if not exists "users can view own messages"
+drop policy if exists "users can view own messages" on public.agent_messages;
+create policy "users can view own messages"
   on public.agent_messages for select
   using (
     exists (
@@ -46,7 +50,8 @@ create policy if not exists "users can view own messages"
     )
   );
 
-create policy if not exists "users can create own messages"
+drop policy if exists "users can create own messages" on public.agent_messages;
+create policy "users can create own messages"
   on public.agent_messages for insert
   with check (
     exists (
@@ -57,7 +62,8 @@ create policy if not exists "users can create own messages"
     )
   );
 
-create policy if not exists "users can delete own messages"
+drop policy if exists "users can delete own messages" on public.agent_messages;
+create policy "users can delete own messages"
   on public.agent_messages for delete
   using (
     exists (

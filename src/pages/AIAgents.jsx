@@ -1,10 +1,39 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import AgentChat from '@/components/agents/AgentChat';
+import { AGENT_WORKFLOWS } from '@/config/agentWorkflows';
+
+const WORKFLOW_ICONS = {
+  central_orchestrator: '👔',
+  market_intelligence: '📊',
+  bid_package_assembly: '📋',
+  proposal_generation: '✍️',
+  regulatory_intelligence: '⚖️',
+  risk_prediction: '⚠️',
+  quality_assurance: '✅',
+  safety_compliance: '🛡️',
+  sustainability_optimization: '🌱',
+  stakeholder_communication: '💬',
+};
+
+const WORKFLOW_COLORS = {
+  central_orchestrator: 'from-slate-500 to-slate-600',
+  market_intelligence: 'from-blue-500 to-cyan-600',
+  bid_package_assembly: 'from-amber-500 to-amber-600',
+  proposal_generation: 'from-emerald-500 to-emerald-600',
+  regulatory_intelligence: 'from-violet-500 to-violet-600',
+  risk_prediction: 'from-orange-500 to-orange-600',
+  quality_assurance: 'from-green-500 to-green-600',
+  safety_compliance: 'from-red-500 to-red-600',
+  sustainability_optimization: 'from-teal-500 to-teal-600',
+  stakeholder_communication: 'from-indigo-500 to-indigo-600',
+};
 
 export default function AIAgents() {
   const [activeTab, setActiveTab] = useState('deepseek');
   const [selectedAgent, setSelectedAgent] = useState(null);
+  const [chatAgent, setChatAgent] = useState(null);
 
   const agents = {
     deepseek: { 
@@ -44,18 +73,13 @@ export default function AIAgents() {
     },
   };
 
-  const customAgents = [
-    { id: 1, name: 'Central Orchestrator', desc: 'Project CEO coordinating all specialist agents', icon: '👔' },
-    { id: 2, name: 'Market Intelligence', desc: 'Proactive bid opportunity searcher', icon: '📊' },
-    { id: 3, name: 'Bid Package Assembly', desc: 'Intelligent document synthesis', icon: '📋' },
-    { id: 4, name: 'Proposal Generation', desc: 'Client-specific proposals', icon: '✍️' },
-    { id: 5, name: 'Risk Prediction', desc: 'Cost overruns and schedule risks', icon: '⚠️' },
-    { id: 6, name: 'Regulatory Intelligence', desc: 'Permit automation and compliance', icon: '⚖️' },
-    { id: 7, name: 'Quality Assurance', desc: 'QA planning and inspections', icon: '✅' },
-    { id: 8, name: 'Safety Compliance', desc: 'Safety planning and OSHA compliance', icon: '🛡️' },
-    { id: 9, name: 'Sustainability Optimization', desc: 'Green building strategies', icon: '🌱' },
-    { id: 10, name: 'Stakeholder Communication', desc: 'Message tailoring for audiences', icon: '💬' },
-  ];
+  const customAgents = Object.entries(AGENT_WORKFLOWS).map(([id, w]) => ({
+    id,
+    name: w.name,
+    desc: w.purpose,
+    icon: WORKFLOW_ICONS[id] || '🤖',
+    color: WORKFLOW_COLORS[id] || 'from-blue-500 to-blue-600',
+  }));
 
   const currentAgent = agents[activeTab];
 
@@ -126,9 +150,12 @@ export default function AIAgents() {
                     <p className="text-sm text-slate-600 dark:text-slate-400">{agent.desc}</p>
                     <Button
                       className={`w-full ${selectedAgent === agent.id ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
-                      onClick={(e) => { e.stopPropagation(); setSelectedAgent(selectedAgent === agent.id ? null : agent.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setChatAgent({ id: agent.id, name: agent.name, description: agent.desc, color: agent.color });
+                      }}
                     >
-                      {selectedAgent === agent.id ? '✓ Selected' : 'Use Agent →'}
+                      {chatAgent?.id === agent.id ? 'Chat open' : 'Use Agent →'}
                     </Button>
                   </CardContent>
                 </Card>
@@ -183,6 +210,13 @@ export default function AIAgents() {
               </div>
             </div>
           </div>
+        )}
+
+        {chatAgent && (
+          <AgentChat
+            agent={chatAgent}
+            onClose={() => setChatAgent(null)}
+          />
         )}
       </div>
     </div>

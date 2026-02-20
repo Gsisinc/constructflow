@@ -704,7 +704,7 @@ Phase 3: Finalization (Week 9-10)`;
  * Falls back to local response if APIs unavailable
  */
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
-  const CLAUDE_API_KEY = process.env.REACT_APP_CLAUDE_API_KEY;
+  const CLAUDE_API_KEY = import.meta.env.VITE_CLAUDE_API_KEY ?? process.env.REACT_APP_CLAUDE_API_KEY;
   const CLAUDE_API_BASE = 'https://api.anthropic.com/v1';
 
   if (!CLAUDE_API_KEY) {

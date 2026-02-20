@@ -14,8 +14,11 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import EmptyState from '../components/ui/EmptyState';
 
+const APPROVAL_THRESHOLD = 5000;
+
 const statusColors = {
   draft: 'bg-slate-100 text-slate-700 border-slate-200',
+  pending_approval: 'bg-amber-100 text-amber-700 border-amber-200',
   sent: 'bg-blue-100 text-blue-700 border-blue-200',
   acknowledged: 'bg-purple-100 text-purple-700 border-purple-200',
   partially_received: 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -131,7 +134,16 @@ export default function PurchaseOrders() {
                 <div><p className="text-slate-500">Total</p><p className="font-semibold">${(po.total || 0).toLocaleString()}</p></div>
                 <div><p className="text-slate-500">Date</p><p className="font-semibold">{po.po_date ? format(new Date(po.po_date), 'MMM d') : '-'}</p></div>
               </div>
-              <div className="flex gap-1 pt-1 border-t border-slate-100">
+              <div className="flex gap-1 pt-1 border-t border-slate-100 flex-wrap">
+                {po.status === 'pending_approval' && (
+                  <Button
+                    size="sm"
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => updateMutation.mutate({ id: po.id, data: { ...po, status: 'sent' } })}
+                  >
+                    Approve
+                  </Button>
+                )}
                 <Button size="sm" variant="ghost" onClick={() => { setEditingPO(po); setShowForm(true); }} className="flex-1">
                   <Edit2 className="h-3 w-3 mr-1" /> Edit
                 </Button>
@@ -171,6 +183,15 @@ export default function PurchaseOrders() {
                     <td className="p-4 font-semibold">${(po.total || 0).toLocaleString()}</td>
                     <td className="p-4"><Badge className={cn("border text-xs", statusColors[po.status])}>{po.status?.replace('_', ' ')}</Badge></td>
                     <td className="p-4 text-right space-x-1">
+                      {po.status === 'pending_approval' && (
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() => updateMutation.mutate({ id: po.id, data: { ...po, status: 'sent' } })}
+                        >
+                          Approve
+                        </Button>
+                      )}
                       <Button size="sm" variant="ghost" onClick={() => { setEditingPO(po); setShowForm(true); }}>
                         <Edit2 className="h-4 w-4" />
                       </Button>
@@ -313,6 +334,8 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
     const tax = parseFloat(formData.tax) || 0;
     const shipping = parseFloat(formData.shipping) || 0;
     const total = subtotal + tax + shipping;
+    const requiresApproval = total >= APPROVAL_THRESHOLD && !po;
+    const status = requiresApproval ? 'pending_approval' : (formData.status || 'draft');
 
     onSubmit({
       ...formData,
@@ -320,6 +343,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
       tax,
       shipping,
       total,
+      status,
     });
   };
 
@@ -344,7 +368,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
               <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {['draft', 'sent', 'acknowledged', 'partially_received', 'received', 'cancelled'].map(s => (
+                  {['draft', 'pending_approval', 'sent', 'acknowledged', 'partially_received', 'received', 'cancelled'].map(s => (
                     <SelectItem key={s} value={s}>{s.replace('_', ' ')}</SelectItem>
                   ))}
                 </SelectContent>
@@ -381,6 +405,9 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
               <Input type="number" value={formData.shipping} onChange={(e) => setFormData({ ...formData, shipping: e.target.value })} placeholder="0.00" />
             </div>
           </div>
+          <p className="text-xs text-amber-700 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 rounded px-2 py-1.5">
+            POs of $5,000 or more are set to &quot;Pending approval&quot;; use the Approve action to send.
+          </p>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>

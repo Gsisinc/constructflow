@@ -66,7 +66,6 @@ import Calendar from './pages/Calendar';
 import ClientPortal from './pages/ClientPortal';
 import DailyLog from './pages/DailyLog';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
-import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Documents from './pages/Documents';
 import EstimateGenerator from './pages/EstimateGenerator';
@@ -77,6 +76,7 @@ import Invoices from './pages/Invoices';
 import Issues from './pages/Issues';
 import JoinRequest from './pages/JoinRequest';
 import Landing from './pages/Landing';
+import Login from './pages/Login';
 import Materials from './pages/Materials';
 import Onboarding from './pages/Onboarding';
 import PMSetupGuide from './pages/PMSetupGuide';
@@ -125,7 +125,7 @@ export const PAGES = {
     "ClientPortal": ClientPortal,
     "DailyLog": DailyLog,
     "Dashboard.ImprovedVersion": dashboardImprovedversion,
-    "Dashboard": Dashboard,
+    "Dashboard": dashboardImprovedversion,
     "Directory": Directory,
     "Documents": Documents,
     "EstimateGenerator": EstimateGenerator,
@@ -136,6 +136,7 @@ export const PAGES = {
     "Issues": Issues,
     "JoinRequest": JoinRequest,
     "Landing": Landing,
+    "Login": Login,
     "Materials": Materials,
     "Onboarding": Onboarding,
     "PMSetupGuide": PMSetupGuide,

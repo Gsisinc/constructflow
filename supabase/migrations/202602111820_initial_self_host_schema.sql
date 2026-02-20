@@ -89,57 +89,69 @@ alter table public.issues enable row level security;
 alter table public.expenses enable row level security;
 alter table public.documents enable row level security;
 
-create policy if not exists "profile readable by owner"
+drop policy if exists "profile readable by owner" on public.profiles;
+create policy "profile readable by owner"
   on public.profiles for select
   using (id = auth.uid());
 
-create policy if not exists "profile updatable by owner"
+drop policy if exists "profile updatable by owner" on public.profiles;
+create policy "profile updatable by owner"
   on public.profiles for update
   using (id = auth.uid())
   with check (id = auth.uid());
 
-create policy if not exists "org members can view organizations"
+drop policy if exists "org members can view organizations" on public.organizations;
+create policy "org members can view organizations"
   on public.organizations for select
   using (id = (select organization_id from public.profiles where id = auth.uid()));
 
-create policy if not exists "org owner can update organization"
+drop policy if exists "org owner can update organization" on public.organizations;
+create policy "org owner can update organization"
   on public.organizations for update
   using (owner_id = auth.uid())
   with check (owner_id = auth.uid());
 
-create policy if not exists "org members can view projects"
+drop policy if exists "org members can view projects" on public.projects;
+create policy "org members can view projects"
   on public.projects for select
   using (organization_id = (select organization_id from public.profiles where id = auth.uid()));
 
-create policy if not exists "org members can insert projects"
+drop policy if exists "org members can insert projects" on public.projects;
+create policy "org members can insert projects"
   on public.projects for insert
   with check (organization_id = (select organization_id from public.profiles where id = auth.uid()));
 
-create policy if not exists "org members can update projects"
+drop policy if exists "org members can update projects" on public.projects;
+create policy "org members can update projects"
   on public.projects for update
   using (organization_id = (select organization_id from public.profiles where id = auth.uid()))
   with check (organization_id = (select organization_id from public.profiles where id = auth.uid()));
 
-create policy if not exists "org members can view tasks"
+drop policy if exists "org members can view tasks" on public.tasks;
+create policy "org members can view tasks"
   on public.tasks for select
   using (organization_id = (select organization_id from public.profiles where id = auth.uid()));
 
-create policy if not exists "org members can manage tasks"
+drop policy if exists "org members can manage tasks" on public.tasks;
+create policy "org members can manage tasks"
   on public.tasks for all
   using (organization_id = (select organization_id from public.profiles where id = auth.uid()))
   with check (organization_id = (select organization_id from public.profiles where id = auth.uid()));
 
-create policy if not exists "org members can manage issues"
+drop policy if exists "org members can manage issues" on public.issues;
+create policy "org members can manage issues"
   on public.issues for all
   using (organization_id = (select organization_id from public.profiles where id = auth.uid()))
   with check (organization_id = (select organization_id from public.profiles where id = auth.uid()));
 
-create policy if not exists "org members can manage expenses"
+drop policy if exists "org members can manage expenses" on public.expenses;
+create policy "org members can manage expenses"
   on public.expenses for all
   using (organization_id = (select organization_id from public.profiles where id = auth.uid()))
   with check (organization_id = (select organization_id from public.profiles where id = auth.uid()));
 
-create policy if not exists "org members can manage documents"
+drop policy if exists "org members can manage documents" on public.documents;
+create policy "org members can manage documents"
   on public.documents for all
   using (organization_id = (select organization_id from public.profiles where id = auth.uid()))
   with check (organization_id = (select organization_id from public.profiles where id = auth.uid()));
