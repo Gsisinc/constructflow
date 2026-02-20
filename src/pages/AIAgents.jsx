@@ -104,23 +104,17 @@ export default function AIAgents() {
         {/* Content */}
         {activeTab === 'custom' ? (
           // Custom Agents Grid
-          <div className="space-y-4">
-            <Card>
-              <CardHeader className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-t-lg">
-                <CardTitle className="text-2xl flex items-center gap-2">
-                  <span>⚙️</span>
-                  Custom Agents
-                </CardTitle>
-                <p className="text-white/80 text-sm mt-2">ConstructFlow AI agents for construction management</p>
-              </CardHeader>
-            </Card>
-
+          <div>
+            <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white">
+              <h2 className="text-xl font-bold flex items-center gap-2">⚙️ Custom Agents</h2>
+              <p className="text-white/80 text-sm mt-1">ConstructFlow AI agents for construction management</p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {customAgents.map((agent) => (
                 <Card
                   key={agent.id}
-                  className="hover:shadow-lg dark:hover:shadow-slate-700 transition-shadow cursor-pointer"
-                  onClick={() => setSelectedAgent(agent.id)}
+                  className="hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => setSelectedAgent(selectedAgent === agent.id ? null : agent.id)}
                 >
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -129,71 +123,61 @@ export default function AIAgents() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      {agent.desc}
-                    </p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">{agent.desc}</p>
                     <Button
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                      onClick={() => setSelectedAgent(agent.id)}
+                      className={`w-full ${selectedAgent === agent.id ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                      onClick={(e) => { e.stopPropagation(); setSelectedAgent(selectedAgent === agent.id ? null : agent.id); }}
                     >
-                      Use Agent →
+                      {selectedAgent === agent.id ? '✓ Selected' : 'Use Agent →'}
                     </Button>
                   </CardContent>
                 </Card>
               ))}
             </div>
-
-            {selectedAgent && (
-              <Card className="border-2 border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
-                <CardContent className="pt-6">
-                  <h3 className="font-bold text-lg mb-2">
-                    {customAgents.find(a => a.id === selectedAgent)?.name} Selected ✓
-                  </h3>
-                  <p className="text-sm">Agent selected and ready for use.</p>
-                </CardContent>
-              </Card>
-            )}
           </div>
         ) : (
-          // AI Service - Embedded via Iframe
+          // AI Service Launch Cards
           <div className="space-y-4">
-            {/* Info Card */}
-            <Card className={`border-2 bg-gradient-to-r ${currentAgent.color}`}>
-              <CardHeader className={`bg-gradient-to-r ${currentAgent.color} text-white rounded-t-lg`}>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                  <span className="text-3xl">{currentAgent.icon}</span>
-                  {currentAgent.name}
-                </CardTitle>
-                <p className="text-white/80 text-sm mt-2">{currentAgent.desc}</p>
-              </CardHeader>
-            </Card>
-
-            {/* Embedded Iframe */}
-            <Card className="overflow-hidden border-2">
-              <div style={{ height: '800px', width: '100%' }} className="bg-white dark:bg-slate-800">
-                <iframe
-                  src={currentAgent.url}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    border: 'none'
-                  }}
-                  title={currentAgent.name}
-                  allowFullScreen
-                  allow="camera; microphone; clipboard-read; clipboard-write; payment; geolocation"
-                />
+            {/* Launch Card */}
+            <div className={`rounded-2xl p-8 bg-gradient-to-br ${currentAgent.color} text-white text-center shadow-xl`}>
+              <div className="text-6xl mb-4">{currentAgent.icon}</div>
+              <h2 className="text-3xl font-bold mb-2">{currentAgent.name}</h2>
+              <p className="text-white/80 text-lg mb-6">{currentAgent.desc}</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <a
+                  href={currentAgent.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-white/90 transition-all shadow-lg text-base"
+                >
+                  🚀 Open {currentAgent.name}
+                </a>
               </div>
-            </Card>
+              <p className="text-white/60 text-sm mt-4">Opens in a new tab — AI sites block embedding for security</p>
+            </div>
 
-            {/* Info */}
-            <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-              <CardContent className="pt-6">
-                <p className="text-sm text-slate-700 dark:text-slate-300">
-                  ✓ {currentAgent.name} is now embedded and ready to use. 
-                  You can interact with it directly in this window.
-                </p>
-              </CardContent>
-            </Card>
+            {/* Quick Links to all agents */}
+            <div>
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">All AI Services</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {Object.entries(agents).map(([key, agent]) => (
+                  <a
+                    key={key}
+                    href={agent.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r ${agent.color} text-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200`}
+                  >
+                    <span className="text-2xl">{agent.icon}</span>
+                    <div>
+                      <p className="font-semibold">{agent.name}</p>
+                      <p className="text-white/70 text-xs">{agent.desc}</p>
+                    </div>
+                    <span className="ml-auto text-white/70">↗</span>
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
