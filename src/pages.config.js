@@ -104,6 +104,7 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import Estimator from './pages/Estimator';
 import __Layout from './Layout.jsx';
 
 
@@ -165,6 +166,7 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "Estimator": Estimator,
     "Dashboard": Dashboard,
 }
 
