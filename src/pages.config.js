@@ -69,6 +69,7 @@ import dashboardOld from './pages/Dashboard-old';
 import dashboardV2 from './pages/Dashboard-v2';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
 import Dashboard from './pages/Dashboard';
+import EstimateGenerator from './pages/EstimateGenerator';
 import Directory from './pages/Directory';
 import Documents from './pages/Documents';
 import Estimates from './pages/Estimates';
@@ -132,6 +133,7 @@ export const PAGES = {
     "Directory": Directory,
     "Documents": Documents,
     "Estimates": Estimates,
+    "EstimateGenerator": EstimateGenerator,
     "FeatureTesting": FeatureTesting,
     "Home": Home,
     "Invoices": Invoices,
