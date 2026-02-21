@@ -79,45 +79,24 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         }
       }
 
-      if (workflow) {
-        const systemPrompt = buildAgentSystemPrompt(agent.id);
-        let content;
-        let actionsTaken = [];
-        try {
-          const result = await callAgentWithTools(systemPrompt, userMessageForLLM, AGENT_TOOL_DEFINITIONS, toolContext);
-          content = result.content || 'Done.';
-          actionsTaken = result.actionsTaken || [];
-        } catch (toolsErr) {
-          content = await callAgent(systemPrompt, userMessageForLLM);
-        }
-        const actionLines = formatActionsTaken(actionsTaken);
-        const fullContent = actionLines.length > 0
-          ? `**Actions completed:**\n${actionLines.map((a) => `- ${a}`).join('\n')}\n\n---\n\n${content}`
-          : (content || 'I could not generate a response. Please try again.');
-        setMessages(prev => [...prev, {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: fullContent,
-          actionsTaken,
-        }]);
-      } else {
-        const systemPrompt = `You are ${agent.name}, a specialized AI assistant for construction project management.
+      const systemPrompt = buildAgentSystemPrompt(agent.id) || `You are ${agent.name}, a specialized AI assistant for construction project management.
 ${agent.description ? `Your role: ${agent.description}` : ''}
 Provide detailed, actionable, and expert responses. Format with bullet points and clear sections where appropriate.
 Never ask for internal database IDs. Proceed with best-effort answers based on context provided.`;
 
-        const result = await base44.integrations.Core.InvokeLLM({
-          prompt: `${systemPrompt}\n\nUser: ${userMessageForLLM}`,
-        });
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: userMessageForLLM,
+        response_json_schema: null,
+      });
 
-        const content = typeof result === 'string' ? result : (result?.text || result?.output || JSON.stringify(result));
+      // InvokeLLM returns a string directly
+      const content = typeof result === 'string' ? result : (result?.text || result?.output || JSON.stringify(result));
 
-        setMessages(prev => [...prev, {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: content || 'I could not generate a response. Please try again.'
-        }]);
-      }
+      setMessages(prev => [...prev, {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: content || 'I could not generate a response. Please try again.'
+      }]);
     } catch (err) {
       console.error('LLM error:', err);
       setMessages(prev => [...prev, {
