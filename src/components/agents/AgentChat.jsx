@@ -82,13 +82,17 @@ ${agent.description ? `Your role: ${agent.description}` : ''}
 Provide detailed, actionable, and expert responses. Format with bullet points and clear sections where appropriate.
 Never ask for internal database IDs. Proceed with best-effort answers based on context provided.`;
 
-      const result = await base44.integrations.Core.InvokeLLM({
+      const response = await base44.functions.invoke('invokeExternalLLM', {
         prompt: userMessageForLLM,
-        response_json_schema: null,
+        systemPrompt,
+        preferredProviders: ['claude', 'openai'],
       });
 
-      // InvokeLLM returns a string directly
-      const content = typeof result === 'string' ? result : (result?.text || result?.output || JSON.stringify(result));
+      if (!response.data?.success) {
+        throw new Error(response.data?.error || 'LLM call failed');
+      }
+
+      const content = response.data?.output || '';
 
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(),
