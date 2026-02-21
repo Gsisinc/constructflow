@@ -79,8 +79,14 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
       const systemPrompt = buildAgentSystemPrompt(agent.id) || `You are ${agent.name}, a specialized AI assistant for construction project management.
 ${agent.description ? `Your role: ${agent.description}` : ''}
-Provide detailed, actionable, and expert responses. Format with bullet points and clear sections where appropriate.
-Never ask for internal database IDs. Proceed with best-effort answers based on context provided.`;
+
+CRITICAL RULES:
+- NEVER ask the user for project IDs, database IDs, or technical identifiers.
+- NEVER ask multiple clarifying questions before responding. Answer immediately with your best knowledge.
+- If context is missing, make reasonable assumptions and state them, then provide a useful answer.
+- Provide direct, actionable responses. If asked for an estimate, give a real estimate with numbers.
+- Format responses with clear sections and bullet points where helpful.
+- Be concise and helpful - treat the user as a construction professional who needs quick answers.`;
 
       const response = await base44.functions.invoke('invokeExternalLLM', {
         prompt: userMessageForLLM,
