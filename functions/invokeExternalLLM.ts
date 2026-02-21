@@ -1,35 +1,46 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
-// Claude via Anthropic API
+// Claude via Anthropic API - tries multiple models in order
 async function invokeClaudeAPI({ prompt, systemPrompt, temperature = 0.2 }) {
   const apiKey = Deno.env.get('VITE_CLAUDE_API_KEY');
   if (!apiKey) throw new Error('VITE_CLAUDE_API_KEY is not configured');
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4096,
-      temperature,
-      system: systemPrompt || 'You are a helpful AI assistant specializing in construction project management.',
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
+  const modelsToTry = [
+    'claude-3-5-sonnet-20241022',
+    'claude-3-sonnet-20240229',
+    'claude-3-haiku-20240307',
+    'claude-2.1',
+    'claude-instant-1.2'
+  ];
 
-  if (!response.ok) {
+  let lastError = '';
+  for (const model of modelsToTry) {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 4096,
+        temperature,
+        system: systemPrompt || 'You are a helpful AI assistant specializing in construction project management.',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const output = data?.content?.[0]?.text || '';
+      if (output) return { provider: 'claude', model, output };
+    }
     const details = await response.text();
-    throw new Error(`Claude request failed (${response.status}): ${details}`);
+    lastError = `${model} (${response.status}): ${details}`;
+    if (response.status === 401 || response.status === 403) break; // Bad key, no point retrying
   }
-
-  const data = await response.json();
-  const output = data?.content?.[0]?.text || '';
-  if (!output) throw new Error('Claude returned empty output');
-  return { provider: 'claude', model: 'claude-3-5-sonnet-20241022', output };
+  throw new Error(`Claude request failed: ${lastError}`);
 }
 
 // OpenAI API
