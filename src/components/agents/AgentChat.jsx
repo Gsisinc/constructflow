@@ -45,9 +45,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     setMessages(prev => [...prev, userMsg]);
 
     try {
-      const workflow = getAgentWorkflow(agent.id);
       let userMessageForLLM = text;
-      let discoverySummary = '';
 
       // Market Intelligence: trigger live discovery when user asks for opportunities
       if (agent.id === 'market_intelligence' && shouldInvokeLiveDiscovery(agent.id, text)) {
