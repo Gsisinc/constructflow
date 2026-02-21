@@ -3,13 +3,22 @@
  * Complete design system for 10/10 rating
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 /* ========================================
-   CSS VARIABLES - Design Tokens
+   CSS VARIABLES - Design Tokens (ConstructFlow fresh look)
    ======================================== */
 
 :root {
+  --cf-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --cf-page-bg: #f8fafc;
+  --cf-surface: #ffffff;
+  --cf-border: #e2e8f0;
+  --cf-heading: #0f172a;
+  --cf-muted: #64748b;
+  --cf-accent: #6366f1;
+  --cf-accent-hover: #4f46e5;
+
   /* Primary Colors - Blue */
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
@@ -119,7 +128,7 @@
   --color-ring: #2563eb;
 
   /* Typography */
-  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-sans: var(--cf-font);
   --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, monospace;
 
   /* Font Sizes */
@@ -260,6 +269,14 @@
    ======================================== */
 
 .dark {
+  --cf-page-bg: #0f172a;
+  --cf-surface: #1e293b;
+  --cf-border: #334155;
+  --cf-heading: #f8fafc;
+  --cf-muted: #94a3b8;
+  --cf-accent: #818cf8;
+  --cf-accent-hover: #a5b4fc;
+
   /* Semantic Colors - Dark Mode */
   --color-background: #0f172a;
   --color-foreground: #f8fafc;

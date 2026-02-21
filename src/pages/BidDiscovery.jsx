@@ -31,11 +31,8 @@ import {
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { parseLlmJsonResponse } from '@/lib/llmResponse';
-import {
-  detectNewOpportunities,
-  buildDiscoveryFingerprint,
-  fetchDiscoveryFromSources
-} from '@/lib/bidDiscoveryOrchestrator';
+import { searchBidsFromSam } from '@/lib/bidDiscoverySearch';
+import { callAgent } from '@/services/llmService';
 
 const marketIntelligenceAgent = {
   id: 'market_intelligence',
@@ -150,10 +147,12 @@ export default function BidDiscovery() {
 
   const { data: currentUser } = useQuery({ queryKey: ['currentUser', 'bidDiscovery'], queryFn: () => base44.auth.me() });
 
-  const { data: bids = [] } = useQuery({
+  const { data: bidsRaw = [] } = useQuery({
     queryKey: ['bids'],
     queryFn: () => base44.entities.BidOpportunity.list('-created_date', 100)
   });
+  // Only show bids that have a source URL (no fake/placeholder data in pipeline)
+  const bids = (bidsRaw || []).filter((b) => b.url && String(b.url).startsWith('http'));
 
   useEffect(() => {
     const saved = window.localStorage.getItem('bid_discovery_alert_settings');
@@ -210,71 +209,53 @@ export default function BidDiscovery() {
   const executeAISearch = async (page = 1, silent = false) => {
     setSearching(true);
     const workTypeDisplay = workType.replace('_', ' ');
-    const filters = { workType, state, cityCounty: cityCounty === 'all' ? '' : cityCounty, classification };
-    const previousFingerprints = searchResults.map((item) => buildDiscoveryFingerprint(item));
     if (!silent) {
-      toast.info(`🔍 Fetching ${workTypeDisplay} opportunities in ${state} (page ${page})...`);
+      toast.info(`🔍 Searching SAM.gov for ${searchQuery?.trim() || workTypeDisplay} in ${state} (page ${page})...`);
     }
 
     try {
-      const response = await fetchDiscoveryFromSources({
-        base44Client: base44,
-        filters,
+      const result = await searchBidsFromSam({
+        state,
+        workType,
+        classification,
+        keyword: searchQuery?.trim() || undefined,
         page,
         pageSize: 250
       });
-      setSourceSummary(response.sourceSummary || []);
 
-      if (response.opportunities.length > 0) {
-        const nextResults =
-          page === 1
-            ? response.opportunities
-            : [...searchResults, ...response.opportunities];
-        const deduped = Array.from(
-          new Map(nextResults.map((item) => [buildDiscoveryFingerprint(item), item])).values()
-        );
+      setSourceSummary([{
+        source: 'SAM.gov',
+        success: result.opportunities.length > 0,
+        count: result.opportunities.length,
+        error: result.message || null
+      }]);
 
-        if (page === 1) {
-          setSearchResults(deduped);
-        } else {
-          setSearchResults(deduped);
-        }
+      if (result.opportunities.length > 0) {
+        const nextResults = page === 1 ? result.opportunities : [...searchResults, ...result.opportunities];
+        const deduped = Array.from(new Map(nextResults.map((item) => [item.id || item.url || item.title, item])).values());
 
-        const discoveredNew = detectNewOpportunities({
-          previousFingerprints,
-          opportunities: deduped
-        });
-
+        setSearchResults(deduped);
         setTotalPages(Math.max(page, totalPages));
         setTotalAvailable(deduped.length);
-        setHasMore(response.opportunities.length >= 250);
+        setHasMore(result.opportunities.length >= 250);
         setCurrentPage(page);
         if (!silent) {
-          toast.success(`✓ Found ${deduped.length} ranked ${workTypeDisplay} bids.`);
-        }
-
-        if (silent && discoveredNew.length > 0) {
-          toast.success(`🔔 ${discoveredNew.length} new ${workTypeDisplay} opportunities matched your alerts.`);
+          toast.success(`✓ Found ${deduped.length} opportunities from SAM.gov (all with source URL).`);
         }
       } else {
         setSearchResults([]);
         setHasMore(false);
         if (!silent) {
-          const failingSources = (response.sourceSummary || [])
-            .filter((entry) => !entry.success)
-            .map((entry) => entry.source)
-            .join(', ');
-
-          if (failingSources) {
-            toast.error(`No live results. Source issues: ${failingSources}.`);
+          if (result.message) {
+            toast.warning(result.message);
           } else {
-            toast.info(`No live ${workTypeDisplay} opportunities found right now.`);
+            toast.info(`No SAM.gov opportunities found. Try different filters or add VITE_SAM_GOV_API_KEY.`);
           }
         }
       }
     } catch (error) {
-      console.error('❌ Scraper error:', error);
-      toast.error('Failed to fetch: ' + error.message);
+      console.error('❌ SAM search error:', error);
+      toast.error('Search failed: ' + error.message);
     } finally {
       setSearching(false);
       setLoadingMore(false);
@@ -347,20 +328,36 @@ export default function BidDiscovery() {
   });
 
   const handleSearch = async () => {
-    if (!workType || workType === 'all') {
-      toast.error('Please select a specific work type first');
+    const hasKeyword = searchQuery?.trim();
+    if (!hasKeyword && (!workType || workType === 'all')) {
+      toast.error('Enter a search keyword (e.g. electrical, HVAC) or select a work type');
       return;
     }
-    
-    setSearchQuery('');
     await executeAISearch();
   };
 
   const handleAddToPipeline = async (opportunity) => {
+    if (!opportunity?.url) {
+      toast.error('This opportunity has no source URL and cannot be added.');
+      return;
+    }
     try {
-      // Generate checklist from requirements
-      const checklist = generateChecklist(opportunity);
-      
+      let checklist = generateChecklist(opportunity);
+      try {
+        const extractPrompt = `From this bid opportunity, extract a concise list of bid requirements and submission checklist items. Return only a JSON array of strings, e.g. ["Requirement 1", "Requirement 2"]. No other text.
+Title: ${opportunity.title || opportunity.project_name || ''}
+Agency: ${opportunity.agency || opportunity.client_name || ''}
+Description: ${(opportunity.description || '').slice(0, 2000)}`;
+        const raw = await callAgent('You are a procurement assistant. Output only valid JSON.', extractPrompt);
+        const parsed = parseLlmJsonResponse(raw);
+        const items = Array.isArray(parsed) ? parsed : (parsed?.requirements || parsed?.items || []);
+        if (items.length > 0) {
+          const aiItems = items.map((r) => (typeof r === 'string' && !r.startsWith('☐') && !r.startsWith('☑') ? `☐ ${r}` : r));
+          checklist = [...aiItems, ...checklist.filter((c) => !aiItems.some((a) => a.replace(/^[☐☑]\s*/, '') === (c || '').replace(/^[☐☑]\s*/, '')))];
+        }
+      } catch {
+        // keep generateChecklist result
+      }
       await createBidMutation.mutateAsync({
         organization_id: currentUser?.organization_id || null,
         title: opportunity.project_name || opportunity.title,
@@ -370,8 +367,9 @@ export default function BidDiscovery() {
         due_date: opportunity.due_date,
         win_probability: opportunity.win_probability || 50,
         description: opportunity.description,
-        source: opportunity.source_name || opportunity.source || 'Bid Discovery',
+        source: opportunity.source_name || opportunity.source || 'SAM.gov',
         location: opportunity.location,
+        url: opportunity.url,
         requirements: checklist,
         classification: classification === 'all' ? null : classification,
         work_type: workType
@@ -489,7 +487,6 @@ export default function BidDiscovery() {
       if (!expanded && !analysis) {
         setExpanded(true);
         setAnalyzing(true);
-        
         const formatDate = (dateStr) => {
           try {
             const date = new Date(dateStr);
@@ -498,14 +495,14 @@ export default function BidDiscovery() {
             return dateStr;
           }
         };
-
-        const analysisPrompt = `Analyze this bid opportunity and provide a detailed assessment:
+        const userMessage = `Analyze this bid opportunity and provide a detailed assessment:
 
 **Project:** ${bid.title || bid.project_name}
 **Agency:** ${bid.agency || bid.client_name}
 **Location:** ${bid.location || 'Not specified'}
 **Value:** $${bid.estimated_value?.toLocaleString() || 'TBD'}
 **Due Date:** ${bid.due_date ? formatDate(bid.due_date) : 'Not specified'}
+**Source URL:** ${bid.url || 'N/A'}
 
 Provide:
 1. Feasibility Assessment (High/Medium/Low)
@@ -513,17 +510,11 @@ Provide:
 3. Risk Factors
 4. Win Probability & Reasoning
 5. Recommendation (Bid/No Bid)`;
-
         try {
-          const response = await base44.integrations.Core.InvokeLLM({
-            prompt: analysisPrompt,
-            add_context_from_internet: false
-          });
-          const parsed = parseLlmJsonResponse(response);
-          const text = typeof parsed === 'string' ? parsed : (parsed?.answer || parsed?.response || parsed?.content || parsed?.output || JSON.stringify(parsed, null, 2));
-          setAnalysis(text);
+          const text = await callAgent('You are a construction bid analyst. Be concise and actionable.', userMessage);
+          setAnalysis(text || 'No analysis generated.');
         } catch (error) {
-          setAnalysis('Failed to generate analysis. Please try again.');
+          setAnalysis('Analysis failed. ' + (error?.message || 'Please try again.'));
         } finally {
           setAnalyzing(false);
         }
@@ -552,6 +543,17 @@ Provide:
               </div>
             )}
           </div>
+          {bid.url && (
+            <a
+              href={bid.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-blue-600 hover:underline truncate block mt-1"
+              title={bid.url}
+            >
+              {bid.url}
+            </a>
+          )}
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -597,7 +599,6 @@ Provide:
                     <p className="text-sm text-slate-600">{bid.description}</p>
                   </div>
                 )}
-                
                 {analyzing ? (
                   <div className="flex items-center gap-2 py-4">
                     <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
@@ -615,7 +616,17 @@ Provide:
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-2"
+                onClick={() => bid.url && window.open(bid.url, '_blank')}
+                disabled={!bid.url}
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open URL
+              </Button>
               <Button 
                 size="sm"
                 variant="outline"
@@ -628,7 +639,7 @@ Provide:
                 ) : (
                   <Bot className="h-4 w-4" />
                 )}
-                {expanded ? 'Hide Analysis' : 'AI Analysis'}
+                {expanded && analysis ? 'Hide Analysis' : 'AI Analysis'}
               </Button>
               <Button 
                 size="sm" 
@@ -636,21 +647,9 @@ Provide:
                 onClick={() => handleAddToPipeline(bid)}
               >
                 <Plus className="h-4 w-4" />
-                Add to Bids
+                Add to Bid
               </Button>
             </div>
-            
-            {bid.url && (
-              <Button 
-                size="sm" 
-                variant="ghost"
-                className="w-full gap-2"
-                onClick={() => window.open(bid.url, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4" />
-                View Original Posting
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
@@ -669,7 +668,7 @@ Provide:
               </div>
               <div>
                 <h1 className="text-3xl font-bold">Bid Discovery</h1>
-                <p className="text-blue-100 mt-1">AI-powered bid opportunity search across 75+ platforms</p>
+                <p className="text-blue-100 mt-1">Search SAM.gov for real opportunities (all results include source URL)</p>
               </div>
             </div>
           </div>
@@ -894,7 +893,7 @@ Provide:
                 <Search className="h-16 w-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No opportunities yet</h3>
                 <p className="text-slate-600 mb-6">
-                  Run a live search (SAM/county/business). We do not show saved/fallback opportunities here.
+                  Search SAM.gov by keyword or filters. Configure VITE_SAM_GOV_API_KEY for live results. No fake data—every result has a source URL.
                 </p>
                 <Button onClick={() => setShowAgentChat(true)} className="gap-2">
                   <Sparkles className="h-4 w-4" />
@@ -972,7 +971,7 @@ Provide:
                 <FileText className="h-16 w-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No bids in pipeline</h3>
                 <p className="text-slate-600">
-                  Add opportunities to your pipeline to start working on proposals
+                  Add opportunities from Discovery (each has a source URL). Only bids with a URL are shown here.
                 </p>
               </CardContent>
             </Card>

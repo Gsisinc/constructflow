@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Send, X, Paperclip, Bot, User, Sparkles } from 'lucide-react';
+import { Loader2, Send, X, Paperclip, Bot, User, Sparkles, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { getAgentWorkflow, buildAgentSystemPrompt } from '@/config/agentWorkflows';
-import { callAgent } from '@/services/llmService';
+import { callAgent, callAgentWithTools } from '@/services/llmService';
 import { shouldInvokeLiveDiscovery } from '@/config/agentRuntimeRules';
 import { fetchDiscoveryFromSources } from '@/lib/bidDiscoveryOrchestrator';
+import { AGENT_TOOL_DEFINITIONS, executeTool, formatActionsTaken } from '@/lib/agentTools';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,6 +22,10 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const sentInitial = useRef(false);
+  const toolContext = {
+    executeTool,
+    context: { base44, user: user || {} },
+  };
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -80,11 +87,24 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
 
       if (workflow) {
         const systemPrompt = buildAgentSystemPrompt(agent.id);
-        const content = await callAgent(systemPrompt, userMessageForLLM);
+        let content;
+        let actionsTaken = [];
+        try {
+          const result = await callAgentWithTools(systemPrompt, userMessageForLLM, AGENT_TOOL_DEFINITIONS, toolContext);
+          content = result.content || 'Done.';
+          actionsTaken = result.actionsTaken || [];
+        } catch (toolsErr) {
+          content = await callAgent(systemPrompt, userMessageForLLM);
+        }
+        const actionLines = formatActionsTaken(actionsTaken);
+        const fullContent = actionLines.length > 0
+          ? `**Actions completed:**\n${actionLines.map((a) => `- ${a}`).join('\n')}\n\n---\n\n${content}`
+          : (content || 'I could not generate a response. Please try again.');
         setMessages(prev => [...prev, {
           id: crypto.randomUUID(),
           role: 'assistant',
-          content: content || 'I could not generate a response. Please try again.'
+          content: fullContent,
+          actionsTaken,
         }]);
       } else {
         const systemPrompt = `You are ${agent.name}, a specialized AI assistant for construction project management.

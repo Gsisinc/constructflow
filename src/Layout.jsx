@@ -106,10 +106,10 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
       to={createPageUrl(item.page)}
       onClick={onNavigate}
       className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 min-h-[40px] sm:min-h-[44px]",
+        "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 min-h-[42px] sm:min-h-[44px]",
         isActive
-          ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-600/20"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          ? "bg-[var(--cf-accent)] text-white shadow-lg shadow-violet-500/20 dark:shadow-violet-500/10"
+          : "text-[var(--cf-muted)] hover:bg-[var(--cf-border)] hover:text-[var(--cf-heading)] dark:hover:bg-slate-700"
       )}
     >
       <Icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-white" : "text-slate-400")} />

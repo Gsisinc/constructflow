@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { X, Maximize2, Minimize2 } from 'lucide-react';
+import { openMinibrowser } from '@/components/MinibrowserLauncher';
+import { X, Maximize2, Minimize2, ExternalLink } from 'lucide-react';
 
 export default function AIAgentsMultiPlatform() {
   const [windows, setWindows] = useState({
@@ -192,17 +193,35 @@ export default function AIAgentsMultiPlatform() {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-hidden bg-white dark:bg-slate-800">
+        {/* Content: embedded browser in page */}
+        <div className="flex-1 overflow-hidden bg-white dark:bg-slate-800 flex flex-col min-h-0">
           {id === 'custom' ? (
-            <CustomAgents />
+            <div className="flex-1 overflow-auto">
+              <CustomAgents />
+            </div>
           ) : (
-            <iframe
-              src={config.url}
-              className="w-full h-full border-0"
-              title={config.name}
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-presentation"
-            />
+            <>
+              <div className="flex-shrink-0 flex items-center justify-between px-2 py-1.5 bg-slate-100 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600">
+                <span className="text-xs text-slate-600 dark:text-slate-300">Embedded: {config.name}</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs gap-1"
+                  onClick={() => openMinibrowser(config.url, config.name)}
+                >
+                  <ExternalLink className="h-3 w-3" /> Open in new window
+                </Button>
+              </div>
+              <div className="flex-1 min-h-0 relative">
+                <iframe
+                  src={config.url}
+                  className="absolute inset-0 w-full h-full border-0"
+                  title={config.name}
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
+                  allow="clipboard-read; clipboard-write"
+                />
+              </div>
+            </>
           )}
         </div>
 

@@ -53,8 +53,26 @@ const menuSections = [
       { icon: FileText, label: 'Estimates', page: 'Estimates' },
       { icon: Package, label: 'Purchase Orders', page: 'PurchaseOrders' },
       { icon: FileText, label: 'Invoices', page: 'Invoices' },
+      { icon: FileText, label: 'AIA Billing (G702/G703)', page: 'AIABilling' },
+      { icon: FileText, label: 'Bill Approvals', page: 'BillApprovals' },
       { icon: TrendingUp, label: 'Financial Projections', page: 'Budget' },
       { icon: FileStack, label: 'Change Orders', page: 'Budget' },
+    ]
+  },
+  {
+    title: 'Estimating & Proposals',
+    items: [
+      { icon: FileText, label: 'Cost Library', page: 'CostLibrary' },
+      { icon: FileText, label: 'AI Estimate Generator', page: 'EstimateGenerator' },
+      { icon: MessageSquare, label: 'Send Text Messages', page: 'TextMessages' },
+      { icon: FileText, label: 'E-signatures', page: 'ESignatures' },
+    ]
+  },
+  {
+    title: 'Compliance',
+    items: [
+      { icon: Shield, label: 'Lien Waivers', page: 'LienWaivers' },
+      { icon: FileStack, label: 'Document Tracking', page: 'DocumentTracking' },
     ]
   },
   {
@@ -63,6 +81,7 @@ const menuSections = [
       { icon: Users, label: 'Directory', page: 'Directory' },
       { icon: Search, label: 'Opportunities', page: 'BidDiscovery' },
       { icon: Users, label: 'Technicians', page: 'Directory' },
+      { icon: Users, label: 'Subcontractor Portal', page: 'SubcontractorPortal' },
       { icon: Calendar, label: 'Calendar', page: 'Calendar' },
       { icon: Smartphone, label: 'Vehicles', page: 'VehicleLogs' },
       { icon: FileStack, label: 'Documents', page: 'Documents' },
@@ -91,12 +110,15 @@ const menuSections = [
     title: 'Settings & Support',
     items: [
       { icon: HelpCircle, label: 'Help & Support', page: 'Settings' },
+      { icon: MessageSquare, label: 'Support Channels', page: 'SupportChannels' },
       { icon: Radio, label: "What's New", page: 'Dashboard' },
       { icon: MessageSquare, label: 'Make a Suggestion', page: 'Settings' },
       { icon: Bot, label: 'AI Agents', page: 'AIAgents' },
       { icon: Settings, label: 'Role Permissions', page: 'RolePermissions' },
       { icon: FileStack, label: 'Audit Trail', page: 'AuditTrail' },
       { icon: Wrench, label: 'Service Desk', page: 'ServiceDesk' },
+      { icon: Building2, label: 'Implementation', page: 'Implementation' },
+      { icon: Video, label: 'Ongoing Training', page: 'OngoingTraining' },
       { icon: TrendingUp, label: 'Bid Leveling & Forecasts', page: 'Phase2Operations' },
       { icon: Building2, label: 'Enterprise Integrations', page: 'Phase3Operations' },
       { icon: Bot, label: 'AI Governance & Automation', page: 'Phase4AIAutomation' },

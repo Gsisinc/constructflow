@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import AgentChat from '@/components/agents/AgentChat';
+import MinibrowserLauncher, { openMinibrowser } from '@/components/MinibrowserLauncher';
 import { AGENT_WORKFLOWS } from '@/config/agentWorkflows';
+import { Maximize2, Bot, Sparkles } from 'lucide-react';
 
 const WORKFLOW_ICONS = {
   central_orchestrator: '👔',
@@ -84,60 +86,60 @@ export default function AIAgents() {
   const currentAgent = agents[activeTab];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 p-4 sm:p-6">
+    <div className="min-h-screen bg-[var(--cf-page-bg)] p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-2">
-            🤖 AI Agents Hub
+        <header className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--cf-heading)] tracking-tight flex items-center gap-3">
+            <span className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-lg">
+              <Bot className="h-8 w-8" />
+            </span>
+            AI Agents Hub
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">
-            Access AI services and custom construction agents
+          <p className="text-[var(--cf-muted)] mt-2 text-base">
+            Custom construction agents (real AI) and quick access to external AI in minibrowsers
           </p>
-        </div>
+        </header>
 
-        {/* Tab Buttons */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-6">
+        {/* Tab pills */}
+        <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => setActiveTab('custom')}
-            className={`p-3 rounded-lg font-medium text-sm transition-all ${
+            className={`px-4 py-2.5 rounded-full font-medium text-sm transition-all ${
               activeTab === 'custom'
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-lg'
-                : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300'
+                ? 'bg-violet-600 text-white shadow-md'
+                : 'bg-[var(--cf-surface)] text-[var(--cf-muted)] hover:bg-[var(--cf-border)]'
             }`}
           >
-            ⚙️ Custom
+            <Sparkles className="inline h-4 w-4 mr-1.5 -mt-0.5" /> Custom agents
           </button>
           {Object.entries(agents).map(([key, agent]) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`p-3 rounded-lg font-medium text-sm transition-all ${
+              className={`px-4 py-2.5 rounded-full font-medium text-sm transition-all ${
                 activeTab === key
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-lg'
-                  : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-md border border-[var(--cf-border)]'
+                  : 'bg-[var(--cf-surface)] text-[var(--cf-muted)] hover:bg-[var(--cf-border)]'
               }`}
             >
-              <span className="mr-1">{agent.icon}</span>
-              <span className="hidden sm:inline">{agent.name}</span>
+              <span className="mr-1.5">{agent.icon}</span>
+              {agent.name}
             </button>
           ))}
         </div>
 
-        {/* Content */}
         {activeTab === 'custom' ? (
-          // Custom Agents Grid
-          <div>
-            <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white">
-              <h2 className="text-xl font-bold flex items-center gap-2">⚙️ Custom Agents</h2>
-              <p className="text-white/80 text-sm mt-1">ConstructFlow AI agents for construction management</p>
+          <section>
+            <div className="mb-6 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white p-6 shadow-xl">
+              <h2 className="text-xl font-bold flex items-center gap-2">Custom Agents</h2>
+              <p className="text-white/90 text-sm mt-1">Real AI (Claude or OpenAI). Add API keys in .env.local for live responses.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {customAgents.map((agent) => (
                 <Card
                   key={agent.id}
-                  className="hover:shadow-lg transition-shadow cursor-pointer"
+                  className="hover:shadow-xl transition-all cursor-pointer border-[var(--cf-border)] bg-[var(--cf-surface)]"
                   onClick={() => setSelectedAgent(selectedAgent === agent.id ? null : agent.id)}
                 >
                   <CardHeader className="pb-3">
@@ -147,69 +149,97 @@ export default function AIAgents() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <p className="text-sm text-slate-600 dark:text-slate-400">{agent.desc}</p>
+                    <p className="text-sm text-[var(--cf-muted)]">{agent.desc}</p>
                     <Button
-                      className={`w-full ${selectedAgent === agent.id ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                      className={`w-full ${selectedAgent === agent.id ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-violet-600 hover:bg-violet-700'} text-white`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setChatAgent({ id: agent.id, name: agent.name, description: agent.desc, color: agent.color });
                       }}
                     >
-                      {chatAgent?.id === agent.id ? 'Chat open' : 'Use Agent →'}
+                      {chatAgent?.id === agent.id ? 'Chat open' : 'Use agent'}
                     </Button>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          </div>
+          </section>
         ) : (
-          <div className="space-y-4">
-            {/* Hero launch card */}
-            <div className={`rounded-2xl bg-gradient-to-br ${currentAgent.color} text-white shadow-xl overflow-hidden`}>
-              <div className="flex flex-col md:flex-row items-center gap-6 p-8">
-                <div className="text-7xl">{currentAgent.icon}</div>
+          <section className="space-y-6">
+            <Card className={`overflow-hidden border-0 bg-gradient-to-br ${currentAgent.color} text-white shadow-xl`}>
+              <CardContent className="p-4 flex flex-col md:flex-row items-center gap-4">
+                <div className="text-5xl">{currentAgent.icon}</div>
                 <div className="flex-1 text-center md:text-left">
-                  <h2 className="text-3xl font-bold mb-1">{currentAgent.name}</h2>
-                  <p className="text-white/80 text-base mb-4">{currentAgent.desc}</p>
-                  <a
-                    href={currentAgent.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-8 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-white/90 transition-all shadow-lg text-base"
-                  >
-                    🚀 Open {currentAgent.name} <span className="text-slate-400">↗</span>
-                  </a>
+                  <h2 className="text-xl font-bold mb-1">{currentAgent.name}</h2>
+                  <p className="text-white/90 text-sm mb-2">{currentAgent.desc}</p>
+                  <MinibrowserLauncher
+                    url={currentAgent.url}
+                    label="Open in new window"
+                    className="bg-white/20 hover:bg-white/30 text-white border border-white/40 text-sm px-4 py-2 rounded-lg"
+                    icon={Maximize2}
+                  />
                 </div>
-              </div>
-              <div className="bg-black/20 px-8 py-3 text-white/60 text-xs">
-                ⚠️ These AI services enforce security policies that prevent embedding — clicking the button opens them in a new tab for the best experience.
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            {/* All AI services grid */}
+            {/* Embedded browser in page */}
+            <Card className="overflow-hidden border border-[var(--cf-border)]">
+              <div className="bg-[var(--cf-surface)] px-3 py-2 border-b border-[var(--cf-border)] flex items-center justify-between">
+                <span className="text-sm font-medium text-[var(--cf-muted)]">Embedded: {currentAgent.name}</span>
+                <MinibrowserLauncher
+                  url={currentAgent.url}
+                  label="Open in new window"
+                  variant="outline"
+                  className="text-xs"
+                  icon={Maximize2}
+                />
+              </div>
+              <div className="relative bg-slate-100 dark:bg-slate-900" style={{ minHeight: 'calc(100vh - 320px)' }}>
+                <iframe
+                  src={currentAgent.url}
+                  title={`${currentAgent.name} embedded`}
+                  className="w-full border-0 rounded-b-md"
+                  style={{ height: 'calc(100vh - 320px)', minHeight: 480 }}
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
+                  allow="clipboard-read; clipboard-write"
+                />
+              </div>
+              <p className="text-[10px] text-[var(--cf-muted)] px-3 py-1.5 bg-[var(--cf-surface)] border-t border-[var(--cf-border)]">
+                If the frame is blank, the site blocks embedding — use &quot;Open in new window&quot; above.
+              </p>
+            </Card>
+
             <div>
-              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">All AI Services</h3>
+              <h3 className="text-xs font-semibold text-[var(--cf-muted)] uppercase tracking-wider mb-3">All AI services</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {Object.entries(agents).map(([key, agent]) => (
-                  <a
+                  <Card
                     key={key}
-                    href={agent.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    className={`p-4 cursor-pointer transition-all hover:shadow-lg border-[var(--cf-border)] ${activeTab === key ? 'ring-2 ring-violet-500' : ''}`}
                     onClick={() => setActiveTab(key)}
-                    className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r ${agent.color} text-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 ${activeTab === key ? 'ring-4 ring-white/50' : ''}`}
                   >
-                    <span className="text-2xl">{agent.icon}</span>
-                    <div className="flex-1">
-                      <p className="font-semibold">{agent.name}</p>
-                      <p className="text-white/70 text-xs">{agent.desc}</p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{agent.icon}</span>
+                        <div>
+                          <p className="font-semibold text-[var(--cf-heading)]">{agent.name}</p>
+                          <p className="text-xs text-[var(--cf-muted)]">{agent.desc}</p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="shrink-0"
+                        onClick={(e) => { e.stopPropagation(); openMinibrowser(agent.url, agent.name); }}
+                      >
+                        <Maximize2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <span className="text-white/70 text-lg">↗</span>
-                  </a>
+                  </Card>
                 ))}
               </div>
             </div>
-          </div>
+          </section>
         )}
 
         {chatAgent && (

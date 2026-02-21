@@ -102,6 +102,17 @@ import TemplateLibrary from './pages/TemplateLibrary';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import CostLibrary from './pages/CostLibrary';
+import LienWaivers from './pages/LienWaivers';
+import DocumentTracking from './pages/DocumentTracking';
+import AIABilling from './pages/AIABilling';
+import BillApprovals from './pages/BillApprovals';
+import SupportChannels from './pages/SupportChannels';
+import Implementation from './pages/Implementation';
+import OngoingTraining from './pages/OngoingTraining';
+import TextMessages from './pages/TextMessages';
+import ESignatures from './pages/ESignatures';
+import SubcontractorPortal from './pages/SubcontractorPortal';
 import __Layout from './Layout.jsx';
 
 
@@ -162,6 +173,17 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "CostLibrary": CostLibrary,
+    "LienWaivers": LienWaivers,
+    "DocumentTracking": DocumentTracking,
+    "AIABilling": AIABilling,
+    "BillApprovals": BillApprovals,
+    "SupportChannels": SupportChannels,
+    "Implementation": Implementation,
+    "OngoingTraining": OngoingTraining,
+    "TextMessages": TextMessages,
+    "ESignatures": ESignatures,
+    "SubcontractorPortal": SubcontractorPortal,
 }
 
 export const pagesConfig = {

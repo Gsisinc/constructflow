@@ -47,31 +47,36 @@ const STATE_CODES = {
  * Normalize SAM.GOV opportunity to standard format
  */
 function normalizeSamGovOpportunity(samOpp) {
+  const noticeId = samOpp.noticeId || samOpp.notice_id || samOpp.id;
+  const agencyName = samOpp.fullParentPathName || samOpp.department_name || samOpp.agency || 'Federal Government';
+  const loc = samOpp.placeOfPerformance || {};
+  const city = loc.city || samOpp.city;
+  const state = loc.state || samOpp.state;
   return {
-    id: samOpp.id || samOpp.notice_id,
-    external_id: samOpp.notice_id,
+    id: noticeId,
+    external_id: noticeId,
     title: samOpp.title || samOpp.opportunity_title || 'Untitled',
     project_name: samOpp.title || samOpp.opportunity_title || 'Untitled',
-    agency: samOpp.department_name || samOpp.agency || 'Federal Government',
-    client_name: samOpp.department_name || samOpp.agency || 'Federal Government',
-    location: [samOpp.city, samOpp.state].filter(Boolean).join(', ') || 'United States',
-    state: samOpp.state,
-    county: samOpp.county || null,
-    city: samOpp.city,
+    agency: agencyName,
+    client_name: agencyName,
+    location: [city, state].filter(Boolean).join(', ') || 'United States',
+    state,
+    county: samOpp.county || loc.county || null,
+    city,
     source: 'sam_gov',
     source_type: 'sam_gov',
     source_name: 'SAM.GOV',
-    url: `https://sam.gov/opp/${samOpp.id}`,
+    url: noticeId ? `https://sam.gov/opp/${noticeId}` : null,
     description: samOpp.description || samOpp.summary || 'No description provided',
     requirements: samOpp.requirements || [],
     estimated_value: samOpp.estimated_value ? Number(samOpp.estimated_value) : null,
-    due_date: samOpp.response_deadline || samOpp.deadline || null,
+    due_date: samOpp.responseDeadLine || samOpp.response_deadline || samOpp.deadline || null,
     status: samOpp.status || 'active',
     classification: samOpp.classification || 'government',
     work_type: samOpp.work_type || null,
-    posted_date: samOpp.posted_date || samOpp.publish_date || null,
-    naics_code: samOpp.naics_code || null,
-    set_aside: samOpp.set_aside || null,
+    posted_date: samOpp.postedDate || samOpp.posted_date || samOpp.publish_date || null,
+    naics_code: samOpp.naicsCode || samOpp.naics_code || null,
+    set_aside: samOpp.typeOfSetAsideDescription || samOpp.set_aside || null,
     ai_insights: null
   };
 }
