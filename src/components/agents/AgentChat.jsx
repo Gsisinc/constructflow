@@ -7,11 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Loader2, Send, X, Paperclip, Bot, User, Sparkles, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
-import { getAgentWorkflow, buildAgentSystemPrompt } from '@/config/agentWorkflows';
-import { callAgent, callAgentWithTools } from '@/services/llmService';
+import { buildAgentSystemPrompt } from '@/config/agentWorkflows';
 import { shouldInvokeLiveDiscovery } from '@/config/agentRuntimeRules';
 import { fetchDiscoveryFromSources } from '@/lib/bidDiscoveryOrchestrator';
-import { AGENT_TOOL_DEFINITIONS, executeTool, formatActionsTaken } from '@/lib/agentTools';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const { user } = useAuth();
