@@ -20,10 +20,6 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const sentInitial = useRef(false);
-  const toolContext = {
-    executeTool,
-    context: { base44, user: user || {} },
-  };
 
   useEffect(() => {
     if (messagesEndRef.current) {
