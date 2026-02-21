@@ -659,20 +659,20 @@ Provide:
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-8 text-white">
-        <div className="flex items-start justify-between">
-          <div>
+      <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-4 sm:p-8 text-white">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="min-w-0">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-3 bg-white/20 backdrop-blur rounded-xl">
-                <Search className="h-8 w-8" />
+              <div className="p-2 sm:p-3 bg-white/20 backdrop-blur rounded-xl shrink-0">
+                <Search className="h-6 w-6 sm:h-8 sm:w-8" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold">Bid Discovery</h1>
-                <p className="text-blue-100 mt-1">Search SAM.gov for real opportunities (all results include source URL)</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold truncate">Bid Discovery</h1>
+                <p className="text-blue-100 mt-1 text-sm sm:text-base">Search SAM.gov for real opportunities (all results include source URL)</p>
               </div>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 shrink-0">
             <Button 
               variant="secondary"
               className="gap-2"
@@ -682,16 +682,17 @@ Provide:
               }}
             >
               <Bot className="h-4 w-4" />
-              Chat with Agent
+              <span className="hidden sm:inline">Chat with Agent</span>
+              <span className="sm:hidden">Chat</span>
             </Button>
           </div>
         </div>
 
         {/* Search Filters & Bar */}
-        <div className="mt-6 space-y-3">
-          <div className="flex gap-3">
+        <div className="mt-4 sm:mt-6 space-y-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <Select value={classification} onValueChange={setClassification}>
-              <SelectTrigger className="w-[220px] bg-white text-slate-900 h-12">
+              <SelectTrigger className="w-full min-w-0 sm:w-[220px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="Classification" />
               </SelectTrigger>
               <SelectContent>
@@ -704,7 +705,7 @@ Provide:
             </Select>
 
             <Select value={workType} onValueChange={setWorkType}>
-              <SelectTrigger className="w-[220px] bg-white text-slate-900 h-12">
+              <SelectTrigger className="w-full min-w-0 sm:w-[220px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="Type of Work" />
               </SelectTrigger>
               <SelectContent className="max-h-[400px]">
@@ -742,7 +743,7 @@ Provide:
             </Select>
 
             <Select value={state} onValueChange={setState}>
-              <SelectTrigger className="w-[200px] bg-white text-slate-900 h-12">
+              <SelectTrigger className="w-full min-w-0 sm:w-[200px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="State" />
               </SelectTrigger>
               <SelectContent className="max-h-[400px]">
@@ -753,7 +754,7 @@ Provide:
             </Select>
 
             <Select value={cityCounty} onValueChange={setCityCounty}>
-              <SelectTrigger className="w-[250px] bg-white text-slate-900 h-12">
+              <SelectTrigger className="w-full min-w-0 sm:w-[250px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder={`City in ${state} (optional)`} />
               </SelectTrigger>
               <SelectContent className="max-h-[400px]">
@@ -767,19 +768,19 @@ Provide:
 
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-blue-50">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm text-blue-50">
             <div className="flex items-center gap-2">
-              <Switch checked={autoSearchEnabled} onCheckedChange={setAutoSearchEnabled} />
+              <Switch checked={autoSearchEnabled} onCheckedChange={setAutoSearchEnabled} className="data-[state=checked]:bg-white data-[state=unchecked]:bg-white/30" />
               <span>Auto search</span>
             </div>
             <div className="flex items-center gap-2">
-              <Switch checked={autoAlertEnabled} onCheckedChange={setAutoAlertEnabled} />
+              <Switch checked={autoAlertEnabled} onCheckedChange={setAutoAlertEnabled} className="data-[state=checked]:bg-white data-[state=unchecked]:bg-white/30" />
               <span>New bid alerts</span>
             </div>
             <div className="flex items-center gap-2">
               <span>Interval</span>
               <Select value={autoAlertIntervalMin} onValueChange={setAutoAlertIntervalMin}>
-                <SelectTrigger className="w-[110px] h-9 bg-white text-slate-900">
+                <SelectTrigger className="w-[100px] sm:w-[110px] h-9 bg-white text-slate-900">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

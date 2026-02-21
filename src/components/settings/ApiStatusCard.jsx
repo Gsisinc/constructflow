@@ -6,7 +6,7 @@ import { CheckCircle2, XCircle, Key } from 'lucide-react';
 const hasKey = (key) => Boolean(key && String(key).trim().length > 0);
 
 export default function ApiStatusCard() {
-  const claude = import.meta.env.VITE_CLAUDE_API_KEY ?? process.env.REACT_APP_CLAUDE_API_KEY;
+  const claude = import.meta.env.VITE_CLAUDE_API_KEY ?? import.meta.env.VITE_ANTHROPIC_API_KEY ?? process.env.REACT_APP_CLAUDE_API_KEY;
   const openai = import.meta.env.VITE_OPENAI_API_KEY ?? process.env.OPENAI_API_KEY;
   const samGov = import.meta.env.VITE_SAM_GOV_API_KEY ?? process.env.SAM_GOV_API_KEY;
 

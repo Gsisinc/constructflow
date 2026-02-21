@@ -137,14 +137,14 @@ export default function BidDetail() {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="boq">BOQ</TabsTrigger>
-          <TabsTrigger value="requirements">Requirements</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="drawings">Drawing Analysis</TabsTrigger>
-          <TabsTrigger value="designer">Designer</TabsTrigger>
-          <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
+        <TabsList className="w-full overflow-x-auto flex flex-nowrap gap-1 p-1 h-auto bg-slate-100 rounded-lg sm:inline-flex">
+          <TabsTrigger value="overview" className="flex-shrink-0">Overview</TabsTrigger>
+          <TabsTrigger value="boq" className="flex-shrink-0">BOQ</TabsTrigger>
+          <TabsTrigger value="requirements" className="flex-shrink-0">Requirements</TabsTrigger>
+          <TabsTrigger value="documents" className="flex-shrink-0">Documents</TabsTrigger>
+          <TabsTrigger value="drawings" className="flex-shrink-0">Drawing Analysis</TabsTrigger>
+          <TabsTrigger value="designer" className="flex-shrink-0">Designer</TabsTrigger>
+          <TabsTrigger value="analysis" className="flex-shrink-0">AI Analysis</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
