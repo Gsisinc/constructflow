@@ -151,8 +151,15 @@ export default function BidDiscovery() {
     queryKey: ['bids'],
     queryFn: () => base44.entities.BidOpportunity.list('-created_date', 100)
   });
-  // Only show bids that have a source URL (no fake/placeholder data in pipeline)
-  const bids = (bidsRaw || []).filter((b) => b.url && String(b.url).startsWith('http'));
+  // Only show bids with a real source URL (no fake/placeholder data in pipeline)
+  const isRealUrl = (url) => {
+    if (!url || typeof url !== 'string') return false;
+    const u = url.trim();
+    if (!u.startsWith('http')) return false;
+    if (u.includes('example.com') || u.includes('placeholder') || u === 'http://' || u === 'https://') return false;
+    return u.length > 20;
+  };
+  const bids = (bidsRaw || []).filter((b) => isRealUrl(b.url));
 
   useEffect(() => {
     const saved = window.localStorage.getItem('bid_discovery_alert_settings');
@@ -893,8 +900,8 @@ Provide:
               <CardContent className="py-12 text-center">
                 <Search className="h-16 w-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No opportunities yet</h3>
-                <p className="text-slate-600 mb-6">
-                  Search SAM.gov by keyword or filters. Configure VITE_SAM_GOV_API_KEY for live results. No fake data—every result has a source URL.
+                <p className="text-slate-600 mb-4">
+                  Enter a keyword above (e.g. &quot;electrical&quot;, &quot;HVAC&quot;) or select a work type and state, then click &quot;AI Search&quot;. Add VITE_SAM_GOV_API_KEY to .env.local for live SAM.gov results. Pipeline shows only bids with a real source URL (no fake data).
                 </p>
                 <Button onClick={() => setShowAgentChat(true)} className="gap-2">
                   <Sparkles className="h-4 w-4" />
@@ -908,7 +915,7 @@ Provide:
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base">Source health</CardTitle>
-                    <CardDescription>SAM + county + business aggregator status.</CardDescription>
+                    <CardDescription>SAM.gov search status.</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
                     {sourceSummary.map((entry) => (

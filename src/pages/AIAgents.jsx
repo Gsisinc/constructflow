@@ -182,29 +182,45 @@ export default function AIAgents() {
               </CardContent>
             </Card>
 
-            {/* Embedded browser in page */}
+            {/* Open in new window – primary (most AI sites block embedding) */}
+            <Card className="overflow-hidden border-2 border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800">
+              <CardContent className="p-4 sm:p-6">
+                <p className="text-sm font-medium text-amber-900 dark:text-amber-200 mb-3">
+                  Most AI sites (Claude, ChatGPT, etc.) block embedding. Use the button below to open in a new window.
+                </p>
+                <MinibrowserLauncher
+                  url={currentAgent.url}
+                  label="Open in new window"
+                  variant="default"
+                  className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white border-0 px-6 py-3 text-base font-medium"
+                  icon={Maximize2}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Optional embedded frame (often blank due to X-Frame-Options) */}
             <Card className="overflow-hidden border border-[var(--cf-border)]">
-              <div className="bg-[var(--cf-surface)] px-3 py-2 border-b border-[var(--cf-border)] flex items-center justify-between">
-                <span className="text-sm font-medium text-[var(--cf-muted)]">Embedded: {currentAgent.name}</span>
+              <div className="bg-[var(--cf-surface)] px-3 py-2 border-b border-[var(--cf-border)] flex flex-wrap items-center justify-between gap-2">
+                <span className="text-sm font-medium text-[var(--cf-muted)]">Embedded preview (may be blocked)</span>
                 <MinibrowserLauncher
                   url={currentAgent.url}
                   label="Open in new window"
                   variant="outline"
-                  className="text-xs"
+                  className="text-xs shrink-0"
                   icon={Maximize2}
                 />
               </div>
-              <div className="relative bg-slate-100 dark:bg-slate-900" style={{ minHeight: 'calc(100vh - 320px)' }}>
+              <div className="relative bg-slate-100 dark:bg-slate-900 min-h-[200px] sm:min-h-[360px]" style={{ minHeight: 'min(480px, 50vh)' }}>
                 <iframe
                   src={currentAgent.url}
                   title={`${currentAgent.name} embedded`}
                   className="w-full border-0 rounded-b-md"
-                  style={{ height: 'calc(100vh - 320px)', minHeight: 480 }}
+                  style={{ height: 'min(480px, 50vh)', minHeight: 200 }}
                   sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
                   allow="clipboard-read; clipboard-write"
                 />
               </div>
-              <p className="text-[10px] text-[var(--cf-muted)] px-3 py-1.5 bg-[var(--cf-surface)] border-t border-[var(--cf-border)]">
+              <p className="text-xs text-[var(--cf-muted)] px-3 py-2 bg-[var(--cf-surface)] border-t border-[var(--cf-border)]">
                 If the frame is blank, the site blocks embedding — use &quot;Open in new window&quot; above.
               </p>
             </Card>
