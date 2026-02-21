@@ -1,47 +1,50 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
-const PROVIDER_MAP = {
-  openai: {
-    envKey: 'OPENAI_API_KEY',
-    url: 'https://api.openai.com/v1/chat/completions',
-    model: 'gpt-4o-mini'
-  },
-  deepseek: {
-    envKey: 'DEEPSEEK_API_KEY',
-    url: 'https://api.deepseek.com/v1/chat/completions',
-    model: 'deepseek-chat'
-  }
-};
+// Claude via Anthropic API
+async function invokeClaudeAPI({ prompt, systemPrompt, temperature = 0.2 }) {
+  const apiKey = Deno.env.get('VITE_CLAUDE_API_KEY');
+  if (!apiKey) throw new Error('VITE_CLAUDE_API_KEY is not configured');
 
-function extractContent(payload: any): string {
-  const content = payload?.choices?.[0]?.message?.content;
-  if (typeof content === 'string') return content;
-  if (Array.isArray(content)) {
-    return content.map((part) => (typeof part?.text === 'string' ? part.text : '')).join('\n').trim();
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 4096,
+      temperature,
+      system: systemPrompt || 'You are a helpful AI assistant specializing in construction project management.',
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    throw new Error(`Claude request failed (${response.status}): ${details}`);
   }
-  return '';
+
+  const data = await response.json();
+  const output = data?.content?.[0]?.text || '';
+  if (!output) throw new Error('Claude returned empty output');
+  return { provider: 'claude', model: 'claude-3-5-sonnet-20241022', output };
 }
 
-async function invokeProvider({ provider, prompt, systemPrompt, temperature = 0.2 }: {
-  provider: 'openai' | 'deepseek';
-  prompt: string;
-  systemPrompt?: string;
-  temperature?: number;
-}) {
-  const config = PROVIDER_MAP[provider];
-  if (!config) throw new Error(`Unsupported provider: ${provider}`);
+// OpenAI API
+async function invokeOpenAIAPI({ prompt, systemPrompt, temperature = 0.2 }) {
+  const apiKey = Deno.env.get('VITE_OPENAI_API_KEY');
+  if (!apiKey) throw new Error('VITE_OPENAI_API_KEY is not configured');
 
-  const apiKey = Deno.env.get(config.envKey);
-  if (!apiKey) throw new Error(`${config.envKey} is not configured`);
-
-  const response = await fetch(config.url, {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: config.model,
+      model: 'gpt-4o',
       temperature,
       messages: [
         ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
@@ -52,18 +55,13 @@ async function invokeProvider({ provider, prompt, systemPrompt, temperature = 0.
 
   if (!response.ok) {
     const details = await response.text();
-    throw new Error(`${provider} request failed (${response.status}): ${details}`);
+    throw new Error(`OpenAI request failed (${response.status}): ${details}`);
   }
 
   const data = await response.json();
-  const output = extractContent(data);
-  if (!output) throw new Error(`${provider} returned empty output`);
-
-  return {
-    provider,
-    model: config.model,
-    output
-  };
+  const output = data?.choices?.[0]?.message?.content || '';
+  if (!output) throw new Error('OpenAI returned empty output');
+  return { provider: 'openai', model: 'gpt-4o', output };
 }
 
 Deno.serve(async (req) => {
@@ -76,38 +74,32 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const {
-      prompt,
-      systemPrompt,
-      temperature = 0.2,
-      preferredProviders = ['openai', 'deepseek']
-    } = body || {};
+    const { prompt, systemPrompt, temperature = 0.2, preferredProviders = ['claude', 'openai'] } = body || {};
 
     if (!prompt || typeof prompt !== 'string') {
       return Response.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    const providers = (Array.isArray(preferredProviders) ? preferredProviders : ['openai', 'deepseek'])
-      .map((value: string) => String(value).toLowerCase())
-      .filter((value: string) => value in PROVIDER_MAP) as Array<'openai' | 'deepseek'>;
+    const errors = [];
 
-    if (providers.length === 0) {
-      return Response.json({ error: 'No valid providers requested' }, { status: 400 });
-    }
-
-    const errors: string[] = [];
-
-    for (const provider of providers) {
+    for (const provider of preferredProviders) {
       try {
-        const result = await invokeProvider({ provider, prompt, systemPrompt, temperature });
+        let result;
+        if (provider === 'claude') {
+          result = await invokeClaudeAPI({ prompt, systemPrompt, temperature });
+        } else if (provider === 'openai') {
+          result = await invokeOpenAIAPI({ prompt, systemPrompt, temperature });
+        } else {
+          continue;
+        }
         return Response.json({ success: true, ...result });
       } catch (error) {
-        errors.push(`${provider}: ${(error as Error).message}`);
+        errors.push(`${provider}: ${error.message}`);
       }
     }
 
     return Response.json({ success: false, error: 'All providers failed', details: errors }, { status: 502 });
   } catch (error) {
-    return Response.json({ error: (error as Error).message }, { status: 500 });
+    return Response.json({ error: error.message }, { status: 500 });
   }
 });
