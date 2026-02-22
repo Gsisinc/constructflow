@@ -71,7 +71,6 @@ import CostPlusInvoicing from './pages/CostPlusInvoicing';
 import DailyLog from './pages/DailyLog';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
 import Dashboard from './pages/Dashboard';
-import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
@@ -146,7 +145,6 @@ export const PAGES = {
     "CostPlusInvoicing": CostPlusInvoicing,
     "DailyLog": DailyLog,
     "Dashboard.ImprovedVersion": dashboardImprovedversion,
-    "Dashboard": Dashboard,
     "Dashboard": Dashboard,
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
