@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import BlueprintUploader from '@/components/agents/BlueprintUploader';
 import BlueprintEstimateResult from '@/components/agents/BlueprintEstimateResult';
-import { analyzeBlueprintWithVision } from '@/services/bidDocumentAnalysisService';
+import { analyzeBlueprintWithVision, analyzeBlueprintFromPDF } from '@/services/bidDocumentAnalysisService';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const { user } = useAuth();
@@ -102,24 +102,31 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     if (loading) return;
     setLoading(true);
 
-    const userMsg = { id: crypto.randomUUID(), role: 'user', content: '📐 Analyzing uploaded blueprint with computer vision...' };
+    const isPdf = !!options.pdfFile;
+    const userMsg = { id: crypto.randomUUID(), role: 'user', content: isPdf ? '📐 Analyzing PDF (all pages) with computer vision...' : '📐 Analyzing uploaded blueprint with computer vision...' };
     setMessages(prev => [...prev, userMsg]);
 
     const userPrompt = input.trim() || 'Analyze this blueprint. Extract all dimensions, quantities of materials, and generate a complete material takeoff table and cost estimate with labor and materials broken down.';
 
     try {
-      const structured = await analyzeBlueprintWithVision(imageUrl, userPrompt, options);
-      setBlueprintResult({ ...structured, imageUrl });
+      let structured;
+      if (isPdf) {
+        const { combined, pages } = await analyzeBlueprintFromPDF(options.pdfFile, userPrompt, { maxPages: 50 });
+        structured = { ...combined, _pdfPages: pages };
+      } else {
+        structured = await analyzeBlueprintWithVision(imageUrl, userPrompt, options);
+      }
+      setBlueprintResult({ ...structured, imageUrl: imageUrl || undefined });
       setInput('');
     } catch (err) {
       console.error('Blueprint analysis error:', err);
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: `Error analyzing blueprint: ${err.message}. For vision analysis, add VITE_CLAUDE_API_KEY or VITE_OPENAI_API_KEY in Settings (or in AI Agents).`,
+        content: `Error: ${err.message}. Add an API key in Settings → AI Agents (OpenAI or Claude), or set VITE_OPENAI_API_KEY / VITE_CLAUDE_API_KEY in .env.local and restart the dev server.`,
         error: true,
       }]);
-      toast.error('Vision analysis failed: ' + err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }

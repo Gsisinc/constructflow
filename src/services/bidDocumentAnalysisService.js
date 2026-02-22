@@ -489,19 +489,29 @@ function getClaudeKey() {
   );
 }
 
+/** Returns which vision provider has a key: 'claude' | 'openai' | null. Use in UI to show status. */
+export function getVisionKeyStatus() {
+  const c = getClaudeKey();
+  const o = getOpenAIKey();
+  if (typeof c === 'string' && c.trim()) return 'claude';
+  if (typeof o === 'string' && o.trim()) return 'openai';
+  return null;
+}
+
 const NO_VISION_KEY_ERROR =
-  'No vision API key found. Add VITE_CLAUDE_API_KEY or VITE_OPENAI_API_KEY to .env.local (or set in AI Agents settings), then restart the dev server.';
+  'No vision API key found. Do one of: (1) Go to Settings → AI Agents (OpenAI & Claude), enter your OpenAI or Claude key, click Save, then try again. (2) Or add VITE_OPENAI_API_KEY or VITE_CLAUDE_API_KEY to a file named .env.local in the project root (exact names), then restart the dev server (stop and run npm run dev again).';
 
 /** Blueprint analyzer capabilities — real vision analysis only, no fake data. */
 export const BLUEPRINT_ANALYZER_CAPABILITIES = [
-  'Reads blueprint/drawing images only from what is visible (no placeholders or invented data)',
+  'Supports images (PNG, JPG) and PDFs — PDFs are rendered page-by-page and each page is analyzed',
+  'Multiple pages: each PDF page gets its own vision analysis; results are combined (line items + summary)',
+  'Reads only what is visible (no placeholders or invented data)',
   'Extracts drawing overview: type, trade, scale when shown on the sheet',
-  'Quantity takeoff: line items from symbols, dimensions, and counts actually in the image',
+  'Quantity takeoff: line items from symbols, dimensions, and counts in the image',
   'Categories: material, labor, equipment, subcontractor',
   'Summary: materials/labor/equipment/subcontractor subtotals, overhead, profit, total estimate',
-  'Assumptions and notes only for real uncertainties (e.g. scale not visible, symbol meaning assumed)',
-  'Confidence (high/medium/low) reflects image clarity and readability',
-  'Requires Claude (VITE_CLAUDE_API_KEY) or OpenAI (VITE_OPENAI_API_KEY); uses one provider, no fallback',
+  'Assumptions and notes only for real uncertainties',
+  'Requires Claude or OpenAI key: Settings → AI Agents, or VITE_CLAUDE_API_KEY / VITE_OPENAI_API_KEY in .env.local (then restart dev server)',
 ];
 
 /** Call Anthropic Claude with image (vision); returns raw text. */
@@ -682,10 +692,86 @@ export async function analyzeBlueprintWithVision(imageUrl, userPrompt = '', opti
   }
 }
 
+/**
+ * Analyze a PDF blueprint: render each page to an image, run vision on each, combine results.
+ * @param {File} pdfFile - PDF file
+ * @param {string} userPrompt - Optional user prompt
+ * @param {{ maxPages?: number }} options - maxPages (default 20)
+ * @returns {Promise<{ pages: Array<{ pageIndex: number, ...result }>, combined: object }>}
+ */
+export async function analyzeBlueprintFromPDF(pdfFile, userPrompt = '', options = {}) {
+  const rawClaude = getClaudeKey();
+  const rawOpenAI = getOpenAIKey();
+  const claudeKey = typeof rawClaude === 'string' ? rawClaude.trim() : '';
+  const openaiKey = typeof rawOpenAI === 'string' ? rawOpenAI.trim() : '';
+  if (!claudeKey && !openaiKey) {
+    throw new Error(NO_VISION_KEY_ERROR);
+  }
+
+  const { pdfToPageDataUrls } = await import('@/lib/pdfToImages');
+  const pageImages = await pdfToPageDataUrls(pdfFile, { scale: 2, maxPages: options.maxPages ?? 20 });
+  if (!pageImages.length) throw new Error('PDF has no renderable pages.');
+
+  const prompt = userPrompt.trim() || 'Analyze this blueprint page. Extract dimensions, quantities, and generate material takeoff and cost estimate.';
+  const pages = [];
+  const allLineItems = [];
+  let combinedSummary = {
+    subtotal_materials: 0,
+    subtotal_labor: 0,
+    subtotal_equipment: 0,
+    subtotal_subcontractor: 0,
+    overhead_percent: 0,
+    overhead_amount: 0,
+    profit_percent: 0,
+    profit_amount: 0,
+    total_estimate: 0,
+  };
+  const allAssumptions = [];
+  const allNotes = [];
+
+  for (const { pageIndex, dataUrl } of pageImages) {
+    const result = await analyzeBlueprintWithVision('', prompt, { previewDataUrl: dataUrl });
+    pages.push({ pageIndex, ...result });
+    (result.line_items || []).forEach((item) => {
+      allLineItems.push({ ...item, page: pageIndex, description: item.description ? `[Page ${pageIndex}] ${item.description}` : `[Page ${pageIndex}]` });
+    });
+    const s = result.summary || {};
+    combinedSummary.subtotal_materials += Number(s.subtotal_materials) || 0;
+    combinedSummary.subtotal_labor += Number(s.subtotal_labor) || 0;
+    combinedSummary.subtotal_equipment += Number(s.subtotal_equipment) || 0;
+    combinedSummary.subtotal_subcontractor += Number(s.subtotal_subcontractor) || 0;
+    combinedSummary.overhead_amount += Number(s.overhead_amount) || 0;
+    combinedSummary.profit_amount += Number(s.profit_amount) || 0;
+    combinedSummary.total_estimate += Number(s.total_estimate) || 0;
+    if (s.overhead_percent != null) combinedSummary.overhead_percent = s.overhead_percent;
+    if (s.profit_percent != null) combinedSummary.profit_percent = s.profit_percent;
+    (result.assumptions || []).forEach((a) => allAssumptions.push(`Page ${pageIndex}: ${a}`));
+    if (result.notes) allNotes.push(`Page ${pageIndex}: ${result.notes}`);
+  }
+
+  combinedSummary.total_estimate = combinedSummary.subtotal_materials + combinedSummary.subtotal_labor + combinedSummary.subtotal_equipment + combinedSummary.subtotal_subcontractor + combinedSummary.overhead_amount + combinedSummary.profit_amount;
+  if (pages.length === 1) {
+    combinedSummary = pages[0].summary || combinedSummary;
+  }
+
+  return {
+    pages,
+    combined: {
+      drawing_overview: pages[0]?.drawing_overview || { type: '', trade: '', scale: '' },
+      line_items: allLineItems,
+      summary: combinedSummary,
+      assumptions: allAssumptions,
+      notes: allNotes.join('\n\n'),
+      confidence: pages.length === 1 ? (pages[0].confidence || '') : (pages.every((p) => p.confidence === 'high') ? 'high' : 'medium'),
+    },
+  };
+}
+
 export default {
   analyzeBidDocument,
   analyzeDrawing,
   analyzeBlueprintWithVision,
+  analyzeBlueprintFromPDF,
   BLUEPRINT_ANALYZER_CAPABILITIES,
   fileToBase64,
   extractTextFromPDF

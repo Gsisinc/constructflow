@@ -2,13 +2,17 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, ImagePlus, X, FileImage, Sparkles, ListChecks } from 'lucide-react';
 import { toast } from 'sonner';
-import { BLUEPRINT_ANALYZER_CAPABILITIES } from '@/services/bidDocumentAnalysisService';
+import { BLUEPRINT_ANALYZER_CAPABILITIES, getVisionKeyStatus } from '@/services/bidDocumentAnalysisService';
 
 export default function BlueprintUploader({ onAnalysis, disabled }) {
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
+  const visionStatus = getVisionKeyStatus();
+  const hasVisionKey = visionStatus === 'claude' || visionStatus === 'openai';
+  const isPdf = selectedFile?.type === 'application/pdf';
 
   const handleFile = (file) => {
     if (!file) return;
@@ -16,8 +20,15 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
       toast.error('Please upload an image (PNG, JPG, TIFF) or PDF');
       return;
     }
-
+    setSelectedFile(file);
     setLoading(true);
+    if (file.type === 'application/pdf') {
+      setPreview(null);
+      setImageUrl('pdf');
+      setLoading(false);
+      toast.success('PDF loaded — click Analyze to run vision on each page');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       const dataUrl = e.target?.result;
@@ -42,12 +53,17 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
   };
 
   const handleAnalyze = () => {
-    if (imageUrl) onAnalysis(imageUrl, { previewDataUrl: preview || undefined });
+    if (isPdf && selectedFile) {
+      onAnalysis(null, { pdfFile: selectedFile });
+    } else if (imageUrl && imageUrl !== 'pdf') {
+      onAnalysis(imageUrl, { previewDataUrl: preview || undefined });
+    }
   };
 
   const handleClear = () => {
     setPreview(null);
     setImageUrl(null);
+    setSelectedFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -79,7 +95,7 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
           ) : (
             <div className="flex items-center justify-center gap-2 text-slate-400">
               <ImagePlus className="h-4 w-4" />
-              <span className="text-xs">Drop blueprint / drawing here or click to upload</span>
+              <span className="text-xs">Drop image or PDF here (multi-page PDFs supported)</span>
             </div>
           )}
         </div>
@@ -88,7 +104,13 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
           {preview && (
             <img src={preview} alt="Blueprint preview" className="w-full max-h-40 object-contain bg-slate-50" />
           )}
-          {!preview && (
+          {isPdf && (
+            <div className="flex items-center gap-2 p-3 bg-slate-50">
+              <FileImage className="h-5 w-5 text-blue-500" />
+              <span className="text-xs text-slate-600 truncate">PDF: {selectedFile?.name || 'plan'} — each page will be analyzed</span>
+            </div>
+          )}
+          {!preview && !isPdf && (
             <div className="flex items-center gap-2 p-3 bg-slate-50">
               <FileImage className="h-5 w-5 text-blue-500" />
               <span className="text-xs text-slate-600 truncate">Blueprint uploaded</span>
@@ -103,15 +125,20 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
         </div>
       )}
 
+      {!hasVisionKey && (imageUrl || selectedFile) && (
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
+          Add an API key first: Settings → AI Agents (OpenAI or Claude), enter key and Save. Or add VITE_OPENAI_API_KEY or VITE_CLAUDE_API_KEY to .env.local and restart the dev server.
+        </p>
+      )}
       {imageUrl && (
         <Button
           onClick={handleAnalyze}
-          disabled={disabled}
+          disabled={disabled || !hasVisionKey}
           size="sm"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2"
         >
           <Sparkles className="h-4 w-4" />
-          Analyze Blueprint & Generate Estimate
+          {isPdf ? 'Analyze PDF (all pages)' : 'Analyze Blueprint & Generate Estimate'}
         </Button>
       )}
 
