@@ -118,6 +118,7 @@ import JobCosting from './pages/JobCosting';
 import QuickBooksSync from './pages/QuickBooksSync';
 import CostPlusInvoicing from './pages/CostPlusInvoicing';
 import SchedulingAI from './pages/SchedulingAI';
+import Dashboard from './pages/Dashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -193,6 +194,7 @@ export const PAGES = {
     "QuickBooksSync": QuickBooksSync,
     "CostPlusInvoicing": CostPlusInvoicing,
     "SchedulingAI": SchedulingAI,
+    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {
