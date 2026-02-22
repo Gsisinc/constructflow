@@ -26,13 +26,14 @@ const PRIORITIES = [
   { value: 'critical', label: 'Critical' },
 ];
 
-// ─── Step 1: Pick project type ────────────────────────────────────────────────
-function StepTypeSelector({ selectedType, onSelect }) {
+// ─── Step 1: Pick project type + create phases question ────────────────────────
+function StepTypeSelector({ selectedType, onSelect, createPhasesFromTemplate, onCreatePhasesChange }) {
+  const selectedLabel = selectedType && PROJECT_TYPE_CATALOG.flatMap(c => c.types).find(t => t.value === selectedType)?.label;
   return (
     <div className="space-y-5">
       <div>
         <h2 className="text-lg font-semibold text-slate-900">Select Project Type</h2>
-        <p className="text-sm text-slate-500 mt-1">This determines which phases and checklists are generated for your project.</p>
+        <p className="text-sm text-slate-500 mt-1">This determines which phases and checklists can be generated for your project.</p>
       </div>
       {PROJECT_TYPE_CATALOG.map(category => (
         <div key={category.category}>
@@ -65,6 +66,35 @@ function StepTypeSelector({ selectedType, onSelect }) {
           </div>
         </div>
       ))}
+
+      {selectedType && (
+        <div className="rounded-xl border-2 border-slate-200 bg-slate-50/50 p-4 space-y-3">
+          <h3 className="text-sm font-semibold text-slate-900">Create phases and requirements?</h3>
+          <p className="text-sm text-slate-500">
+            Automatically create phases and requirements from the <strong>{selectedLabel}</strong> template. You can edit or delete any of them in the next step before creating the project.
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => onCreatePhasesChange(true)}
+              className={`flex-1 py-2.5 px-4 rounded-lg border-2 text-sm font-medium transition-all ${
+                createPhasesFromTemplate ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+              }`}
+            >
+              Yes, create them
+            </button>
+            <button
+              type="button"
+              onClick={() => onCreatePhasesChange(false)}
+              className={`flex-1 py-2.5 px-4 rounded-lg border-2 text-sm font-medium transition-all ${
+                !createPhasesFromTemplate ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+              }`}
+            >
+              No, I'll add my own or skip
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -204,7 +234,9 @@ function StepPhaseReview({ phases, onChange }) {
         <div>
           <h2 className="text-lg font-semibold text-slate-900">Review & Edit Phase Requirements</h2>
           <p className="text-sm text-slate-500 mt-1">
-            All {phases.reduce((s, p) => s + p.items.length, 0)} requirements pre-loaded from your project type template. Edit, add, or remove anything.
+            {phases.length > 0
+              ? `${phases.reduce((s, p) => s + p.items.length, 0)} requirements from the template. Edit, add, or delete any phase or requirement below.`
+              : 'No phases yet. Add your own below, or leave empty and add them later from the project.'}
           </p>
         </div>
         <Badge className="bg-blue-100 text-blue-700 flex-shrink-0">{phases.length} phases</Badge>
@@ -270,12 +302,13 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
     description: '', project_manager: '', image_url: '',
   });
   const [phases, setPhases] = useState([]);
+  const [createPhasesFromTemplate, setCreatePhasesFromTemplate] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const handleTypeSelect = (type) => {
     setSelectedType(type);
-    setPhases(getPhaseTemplate(type).map(p => ({ ...p, items: [...p.items] })));
+    // Phases are set when user clicks Next (if they chose "Yes, create them")
   };
 
   const handleChange = (key, value) => {
@@ -324,11 +357,12 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         await base44.entities.PhaseRequirement.bulkCreate(allRequirements);
       }
 
-      toast.success(`Project created with ${allRequirements.length} phase requirements`);
+      toast.success(allRequirements.length > 0 ? `Project created with ${allRequirements.length} phase requirements` : 'Project created');
       onCreated(project);
       // Reset
       setStep(1);
       setSelectedType('');
+      setCreatePhasesFromTemplate(true);
       setFormData({ name: '', client_name: '', status: 'bidding', priority: 'medium', address: '', start_date: '', end_date: '', budget: '', description: '', project_manager: '', image_url: '' });
       setPhases([]);
     } catch (err) {
@@ -340,6 +374,15 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
 
   const canProceedStep1 = !!selectedType;
   const canProceedStep2 = !!formData.name && !!formData.client_name;
+
+  const handleStep1Next = () => {
+    if (createPhasesFromTemplate && selectedType) {
+      setPhases(getPhaseTemplate(selectedType).map(p => ({ ...p, items: [...p.items] })));
+    } else {
+      setPhases([]);
+    }
+    setStep(2);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -361,7 +404,14 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-2 pr-1">
-          {step === 1 && <StepTypeSelector selectedType={selectedType} onSelect={handleTypeSelect} />}
+          {step === 1 && (
+            <StepTypeSelector
+              selectedType={selectedType}
+              onSelect={handleTypeSelect}
+              createPhasesFromTemplate={createPhasesFromTemplate}
+              onCreatePhasesChange={setCreatePhasesFromTemplate}
+            />
+          )}
           {step === 2 && <StepProjectDetails formData={formData} onChange={handleChange} uploading={uploading} onImageUpload={handleImageUpload} />}
           {step === 3 && <StepPhaseReview phases={phases} onChange={setPhases} />}
         </div>
@@ -372,7 +422,7 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
           </Button>
           {step < 3 ? (
             <Button
-              onClick={() => setStep(s => s + 1)}
+              onClick={() => step === 1 ? handleStep1Next() : setStep(3)}
               disabled={step === 1 ? !canProceedStep1 : !canProceedStep2}
             >
               Next <ChevronRight className="h-4 w-4 ml-1" />
