@@ -77,13 +77,23 @@ export default function AIAgents() {
     },
   };
 
-  const customAgents = Object.entries(AGENT_WORKFLOWS).map(([id, w]) => ({
-    id,
-    name: w.name,
-    desc: w.purpose,
-    icon: WORKFLOW_ICONS[id] || '🤖',
-    color: WORKFLOW_COLORS[id] || 'from-blue-500 to-blue-600',
-  }));
+  const customAgents = [
+    ...Object.entries(AGENT_WORKFLOWS).map(([id, w]) => ({
+      id,
+      name: w.name,
+      desc: w.purpose,
+      icon: WORKFLOW_ICONS[id] || '🤖',
+      color: WORKFLOW_COLORS[id] || 'from-blue-500 to-blue-600',
+    })),
+    {
+      id: 'blueprint_analyzer',
+      name: 'Blueprint Analyzer',
+      desc: 'Upload blueprints or drawings — AI reads them with computer vision and generates quantity takeoffs and cost estimates.',
+      icon: '📐',
+      color: 'from-blue-600 to-violet-600',
+      badge: 'Vision AI',
+    },
+  ];
 
   const currentAgent = agents[activeTab];
 
