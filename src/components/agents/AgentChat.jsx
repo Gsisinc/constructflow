@@ -8,6 +8,7 @@ import { Loader2, Send, X, Paperclip, Bot, User, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import BlueprintUploader from '@/components/agents/BlueprintUploader';
+import BlueprintEstimateResult from '@/components/agents/BlueprintEstimateResult';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const { user } = useAuth();
