@@ -121,6 +121,7 @@ import TrainingManagement from './pages/TrainingManagement';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import TechnicianPortal from './pages/TechnicianPortal';
+import Dashboard from './pages/Dashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -199,6 +200,7 @@ export const PAGES = {
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
     "TechnicianPortal": TechnicianPortal,
+    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {
