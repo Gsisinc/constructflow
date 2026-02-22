@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, ImagePlus, X, FileImage, Sparkles } from 'lucide-react';
+import { Loader2, ImagePlus, X, FileImage, Sparkles, ListChecks } from 'lucide-react';
 import { toast } from 'sonner';
+import { BLUEPRINT_ANALYZER_CAPABILITIES } from '@/services/bidDocumentAnalysisService';
 
 export default function BlueprintUploader({ onAnalysis, disabled }) {
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,17 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
 
   return (
     <div className="space-y-2">
+      <div className="rounded-lg border border-slate-200 bg-slate-50/80 p-3 text-left">
+        <p className="flex items-center gap-1.5 text-xs font-medium text-slate-700 mb-2">
+          <ListChecks className="h-3.5 w-3.5" />
+          Blueprint analyzer — real vision only, no fake data
+        </p>
+        <ul className="text-xs text-slate-600 space-y-1 list-disc list-inside">
+          {BLUEPRINT_ANALYZER_CAPABILITIES.map((cap, i) => (
+            <li key={i}>{cap}</li>
+          ))}
+        </ul>
+      </div>
       {!imageUrl ? (
         <div
           onDrop={handleDrop}

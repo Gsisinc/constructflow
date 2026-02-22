@@ -127,10 +127,10 @@ export async function extractTextFromPDF(pdfFile) {
     // For PDFs, we'll need to convert to images first
     // This is a simplified approach - in production, use pdf-lib or similar
     const base64 = await fileToBase64(pdfFile);
-    
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+    const raw = getOpenAIKey();
+    const apiKey = typeof raw === 'string' ? raw.trim() : '';
     if (!apiKey) {
-      throw new Error('OpenAI API key not configured');
+      throw new Error('OpenAI API key not found. Add VITE_OPENAI_API_KEY to .env.local and restart the dev server, or set it in AI Agents (OpenAI/Claude) settings.');
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -208,9 +208,10 @@ export async function analyzeBidDocument(document, isImage = false) {
     }
 
     // Call OpenAI with vision if we have an image, otherwise use text
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+    const raw = getOpenAIKey();
+    const apiKey = typeof raw === 'string' ? raw.trim() : '';
     if (!apiKey) {
-      throw new Error('OpenAI API key not configured');
+      throw new Error('OpenAI API key not found. Add VITE_OPENAI_API_KEY to .env.local and restart the dev server, or set it in AI Agents (OpenAI/Claude) settings.');
     }
 
     let messageContent;
@@ -470,10 +471,91 @@ async function fetchImageAsBase64(imageUrl) {
  * @param {{ previewDataUrl?: string }} options - Optional previewDataUrl (data URL with base64 image)
  * @returns {Promise<Object>} Structured result: drawing_overview, line_items, summary, assumptions, notes, confidence
  */
+function getOpenAIKey() {
+  return (
+    import.meta.env.VITE_OPENAI_API_KEY ||
+    import.meta.env.REACT_APP_OPENAI_API_KEY ||
+    (typeof localStorage !== 'undefined' ? localStorage.getItem('openai_api_key') : null) ||
+    (typeof localStorage !== 'undefined' ? localStorage.getItem('VITE_OPENAI_API_KEY') : null)
+  );
+}
+
+function getClaudeKey() {
+  return (
+    import.meta.env.VITE_CLAUDE_API_KEY ||
+    import.meta.env.VITE_ANTHROPIC_API_KEY ||
+    import.meta.env.REACT_APP_CLAUDE_API_KEY ||
+    (typeof localStorage !== 'undefined' ? localStorage.getItem('claude_api_key') : null)
+  );
+}
+
+const NO_VISION_KEY_ERROR =
+  'No vision API key found. Add VITE_CLAUDE_API_KEY or VITE_OPENAI_API_KEY to .env.local (or set in AI Agents settings), then restart the dev server.';
+
+/** Blueprint analyzer capabilities — real vision analysis only, no fake data. */
+export const BLUEPRINT_ANALYZER_CAPABILITIES = [
+  'Reads blueprint/drawing images only from what is visible (no placeholders or invented data)',
+  'Extracts drawing overview: type, trade, scale when shown on the sheet',
+  'Quantity takeoff: line items from symbols, dimensions, and counts actually in the image',
+  'Categories: material, labor, equipment, subcontractor',
+  'Summary: materials/labor/equipment/subcontractor subtotals, overhead, profit, total estimate',
+  'Assumptions and notes only for real uncertainties (e.g. scale not visible, symbol meaning assumed)',
+  'Confidence (high/medium/low) reflects image clarity and readability',
+  'Requires Claude (VITE_CLAUDE_API_KEY) or OpenAI (VITE_OPENAI_API_KEY); uses one provider, no fallback',
+];
+
+/** Call Anthropic Claude with image (vision); returns raw text. */
+async function callClaudeVision(systemPrompt, userText, imageBase64, mimeType = 'image/jpeg') {
+  const key = getClaudeKey();
+  const trimmed = typeof key === 'string' ? key.trim() : '';
+  if (!trimmed) return null;
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': trimmed,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 4096,
+      temperature: 0.1,
+      system: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: mimeType,
+                data: imageBase64,
+              },
+            },
+            { type: 'text', text: userText },
+          ],
+        },
+      ],
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Claude ${res.status}`);
+  }
+  const data = await res.json();
+  const text = data.content?.[0]?.text;
+  if (!text) throw new Error('Empty Claude response');
+  return text;
+}
+
 export async function analyzeBlueprintWithVision(imageUrl, userPrompt = '', options = {}) {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error('OpenAI API key not configured. Add VITE_OPENAI_API_KEY in Settings for blueprint vision.');
+  const rawClaude = getClaudeKey();
+  const rawOpenAI = getOpenAIKey();
+  const claudeKey = typeof rawClaude === 'string' ? rawClaude.trim() : '';
+  const openaiKey = typeof rawOpenAI === 'string' ? rawOpenAI.trim() : '';
+  if (!claudeKey && !openaiKey) {
+    throw new Error(NO_VISION_KEY_ERROR);
   }
 
   let imageBase64 = null;
@@ -501,58 +583,72 @@ export async function analyzeBlueprintWithVision(imageUrl, userPrompt = '', opti
 
   const prompt = userPrompt.trim() || 'Analyze this blueprint. Extract all dimensions, quantities of materials, and generate a complete material takeoff table and cost estimate with labor and materials broken down.';
 
-  const body = {
-    model: 'gpt-4o',
-    messages: [
-      { role: 'system', content: BLUEPRINT_ESTIMATE_SYSTEM_PROMPT },
-      {
-        role: 'user',
-        content: [
-          { type: 'text', text: prompt },
-          {
-            type: 'image_url',
-            image_url: {
-              url: `data:${mimeType};base64,${imageBase64}`,
-              detail: 'high',
-            },
-          },
-        ],
-      },
-    ],
-    temperature: 0.1,
-    max_tokens: 4096,
-  };
+  let text = null;
+  let lastError = null;
 
-  let response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
-
-  // Fallback for accounts that have gpt-4-vision but not gpt-4o
-  if (!response.ok && response.status === 400) {
-    const errBody = await response.json().catch(() => ({}));
-    if (errBody.error?.code === 'invalid_model' || (errBody.error?.message && errBody.error.message.includes('model'))) {
-      body.model = 'gpt-4-vision-preview';
-      response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-        body: JSON.stringify(body),
-      });
+  // Try Claude first if key is configured
+  if (claudeKey) {
+    try {
+      text = await callClaudeVision(BLUEPRINT_ESTIMATE_SYSTEM_PROMPT, prompt, imageBase64, mimeType);
+    } catch (e) {
+      lastError = e;
     }
   }
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || `Vision API error: ${response.status}`);
+  // Fall back to OpenAI if no Claude response
+  if (!text && openaiKey) {
+    const body = {
+      model: 'gpt-4o',
+      messages: [
+        { role: 'system', content: BLUEPRINT_ESTIMATE_SYSTEM_PROMPT },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            {
+              type: 'image_url',
+              image_url: {
+                url: `data:${mimeType};base64,${imageBase64}`,
+                detail: 'high',
+              },
+            },
+          ],
+        },
+      ],
+      temperature: 0.1,
+      max_tokens: 4096,
+    };
+    let response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openaiKey}`,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok && response.status === 400) {
+      const errBody = await response.json().catch(() => ({}));
+      if (errBody.error?.code === 'invalid_model' || (errBody.error?.message && errBody.error.message.includes('model'))) {
+        body.model = 'gpt-4-vision-preview';
+        response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openaiKey}` },
+          body: JSON.stringify(body),
+        });
+      }
+    }
+    if (response.ok) {
+      const data = await response.json();
+      text = data.choices?.[0]?.message?.content;
+    } else {
+      const err = await response.json().catch(() => ({}));
+      lastError = new Error(err.error?.message || `Vision API error: ${response.status}`);
+    }
   }
 
-  const data = await response.json();
-  const text = data.choices?.[0]?.message?.content;
-  if (!text) throw new Error('Empty response from vision API');
+  if (!text) {
+    throw lastError || new Error(NO_VISION_KEY_ERROR);
+  }
 
   // Parse JSON (strip markdown code block if present)
   let raw = text.trim();
@@ -578,7 +674,7 @@ export async function analyzeBlueprintWithVision(imageUrl, userPrompt = '', opti
       summary: structured.summary && typeof structured.summary === 'object' ? structured.summary : {},
       assumptions: Array.isArray(structured.assumptions) ? structured.assumptions : [],
       notes: typeof structured.notes === 'string' ? structured.notes : '',
-      confidence: ['high', 'medium', 'low'].includes(structured.confidence) ? structured.confidence : 'medium',
+      confidence: ['high', 'medium', 'low'].includes(structured.confidence) ? structured.confidence : '',
     };
   } catch (e) {
     if (e.message && (e.message.includes('Vision did not') || e.message.includes('valid object'))) throw e;
@@ -590,6 +686,7 @@ export default {
   analyzeBidDocument,
   analyzeDrawing,
   analyzeBlueprintWithVision,
+  BLUEPRINT_ANALYZER_CAPABILITIES,
   fileToBase64,
   extractTextFromPDF
 };

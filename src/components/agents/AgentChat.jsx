@@ -116,7 +116,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: `Error analyzing blueprint: ${err.message}. For vision analysis, add VITE_OPENAI_API_KEY in Settings (OpenAI key is required for blueprint reading).`,
+        content: `Error analyzing blueprint: ${err.message}. For vision analysis, add VITE_CLAUDE_API_KEY or VITE_OPENAI_API_KEY in Settings (or in AI Agents).`,
         error: true,
       }]);
       toast.error('Vision analysis failed: ' + err.message);

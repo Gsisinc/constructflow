@@ -197,7 +197,7 @@ export default function BlueprintEstimateResult({ result, imageUrl, onClose }) {
             {result.drawing_overview?.trade || 'unknown'}
           </Badge>
           <Badge variant="outline" className="text-xs">{result.drawing_overview?.type || ''}</Badge>
-          <Badge variant="outline" className="text-xs capitalize">Confidence: {result.confidence || 'medium'}</Badge>
+          <Badge variant="outline" className="text-xs capitalize">Confidence: {result.confidence || '—'}</Badge>
         </div>
         <div className="flex gap-1">
           <Button size="sm" variant="ghost" onClick={() => setCollapsed(c => !c)}>
