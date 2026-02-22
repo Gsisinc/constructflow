@@ -263,7 +263,7 @@ function StepPhaseReview({ phases, onChange }) {
             <div className="p-3 space-y-1.5">
               {phase.items.map((item, itemIdx) => (
                 <div key={itemIdx} className="flex items-start gap-2">
-                  <div className="h-5 w-5 rounded border border-slate-300 flex-shrink-0 mt-0.5" />
+                  <Checkbox />
                   <Input
                     value={item}
                     onChange={e => updateItem(phaseIdx, itemIdx, e.target.value)}
