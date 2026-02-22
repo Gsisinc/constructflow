@@ -136,10 +136,10 @@ export default function ProjectCard({ project, onProjectDeleted }) {
             </div>
           </div>
         )}
-      </div>
-      </Link>
+        </div>
+        </Link>
 
-      {/* Delete Button */}
+        {/* Delete Button */}
       <Button
         onClick={handleDelete}
         disabled={isDeleting}
