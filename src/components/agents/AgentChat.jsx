@@ -178,14 +178,14 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && !loading && sendMessage()}
-              disabled={loading}
+              disabled={loading || !isReady}
               className="flex-1"
             />
             <Button
               onClick={() => fileInputRef.current?.click()}
               variant="outline"
               size="icon"
-              disabled={loading || uploading}
+              disabled={loading || uploading || !isReady}
               title="Attach file"
             >
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Paperclip className="h-4 w-4" />}
