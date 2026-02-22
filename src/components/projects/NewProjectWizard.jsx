@@ -409,36 +409,35 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-2 pr-1">
-          {step === 1 && (
-            <StepTypeSelector
-              selectedType={selectedType}
-              onSelect={handleTypeSelect}
-              createPhasesFromTemplate={createPhasesFromTemplate}
-              onCreatePhasesChange={setCreatePhasesFromTemplate}
-            />
-          )}
-          {step === 2 && <StepProjectDetails formData={formData} onChange={handleChange} uploading={uploading} onImageUpload={handleImageUpload} />}
-          {step === 3 && <StepPhaseReview phases={phases} onChange={setPhases} />}
-        </div>
+           {step === 1 && (
+             <StepTypeSelector
+               selectedType={selectedType}
+               onSelect={handleTypeSelect}
+               createPhasesFromTemplate={createPhasesFromTemplate}
+               onCreatePhasesChange={setCreatePhasesFromTemplate}
+             />
+           )}
+           {step === 2 && <StepProjectDetails formData={formData} onChange={handleChange} uploading={uploading} onImageUpload={handleImageUpload} />}
+         </div>
 
-        <div className="flex justify-between pt-4 border-t mt-2">
-          <Button variant="outline" onClick={() => step === 1 ? onOpenChange(false) : setStep(s => s - 1)}>
-            {step === 1 ? 'Cancel' : <><ChevronLeft className="h-4 w-4 mr-1" />Back</>}
-          </Button>
-          {step < 3 ? (
-            <Button
-              onClick={() => step === 1 ? handleStep1Next() : setStep(3)}
-              disabled={step === 1 ? !canProceedStep1 : !canProceedStep2}
-            >
-              Next <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          ) : (
-            <Button onClick={handleCreate} disabled={saving} className="bg-green-600 hover:bg-green-700">
-              {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
-              Create Project
-            </Button>
-          )}
-        </div>
+         <div className="flex justify-between pt-4 border-t mt-2">
+           <Button variant="outline" onClick={() => step === 1 ? onOpenChange(false) : setStep(s => s - 1)}>
+             {step === 1 ? 'Cancel' : <><ChevronLeft className="h-4 w-4 mr-1" />Back</>}
+           </Button>
+           {step < 2 ? (
+             <Button
+               onClick={handleStep1Next}
+               disabled={!canProceedStep1}
+             >
+               Next <ChevronRight className="h-4 w-4 ml-1" />
+             </Button>
+           ) : (
+             <Button onClick={handleCreate} disabled={saving} className="bg-green-600 hover:bg-green-700">
+               {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
+               Create Project
+             </Button>
+           )}
+         </div>
       </DialogContent>
     </Dialog>
   );
