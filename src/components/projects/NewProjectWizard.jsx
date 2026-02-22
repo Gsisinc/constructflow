@@ -318,7 +318,23 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         budget: formData.budget ? parseFloat(formData.budget) : null,
       });
 
-      // Always create phase requirements from template
+      // Create CustomPhases for each phase
+      const customPhases = [];
+      phases.forEach((phase, idx) => {
+        customPhases.push({
+          project_id: project.id,
+          phase_name: phase.phase,
+          display_name: phase.phase,
+          order: idx,
+          status: 'pending',
+        });
+      });
+
+      if (customPhases.length > 0) {
+        await base44.entities.CustomPhase.bulkCreate(customPhases);
+      }
+
+      // Create PhaseRequirements
       const allRequirements = [];
       phases.forEach((phase) => {
         phase.items.forEach((item) => {
@@ -337,7 +353,7 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         await base44.entities.PhaseRequirement.bulkCreate(allRequirements);
       }
 
-      toast.success(allRequirements.length > 0 ? `Project created with ${allRequirements.length} requirements` : 'Project created');
+      toast.success(`Project created with ${customPhases.length} phases and ${allRequirements.length} requirements`);
       onCreated(project);
       setStep(1);
       setSelectedType('');
