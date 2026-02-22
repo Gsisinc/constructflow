@@ -378,13 +378,16 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
   const canProceedStep2 = !!formData.name && !!formData.client_name;
 
   const handleStep1Next = () => {
-    if (createPhasesFromTemplate && selectedType) {
-      setPhases(getPhaseTemplate(selectedType).map(p => ({ ...p, items: [...p.items] })));
-    } else {
-      setPhases([]);
-    }
-    setStep(2);
-  };
+     if (createPhasesFromTemplate && selectedType) {
+       setPhases(getPhaseTemplate(selectedType).map(p => ({ 
+         ...p, 
+         items: p.items.map(item => ({ text: item, completed: false })) 
+       })));
+     } else {
+       setPhases([]);
+     }
+     setStep(2);
+   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
