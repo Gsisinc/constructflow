@@ -340,20 +340,20 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
       });
 
       // Bulk-create phase requirements
-      const allRequirements = [];
-      phases.forEach((phase, phaseOrder) => {
-        phase.items.forEach((item, itemOrder) => {
-          if (item.trim()) {
-            allRequirements.push({
-              project_id: project.id,
-              phase_name: phase.phase,
-              requirement_text: item.trim(),
-              order: phaseOrder * 1000 + itemOrder,
-              status: 'pending',
-            });
-          }
-        });
-      });
+       const allRequirements = [];
+       phases.forEach((phase, phaseOrder) => {
+         phase.items.forEach((item, itemOrder) => {
+           if (item.text.trim()) {
+             allRequirements.push({
+               project_id: project.id,
+               phase_name: phase.phase,
+               requirement_text: item.text.trim(),
+               order: phaseOrder * 1000 + itemOrder,
+               status: item.completed ? 'completed' : 'pending',
+             });
+           }
+         });
+       });
 
       if (allRequirements.length > 0) {
         await base44.entities.PhaseRequirement.bulkCreate(allRequirements);
