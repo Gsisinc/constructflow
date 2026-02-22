@@ -39,6 +39,8 @@ const menuSections = [
       { icon: LayoutDashboard, label: 'Dashboard', page: 'Dashboard' },
       { icon: FileText, label: 'Daily Log', page: 'DailyLog' },
       { icon: Clock, label: 'Time Cards', page: 'TimeCards' },
+      { icon: Calendar, label: 'Schedules', page: 'Calendar' },
+      { icon: Bot, label: 'Scheduling AI', page: 'SchedulingAI' },
       { icon: AlertTriangle, label: 'Issues', page: 'Issues' },
       { icon: Shield, label: 'Safety', page: 'Safety' },
       { icon: Smartphone, label: 'Vehicles', page: 'VehicleLogs' },
@@ -66,6 +68,17 @@ const menuSections = [
       { icon: FileText, label: 'AI Estimate Generator', page: 'EstimateGenerator' },
       { icon: MessageSquare, label: 'Send Text Messages', page: 'TextMessages' },
       { icon: FileText, label: 'E-signatures', page: 'ESignatures' },
+    ]
+  },
+  {
+    title: 'Financial Management',
+    items: [
+      { icon: FileText, label: 'Invoices', page: 'Invoices' },
+      { icon: DollarSign, label: 'Bill Approvals', page: 'BillApprovals' },
+      { icon: TrendingUp, label: 'Job Costing (WIP)', page: 'JobCosting' },
+      { icon: FileText, label: 'AIA Billing (G702/G703)', page: 'AIABilling' },
+      { icon: FileStack, label: 'Cost Plus Invoicing', page: 'CostPlusInvoicing' },
+      { icon: Building2, label: 'QuickBooks Sync', page: 'QuickBooksSync' },
     ]
   },
   {
