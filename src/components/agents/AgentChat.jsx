@@ -102,13 +102,8 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     if (loading) return;
     setLoading(true);
 
-<<<<<<< HEAD
     const isPdf = !!options.pdfFile;
     const userMsg = { id: crypto.randomUUID(), role: 'user', content: isPdf ? '📐 Analyzing PDF (all pages) with computer vision...' : '📐 Analyzing uploaded blueprint with computer vision...' };
-=======
-    const pageCount = options.imageUrls ? options.imageUrls.length : 1;
-    const userMsg = { id: crypto.randomUUID(), role: 'user', content: `📐 Analyzing ${pageCount > 1 ? pageCount + '-page' : ''} blueprint with computer vision...` };
->>>>>>> e332325ee85f762dda22771a729744a4948023be
     setMessages(prev => [...prev, userMsg]);
 
     const userPrompt = input.trim() || 'Analyze this blueprint. Extract all dimensions, quantities of materials, and generate a complete material takeoff table and cost estimate with labor and materials broken down.';
