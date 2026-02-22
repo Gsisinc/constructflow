@@ -158,6 +158,11 @@ export default function AIAgents() {
                     <CardTitle className="text-lg flex items-center gap-2">
                       <span className="text-2xl">{agent.icon}</span>
                       {agent.name}
+                      {agent.badge && (
+                        <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">
+                          {agent.badge}
+                        </span>
+                      )}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
