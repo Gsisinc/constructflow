@@ -17,6 +17,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [conversation, setConversation] = useState(null);
+  const [blueprintResult, setBlueprintResult] = useState(null);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const sentInitial = useRef(false);
