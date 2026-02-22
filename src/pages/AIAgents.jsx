@@ -17,6 +17,7 @@ const WORKFLOW_ICONS = {
   safety_compliance: '🛡️',
   sustainability_optimization: '🌱',
   stakeholder_communication: '💬',
+  blueprint_analyzer: '📐',
 };
 
 const WORKFLOW_COLORS = {
@@ -30,6 +31,7 @@ const WORKFLOW_COLORS = {
   safety_compliance: 'from-red-500 to-red-600',
   sustainability_optimization: 'from-teal-500 to-teal-600',
   stakeholder_communication: 'from-indigo-500 to-indigo-600',
+  blueprint_analyzer: 'from-blue-600 to-violet-600',
 };
 
 export default function AIAgents() {
