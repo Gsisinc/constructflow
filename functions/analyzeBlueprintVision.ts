@@ -19,7 +19,7 @@ async function analyzeWithClaude(imageUrl, userPrompt, apiKey) {
       },
       body: JSON.stringify({
         model,
-        max_tokens: 8096,
+        max_tokens: model.includes('haiku') ? 4096 : 8096,
         messages: [
           {
             role: 'user',
