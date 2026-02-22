@@ -68,33 +68,12 @@ function StepTypeSelector({ selectedType, onSelect, createPhasesFromTemplate, on
       ))}
 
       {selectedType && (
-        <div className="rounded-xl border-2 border-slate-200 bg-slate-50/50 p-4 space-y-3">
-          <h3 className="text-sm font-semibold text-slate-900">Create phases and requirements?</h3>
-          <p className="text-sm text-slate-500">
-            Automatically create phases and requirements from the <strong>{selectedLabel}</strong> template. You can edit or delete any of them in the next step before creating the project.
-          </p>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => onCreatePhasesChange(true)}
-              className={`flex-1 py-2.5 px-4 rounded-lg border-2 text-sm font-medium transition-all ${
-                createPhasesFromTemplate ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-              }`}
-            >
-              Yes, create them
-            </button>
-            <button
-              type="button"
-              onClick={() => onCreatePhasesChange(false)}
-              className={`flex-1 py-2.5 px-4 rounded-lg border-2 text-sm font-medium transition-all ${
-                !createPhasesFromTemplate ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-              }`}
-            >
-              No, I'll add my own or skip
-            </button>
-          </div>
-        </div>
-      )}
+         <div className="rounded-xl border-2 border-blue-200 bg-blue-50/50 p-4">
+           <p className="text-sm text-slate-700">
+             ✓ Phases and requirements will be automatically created from the <strong>{selectedLabel}</strong> template.
+           </p>
+         </div>
+       )}
     </div>
   );
 }
