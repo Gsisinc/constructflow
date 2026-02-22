@@ -190,7 +190,11 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         </div>
 
         {/* Input */}
-        <div className="border-t p-4 flex-shrink-0">
+        <div className="border-t p-4 flex-shrink-0 space-y-3">
+          {/* Blueprint uploader — shown for blueprint agent or any agent */}
+          {isReady && (
+            <BlueprintUploader onAnalysis={handleBlueprintAnalysis} disabled={loading} />
+          )}
           <div className="flex gap-2">
             <Input
               placeholder="Ask me anything..."
