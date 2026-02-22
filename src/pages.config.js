@@ -113,13 +113,14 @@ import TaskTracker from './pages/TaskTracker';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
 import TeamManagement from './pages/TeamManagement';
+import TechnicianTraining from './pages/TechnicianTraining';
 import TemplateLibrary from './pages/TemplateLibrary';
 import TextMessages from './pages/TextMessages';
 import TimeCards from './pages/TimeCards';
+import TrainingManagement from './pages/TrainingManagement';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import TechnicianTraining from './pages/TechnicianTraining';
-import TrainingManagement from './pages/TrainingManagement';
+import TechnicianPortal from './pages/TechnicianPortal';
 import __Layout from './Layout.jsx';
 
 
@@ -190,13 +191,14 @@ export const PAGES = {
     "Tasks": Tasks,
     "Team": Team,
     "TeamManagement": TeamManagement,
+    "TechnicianTraining": TechnicianTraining,
     "TemplateLibrary": TemplateLibrary,
     "TextMessages": TextMessages,
     "TimeCards": TimeCards,
+    "TrainingManagement": TrainingManagement,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "TechnicianTraining": TechnicianTraining,
-    "TrainingManagement": TrainingManagement,
+    "TechnicianPortal": TechnicianPortal,
 }
 
 export const pagesConfig = {
