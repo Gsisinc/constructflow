@@ -70,7 +70,7 @@ import ClientPortal from './pages/ClientPortal';
 import CostLibrary from './pages/CostLibrary';
 import CostPlusInvoicing from './pages/CostPlusInvoicing';
 import DailyLog from './pages/DailyLog';
-import dashboardImprovedVersion from './pages/Dashboard.ImprovedVersion';
+import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
@@ -126,6 +126,8 @@ import TrainingMaterials from './pages/TrainingMaterials';
 import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import Dashboard from './pages/Dashboard';
+import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
 import __Layout from './Layout.jsx';
 
 
@@ -153,7 +155,7 @@ export const PAGES = {
     "CostLibrary": CostLibrary,
     "CostPlusInvoicing": CostPlusInvoicing,
     "DailyLog": DailyLog,
-    "Dashboard": dashboardImprovedVersion,
+    "Dashboard": Dashboard,
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
     "Documents": Documents,
@@ -209,6 +211,8 @@ export const PAGES = {
     "TrainingSchedule": TrainingSchedule,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "Dashboard": Dashboard,
+    "Dashboard.ImprovedVersion": dashboardImprovedversion,
 }
 
 export const pagesConfig = {

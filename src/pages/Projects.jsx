@@ -42,6 +42,10 @@ export default function Projects() {
     setShowForm(false);
   };
 
+  const handleProjectDeleted = () => {
+    queryClient.invalidateQueries({ queryKey: ['projects', user?.organization_id] });
+  };
+
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       project.name?.toLowerCase().includes(search.toLowerCase()) ||
