@@ -3219,6 +3219,87 @@ export const PHASE_TEMPLATES = {
     },
   ],
 
+  // ─── ISP: FIBER BACKBONE ──────────────────────────────────────────────────────────
+  isp_fiber_backbone: [
+    { phase: 'Bidding & Estimating', items: ['Perform route survey', 'Identify aerial vs. underground', 'Assess existing conduit', 'Get fiber vendor quotes', 'Calculate labor and materials', 'Submit bid proposal'] },
+    { phase: 'Permitting', items: ['Obtain ROW agreements', 'File utility locate requests', 'Get city permits', 'Coordinate with utilities', 'Plan construction timeline'] },
+    { phase: 'Materials & Planning', items: ['Order fiber cable', 'Order conduit and hardware', 'Arrange equipment delivery', 'Stage materials at job site', 'Verify all equipment received'] },
+    { phase: 'Construction', items: ['Clear route', 'Install conduit', 'Install pull boxes', 'Pull fiber', 'Install splicing enclosures', 'Perform fiber splicing'] },
+    { phase: 'Testing & Activation', items: ['Test fiber with OTDR', 'Measure attenuation', 'Document test results', 'Activate circuit', 'Handoff to operations'] },
+    { phase: 'Closeout', items: ['Create as-built drawings', 'Compile documentation', 'Submit final invoice', 'Schedule maintenance plan'] }
+  ],
+
+  // ─── ISP: WIRELESS INFRASTRUCTURE ─────────────────────────────────────────────────
+  isp_wireless: [
+    { phase: 'RF Site Survey', items: ['Conduct RF assessment', 'Identify AP/antenna locations', 'Check coverage gaps', 'Test signal strength', 'Document findings'] },
+    { phase: 'Design & Planning', items: ['Create wireless design', 'Select equipment', 'Calculate backhaul needs', 'Plan power requirements', 'Get client approval'] },
+    { phase: 'Materials & Procurement', items: ['Order WAPs and antennas', 'Order mounting hardware', 'Order cables and connectors', 'Order network equipment'] },
+    { phase: 'Installation', items: ['Install poles/brackets', 'Mount antennas', 'Pull network cables', 'Install and configure WAPs', 'Connect backhaul'] },
+    { phase: 'Configuration & Testing', items: ['Configure SSID and security', 'Test coverage', 'Measure throughput', 'Load-test system', 'Optimize performance'] },
+    { phase: 'Closeout', items: ['Create documentation', 'Provide client training', 'Submit invoice', 'Schedule support contract'] }
+  ],
+
+  // ─── ISP: UNDERGROUND CONDUIT ──────────────────────────────────────────────────────
+  isp_underground: [
+    { phase: 'Design & Permitting', items: ['Design conduit route', 'Get utility locates', 'Obtain excavation permits', 'Get boring permits', 'Submit plans to municipality'] },
+    { phase: 'Materials', items: ['Order conduit (PVC/concrete)', 'Order junction boxes', 'Order pull rope', 'Stage materials'] },
+    { phase: 'Excavation & Boring', items: ['Mark utility lines', 'Bore under roads', 'Trench right-of-way', 'Install conduit', 'Backfill and compact'] },
+    { phase: 'Finishing', items: ['Install pull boxes', 'Install vaults at access points', 'Pull fiber or cables', 'Cap openings', 'Restore surface'] },
+    { phase: 'Documentation', items: ['Create as-built with GPS', 'Document vault locations', 'Compile test records'] },
+    { phase: 'Closeout', items: ['Final inspection', 'Submit to municipality', 'Invoice and closeout'] }
+  ],
+
+  // ─── RESIDENTIAL CONSTRUCTION ─────────────────────────────────────────────────────
+  residential: [
+    { phase: 'Design & Pre-Con', items: ['Review architectural drawings', 'Attend pre-construction meeting', 'Perform site survey', 'Submit project schedule', 'Coordinate with trades'] },
+    { phase: 'Foundation & Rough-In', items: ['Excavate and grade', 'Install foundations', 'Frame walls and roof', 'Install mechanicals rough-in', 'Rough electrical/plumbing'] },
+    { phase: 'Enclosure & Finishes', items: ['Install roof and gutters', 'Install windows and doors', 'Install sheathing', 'Install drywall', 'Paint interior/exterior'] },
+    { phase: 'MEP Finish-Out', items: ['Finish electrical (outlets/lights)', 'Finish plumbing (fixtures)', 'Finish HVAC', 'Install flooring', 'Install trim and doors'] },
+    { phase: 'Final Inspections', items: ['Rough inspection', 'Final inspection', 'Correct deficiencies', 'Obtain certificate of occupancy'] },
+    { phase: 'Closeout', items: ['Final walkthrough', 'Provide manuals', 'Train homeowner', 'Collect warranty documents'] }
+  ],
+
+  // ─── COMMERCIAL CONSTRUCTION ───────────────────────────────────────────────────────
+  commercial: [
+    { phase: 'Preconstruction', items: ['Review plans and specs', 'Perform value engineering', 'Develop schedule', 'Submit permits', 'Obtain insurance'] },
+    { phase: 'Demolition & Site Prep', items: ['Clear site', 'Demolish existing structures', 'Remediate hazardous materials', 'Grade and prepare subgrade'] },
+    { phase: 'Concrete & Structure', items: ['Install foundations', 'Pour concrete decks', 'Erect structural steel', 'Install curtainwall systems'] },
+    { phase: 'MEP Rough-In', items: ['Install electrical conduit', 'Install plumbing rough-in', 'Install HVAC ducts', 'Install fire protection'] },
+    { phase: 'Interior Build-Out', items: ['Install drywall', 'Install ceilings and lighting', 'Install doors and hardware', 'Finish flooring', 'Paint'] },
+    { phase: 'Systems Testing', items: ['Test HVAC', 'Test electrical systems', 'Test fire/life safety', 'Commission building systems'] },
+    { phase: 'Final Inspection & Closeout', items: ['Final building inspection', 'Correct punch list items', 'Obtain CO', 'Provide O&M documentation'] }
+  ],
+
+  // ─── INDUSTRIAL CONSTRUCTION ───────────────────────────────────────────────────────
+  industrial: [
+    { phase: 'Planning & Permitting', items: ['Design layout for manufacturing', 'Plan utility requirements', 'Obtain zoning approval', 'Get air quality permits'] },
+    { phase: 'Foundation & Structural', items: ['Design heavy foundations', 'Install pad-mounted equipment bases', 'Erect structural frame', 'Install roof and enclosure'] },
+    { phase: 'Utilities & MEP', items: ['Install 3-phase electrical service', 'Install process water lines', 'Install compressed air', 'Install HVAC for process control'] },
+    { phase: 'Equipment Installation', items: ['Deliver equipment to site', 'Install machinery', 'Connect process piping', 'Connect electrical controls'] },
+    { phase: 'Systems Integration', items: ['Commission machinery', 'Test automation systems', 'Verify safety interlocks', 'Train operators'] },
+    { phase: 'Final Startup', items: ['Run pilot production', 'Optimize processes', 'Obtain occupancy permit', 'Complete closeout'] }
+  ],
+
+  // ─── INFRASTRUCTURE CONSTRUCTION ───────────────────────────────────────────────────
+  infrastructure: [
+    { phase: 'Design & Permitting', items: ['Develop design', 'Perform environmental assessment', 'Get agency permits', 'Public hearing (if required)'] },
+    { phase: 'Mobilization', items: ['Mobilize equipment', 'Set up site', 'Install erosion control', 'Establish staging areas'] },
+    { phase: 'Earthwork & Grading', items: ['Clear right-of-way', 'Grade roadbed', 'Install fill material', 'Compact base'] },
+    { phase: 'Installation', items: ['Install utilities (water, sewer, storm)', 'Install pavement', 'Install drainage structures', 'Install traffic control devices'] },
+    { phase: 'Testing & Verification', items: ['Perform compaction testing', 'Test utility lines', 'Inspect final grade', 'Verify to plans'] },
+    { phase: 'Closeout', items: ['Remove temporary controls', 'Final restoration', 'Obtain final acceptance', 'Submit as-builts'] }
+  ],
+
+  // ─── RENOVATION / TENANT IMPROVEMENT ────────────────────────────────────────────
+  renovation: [
+    { phase: 'Design & Planning', items: ['Develop renovation scope', 'Create phasing plan', 'Identify occupied areas', 'Plan tenant coordination'] },
+    { phase: 'Permitting & Prep', items: ['Obtain building permits', 'Get occupancy variance (if needed)', 'Notify tenants of work schedule'] },
+    { phase: 'Demolition & Rough-In', items: ['Protect adjacent tenants', 'Demolish walls/finishes', 'Install new systems rough-in', 'Verify new systems'] },
+    { phase: 'Finishes & Systems', items: ['Install drywall', 'Install MEP finishes', 'Paint and flooring', 'Trim and doors'] },
+    { phase: 'Final Inspection', items: ['Final walkthrough', 'Address punch list', 'Obtain occupancy approval'] },
+    { phase: 'Closeout', items: ['Provide as-builts', 'Provide manuals', 'Final invoice and lien waivers'] }
+  ],
+
   // ─── DEFAULT (generic) for types without a specific template ──────────────
   _default: [
     {
