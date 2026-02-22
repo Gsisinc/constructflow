@@ -325,25 +325,29 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch user data
+  // Fetch user data (never throw so dashboard never goes blank)
   const { data: user, isLoading: loadingUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
-      // Replace with actual API call
-      return {
-        id: '1',
-        full_name: 'John Smith',
-        email: 'john@constructflow.com',
-        role: 'admin',
-        organization_id: 'org-1',
-        avatar: null,
-      };
+      try {
+        return {
+          id: '1',
+          full_name: 'John Smith',
+          email: 'john@constructflow.com',
+          role: 'admin',
+          organization_id: 'org-1',
+          avatar: null,
+        };
+      } catch (e) {
+        return { id: '1', full_name: 'User', email: '', role: 'user', organization_id: 'org-1', avatar: null };
+      }
     },
+    retry: false,
   });
 
   // Fetch projects
   const { data: projects = [], isLoading: loadingProjects } = useQuery({
-    queryKey: ['projects', user?.organization_id],
+    queryKey: ['projects', user?.organization_id ?? 'org-1'],
     queryFn: async () => {
       // Replace with actual API call
       return [
@@ -353,12 +357,12 @@ export default function Dashboard() {
         { id: '4', name: 'Harbor Bridge Repair', client_name: 'Port Authority', status: 'completed', progress: 100, manager: 'Lisa Park', end_date: '2024-01-20' },
       ];
     },
-    enabled: !!user?.organization_id,
+    enabled: !!(user?.organization_id ?? 'org-1'),
   });
 
   // Fetch bids
   const { data: bids = [], isLoading: loadingBids } = useQuery({
-    queryKey: ['bids', user?.organization_id],
+    queryKey: ['bids', user?.organization_id ?? 'org-1'],
     queryFn: async () => {
       // Replace with actual API call
       return [
@@ -367,7 +371,7 @@ export default function Dashboard() {
         { id: '3', title: 'Water Treatment Facility', value: 8200000, status: 'estimating', deadline: '2024-04-01' },
       ];
     },
-    enabled: !!user?.organization_id,
+    enabled: !!(user?.organization_id ?? 'org-1'),
   });
 
   // Mock activity data
@@ -480,7 +484,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="min-h-[60vh] p-6 space-y-6 bg-slate-50/50 dark:bg-slate-900/50">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <div className="h-8 w-64 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
@@ -497,6 +501,9 @@ export default function Dashboard() {
     );
   }
 
+  // Fallback so we never render blank (e.g. if user query failed)
+  const safeUser = user || { full_name: 'User', organization_id: 'org-1' };
+
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-900/50">
       {/* Header Section */}
@@ -509,7 +516,7 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                {greeting}, {user?.full_name?.split(' ')[0] || 'User'}! 👋
+                {greeting}, {safeUser?.full_name?.split(' ')[0] || 'User'}! 👋
               </h1>
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Here's what's happening with your projects today.
