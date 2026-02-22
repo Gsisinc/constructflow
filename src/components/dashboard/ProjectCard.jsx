@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '../../utils';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, DollarSign, Trash2 } from 'lucide-react';
+import { Calendar, MapPin, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
-import { toast } from 'sonner';
 
 const statusColors = {
   bidding: 'bg-purple-50 text-purple-700 border-purple-200',
@@ -28,40 +24,15 @@ const priorityColors = {
   critical: 'bg-red-100 text-red-600',
 };
 
-export default function ProjectCard({ project, onProjectDeleted }) {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const queryClient = useQueryClient();
+export default function ProjectCard({ project }) {
   const budgetUsed = project.budget ? ((project.spent || 0) / project.budget * 100).toFixed(0) : 0;
 
-  const deleteProjectMutation = useMutation({
-    mutationFn: () => base44.entities.Project.delete(project.id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      toast.success('Project deleted');
-      if (onProjectDeleted) onProjectDeleted();
-    },
-    onError: () => {
-      toast.error('Failed to delete project');
-      setIsDeleting(false);
-    }
-  });
-
-  const handleDelete = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (confirm('Are you sure you want to delete this project?')) {
-      setIsDeleting(true);
-      deleteProjectMutation.mutate();
-    }
-  };
-
   return (
-    <div className="relative bg-white rounded-2xl border border-slate-200/60 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 group">
-      <Link
-        to={createPageUrl(`ProjectDetail?id=${project.id}`)}
-        className="block"
-      >
-        {/* Image */}
+    <Link
+      to={createPageUrl(`ProjectDetail?id=${project.id}`)}
+      className="block bg-white rounded-2xl border border-slate-200/60 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 group"
+    >
+      {/* Image */}
       <div className="h-40 bg-gradient-to-br from-slate-100 to-slate-200 relative overflow-hidden">
         {project.image_url ? (
           <img
@@ -83,8 +54,8 @@ export default function ProjectCard({ project, onProjectDeleted }) {
         </div>
       </div>
 
-        {/* Content */}
-        <div className="p-5 space-y-4">
+      {/* Content */}
+      <div className="p-5 space-y-4">
         <div>
           <h3 className="font-semibold text-slate-900 text-lg group-hover:text-slate-700 transition-colors">
             {project.name}
@@ -136,19 +107,7 @@ export default function ProjectCard({ project, onProjectDeleted }) {
             </div>
           </div>
         )}
-        </div>
-        </Link>
-
-        {/* Delete Button */}
-      <Button
-        onClick={handleDelete}
-        disabled={isDeleting}
-        variant="ghost"
-        size="icon"
-        className="absolute top-3 right-3 h-8 w-8 bg-white/80 hover:bg-red-50 text-slate-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
+      </div>
+    </Link>
   );
 }

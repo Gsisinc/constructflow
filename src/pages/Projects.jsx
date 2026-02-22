@@ -42,10 +42,6 @@ export default function Projects() {
     setShowForm(false);
   };
 
-  const handleProjectDeleted = () => {
-    queryClient.invalidateQueries({ queryKey: ['projects', user?.organization_id] });
-  };
-
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       project.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -153,7 +149,7 @@ export default function Projects() {
           viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
         )}>
           {filteredProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} onProjectDeleted={handleProjectDeleted} />
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       )}
