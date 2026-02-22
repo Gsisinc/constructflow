@@ -119,6 +119,8 @@ import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import Dashboard from './pages/Dashboard';
+import TechnicianTraining from './pages/TechnicianTraining';
+import TrainingManagement from './pages/TrainingManagement';
 import __Layout from './Layout.jsx';
 
 
@@ -195,6 +197,8 @@ export const PAGES = {
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
     "Dashboard": Dashboard,
+    "TechnicianTraining": TechnicianTraining,
+    "TrainingManagement": TrainingManagement,
 }
 
 export const pagesConfig = {
