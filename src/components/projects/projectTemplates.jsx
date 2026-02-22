@@ -29,6 +29,7 @@ export const PROJECT_TYPE_CATALOG = [
     icon: '🌐',
     types: [
       { value: 'isp_fiber_backbone', label: 'Fiber Backbone', description: 'Aerial/underground fiber runs, splice, termination' },
+      { value: 'isp_fiber_installation', label: 'Fiber Circuit Installation', description: 'DIA, Point-to-Point, MPLS, Dark Fiber — client service delivery' },
       { value: 'isp_wireless', label: 'Wireless Infrastructure', description: 'WAPs, antennas, outdoor wireless links' },
       { value: 'isp_underground', label: 'Underground Conduit', description: 'Boring, trenching, conduit, pull boxes' },
     ]
