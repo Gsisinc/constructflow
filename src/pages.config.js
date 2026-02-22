@@ -126,6 +126,7 @@ import TrainingMaterials from './pages/TrainingMaterials';
 import TeamSkillsMatrix from './pages/TeamSkillsMatrix';
 import FieldHoursApproval from './pages/FieldHoursApproval';
 import TrainingSchedule from './pages/TrainingSchedule';
+import LessonPlanTemplates from './pages/LessonPlanTemplates';
 import __Layout from './Layout.jsx';
 
 
@@ -209,6 +210,7 @@ export const PAGES = {
     "TeamSkillsMatrix": TeamSkillsMatrix,
     "FieldHoursApproval": FieldHoursApproval,
     "TrainingSchedule": TrainingSchedule,
+    "LessonPlanTemplates": LessonPlanTemplates,
 }
 
 export const pagesConfig = {
