@@ -30,7 +30,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     }
   }, [messages.length]);
 
-  // Init conversation and subscribe
+  // Init conversation and subscribe (resilient to base44 failures)
   useEffect(() => {
     let cancelled = false;
     const init = async () => {
@@ -40,7 +40,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         setConversation(conv);
 
         unsubscribeRef.current = base44.agents.subscribeToConversation(conv.id, (updated) => {
-          const agentMessages = updated.messages
+          const agentMessages = (updated?.messages || [])
             .filter(m => m.role === 'assistant' || m.role === 'user')
             .map(m => ({ id: m.id || crypto.randomUUID(), role: m.role, content: m.content }));
           setMessages(agentMessages);
@@ -48,7 +48,8 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         });
       } catch (err) {
         console.error('Failed to create conversation:', err);
-        toast.error('Could not start agent conversation: ' + err.message);
+        setMessages([{ id: crypto.randomUUID(), role: 'assistant', content: `Chat is temporarily unavailable (${err.message || 'service error'}). You can still use the blueprint analyzer below.` }]);
+        setLoading(false);
       }
     };
     init();
@@ -91,7 +92,10 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
       await sendMessage(`I've uploaded a file: ${file.name}. URL: ${file_url}. Please analyze it.`);
       toast.success('File uploaded');
     } catch (err) {
-      toast.error('Upload failed: ' + err.message);
+      if (conversation) {
+        await sendMessage(`I tried to attach a file: ${file.name}. (Upload unavailable — you can paste content or use the blueprint analyzer for images.)`);
+      }
+      toast.error('Upload unavailable' + (conversation ? '. Message sent without file.' : '.'));
     } finally {
       setUploading(false);
       e.target.value = '';
