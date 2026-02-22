@@ -396,12 +396,12 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
           <DialogTitle className="flex items-center gap-3">
             New Project
             <div className="flex items-center gap-1 ml-auto">
-              {[1, 2, 3].map(s => (
+              {[1, 2].map(s => (
                 <React.Fragment key={s}>
                   <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
                     step === s ? 'bg-blue-600 text-white' : step > s ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-500'
                   }`}>{step > s ? <Check className="h-3 w-3" /> : s}</div>
-                  {s < 3 && <div className={`h-0.5 w-6 transition-colors ${step > s ? 'bg-green-500' : 'bg-slate-200'}`} />}
+                  {s < 2 && <div className={`h-0.5 w-6 transition-colors ${step > s ? 'bg-green-500' : 'bg-slate-200'}`} />}
                 </React.Fragment>
               ))}
             </div>
