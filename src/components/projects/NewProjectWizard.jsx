@@ -308,7 +308,7 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
     finally { setUploading(false); }
   };
 
-  c  const handleCreate = async () => {
+  const handleCreate = async () => {
     setSaving(true);
     try {
       const project = await base44.entities.Project.create({
