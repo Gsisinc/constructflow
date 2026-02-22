@@ -9,7 +9,7 @@ export const PROJECT_TYPE_CATALOG = [
       { value: 'fire_alarm_new_construction', label: 'New Construction (Ground-Up)', description: 'Full building from dirt — multi-story concrete/steel frame' },
       { value: 'fire_alarm_tenant_improvement', label: 'Tenant Improvement', description: 'TI work in existing shell or occupied building' },
       { value: 'fire_alarm_retrofit', label: 'Retrofit / Replacement (Occupied)', description: 'Old system removed, new system installed while building is occupied' },
-      { value: 'fire_alarm_service_inspection', label: 'Service & Inspection', description: 'Annual inspection, testing, and service calls' },
+      { value: 'fire_alarm_service_inspection', label: 'Service & Inspection (ITM)', description: 'Annual/semi-annual inspection, testing & maintenance — NFPA 72 compliance' },
       { value: 'fire_alarm_special_hazard', label: 'Special Hazard / Suppression', description: 'Clean agent, CO2, foam, or kitchen suppression systems' },
     ]
   },
