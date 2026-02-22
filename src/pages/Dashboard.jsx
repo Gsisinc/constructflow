@@ -12,7 +12,7 @@ import {
   Plus, ArrowUpRight, Sparkles, Bot, Clock, Calendar,
   CheckCircle2, AlertCircle, Timer, Target, Search, Zap
 } from 'lucide-react';
-import { format, formatDistanceToNow, isPast } from 'date-fns';
+import { format, isPast } from 'date-fns';
 
 export default function Dashboard() {
   const navigate = useNavigate();
