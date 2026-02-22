@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { ProjectCardSkeleton } from '@/components/skeleton/SkeletonComponents';
 import ProjectCard from '../components/dashboard/ProjectCard';
-import ProjectForm from '../components/projects/ProjectForm';
+import NewProjectWizard from '../components/projects/NewProjectWizard';
 import PullToRefresh from '@/components/ui/PullToRefresh';
 import EmptyState from '../components/ui/EmptyState';
 import { Button } from '@/components/ui/button';

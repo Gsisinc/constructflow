@@ -67,8 +67,10 @@ import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
 import ClientPortal from './pages/ClientPortal';
 import CostLibrary from './pages/CostLibrary';
+import CostPlusInvoicing from './pages/CostPlusInvoicing';
 import DailyLog from './pages/DailyLog';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
+import Dashboard from './pages/Dashboard';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import DocumentTracking from './pages/DocumentTracking';
@@ -81,6 +83,7 @@ import Home from './pages/Home';
 import Implementation from './pages/Implementation';
 import Invoices from './pages/Invoices';
 import Issues from './pages/Issues';
+import JobCosting from './pages/JobCosting';
 import JoinRequest from './pages/JoinRequest';
 import Landing from './pages/Landing';
 import LienWaivers from './pages/LienWaivers';
@@ -98,8 +101,10 @@ import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
 import PurchaseOrders from './pages/PurchaseOrders';
+import QuickBooksSync from './pages/QuickBooksSync';
 import RolePermissions from './pages/RolePermissions';
 import Safety from './pages/Safety';
+import SchedulingAI from './pages/SchedulingAI';
 import ServiceDesk from './pages/ServiceDesk';
 import Settings from './pages/Settings';
 import SubcontractorPortal from './pages/SubcontractorPortal';
@@ -114,11 +119,6 @@ import TextMessages from './pages/TextMessages';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import JobCosting from './pages/JobCosting';
-import QuickBooksSync from './pages/QuickBooksSync';
-import CostPlusInvoicing from './pages/CostPlusInvoicing';
-import SchedulingAI from './pages/SchedulingAI';
-import Dashboard from './pages/Dashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -143,8 +143,10 @@ export const PAGES = {
     "Calendar": Calendar,
     "ClientPortal": ClientPortal,
     "CostLibrary": CostLibrary,
+    "CostPlusInvoicing": CostPlusInvoicing,
     "DailyLog": DailyLog,
     "Dashboard.ImprovedVersion": dashboardImprovedversion,
+    "Dashboard": Dashboard,
     "Dashboard": Dashboard,
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
@@ -157,6 +159,7 @@ export const PAGES = {
     "Implementation": Implementation,
     "Invoices": Invoices,
     "Issues": Issues,
+    "JobCosting": JobCosting,
     "JoinRequest": JoinRequest,
     "Landing": Landing,
     "LienWaivers": LienWaivers,
@@ -174,8 +177,10 @@ export const PAGES = {
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
     "PurchaseOrders": PurchaseOrders,
+    "QuickBooksSync": QuickBooksSync,
     "RolePermissions": RolePermissions,
     "Safety": Safety,
+    "SchedulingAI": SchedulingAI,
     "ServiceDesk": ServiceDesk,
     "Settings": Settings,
     "SubcontractorPortal": SubcontractorPortal,
@@ -190,11 +195,6 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "JobCosting": JobCosting,
-    "QuickBooksSync": QuickBooksSync,
-    "CostPlusInvoicing": CostPlusInvoicing,
-    "SchedulingAI": SchedulingAI,
-    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {
