@@ -5,6 +5,8 @@ import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
+// SAFEGUARD: Dashboard is always the improved version. Do not remove — Base44 auto-gen often overwrites pages.config and breaks the Dashboard route.
+import DashboardPage from './pages/Dashboard.ImprovedVersion';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -17,7 +19,8 @@ import { PageTransition } from '@/components/layout/PageTransition';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
-const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
+// SAFEGUARD: When main page is Dashboard, use real dashboard (same as route override below)
+const MainPage = mainPageKey === 'Dashboard' ? DashboardPage : (mainPageKey ? Pages[mainPageKey] : null);
 
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
@@ -94,14 +97,16 @@ const AuthenticatedApp = () => {
         </LayoutWrapper>
       } />
       {Object.entries(Pages).map(([path, Page]) => {
-        const isValid = Page && typeof Page === 'function';
+        // SAFEGUARD: Always use the real Dashboard so Base44 overwriting pages.config cannot break it
+        const Component = path === 'Dashboard' ? DashboardPage : Page;
+        const isValid = Component && typeof Component === 'function';
         return (
           <Route
             key={path}
             path={`/${path}`}
             element={
               <LayoutWrapper currentPageName={path}>
-                {isValid ? <Page /> : <PageNotFound />}
+                {isValid ? <Component /> : <PageNotFound />}
               </LayoutWrapper>
             }
           />
