@@ -154,11 +154,12 @@ export default function Projects() {
         </div>
       )}
 
-      {/* Create Form */}
-      <ProjectForm
+      {/* Create Wizard */}
+      <NewProjectWizard
         open={showForm}
         onOpenChange={setShowForm}
-        onSubmit={(data) => createMutation.mutate(data)}
+        onCreated={handleProjectCreated}
+        organizationId={user?.organization_id}
       />
       </div>
     </PullToRefresh>
