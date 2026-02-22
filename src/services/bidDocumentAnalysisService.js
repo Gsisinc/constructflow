@@ -34,6 +34,51 @@ Your task is to analyze construction drawings and:
 
 Provide a detailed analysis in JSON format with sections for each system and estimated quantities.`;
 
+const BLUEPRINT_ESTIMATE_SYSTEM_PROMPT = `You are an expert construction estimator and blueprint reader. Your output must be based ONLY on what you actually see in the image. No guessing, no placeholders, no generic fallbacks.
+
+CRITICAL RULES:
+- Report ONLY what is clearly visible or unambiguously derivable from visible dimensions/scale. Do not invent quantities, types, or costs.
+- If the drawing type, scale, or trade is not clearly shown, set that field to empty string "" or "not visible" and add a short note in "assumptions".
+- Every line_item must correspond to something you can point to in the image (e.g. counted symbols, measured lengths). Do not add generic or example line items.
+- Use real unit costs only if you can infer them from the drawing or use industry-typical values and state "typical unit cost assumed" in notes. Otherwise use 0 and note in assumptions.
+- confidence must reflect how readable the drawing is: "high" only if scale and symbols are clear, "low" if blurry or ambiguous.
+- Return ONLY a single valid JSON object (no markdown, no code fence). No other text.
+
+Required JSON structure:
+{
+  "drawing_overview": {
+    "type": "string from drawing title/sheet or empty if not visible",
+    "trade": "string from drawing or empty",
+    "scale": "string from scale block or empty if not visible"
+  },
+  "line_items": [
+    {
+      "description": "string - what you see",
+      "category": "material | labor | equipment | subcontractor",
+      "trade": "string",
+      "quantity": number - from count or measurement only,
+      "unit": "LF | SF | EA | etc.",
+      "unit_cost": number,
+      "total_cost": number,
+      "notes": "string"
+    }
+  ],
+  "summary": {
+    "subtotal_materials": number,
+    "subtotal_labor": number,
+    "subtotal_equipment": number,
+    "subtotal_subcontractor": number,
+    "overhead_percent": number,
+    "overhead_amount": number,
+    "profit_percent": number,
+    "profit_amount": number,
+    "total_estimate": number
+  },
+  "assumptions": ["list only real assumptions e.g. scale not visible, symbol meaning assumed"],
+  "notes": "string",
+  "confidence": "high | medium | low"
+}`;
+
 /**
  * Convert file to base64 for API transmission
  * @param {File} file - The file to convert
@@ -396,9 +441,155 @@ function parseAnalysisText(text) {
   return sections;
 }
 
+/**
+ * Fetch image from URL and return as base64 (data URL suffix).
+ * @param {string} imageUrl - Public image URL
+ * @returns {Promise<string>} Base64 string (no data URL prefix)
+ */
+async function fetchImageAsBase64(imageUrl) {
+  const res = await fetch(imageUrl, { mode: 'cors' });
+  if (!res.ok) throw new Error(`Failed to fetch image: ${res.status}`);
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const base64 = dataUrl.indexOf(',') >= 0 ? dataUrl.split(',')[1] : dataUrl;
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+/**
+ * Analyze a blueprint/drawing image with computer vision and return structured estimate.
+ * Use previewDataUrl when available (from uploader) to avoid CORS; otherwise fetches imageUrl.
+ * @param {string} imageUrl - Image URL (for reference; used if previewDataUrl not provided)
+ * @param {string} userPrompt - Optional user prompt
+ * @param {{ previewDataUrl?: string }} options - Optional previewDataUrl (data URL with base64 image)
+ * @returns {Promise<Object>} Structured result: drawing_overview, line_items, summary, assumptions, notes, confidence
+ */
+export async function analyzeBlueprintWithVision(imageUrl, userPrompt = '', options = {}) {
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OpenAI API key not configured. Add VITE_OPENAI_API_KEY in Settings for blueprint vision.');
+  }
+
+  let imageBase64 = null;
+  let mimeType = 'image/jpeg';
+
+  if (options.previewDataUrl && typeof options.previewDataUrl === 'string') {
+    const match = options.previewDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+    if (match) {
+      mimeType = match[1];
+      imageBase64 = match[2];
+    }
+  }
+
+  if (!imageBase64 && imageUrl) {
+    try {
+      imageBase64 = await fetchImageAsBase64(imageUrl);
+    } catch (e) {
+      throw new Error('Could not load image for analysis. Upload an image file (not just PDF) for best results, or check the file URL.');
+    }
+  }
+
+  if (!imageBase64) {
+    throw new Error('No image data. Please upload a blueprint image (PNG, JPG) and try again.');
+  }
+
+  const prompt = userPrompt.trim() || 'Analyze this blueprint. Extract all dimensions, quantities of materials, and generate a complete material takeoff table and cost estimate with labor and materials broken down.';
+
+  const body = {
+    model: 'gpt-4o',
+    messages: [
+      { role: 'system', content: BLUEPRINT_ESTIMATE_SYSTEM_PROMPT },
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: prompt },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:${mimeType};base64,${imageBase64}`,
+              detail: 'high',
+            },
+          },
+        ],
+      },
+    ],
+    temperature: 0.1,
+    max_tokens: 4096,
+  };
+
+  let response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  // Fallback for accounts that have gpt-4-vision but not gpt-4o
+  if (!response.ok && response.status === 400) {
+    const errBody = await response.json().catch(() => ({}));
+    if (errBody.error?.code === 'invalid_model' || (errBody.error?.message && errBody.error.message.includes('model'))) {
+      body.model = 'gpt-4-vision-preview';
+      response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify(body),
+      });
+    }
+  }
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Vision API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const text = data.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from vision API');
+
+  // Parse JSON (strip markdown code block if present)
+  let raw = text.trim();
+  const codeBlock = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlock) raw = codeBlock[1].trim();
+
+  try {
+    const structured = JSON.parse(raw);
+    // No fake defaults: only return what the API actually returned. Fail if critical structure is missing.
+    if (!structured || typeof structured !== 'object') {
+      throw new Error('Vision did not return a valid object.');
+    }
+    if (!structured.drawing_overview || typeof structured.drawing_overview !== 'object') {
+      throw new Error('Vision did not return drawing_overview. The image may be unreadable or the response was invalid.');
+    }
+    return {
+      drawing_overview: {
+        type: structured.drawing_overview.type ?? '',
+        trade: structured.drawing_overview.trade ?? '',
+        scale: structured.drawing_overview.scale ?? '',
+      },
+      line_items: Array.isArray(structured.line_items) ? structured.line_items : [],
+      summary: structured.summary && typeof structured.summary === 'object' ? structured.summary : {},
+      assumptions: Array.isArray(structured.assumptions) ? structured.assumptions : [],
+      notes: typeof structured.notes === 'string' ? structured.notes : '',
+      confidence: ['high', 'medium', 'low'].includes(structured.confidence) ? structured.confidence : 'medium',
+    };
+  } catch (e) {
+    if (e.message && (e.message.includes('Vision did not') || e.message.includes('valid object'))) throw e;
+    throw new Error('Vision analysis did not return valid JSON. Try a clearer image or different prompt.');
+  }
+}
+
 export default {
   analyzeBidDocument,
   analyzeDrawing,
+  analyzeBlueprintWithVision,
   fileToBase64,
   extractTextFromPDF
 };

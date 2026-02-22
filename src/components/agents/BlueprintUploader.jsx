@@ -1,39 +1,37 @@
 import React, { useState, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Loader2, ImagePlus, X, FileImage, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function BlueprintUploader({ onAnalysis, disabled }) {
-  const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const fileInputRef = useRef(null);
 
-  const handleFile = async (file) => {
+  const handleFile = (file) => {
     if (!file) return;
     if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
       toast.error('Please upload an image (PNG, JPG, TIFF) or PDF');
       return;
     }
 
-    setUploading(true);
-    try {
-      // Show local preview for images
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => setPreview(e.target.result);
-        reader.readAsDataURL(file);
+    setLoading(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result;
+      if (dataUrl) {
+        setPreview(dataUrl);
+        setImageUrl(dataUrl);
+        toast.success('Blueprint loaded — click Analyze to run vision');
       }
-
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setImageUrl(file_url);
-      toast.success('Blueprint uploaded — ready to analyze');
-    } catch (err) {
-      toast.error('Upload failed: ' + err.message);
-    } finally {
-      setUploading(false);
-    }
+      setLoading(false);
+    };
+    reader.onerror = () => {
+      toast.error('Could not read file');
+      setLoading(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDrop = (e) => {
@@ -43,7 +41,7 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
   };
 
   const handleAnalyze = () => {
-    if (imageUrl) onAnalysis(imageUrl);
+    if (imageUrl) onAnalysis(imageUrl, { previewDataUrl: preview || undefined });
   };
 
   const handleClear = () => {
@@ -58,13 +56,13 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
         <div
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
-          onClick={() => !uploading && fileInputRef.current?.click()}
+          onClick={() => !loading && fileInputRef.current?.click()}
           className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
         >
-          {uploading ? (
+          {loading ? (
             <div className="flex items-center justify-center gap-2 text-slate-500">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-xs">Uploading blueprint...</span>
+              <span className="text-xs">Loading blueprint...</span>
             </div>
           ) : (
             <div className="flex items-center justify-center gap-2 text-slate-400">

@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import BlueprintUploader from '@/components/agents/BlueprintUploader';
 import BlueprintEstimateResult from '@/components/agents/BlueprintEstimateResult';
+import { analyzeBlueprintWithVision } from '@/services/bidDocumentAnalysisService';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const { user } = useAuth();
@@ -97,41 +98,25 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     }
   };
 
-  const handleBlueprintAnalysis = async (imageUrl) => {
+  const handleBlueprintAnalysis = async (imageUrl, options = {}) => {
     if (loading) return;
     setLoading(true);
 
-    // Add a user message to chat showing the action
     const userMsg = { id: crypto.randomUUID(), role: 'user', content: '📐 Analyzing uploaded blueprint with computer vision...' };
     setMessages(prev => [...prev, userMsg]);
 
+    const userPrompt = input.trim() || 'Analyze this blueprint. Extract all dimensions, quantities of materials, and generate a complete material takeoff table and cost estimate with labor and materials broken down.';
+
     try {
-      const response = await base44.functions.invoke('analyzeBlueprintVision', {
-        imageUrl,
-        prompt: input.trim() || 'Analyze this blueprint. Extract all dimensions, quantities of materials, and generate a complete material takeoff table and cost estimate with labor and materials broken down.',
-        preferredProviders: ['claude', 'openai'],
-      });
-
-      if (!response.data?.success) {
-          throw new Error(response.data?.error || 'Vision analysis failed');
-        }
-
-        if (response.data.structured) {
-          setBlueprintResult({ ...response.data.structured, imageUrl });
-        } else {
-          setMessages(prev => [...prev, {
-            id: crypto.randomUUID(),
-            role: 'assistant',
-            content: response.data.rawText || response.data.output || 'Analysis complete.',
-          }]);
-        }
-        setInput('');
+      const structured = await analyzeBlueprintWithVision(imageUrl, userPrompt, options);
+      setBlueprintResult({ ...structured, imageUrl });
+      setInput('');
     } catch (err) {
       console.error('Blueprint analysis error:', err);
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: `Error analyzing blueprint: ${err.message}. Please ensure your Claude or OpenAI API key is configured in Settings.`,
+        content: `Error analyzing blueprint: ${err.message}. For vision analysis, add VITE_OPENAI_API_KEY in Settings (OpenAI key is required for blueprint reading).`,
         error: true,
       }]);
       toast.error('Vision analysis failed: ' + err.message);
