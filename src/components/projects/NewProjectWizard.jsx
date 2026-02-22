@@ -357,11 +357,13 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
   const canProceedStep2 = !!formData.name && !!formData.client_name;
 
   const handleStep1Next = () => {
-     if (createPhasesFromTemplate && selectedType) {
-       setPhases(getPhaseTemplate(selectedType).map(p => ({ 
+     if (selectedType) {
+       const template = getPhaseTemplate(selectedType);
+       const formattedPhases = template.map(p => ({ 
          ...p, 
          items: p.items.map(item => ({ text: item, completed: false })) 
-       })));
+       }));
+       setPhases(formattedPhases);
      } else {
        setPhases([]);
      }
