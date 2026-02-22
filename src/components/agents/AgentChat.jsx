@@ -192,7 +192,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
             </Button>
             <Button
               onClick={() => sendMessage()}
-              disabled={loading || !input.trim()}
+              disabled={loading || !input.trim() || !isReady}
               size="icon"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
