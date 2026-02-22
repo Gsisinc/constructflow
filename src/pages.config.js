@@ -69,7 +69,6 @@ import ClientPortal from './pages/ClientPortal';
 import CostLibrary from './pages/CostLibrary';
 import DailyLog from './pages/DailyLog';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
-import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
@@ -139,8 +138,7 @@ export const PAGES = {
     "ClientPortal": ClientPortal,
     "CostLibrary": CostLibrary,
     "DailyLog": DailyLog,
-    "Dashboard.ImprovedVersion": dashboardImprovedversion,
-    "Dashboard": Dashboard,
+    "Dashboard": dashboardImprovedversion,
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
     "Documents": Documents,
