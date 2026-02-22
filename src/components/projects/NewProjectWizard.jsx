@@ -191,7 +191,7 @@ function StepProjectDetails({ formData, onChange, uploading, onImageUpload }) {
 function StepPhaseReview({ phases, onChange }) {
   const addItem = (phaseIdx) => {
     const updated = [...phases];
-    updated[phaseIdx] = { ...updated[phaseIdx], items: [...updated[phaseIdx].items, ''] };
+    updated[phaseIdx] = { ...updated[phaseIdx], items: [...updated[phaseIdx].items, { text: '', completed: false }] };
     onChange(updated);
   };
 
@@ -203,14 +203,13 @@ function StepPhaseReview({ phases, onChange }) {
 
   const updateItem = (phaseIdx, itemIdx, value) => {
     const updated = [...phases];
-    updated[phaseIdx].items[itemIdx] = value;
+    updated[phaseIdx].items[itemIdx] = { ...updated[phaseIdx].items[itemIdx], text: value };
     onChange(updated);
   };
 
   const toggleItem = (phaseIdx, itemIdx) => {
     const updated = [...phases];
-    const items = [...updated[phaseIdx].items];
-    // items are strings; completed tracked separately if needed — skip for now
+    updated[phaseIdx].items[itemIdx] = { ...updated[phaseIdx].items[itemIdx], completed: !updated[phaseIdx].items[itemIdx].completed };
     onChange(updated);
   };
 
