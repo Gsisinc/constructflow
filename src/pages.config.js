@@ -127,7 +127,6 @@ import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
-import Dashboard from './pages/Dashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -212,7 +211,6 @@ export const PAGES = {
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
     "Dashboard.ImprovedVersion": dashboardImprovedversion,
-    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {
