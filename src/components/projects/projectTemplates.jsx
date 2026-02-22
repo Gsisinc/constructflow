@@ -3219,6 +3219,28 @@ export const PHASE_TEMPLATES = {
     },
   ],
 
+  // ─── FIRE ALARM: SPECIAL HAZARD / SUPPRESSION SYSTEMS ───────────────────────────
+  fire_alarm_special_hazard: [
+    { phase: 'Bidding & Estimating', items: ['Identify hazard type (clean agent, CO2, foam, kitchen)', 'Obtain system design from manufacturer', 'Count discharge nozzles', 'Size agent containers', 'Estimate rough-in labor', 'Price suppression system', 'Get contractor quotes'] },
+    { phase: 'Material Procurement', items: ['Order suppression system components', 'Order agent (canisters/tanks)', 'Order nozzles and piping', 'Order detection devices', 'Order manual pull stations'] },
+    { phase: 'Design & Permitting', items: ['Submit design drawings', 'Get AHJ approval', 'Verify code compliance', 'Submit for mechanical permit'] },
+    { phase: 'Installation', items: ['Install main panel', 'Install detection devices', 'Install piping and nozzles', 'Mount agent containers', 'Install manual activation stations'] },
+    { phase: 'System Testing', items: ['Hydrostatic test piping', 'Pressure test agent containers', 'Test detection sensors', 'Verify discharge nozzle pattern', 'Test manual activation'] },
+    { phase: 'Final Inspection & Closeout', items: ['AHJ final inspection', 'Provide O&M documentation', 'Technician training', 'Certificate of installation'] }
+  ],
+
+  // ─── LOW VOLTAGE: NURSE CALL SYSTEM ────────────────────────────────────────────
+  low_voltage_nurse_call: [
+    { phase: 'Design & Planning', items: ['Count patient rooms', 'Identify call button locations (bed, bathroom)', 'Plan speaker/strobe locations', 'Design staff notification zones', 'Create wiring diagram'] },
+    { phase: 'Material & Equipment', items: ['Order nurse call panel', 'Order patient call buttons', 'Order speaker/strobes', 'Order wireless handsets (if applicable)', 'Order wiring and conduit'] },
+    { phase: 'Rough-In Installation', items: ['Run conduit from rooms to telecom room', 'Run shielded cable to patient rooms', 'Install conduit to speaker locations', 'Support and secure all pathways'] },
+    { phase: 'Device Installation', items: ['Mount call buttons at bedside', 'Mount buttons in bathrooms', 'Install speakers in corridors', 'Install strobes at nurse stations', 'Mount main panel in secure location'] },
+    { phase: 'Wiring & Termination', items: ['Terminate all wiring to panel', 'Test continuity of all circuits', 'Label all wiring', 'Connect power', 'Verify all connections'] },
+    { phase: 'System Configuration', items: ['Program room assignments', 'Configure call zones', 'Test button functionality', 'Configure staff notification', 'Test alarm sounds and messages'] },
+    { phase: 'Testing & Training', items: ['Test all call buttons', 'Test audio/visual notification', 'Train nursing staff', 'Create quick reference cards'] },
+    { phase: 'Closeout', items: ['Provide as-built documentation', 'Provide O&M manuals', 'Final testing sign-off'] }
+  ],
+
   // ─── ISP: FIBER BACKBONE ──────────────────────────────────────────────────────────
   isp_fiber_backbone: [
     { phase: 'Bidding & Estimating', items: ['Perform route survey', 'Identify aerial vs. underground', 'Assess existing conduit', 'Get fiber vendor quotes', 'Calculate labor and materials', 'Submit bid proposal'] },
