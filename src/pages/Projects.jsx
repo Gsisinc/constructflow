@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { ProjectCardSkeleton } from '@/components/skeleton/SkeletonComponents';
 import ProjectCard from '../components/dashboard/ProjectCard';
-import ProjectForm from '../components/projects/ProjectForm';
+import NewProjectWizard from '../components/projects/NewProjectWizard';
 import PullToRefresh from '@/components/ui/PullToRefresh';
 import EmptyState from '../components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
@@ -37,16 +37,10 @@ export default function Projects() {
     enabled: !!user?.organization_id
   });
 
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Project.create({
-      ...data,
-      organization_id: user?.organization_id
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects', user?.organization_id] });
-      setShowForm(false);
-    },
-  });
+  const handleProjectCreated = (project) => {
+    queryClient.invalidateQueries({ queryKey: ['projects', user?.organization_id] });
+    setShowForm(false);
+  };
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
@@ -160,11 +154,12 @@ export default function Projects() {
         </div>
       )}
 
-      {/* Create Form */}
-      <ProjectForm
+      {/* Create Wizard */}
+      <NewProjectWizard
         open={showForm}
         onOpenChange={setShowForm}
-        onSubmit={(data) => createMutation.mutate(data)}
+        onCreated={handleProjectCreated}
+        organizationId={user?.organization_id}
       />
       </div>
     </PullToRefresh>

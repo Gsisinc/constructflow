@@ -67,8 +67,10 @@ import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
 import ClientPortal from './pages/ClientPortal';
 import CostLibrary from './pages/CostLibrary';
+import CostPlusInvoicing from './pages/CostPlusInvoicing';
 import DailyLog from './pages/DailyLog';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
+import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
@@ -80,6 +82,7 @@ import Home from './pages/Home';
 import Implementation from './pages/Implementation';
 import Invoices from './pages/Invoices';
 import Issues from './pages/Issues';
+import JobCosting from './pages/JobCosting';
 import JoinRequest from './pages/JoinRequest';
 import Landing from './pages/Landing';
 import LienWaivers from './pages/LienWaivers';
@@ -97,8 +100,10 @@ import Photos from './pages/Photos';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
 import PurchaseOrders from './pages/PurchaseOrders';
+import QuickBooksSync from './pages/QuickBooksSync';
 import RolePermissions from './pages/RolePermissions';
 import Safety from './pages/Safety';
+import SchedulingAI from './pages/SchedulingAI';
 import ServiceDesk from './pages/ServiceDesk';
 import Settings from './pages/Settings';
 import SubcontractorPortal from './pages/SubcontractorPortal';
@@ -108,11 +113,21 @@ import TaskTracker from './pages/TaskTracker';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
 import TeamManagement from './pages/TeamManagement';
+import TechnicianTraining from './pages/TechnicianTraining';
 import TemplateLibrary from './pages/TemplateLibrary';
 import TextMessages from './pages/TextMessages';
 import TimeCards from './pages/TimeCards';
+import TrainingManagement from './pages/TrainingManagement';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import TechnicianPortal from './pages/TechnicianPortal';
+import CertificationRoadmap from './pages/CertificationRoadmap';
+import TrainingMaterials from './pages/TrainingMaterials';
+import TeamSkillsMatrix from './pages/TeamSkillsMatrix';
+import FieldHoursApproval from './pages/FieldHoursApproval';
+import TrainingSchedule from './pages/TrainingSchedule';
+import LessonPlanTemplates from './pages/LessonPlanTemplates';
+import Dashboard from './pages/Dashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -137,8 +152,10 @@ export const PAGES = {
     "Calendar": Calendar,
     "ClientPortal": ClientPortal,
     "CostLibrary": CostLibrary,
+    "CostPlusInvoicing": CostPlusInvoicing,
     "DailyLog": DailyLog,
-    "Dashboard": dashboardImprovedversion,
+    "Dashboard.ImprovedVersion": dashboardImprovedversion,
+    "Dashboard": Dashboard,
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
     "Documents": Documents,
@@ -150,6 +167,7 @@ export const PAGES = {
     "Implementation": Implementation,
     "Invoices": Invoices,
     "Issues": Issues,
+    "JobCosting": JobCosting,
     "JoinRequest": JoinRequest,
     "Landing": Landing,
     "LienWaivers": LienWaivers,
@@ -167,8 +185,10 @@ export const PAGES = {
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
     "PurchaseOrders": PurchaseOrders,
+    "QuickBooksSync": QuickBooksSync,
     "RolePermissions": RolePermissions,
     "Safety": Safety,
+    "SchedulingAI": SchedulingAI,
     "ServiceDesk": ServiceDesk,
     "Settings": Settings,
     "SubcontractorPortal": SubcontractorPortal,
@@ -178,11 +198,21 @@ export const PAGES = {
     "Tasks": Tasks,
     "Team": Team,
     "TeamManagement": TeamManagement,
+    "TechnicianTraining": TechnicianTraining,
     "TemplateLibrary": TemplateLibrary,
     "TextMessages": TextMessages,
     "TimeCards": TimeCards,
+    "TrainingManagement": TrainingManagement,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "TechnicianPortal": TechnicianPortal,
+    "CertificationRoadmap": CertificationRoadmap,
+    "TrainingMaterials": TrainingMaterials,
+    "TeamSkillsMatrix": TeamSkillsMatrix,
+    "FieldHoursApproval": FieldHoursApproval,
+    "TrainingSchedule": TrainingSchedule,
+    "LessonPlanTemplates": LessonPlanTemplates,
+    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {
