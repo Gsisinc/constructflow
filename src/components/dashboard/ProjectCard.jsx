@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '../../utils';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, MapPin, DollarSign, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 const statusColors = {
   bidding: 'bg-purple-50 text-purple-700 border-purple-200',
