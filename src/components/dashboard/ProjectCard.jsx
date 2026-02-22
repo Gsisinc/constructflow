@@ -61,7 +61,7 @@ export default function ProjectCard({ project, onProjectDeleted }) {
         to={createPageUrl(`ProjectDetail?id=${project.id}`)}
         className="block"
       >
-      {/* Image */}
+        {/* Image */}
       <div className="h-40 bg-gradient-to-br from-slate-100 to-slate-200 relative overflow-hidden">
         {project.image_url ? (
           <img

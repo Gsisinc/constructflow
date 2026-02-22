@@ -126,7 +126,6 @@ import TrainingMaterials from './pages/TrainingMaterials';
 import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import Dashboard from './pages/Dashboard';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
 import __Layout from './Layout.jsx';
 
@@ -211,7 +210,6 @@ export const PAGES = {
     "TrainingSchedule": TrainingSchedule,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "Dashboard": Dashboard,
     "Dashboard.ImprovedVersion": dashboardImprovedversion,
 }
 
