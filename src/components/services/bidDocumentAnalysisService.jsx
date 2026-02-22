@@ -13,11 +13,16 @@ export const BLUEPRINT_ANALYZER_CAPABILITIES = [
  */
 export async function analyzeBlueprintWithVision(imageUrl, prompt = '', options = {}) {
   try {
-    const response = await base44.functions.invoke('analyzeBlueprintVision', {
+    // Support multi-page: options.imageUrls overrides single imageUrl
+    const payload = {
       imageUrl,
       prompt,
       preferredProviders: ['claude', 'openai'],
-    });
+    };
+    if (options.imageUrls && options.imageUrls.length > 1) {
+      payload.imageUrls = options.imageUrls;
+    }
+    const response = await base44.functions.invoke('analyzeBlueprintVision', payload);
 
     const data = response.data;
     if (data?.success && data?.structured) {
