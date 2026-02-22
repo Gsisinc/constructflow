@@ -122,6 +122,11 @@ import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import TechnicianPortal from './pages/TechnicianPortal';
 import Dashboard from './pages/Dashboard';
+import CertificationRoadmap from './pages/CertificationRoadmap';
+import TrainingMaterials from './pages/TrainingMaterials';
+import TeamSkillsMatrix from './pages/TeamSkillsMatrix';
+import FieldHoursApproval from './pages/FieldHoursApproval';
+import TrainingSchedule from './pages/TrainingSchedule';
 import __Layout from './Layout.jsx';
 
 
@@ -201,6 +206,11 @@ export const PAGES = {
     "VehicleLogs": VehicleLogs,
     "TechnicianPortal": TechnicianPortal,
     "Dashboard": Dashboard,
+    "CertificationRoadmap": CertificationRoadmap,
+    "TrainingMaterials": TrainingMaterials,
+    "TeamSkillsMatrix": TeamSkillsMatrix,
+    "FieldHoursApproval": FieldHoursApproval,
+    "TrainingSchedule": TrainingSchedule,
 }
 
 export const pagesConfig = {
