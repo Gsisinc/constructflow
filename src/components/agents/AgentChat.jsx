@@ -113,15 +113,19 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
       });
 
       if (!response.data?.success) {
-        throw new Error(response.data?.error || 'Vision analysis failed');
-      }
+          throw new Error(response.data?.error || 'Vision analysis failed');
+        }
 
-      setMessages(prev => [...prev, {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: response.data.output,
-      }]);
-      setInput('');
+        if (response.data.structured) {
+          setBlueprintResult({ ...response.data.structured, imageUrl });
+        } else {
+          setMessages(prev => [...prev, {
+            id: crypto.randomUUID(),
+            role: 'assistant',
+            content: response.data.rawText || response.data.output || 'Analysis complete.',
+          }]);
+        }
+        setInput('');
     } catch (err) {
       console.error('Blueprint analysis error:', err);
       setMessages(prev => [...prev, {
