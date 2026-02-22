@@ -318,34 +318,33 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         budget: formData.budget ? parseFloat(formData.budget) : null,
       });
 
-      // Bulk-create phase requirements
-       const allRequirements = [];
-       phases.forEach((phase, phaseOrder) => {
-         phase.items.forEach((item, itemOrder) => {
-           if (item.text.trim()) {
-             allRequirements.push({
-               project_id: project.id,
-               phase_name: phase.phase,
-               requirement_text: item.text.trim(),
-               order: phaseOrder * 1000 + itemOrder,
-               status: item.completed ? 'completed' : 'pending',
-             });
-           }
-         });
-       });
+      // Always create phase requirements from template
+      const allRequirements = [];
+      phases.forEach((phase) => {
+        phase.items.forEach((item) => {
+          if (item.text.trim()) {
+            allRequirements.push({
+              project_id: project.id,
+              phase_name: phase.phase,
+              requirement_text: item.text.trim(),
+              status: item.completed ? 'completed' : 'pending',
+            });
+          }
+        });
+      });
 
       if (allRequirements.length > 0) {
         await base44.entities.PhaseRequirement.bulkCreate(allRequirements);
       }
 
-      toast.success(allRequirements.length > 0 ? `Project created with ${allRequirements.length} phase requirements` : 'Project created');
+      toast.success(allRequirements.length > 0 ? `Project created with ${allRequirements.length} requirements` : 'Project created');
       onCreated(project);
-      // Reset
       setStep(1);
       setSelectedType('');
       setCreatePhasesFromTemplate(true);
       setFormData({ name: '', client_name: '', status: 'bidding', priority: 'medium', address: '', start_date: '', end_date: '', budget: '', description: '', project_manager: '', image_url: '' });
       setPhases([]);
+      onOpenChange(false);
     } catch (err) {
       toast.error('Failed to create project: ' + err.message);
     } finally {
