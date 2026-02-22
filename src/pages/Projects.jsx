@@ -37,16 +37,10 @@ export default function Projects() {
     enabled: !!user?.organization_id
   });
 
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Project.create({
-      ...data,
-      organization_id: user?.organization_id
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects', user?.organization_id] });
-      setShowForm(false);
-    },
-  });
+  const handleProjectCreated = (project) => {
+    queryClient.invalidateQueries({ queryKey: ['projects', user?.organization_id] });
+    setShowForm(false);
+  };
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
