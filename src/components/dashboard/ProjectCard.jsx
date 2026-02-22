@@ -28,14 +28,39 @@ const priorityColors = {
   critical: 'bg-red-100 text-red-600',
 };
 
-export default function ProjectCard({ project }) {
+export default function ProjectCard({ project, onProjectDeleted }) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const queryClient = useQueryClient();
   const budgetUsed = project.budget ? ((project.spent || 0) / project.budget * 100).toFixed(0) : 0;
 
+  const deleteProjectMutation = useMutation({
+    mutationFn: () => base44.entities.Project.delete(project.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast.success('Project deleted');
+      if (onProjectDeleted) onProjectDeleted();
+    },
+    onError: () => {
+      toast.error('Failed to delete project');
+      setIsDeleting(false);
+    }
+  });
+
+  const handleDelete = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this project?')) {
+      setIsDeleting(true);
+      deleteProjectMutation.mutate();
+    }
+  };
+
   return (
-    <Link
-      to={createPageUrl(`ProjectDetail?id=${project.id}`)}
-      className="block bg-white rounded-2xl border border-slate-200/60 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 group"
-    >
+    <div className="relative bg-white rounded-2xl border border-slate-200/60 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 group">
+      <Link
+        to={createPageUrl(`ProjectDetail?id=${project.id}`)}
+        className="block"
+      >
       {/* Image */}
       <div className="h-40 bg-gradient-to-br from-slate-100 to-slate-200 relative overflow-hidden">
         {project.image_url ? (
