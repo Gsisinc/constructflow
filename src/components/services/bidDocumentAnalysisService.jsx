@@ -11,6 +11,17 @@ export const BLUEPRINT_ANALYZER_CAPABILITIES = [
 /**
  * Analyze a blueprint image (data URL or public URL) using the backend vision function.
  */
+export function getVisionKeyStatus() {
+  const claudeKey = import.meta.env.VITE_CLAUDE_API_KEY;
+  const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  if (claudeKey) return 'claude';
+  if (openaiKey) return 'openai';
+  return 'none';
+}
+
+/**
+ * Analyze a blueprint image (data URL or public URL) using the backend vision function.
+ */
 export async function analyzeBlueprintWithVision(imageUrl, prompt = '', options = {}) {
   try {
     // Support multi-page: options.imageUrls overrides single imageUrl
