@@ -124,9 +124,18 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full text-center">
               <div>
-                <Sparkles className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                <p className="text-slate-500 font-medium">Start a conversation with {agent.name}</p>
-                <p className="text-xs text-slate-400 mt-1">Ask questions or describe your needs</p>
+                {!isReady ? (
+                  <>
+                    <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />
+                    <p className="text-slate-500 font-medium">Starting {agent.name}...</p>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+                    <p className="text-slate-500 font-medium">Start a conversation with {agent.name}</p>
+                    <p className="text-xs text-slate-400 mt-1">Ask questions or describe your needs</p>
+                  </>
+                )}
               </div>
             </div>
           )}
