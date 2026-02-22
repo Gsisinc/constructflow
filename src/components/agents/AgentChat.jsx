@@ -216,6 +216,17 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Blueprint Estimate Result Panel */}
+        {blueprintResult && (
+          <div className="px-4 pb-2">
+            <BlueprintEstimateResult
+              result={blueprintResult}
+              imageUrl={blueprintResult.imageUrl}
+              onClose={() => setBlueprintResult(null)}
+            />
+          </div>
+        )}
+
         {/* Input */}
         <div className="border-t p-4 flex-shrink-0 space-y-3">
           {/* Blueprint uploader — shown for blueprint agent or any agent */}
