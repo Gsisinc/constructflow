@@ -69,6 +69,7 @@ import ClientPortal from './pages/ClientPortal';
 import CostLibrary from './pages/CostLibrary';
 import DailyLog from './pages/DailyLog';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
+import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
@@ -113,6 +114,10 @@ import TextMessages from './pages/TextMessages';
 import TimeCards from './pages/TimeCards';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import JobCosting from './pages/JobCosting';
+import QuickBooksSync from './pages/QuickBooksSync';
+import CostPlusInvoicing from './pages/CostPlusInvoicing';
+import SchedulingAI from './pages/SchedulingAI';
 import __Layout from './Layout.jsx';
 
 
@@ -138,7 +143,8 @@ export const PAGES = {
     "ClientPortal": ClientPortal,
     "CostLibrary": CostLibrary,
     "DailyLog": DailyLog,
-    "Dashboard": dashboardImprovedversion,
+    "Dashboard.ImprovedVersion": dashboardImprovedversion,
+    "Dashboard": Dashboard,
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
     "Documents": Documents,
@@ -183,6 +189,10 @@ export const PAGES = {
     "TimeCards": TimeCards,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "JobCosting": JobCosting,
+    "QuickBooksSync": QuickBooksSync,
+    "CostPlusInvoicing": CostPlusInvoicing,
+    "SchedulingAI": SchedulingAI,
 }
 
 export const pagesConfig = {
