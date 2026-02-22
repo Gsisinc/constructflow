@@ -307,6 +307,207 @@ export const PHASE_TEMPLATES = {
     },
   ],
 
+  // ─── FIRE ALARM: TENANT IMPROVEMENT (Shell to Suite) ──────────────────────
+  fire_alarm_tenant_improvement: [
+    {
+      phase: 'Bidding & Estimating',
+      items: [
+        'Site visit: locate existing fire alarm control panel in building',
+        'Identify panel manufacturer and model (Simplex, Honeywell, Siemens, Edwards)',
+        'Determine if system is addressable or conventional',
+        'Check panel capacity for additional devices',
+        'Verify building has spare SLC loop capacity',
+        'Locate nearest riser access point to tenant space',
+        'Check for existing junction boxes in ceiling',
+        'Verify ceiling type (grid vs. hard lid)',
+        'Takeoff smoke detectors: per code (corridors, common areas)',
+        'Takeoff heat detectors: kitchens, boiler rooms',
+        'Takeoff pull stations: at exits (max travel distance 200ft)',
+        'Takeoff horn/strobes: habitable spaces, corridors',
+        'Takeoff speaker/strobes: if building has voice evac',
+        'Takeoff monitor modules: tie into tenant sprinkler (if applicable)',
+        'Calculate SLC wire (18/2 shielded): run from riser to devices',
+        'Calculate NAC wire (14/2 or 16/2): notification circuit',
+        'Calculate conduit: homeruns to riser (often required)',
+        'Count backboxes: 4SQ or round',
+        'Verify all devices match existing manufacturer',
+        'Contact building system vendor for programming access',
+        'Get programming rate ($150–300/hr typically)',
+        'Verify if building requires specific authorized vendor',
+        'Obtain compatibility data from base system manufacturer',
+        'Estimate device installation labor: 0.75–1.5 hours each',
+        'Estimate conduit installation: linear feet at $4–8/ft',
+        'Estimate wire pulling: per run + homerun to riser',
+        'Estimate termination labor: per device + riser connections',
+        'Estimate testing: 0.5 hours per device',
+        'Coordinate with electrical contractor for rough-in (if separate scope)',
+        'Coordinate drywall patching and ceiling grid installation timing',
+      ]
+    },
+    {
+      phase: 'Material Procurement',
+      items: [
+        'Verify exact model numbers from base system',
+        'Order compatible devices from authorized distributor',
+        'Allow 2–3 weeks for shipping',
+        'Order conduit (EMT or rigid as required)',
+        'Order boxes and mud rings',
+        'Order mounting hardware',
+        'Order fire caulking',
+        'Stage materials in tenant space (secured)',
+        'Check-in materials upon delivery',
+        'Separate by floor/wing if large tenant space',
+      ]
+    },
+    {
+      phase: 'Permitting & Approvals',
+      items: [
+        'Submit shop drawings: floor plan with device locations',
+        'Submit riser diagram showing connection to base system',
+        'Submit device compatibility letter from manufacturer',
+        'Submit cut sheets for all devices',
+        'Submit for building owner architectural review',
+        'Get property management sign-off',
+        'Schedule access to base building panel with building owner',
+        'Submit tenant improvement permit application to city',
+        'Include fire alarm drawings in permit submittal',
+        'Pay permit fees',
+        'Schedule inspections with AHJ',
+      ]
+    },
+    {
+      phase: 'Rough-In Phase',
+      items: [
+        'Provide box location plans to electrician',
+        'Verify box types and depths with electrician',
+        'Confirm mounting heights with electrician',
+        'Check for backing requirements (drywall backing)',
+        'Install conduit homeruns from tenant space to riser access point',
+        'Use minimum 3/4" conduit (typically)',
+        'Install pull string in conduit',
+        'Cap conduit ends to prevent debris',
+        'Support conduit per code',
+        'Mount backboxes to studs or backing',
+        'Level all boxes',
+        'Install mud rings for drywall thickness',
+        'Protect boxes from drywall compound',
+        'Firestop all conduit entries through rated walls (intumescent putty or caulk)',
+        'Document all firestop penetrations with photos',
+        'Mark box locations before drywall',
+        'Ensure boxes are not buried during drywall installation',
+        'Provide cutout locations to drywall crew',
+      ]
+    },
+    {
+      phase: 'Riser Connection Preparation',
+      items: [
+        'Locate base building junction box (electrical room, stairwell, or corridor)',
+        'Identify SLC loop in/out wires in junction box',
+        'Document existing wiring configuration',
+        'Check panel for available addresses',
+        'Confirm loop power can handle additional devices',
+        'Test existing loop continuity',
+        'Determine connection method: T-tap vs. new homerun to panel',
+        'Determine if isolator modules are required',
+      ]
+    },
+    {
+      phase: 'Wire Pulling & Termination',
+      items: [
+        'Pull SLC wire from riser junction box to first device',
+        'Daisy chain SLC wire between devices',
+        'Label both ends of SLC wire with circuit/address info',
+        'Leave service loops (12–18" at each device)',
+        'Pull NAC wire from riser (or remote power supply) to devices',
+        'Follow Class A or B requirements per design',
+        'Install EOL resistor at last NAC device',
+        'Strip and prepare wires at riser connection',
+        'Connect to base building SLC loop at riser',
+        'Document connection points for as-built',
+        'Label all wires in junction box',
+      ]
+    },
+    {
+      phase: 'Trim-Out Phase',
+      items: [
+        'Install device bases after drywall and paint complete',
+        'Mount bases to backboxes and level',
+        'Wire devices: trim, strip, and terminate',
+        'Document addresses for each device',
+        'Install smoke detector heads (snap in)',
+        'Install heat detectors',
+        'Install pull stations',
+        'Install horns/strobes',
+        'Install trim plates to cover gaps',
+        'Paint trim plates if required to match ceiling',
+      ]
+    },
+    {
+      phase: 'Programming & Integration',
+      items: [
+        'Schedule programming appointment with building vendor',
+        'Provide device list with locations to vendor',
+        'Provide desired device labels to vendor',
+        'Put panel in programming mode',
+        'Learn new devices on system',
+        'Assign addresses to all new devices',
+        'Program custom labels for new devices',
+        'Add new NAC circuits to system',
+        'Set NAC synchronization',
+        'Test NAC output',
+        'Verify new devices report to panel',
+        'Check for ground faults',
+        'Confirm no interference with existing devices',
+      ]
+    },
+    {
+      phase: 'Testing Phase',
+      items: [
+        'Test every smoke detector (aerosol or magnet)',
+        'Test every heat detector (heat gun)',
+        'Test every pull station (physical pull)',
+        'Test every horn/strobe (visual and audible verification)',
+        'Measure ambient noise level for sound level testing',
+        'Verify notification 15dB above ambient',
+        'Document all sound level readings',
+        'Verify alarm reports to main panel',
+        'Check trouble conditions',
+        'Test battery backup if applicable',
+      ]
+    },
+    {
+      phase: 'Inspections',
+      items: [
+        'Schedule rough-in inspection with AHJ (if required)',
+        'Verify exposed work visible for rough-in inspection',
+        'Verify conduit complete for rough-in inspection',
+        'Verify firestopping in place for rough-in inspection',
+        'Schedule final inspection with local AHJ',
+        'Demonstrate all devices to AHJ',
+        'Show communication to base system for AHJ',
+        'Provide test records to AHJ',
+        'Walk with property manager for building owner acceptance',
+        'Demonstrate system operation to property manager',
+        'Obtain property manager sign-off',
+      ]
+    },
+    {
+      phase: 'Closeout',
+      items: [
+        'Produce updated floor plans with all device locations (as-built)',
+        'Produce device address list',
+        'Produce riser diagram showing connection to base system',
+        'Provide as-built documentation to building management',
+        'Tenant training: demonstrate how to silence alarms',
+        'Tenant training: demonstrate how to reset system',
+        'Provide emergency contact list to tenant',
+        'Submit final invoice',
+        'Include all change orders in final billing',
+        'Collect lien waiver',
+      ]
+    },
+  ],
+
   // ─── DEFAULT (generic) for types without a specific template ──────────────
   _default: [
     {
