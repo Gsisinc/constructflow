@@ -83,8 +83,8 @@ export default function ProjectCard({ project, onProjectDeleted }) {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-5 space-y-4">
+        {/* Content */}
+        <div className="p-5 space-y-4">
         <div>
           <h3 className="font-semibold text-slate-900 text-lg group-hover:text-slate-700 transition-colors">
             {project.name}
