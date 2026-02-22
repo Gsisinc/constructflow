@@ -65,11 +65,13 @@ import Bids from './pages/Bids';
 import BillApprovals from './pages/BillApprovals';
 import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
+import CertificationRoadmap from './pages/CertificationRoadmap';
 import ClientPortal from './pages/ClientPortal';
 import CostLibrary from './pages/CostLibrary';
 import CostPlusInvoicing from './pages/CostPlusInvoicing';
 import DailyLog from './pages/DailyLog';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
+import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
@@ -77,6 +79,7 @@ import ESignatures from './pages/ESignatures';
 import EstimateGenerator from './pages/EstimateGenerator';
 import Estimates from './pages/Estimates';
 import FeatureTesting from './pages/FeatureTesting';
+import FieldHoursApproval from './pages/FieldHoursApproval';
 import Home from './pages/Home';
 import Implementation from './pages/Implementation';
 import Invoices from './pages/Invoices';
@@ -84,6 +87,7 @@ import Issues from './pages/Issues';
 import JobCosting from './pages/JobCosting';
 import JoinRequest from './pages/JoinRequest';
 import Landing from './pages/Landing';
+import LessonPlanTemplates from './pages/LessonPlanTemplates';
 import LienWaivers from './pages/LienWaivers';
 import Login from './pages/Login';
 import Materials from './pages/Materials';
@@ -112,20 +116,17 @@ import TaskTracker from './pages/TaskTracker';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
 import TeamManagement from './pages/TeamManagement';
+import TeamSkillsMatrix from './pages/TeamSkillsMatrix';
+import TechnicianPortal from './pages/TechnicianPortal';
 import TechnicianTraining from './pages/TechnicianTraining';
 import TemplateLibrary from './pages/TemplateLibrary';
 import TextMessages from './pages/TextMessages';
 import TimeCards from './pages/TimeCards';
 import TrainingManagement from './pages/TrainingManagement';
+import TrainingMaterials from './pages/TrainingMaterials';
+import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import TechnicianPortal from './pages/TechnicianPortal';
-import CertificationRoadmap from './pages/CertificationRoadmap';
-import TrainingMaterials from './pages/TrainingMaterials';
-import TeamSkillsMatrix from './pages/TeamSkillsMatrix';
-import FieldHoursApproval from './pages/FieldHoursApproval';
-import TrainingSchedule from './pages/TrainingSchedule';
-import LessonPlanTemplates from './pages/LessonPlanTemplates';
 import __Layout from './Layout.jsx';
 
 
@@ -148,11 +149,13 @@ export const PAGES = {
     "BillApprovals": BillApprovals,
     "Budget": Budget,
     "Calendar": Calendar,
+    "CertificationRoadmap": CertificationRoadmap,
     "ClientPortal": ClientPortal,
     "CostLibrary": CostLibrary,
     "CostPlusInvoicing": CostPlusInvoicing,
     "DailyLog": DailyLog,
-    "Dashboard": dashboardImprovedversion,
+    "Dashboard.ImprovedVersion": dashboardImprovedversion,
+    "Dashboard": Dashboard,
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
     "Documents": Documents,
@@ -160,6 +163,7 @@ export const PAGES = {
     "EstimateGenerator": EstimateGenerator,
     "Estimates": Estimates,
     "FeatureTesting": FeatureTesting,
+    "FieldHoursApproval": FieldHoursApproval,
     "Home": Home,
     "Implementation": Implementation,
     "Invoices": Invoices,
@@ -167,6 +171,7 @@ export const PAGES = {
     "JobCosting": JobCosting,
     "JoinRequest": JoinRequest,
     "Landing": Landing,
+    "LessonPlanTemplates": LessonPlanTemplates,
     "LienWaivers": LienWaivers,
     "Login": Login,
     "Materials": Materials,
@@ -195,20 +200,17 @@ export const PAGES = {
     "Tasks": Tasks,
     "Team": Team,
     "TeamManagement": TeamManagement,
+    "TeamSkillsMatrix": TeamSkillsMatrix,
+    "TechnicianPortal": TechnicianPortal,
     "TechnicianTraining": TechnicianTraining,
     "TemplateLibrary": TemplateLibrary,
     "TextMessages": TextMessages,
     "TimeCards": TimeCards,
     "TrainingManagement": TrainingManagement,
+    "TrainingMaterials": TrainingMaterials,
+    "TrainingSchedule": TrainingSchedule,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "TechnicianPortal": TechnicianPortal,
-    "CertificationRoadmap": CertificationRoadmap,
-    "TrainingMaterials": TrainingMaterials,
-    "TeamSkillsMatrix": TeamSkillsMatrix,
-    "FieldHoursApproval": FieldHoursApproval,
-    "TrainingSchedule": TrainingSchedule,
-    "LessonPlanTemplates": LessonPlanTemplates,
 }
 
 export const pagesConfig = {
