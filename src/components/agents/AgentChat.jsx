@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import BlueprintUploader from '@/components/agents/BlueprintUploader';
 import BlueprintEstimateResult from '@/components/agents/BlueprintEstimateResult';
-import { analyzeBlueprintWithVision } from '@/services/bidDocumentAnalysisService';
+import { analyzeBlueprintWithVision } from '@/components/services/bidDocumentAnalysisService';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const { user } = useAuth();

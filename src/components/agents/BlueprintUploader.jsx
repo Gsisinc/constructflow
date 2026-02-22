@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, ImagePlus, X, FileImage, Sparkles, ListChecks } from 'lucide-react';
 import { toast } from 'sonner';
-import { BLUEPRINT_ANALYZER_CAPABILITIES } from '@/services/bidDocumentAnalysisService';
+import { BLUEPRINT_ANALYZER_CAPABILITIES } from '@/components/services/bidDocumentAnalysisService';
 
 export default function BlueprintUploader({ onAnalysis, disabled }) {
   const [loading, setLoading] = useState(false);
