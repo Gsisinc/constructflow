@@ -137,6 +137,18 @@ export default function ProjectCard({ project, onProjectDeleted }) {
           </div>
         )}
       </div>
-    </Link>
+      </Link>
+
+      {/* Delete Button */}
+      <Button
+        onClick={handleDelete}
+        disabled={isDeleting}
+        variant="ghost"
+        size="icon"
+        className="absolute top-3 right-3 h-8 w-8 bg-white/80 hover:bg-red-50 text-slate-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </div>
   );
 }
