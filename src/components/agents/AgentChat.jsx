@@ -96,23 +96,44 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   };
 
   const handleBlueprintAnalysis = async (imageUrl) => {
-    if (!conversation || loading) return;
+    if (loading) return;
     setLoading(true);
-    setInput('');
+
+    // Add a user message to chat showing the action
+    const userMsg = { id: crypto.randomUUID(), role: 'user', content: '📐 Analyzing uploaded blueprint with computer vision...' };
+    setMessages(prev => [...prev, userMsg]);
+
     try {
-      // First show the user action in chat
-      await base44.agents.addMessage(conversation, {
-        role: 'user',
-        content: `[Blueprint uploaded] Please analyze this drawing and generate a full quantity takeoff and cost estimate. Image: ${imageUrl}`
+      const response = await base44.functions.invoke('analyzeBlueprintVision', {
+        imageUrl,
+        prompt: input.trim() || 'Analyze this blueprint. Extract all dimensions, quantities of materials, and generate a complete material takeoff table and cost estimate with labor and materials broken down.',
+        preferredProviders: ['claude', 'openai'],
       });
+
+      if (!response.data?.success) {
+        throw new Error(response.data?.error || 'Vision analysis failed');
+      }
+
+      setMessages(prev => [...prev, {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: response.data.output,
+      }]);
+      setInput('');
     } catch (err) {
       console.error('Blueprint analysis error:', err);
-      toast.error('Failed to send blueprint: ' + err.message);
+      setMessages(prev => [...prev, {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: `Error analyzing blueprint: ${err.message}. Please ensure your Claude or OpenAI API key is configured in Settings.`,
+        error: true,
+      }]);
+      toast.error('Vision analysis failed: ' + err.message);
+    } finally {
       setLoading(false);
     }
   };
 
-  const isBlueprintAgent = agent.id === 'blueprint_analyzer';
   const isReady = !!conversation;
 
   const agentColor = agent.color || 'from-blue-500 to-blue-600';
