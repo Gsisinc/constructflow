@@ -94,6 +94,8 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     }
   };
 
+  const isReady = !!conversation;
+
   const agentColor = agent.color || 'from-blue-500 to-blue-600';
 
   return (
