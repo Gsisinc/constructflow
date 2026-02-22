@@ -95,6 +95,24 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     }
   };
 
+  const handleBlueprintAnalysis = async (imageUrl) => {
+    if (!conversation || loading) return;
+    setLoading(true);
+    setInput('');
+    try {
+      // First show the user action in chat
+      await base44.agents.addMessage(conversation, {
+        role: 'user',
+        content: `[Blueprint uploaded] Please analyze this drawing and generate a full quantity takeoff and cost estimate. Image: ${imageUrl}`
+      });
+    } catch (err) {
+      console.error('Blueprint analysis error:', err);
+      toast.error('Failed to send blueprint: ' + err.message);
+      setLoading(false);
+    }
+  };
+
+  const isBlueprintAgent = agent.id === 'blueprint_analyzer';
   const isReady = !!conversation;
 
   const agentColor = agent.color || 'from-blue-500 to-blue-600';
