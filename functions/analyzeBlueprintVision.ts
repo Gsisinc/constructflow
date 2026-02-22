@@ -55,7 +55,39 @@ CRITICAL: You MUST return ONLY valid JSON matching this exact schema, no extra t
   "notes": "any important notes"
 }`;
 
-async function analyzeWithClaude(imageUrl, userPrompt, apiKey) {
+function parseResult(rawText) {
+  try {
+    return JSON.parse(rawText);
+  } catch {
+    const match = rawText.match(/\{[\s\S]*\}/);
+    if (match) {
+      try { return JSON.parse(match[0]); } catch {}
+    }
+  }
+  return null;
+}
+
+// Build the image content block based on whether it's a URL or base64 data URL
+function buildImageContent(imageData) {
+  if (imageData.startsWith('data:')) {
+    // Base64 data URL: data:<mediaType>;base64,<data>
+    const [header, base64Data] = imageData.split(',');
+    const mediaType = header.replace('data:', '').replace(';base64', '');
+    const supportedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const mt = supportedTypes.includes(mediaType) ? mediaType : 'image/png';
+    return {
+      type: 'image',
+      source: { type: 'base64', media_type: mt, data: base64Data }
+    };
+  }
+  // Regular URL
+  return {
+    type: 'image',
+    source: { type: 'url', url: imageData }
+  };
+}
+
+async function analyzeWithClaude(imageData, userPrompt, apiKey) {
   const modelsToTry = [
     'claude-3-5-sonnet-20241022',
     'claude-3-5-haiku-20241022',
@@ -65,6 +97,13 @@ async function analyzeWithClaude(imageUrl, userPrompt, apiKey) {
 
   let lastError = '';
   for (const model of modelsToTry) {
+    // Build content - support multiple images (pages)
+    const images = Array.isArray(imageData) ? imageData : [imageData];
+    const content = [
+      ...images.map(img => buildImageContent(img)),
+      { type: 'text', text: userPrompt || 'Analyze this blueprint and return a complete quantity takeoff and cost estimate as JSON.' }
+    ];
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -76,15 +115,7 @@ async function analyzeWithClaude(imageUrl, userPrompt, apiKey) {
         model,
         max_tokens: model.includes('haiku') ? 4096 : 8096,
         system: SYSTEM_PROMPT,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'image', source: { type: 'url', url: imageUrl } },
-              { type: 'text', text: userPrompt || 'Analyze this blueprint and return a complete quantity takeoff and cost estimate as JSON.' },
-            ],
-          },
-        ],
+        messages: [{ role: 'user', content }],
       }),
     });
 
@@ -101,7 +132,19 @@ async function analyzeWithClaude(imageUrl, userPrompt, apiKey) {
   throw new Error(`Claude vision failed: ${lastError}`);
 }
 
-async function analyzeWithOpenAI(imageUrl, userPrompt, apiKey) {
+async function analyzeWithOpenAI(imageData, userPrompt, apiKey) {
+  const images = Array.isArray(imageData) ? imageData : [imageData];
+
+  const content = [
+    ...images.map(img => {
+      if (img.startsWith('data:')) {
+        return { type: 'image_url', image_url: { url: img, detail: 'high' } };
+      }
+      return { type: 'image_url', image_url: { url: img, detail: 'high' } };
+    }),
+    { type: 'text', text: userPrompt || 'Analyze this blueprint and return a complete quantity takeoff and cost estimate as JSON.' }
+  ];
+
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
@@ -111,13 +154,7 @@ async function analyzeWithOpenAI(imageUrl, userPrompt, apiKey) {
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
-        {
-          role: 'user',
-          content: [
-            { type: 'image_url', image_url: { url: imageUrl, detail: 'high' } },
-            { type: 'text', text: userPrompt || 'Analyze this blueprint and return a complete quantity takeoff and cost estimate as JSON.' },
-          ],
-        },
+        { role: 'user', content }
       ],
     }),
   });
@@ -133,21 +170,6 @@ async function analyzeWithOpenAI(imageUrl, userPrompt, apiKey) {
   return { provider: 'openai', model: 'gpt-4o', rawText };
 }
 
-function parseResult(rawText) {
-  // Try to extract JSON from the response
-  try {
-    // Direct parse
-    return JSON.parse(rawText);
-  } catch {
-    // Try to extract JSON block
-    const match = rawText.match(/\{[\s\S]*\}/);
-    if (match) {
-      try { return JSON.parse(match[0]); } catch {}
-    }
-  }
-  return null;
-}
-
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -155,12 +177,15 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { imageUrl, prompt, preferredProviders = ['claude', 'openai'] } = body || {};
+    const { imageUrl, imageUrls, prompt, preferredProviders = ['claude', 'openai'] } = body || {};
 
-    if (!imageUrl) return Response.json({ error: 'imageUrl is required' }, { status: 400 });
+    // Support both single imageUrl and multiple imageUrls (for PDF pages)
+    const imageData = imageUrls && imageUrls.length > 0 ? imageUrls : imageUrl;
+    if (!imageData) return Response.json({ error: 'imageUrl or imageUrls is required' }, { status: 400 });
 
-    const claudeKey = Deno.env.get('VITE_CLAUDE_API_KEY');
-    const openaiKey = Deno.env.get('VITE_OPENAI_API_KEY');
+    // Read API keys - try both with and without VITE_ prefix
+    const claudeKey = Deno.env.get('VITE_CLAUDE_API_KEY') || Deno.env.get('CLAUDE_API_KEY');
+    const openaiKey = Deno.env.get('VITE_OPENAI_API_KEY') || Deno.env.get('OPENAI_API_KEY');
 
     const errors = [];
 
@@ -168,11 +193,11 @@ Deno.serve(async (req) => {
       try {
         let result;
         if (provider === 'claude' && claudeKey) {
-          result = await analyzeWithClaude(imageUrl, prompt, claudeKey);
+          result = await analyzeWithClaude(imageData, prompt, claudeKey);
         } else if (provider === 'openai' && openaiKey) {
-          result = await analyzeWithOpenAI(imageUrl, prompt, openaiKey);
+          result = await analyzeWithOpenAI(imageData, prompt, openaiKey);
         } else {
-          errors.push(`${provider}: API key not configured`);
+          errors.push(`${provider}: API key not configured (checked VITE_${provider.toUpperCase()}_API_KEY and ${provider.toUpperCase()}_API_KEY)`);
           continue;
         }
 
