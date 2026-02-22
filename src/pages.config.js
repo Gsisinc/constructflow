@@ -121,7 +121,6 @@ import TrainingManagement from './pages/TrainingManagement';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import TechnicianPortal from './pages/TechnicianPortal';
-import Dashboard from './pages/Dashboard';
 import CertificationRoadmap from './pages/CertificationRoadmap';
 import TrainingMaterials from './pages/TrainingMaterials';
 import TeamSkillsMatrix from './pages/TeamSkillsMatrix';
@@ -205,7 +204,6 @@ export const PAGES = {
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
     "TechnicianPortal": TechnicianPortal,
-    "Dashboard": Dashboard,
     "CertificationRoadmap": CertificationRoadmap,
     "TrainingMaterials": TrainingMaterials,
     "TeamSkillsMatrix": TeamSkillsMatrix,
