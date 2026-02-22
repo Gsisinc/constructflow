@@ -3,8 +3,9 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 async function analyzeWithClaude(imageUrl, userPrompt, apiKey) {
   const modelsToTry = [
     'claude-3-5-sonnet-20241022',
+    'claude-3-5-haiku-20241022',
     'claude-3-opus-20240229',
-    'claude-3-sonnet-20240229',
+    'claude-3-haiku-20240307',
   ];
 
   let lastError = '';
