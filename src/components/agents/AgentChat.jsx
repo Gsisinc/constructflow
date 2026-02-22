@@ -4,12 +4,9 @@ import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Send, X, Paperclip, Bot, User, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Loader2, Send, X, Paperclip, Bot, User, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
-import { buildAgentSystemPrompt } from '@/config/agentWorkflows';
-import { shouldInvokeLiveDiscovery } from '@/config/agentRuntimeRules';
-import { fetchDiscoveryFromSources } from '@/lib/bidDiscoveryOrchestrator';
 
 export default function AgentChat({ agent, onClose, initialPrompt }) {
   const { user } = useAuth();
@@ -17,9 +14,11 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [conversation, setConversation] = useState(null);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const sentInitial = useRef(false);
+  const unsubscribeRef = useRef(null);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -27,94 +26,54 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     }
   }, [messages.length]);
 
+  // Init conversation and subscribe
   useEffect(() => {
-    if (initialPrompt && !sentInitial.current) {
+    let cancelled = false;
+    const init = async () => {
+      try {
+        const conv = await base44.agents.createConversation({ agent_name: agent.id });
+        if (cancelled) return;
+        setConversation(conv);
+
+        unsubscribeRef.current = base44.agents.subscribeToConversation(conv.id, (updated) => {
+          const agentMessages = updated.messages
+            .filter(m => m.role === 'assistant' || m.role === 'user')
+            .map(m => ({ id: m.id || crypto.randomUUID(), role: m.role, content: m.content }));
+          setMessages(agentMessages);
+          setLoading(false);
+        });
+      } catch (err) {
+        console.error('Failed to create conversation:', err);
+        toast.error('Could not start agent conversation: ' + err.message);
+      }
+    };
+    init();
+    return () => {
+      cancelled = true;
+      if (unsubscribeRef.current) unsubscribeRef.current();
+    };
+  }, [agent.id]);
+
+  // Send initial prompt once conversation is ready
+  useEffect(() => {
+    if (conversation && initialPrompt && !sentInitial.current) {
       sentInitial.current = true;
       setTimeout(() => sendMessage(initialPrompt), 200);
     }
-  }, [initialPrompt]);
+  }, [conversation, initialPrompt]);
 
   const sendMessage = async (overrideText) => {
     const text = typeof overrideText === 'string' ? overrideText.trim() : input.trim();
-    if (!text || loading) return;
+    if (!text || loading || !conversation) return;
 
     setInput('');
     setLoading(true);
 
-    const userMsg = { id: crypto.randomUUID(), role: 'user', content: text };
-    setMessages(prev => [...prev, userMsg]);
-
     try {
-      let userMessageForLLM = text;
-
-      // Market Intelligence: trigger live discovery when user asks for opportunities
-      if (agent.id === 'market_intelligence' && shouldInvokeLiveDiscovery(agent.id, text)) {
-        try {
-          const lower = text.toLowerCase();
-          const stateMatch = lower.match(/\b(california|ca|texas|florida|new york|washington)\b/);
-          const filters = {
-            state: stateMatch ? (stateMatch[1] === 'ca' ? 'California' : stateMatch[1].replace(/\b\w/g, c => c.toUpperCase())) : 'California',
-            workType: 'all',
-            classification: 'all'
-          };
-          const { opportunities = [] } = await fetchDiscoveryFromSources({
-            base44Client: base44,
-            filters,
-            page: 1,
-            pageSize: 25
-          });
-          if (opportunities.length > 0) {
-            discoverySummary = opportunities.slice(0, 15).map((opp, i) =>
-              `${i + 1}. ${opp.title || 'Untitled'} | ${opp.agency || 'N/A'} | ${opp.location || 'N/A'} | Due: ${opp.due_date || 'N/A'} | ${opp.url ? opp.url : ''}`
-            ).join('\n');
-            userMessageForLLM = `${text}\n\n[Live discovery results from SAM.gov and county portals - use these real opportunities in your response. Do not fabricate; only reference these.]\n${discoverySummary}`;
-          } else {
-            userMessageForLLM = `${text}\n\n[Live discovery was run but no opportunities were returned from sources. State this clearly and suggest checking filters or SAM.gov API key.]`;
-          }
-        } catch (discoveryErr) {
-          console.warn('Live discovery failed:', discoveryErr);
-          userMessageForLLM = `${text}\n\n[Live discovery could not be completed (${discoveryErr.message}). Answer from your workflow and advise the user to try the Bid Discovery page or check API configuration.]`;
-        }
-      }
-
-      const systemPrompt = buildAgentSystemPrompt(agent.id) || `You are ${agent.name}, a specialized AI assistant for construction project management.
-${agent.description ? `Your role: ${agent.description}` : ''}
-
-CRITICAL RULES:
-- NEVER ask the user for project IDs, database IDs, or technical identifiers.
-- NEVER ask multiple clarifying questions before responding. Answer immediately with your best knowledge.
-- If context is missing, make reasonable assumptions and state them, then provide a useful answer.
-- Provide direct, actionable responses. If asked for an estimate, give a real estimate with numbers.
-- Format responses with clear sections and bullet points where helpful.
-- Be concise and helpful - treat the user as a construction professional who needs quick answers.`;
-
-      const response = await base44.functions.invoke('invokeExternalLLM', {
-        prompt: userMessageForLLM,
-        systemPrompt,
-        preferredProviders: ['claude', 'openai'],
-      });
-
-      if (!response.data?.success) {
-        throw new Error(response.data?.error || 'LLM call failed');
-      }
-
-      const content = response.data?.output || '';
-
-      setMessages(prev => [...prev, {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: content || 'I could not generate a response. Please try again.'
-      }]);
+      await base44.agents.addMessage(conversation, { role: 'user', content: text });
     } catch (err) {
-      console.error('LLM error:', err);
-      setMessages(prev => [...prev, {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: `Error: ${err.message}. Please try again.`,
-        error: true
-      }]);
-      toast.error('Agent error: ' + err.message);
-    } finally {
+      console.error('Send error:', err);
+      toast.error('Failed to send message: ' + err.message);
       setLoading(false);
     }
   };
