@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-// PAGES will be passed as a prop or handled via a different mechanism to avoid circular dependency
-// For now, we'll assume the pages are available or use a safer way to access them
 import {
   LayoutDashboard,
   Clock,
@@ -149,7 +147,6 @@ const menuSections = [
   }
 ];
 
-
 export default function MegaMenu({ isOpen, onClose }) {
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -171,23 +168,23 @@ export default function MegaMenu({ isOpen, onClose }) {
         onClick={onClose}
       />
       
-      {/* Mega Menu - Mobile optimized */}
-      <div className="fixed left-0 right-0 top-14 sm:top-16 lg:left-64 lg:right-auto z-50 bg-white border-b lg:border-r border-slate-200 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto" role="dialog" aria-modal="true" aria-label="Quick access navigation">
-        <div className="p-2 sm:p-3 lg:p-4">
+      {/* Mega Menu - Professional Design */}
+      <div className="fixed left-0 right-0 top-14 sm:top-16 lg:left-64 lg:right-auto z-50 bg-white border-b lg:border-r border-slate-200 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto shadow-lg" role="dialog" aria-modal="true" aria-label="Quick access navigation">
+        <div className="p-3 sm:p-4 lg:p-5">
           {/* Header */}
-          <div className="flex items-center justify-between mb-2 sm:mb-3 pb-2 sm:pb-3 border-b border-slate-200 lg:mb-4">
-            <h2 className="text-sm sm:text-base lg:text-lg font-bold text-slate-900">Quick Access</h2>
-            <button onClick={onClose} className="h-8 w-8 lg:hidden rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-600">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900">Quick Access</h2>
+            <button onClick={onClose} className="h-8 w-8 lg:hidden rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors">
               <X className="h-4 w-4" />
             </button>
           </div>
           
-          {/* Menu Grid - Responsive columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-1 sm:gap-1.5">
+          {/* Menu Grid - Professional card layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {menuSections.map((section, idx) => (
-              <div key={idx} className="min-w-0">
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 pl-1 hidden sm:block lg:block">{section.title}</h3>
-                <div className="space-y-0.5">
+              <div key={idx} className="bg-slate-50 rounded-lg p-3 border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
+                <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-2">{section.title}</h3>
+                <div className="space-y-1">
                   {section.items.map((item, itemIdx) => {
                     const Icon = item.icon;
                     return (
@@ -195,12 +192,12 @@ export default function MegaMenu({ isOpen, onClose }) {
                         key={itemIdx}
                         to={createPageUrl(item.page)}
                         onClick={onClose}
-                        className="flex flex-col sm:flex-row lg:flex-row items-center sm:items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all group"
+                        className="flex items-center gap-2 px-2 py-1.5 text-xs font-medium text-slate-700 hover:text-blue-600 hover:bg-white rounded-md transition-all group"
                       >
-                        <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-md bg-slate-100 flex items-center justify-center group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors flex-shrink-0">
-                          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        <div className="h-5 w-5 rounded-md bg-slate-200 flex items-center justify-center group-hover:bg-blue-200 group-hover:text-blue-600 transition-colors flex-shrink-0">
+                          <Icon className="h-3 w-3" />
                         </div>
-                        <span className="text-center sm:text-left truncate text-xs sm:text-sm">{item.label}</span>
+                        <span className="truncate">{item.label}</span>
                       </Link>
                     );
                   })}
