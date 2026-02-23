@@ -11,7 +11,8 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
   const visionStatus = getVisionKeyStatus();
-  const hasVisionKey = visionStatus === 'claude' || visionStatus === 'openai';
+  // Always allow analysis if we have a system key or a local key
+  const hasVisionKey = visionStatus === 'claude' || visionStatus === 'openai' || !!import.meta.env.VITE_OPENAI_API_KEY;
   const isPdf = selectedFile?.type === 'application/pdf';
 
   const handleFile = (file) => {
@@ -125,11 +126,7 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
         </div>
       )}
 
-      {!hasVisionKey && (imageUrl || selectedFile) && (
-        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
-          Add an API key first: Settings → AI Agents (OpenAI or Claude), enter key and Save. Or add VITE_OPENAI_API_KEY or VITE_CLAUDE_API_KEY to .env.local and restart the dev server.
-        </p>
-      )}
+      {/* Key warning removed as system keys are now provided via .env.local */}
       {imageUrl && (
         <Button
           onClick={handleAnalyze}

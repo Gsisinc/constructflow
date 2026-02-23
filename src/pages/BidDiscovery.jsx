@@ -32,6 +32,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { parseLlmJsonResponse } from '@/lib/llmResponse';
 import { searchBidsFromSam } from '@/lib/bidDiscoverySearch';
+import { fetchRealBidOpportunities } from '@/services/realBidDiscoveryService';
 import { callAgent } from '@/services/llmService';
 
 const marketIntelligenceAgent = {
@@ -217,29 +218,27 @@ export default function BidDiscovery() {
     setSearching(true);
     const workTypeDisplay = workType.replace('_', ' ');
     if (!silent) {
-      toast.info(`🔍 Searching SAM.gov for ${searchQuery?.trim() || workTypeDisplay} in ${state} (page ${page})...`);
+      toast.info(`🔍 Searching SAM.gov & County Portals for ${searchQuery?.trim() || workTypeDisplay} in ${state}...`);
     }
 
     try {
-      const result = await searchBidsFromSam({
+      // Use unified real bid discovery service (SAM.gov + county scrapers)
+      const result = await fetchRealBidOpportunities({
         state,
-        workType,
-        classification,
-        keyword: searchQuery?.trim() || undefined,
+        workType: workType && workType !== 'all' ? workType : undefined,
+        classification: classification && classification !== 'all' ? classification : undefined,
+        cityCounty: cityCounty || undefined,
+        searchTerm: searchQuery?.trim() || undefined,
         page,
         pageSize: 250
       });
 
-      setSourceSummary([{
-        source: 'SAM.gov',
-        success: result.opportunities.length > 0,
-        count: result.opportunities.length,
-        error: result.message || null
-      }]);
+      // Display source summary from real discovery service
+      setSourceSummary(result.sources || []);
 
-      if (result.opportunities.length > 0) {
+      if (result.opportunities && result.opportunities.length > 0) {
         const nextResults = page === 1 ? result.opportunities : [...searchResults, ...result.opportunities];
-        const deduped = Array.from(new Map(nextResults.map((item) => [item.id || item.url || item.title, item])).values());
+        const deduped = Array.from(new Map(nextResults.map((item) => [item.id || item.external_id || item.url || item.title, item])).values());
 
         setSearchResults(deduped);
         setTotalPages(Math.max(page, totalPages));
@@ -247,7 +246,8 @@ export default function BidDiscovery() {
         setHasMore(result.opportunities.length >= 250);
         setCurrentPage(page);
         if (!silent) {
-          toast.success(`✓ Found ${deduped.length} opportunities from SAM.gov (all with source URL).`);
+          const sourceNames = result.sources?.map(s => s.name).join(', ') || 'multiple sources';
+          toast.success(`✓ Found ${deduped.length} real opportunities from ${sourceNames}.`);
         }
       } else {
         setSearchResults([]);
@@ -256,12 +256,17 @@ export default function BidDiscovery() {
           if (result.message) {
             toast.warning(result.message);
           } else {
-            toast.info(`No SAM.gov opportunities found. Try different filters or add VITE_SAM_GOV_API_KEY.`);
+            toast.info(`No opportunities found. Try different filters or check back later.`);
           }
         }
       }
+
+      // Log any errors from sources
+      if (result.errors && result.errors.length > 0) {
+        console.warn('⚠️ Errors from bid discovery sources:', result.errors);
+      }
     } catch (error) {
-      console.error('❌ SAM search error:', error);
+      console.error('❌ Bid discovery error:', error);
       toast.error('Search failed: ' + error.message);
     } finally {
       setSearching(false);
@@ -675,14 +680,14 @@ Provide:
               </div>
               <div className="min-w-0">
                 <h1 className="text-2xl sm:text-3xl font-bold truncate">Bid Discovery</h1>
-                <p className="text-blue-100 mt-1 text-sm sm:text-base">Search SAM.gov for real opportunities (all results include source URL)</p>
+                <p className="text-blue-100 mt-1 text-sm sm:text-base">Search federal (SAM.gov) and local (county) bid opportunities - real data only</p>
               </div>
             </div>
           </div>
           <div className="flex gap-2 shrink-0">
             <Button 
               variant="secondary"
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
               onClick={() => {
                 setAnalysisPrompt(null);
                 setShowAgentChat(true);
@@ -697,7 +702,7 @@ Provide:
 
         {/* Search Filters & Bar */}
         <div className="mt-4 sm:mt-6 space-y-3">
-          <div className="flex flex-wrap gap-2 sm:gap-3">
+          <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-2 sm:gap-3">
             <Select value={classification} onValueChange={setClassification}>
               <SelectTrigger className="w-full min-w-0 sm:w-[220px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="Classification" />
@@ -806,7 +811,7 @@ Provide:
             <p className="text-white text-sm font-medium">{buildSearchQuery()}</p>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -818,7 +823,7 @@ Provide:
               size="lg"
               onClick={handleSearch}
               disabled={searching}
-              className="bg-white text-blue-600 hover:bg-blue-50 gap-2 min-w-[140px]"
+              className="bg-white text-blue-600 hover:bg-blue-50 gap-2 w-full sm:min-w-[140px]"
             >
               {searching ? (
                 <>
@@ -914,18 +919,26 @@ Provide:
               {sourceSummary.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Source health</CardTitle>
-                    <CardDescription>SAM.gov search status.</CardDescription>
+                    <CardTitle className="text-base">Search Sources Status</CardTitle>
+                    <CardDescription>Real data from federal and local bid portals</CardDescription>
                   </CardHeader>
-                  <CardContent className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                  <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {sourceSummary.map((entry) => (
-                      <div key={entry.functionName} className="rounded-md border p-3 text-sm">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{entry.source}</span>
-                          <Badge variant={entry.success ? 'default' : 'outline'}>{entry.success ? 'ok' : 'issue'}</Badge>
+                      <div key={entry.name || entry.source} className={`rounded-lg border p-4 text-sm ${entry.success ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-semibold text-slate-900">{entry.name || entry.source}</span>
+                          <Badge variant={entry.success ? 'default' : 'secondary'} className={entry.success ? 'bg-green-600' : 'bg-amber-600'}>
+                            {entry.success ? '✓ Active' : '⚠ Limited'}
+                          </Badge>
                         </div>
-                        <p className="text-slate-500 mt-1">{entry.count} results</p>
-                        {entry.error && <p className="text-red-500 text-xs mt-1">{entry.error}</p>}
+                        <p className={`text-sm font-medium ${entry.success ? 'text-green-700' : 'text-amber-700'}`}>
+                          {entry.count} {entry.count === 1 ? 'opportunity' : 'opportunities'}
+                        </p>
+                        {entry.error && (
+                          <p className="text-amber-600 text-xs mt-2 bg-white/50 rounded px-2 py-1">
+                            {entry.error}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </CardContent>

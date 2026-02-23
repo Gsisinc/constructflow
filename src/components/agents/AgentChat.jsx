@@ -127,7 +127,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: `Error: ${err.message}. Add an API key in Settings → AI Agents (OpenAI or Claude), or set VITE_OPENAI_API_KEY / VITE_CLAUDE_API_KEY in .env.local and restart the dev server.`,
+        content: `Error: ${err.message}. Please check your connection or try again later.`,
         error: true,
       }]);
       toast.error(err.message);
@@ -141,8 +141,8 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
   const agentColor = agent.color || 'from-blue-500 to-blue-600';
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-2xl h-[80vh] flex flex-col shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-0 sm:p-4">
+      <Card className="w-full max-w-2xl h-full sm:h-[80vh] flex flex-col shadow-2xl rounded-none sm:rounded-xl">
         {/* Header */}
         <CardHeader className="border-b pb-4 flex-shrink-0">
           <div className="flex items-center justify-between">

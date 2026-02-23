@@ -133,14 +133,17 @@ export async function extractTextFromPDF(pdfFile) {
       throw new Error('OpenAI API key not found. Add VITE_OPENAI_API_KEY to .env.local and restart the dev server, or set it in AI Agents (OpenAI/Claude) settings.');
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const apiBase = import.meta.env.VITE_OPENAI_API_BASE || 'https://api.openai.com/v1';
+    const url = `${apiBase.replace(/\/$/, '')}/chat/completions`;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'user',
@@ -169,7 +172,6 @@ export async function extractTextFromPDF(pdfFile) {
     const data = await response.json();
     return data.choices[0].message.content;
   } catch (error) {
-    console.error('PDF extraction error:', error);
     throw error;
   }
 }
@@ -237,14 +239,17 @@ export async function analyzeBidDocument(document, isImage = false) {
       ];
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const apiBase = import.meta.env.VITE_OPENAI_API_BASE || 'https://api.openai.com/v1';
+    const url = `${apiBase.replace(/\/$/, '')}/chat/completions`;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: imageBase64 ? 'gpt-4-vision' : 'gpt-4-mini',
+        model: imageBase64 ? 'gpt-4o' : 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -278,7 +283,6 @@ export async function analyzeBidDocument(document, isImage = false) {
       };
     }
   } catch (error) {
-    console.error('Bid document analysis error:', error);
     throw error;
   }
 }
@@ -291,20 +295,23 @@ export async function analyzeBidDocument(document, isImage = false) {
 export async function analyzeDrawing(drawingFile) {
   try {
     const imageBase64 = await fileToBase64(drawingFile);
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+    const apiKey = getOpenAIKey();
 
     if (!apiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const apiBase = import.meta.env.VITE_OPENAI_API_BASE || 'https://api.openai.com/v1';
+    const url = `${apiBase.replace(/\/$/, '')}/chat/completions`;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
@@ -350,7 +357,6 @@ export async function analyzeDrawing(drawingFile) {
       };
     }
   } catch (error) {
-    console.error('Drawing analysis error:', error);
     throw error;
   }
 }
@@ -498,8 +504,7 @@ export function getVisionKeyStatus() {
   return null;
 }
 
-const NO_VISION_KEY_ERROR =
-  'No vision API key found. Do one of: (1) Go to Settings → AI Agents (OpenAI & Claude), enter your OpenAI or Claude key, click Save, then try again. (2) Or add VITE_OPENAI_API_KEY or VITE_CLAUDE_API_KEY to a file named .env.local in the project root (exact names), then restart the dev server (stop and run npm run dev again).';
+const NO_VISION_KEY_ERROR = 'Vision API key not found. Please check your configuration.';
 
 /** Blueprint analyzer capabilities — real vision analysis only, no fake data. */
 export const BLUEPRINT_ANALYZER_CAPABILITIES = [
@@ -511,7 +516,6 @@ export const BLUEPRINT_ANALYZER_CAPABILITIES = [
   'Categories: material, labor, equipment, subcontractor',
   'Summary: materials/labor/equipment/subcontractor subtotals, overhead, profit, total estimate',
   'Assumptions and notes only for real uncertainties',
-  'Requires Claude or OpenAI key: Settings → AI Agents, or VITE_CLAUDE_API_KEY / VITE_OPENAI_API_KEY in .env.local (then restart dev server)',
 ];
 
 /** Call Anthropic Claude with image (vision); returns raw text. */
@@ -628,7 +632,11 @@ export async function analyzeBlueprintWithVision(imageUrl, userPrompt = '', opti
       temperature: 0.1,
       max_tokens: 4096,
     };
-    let response = await fetch('https://api.openai.com/v1/chat/completions', {
+
+    const apiBase = import.meta.env.VITE_OPENAI_API_BASE || 'https://api.openai.com/v1';
+    const url = `${apiBase.replace(/\/$/, '')}/chat/completions`;
+
+    let response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -636,17 +644,22 @@ export async function analyzeBlueprintWithVision(imageUrl, userPrompt = '', opti
       },
       body: JSON.stringify(body),
     });
+
     if (!response.ok && response.status === 400) {
       const errBody = await response.json().catch(() => ({}));
       if (errBody.error?.code === 'invalid_model' || (errBody.error?.message && errBody.error.message.includes('model'))) {
         body.model = 'gpt-4-vision-preview';
-        response = await fetch('https://api.openai.com/v1/chat/completions', {
+        response = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openaiKey}` },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${openaiKey}`,
+          },
           body: JSON.stringify(body),
         });
       }
     }
+
     if (response.ok) {
       const data = await response.json();
       text = data.choices?.[0]?.message?.content;
