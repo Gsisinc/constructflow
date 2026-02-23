@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
-import { base44 } from '@/api/base44Client';
+// Do not import base44 at top level — Base44 can break the app; load dynamically so Dashboard still renders.
 
 // UI Components
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -295,10 +295,10 @@ export default function Dashboard() {
     queryKey: ['currentUser'],
     queryFn: async () => {
       try {
-        return await base44.auth.me();
-      } catch (e) {
-        return { id: '1', full_name: 'User', email: '', role: 'user', organization_id: 'org-1', avatar: null };
-      }
+        const { base44: b44 } = await import('@/api/base44Client');
+        if (b44?.auth?.me) return await b44.auth.me();
+      } catch (_) {}
+      return { id: '1', full_name: 'User', email: '', role: 'user', organization_id: 'org-1', avatar: null };
     },
     retry: false,
   });
@@ -307,7 +307,11 @@ export default function Dashboard() {
     queryKey: ['projects', user?.organization_id],
     queryFn: async () => {
       if (!user?.organization_id) return [];
-      return await base44.entities.Project.filter({ organization_id: user.organization_id });
+      try {
+        const { base44: b44 } = await import('@/api/base44Client');
+        if (b44?.entities?.Project?.filter) return await b44.entities.Project.filter({ organization_id: user.organization_id });
+      } catch (_) {}
+      return [];
     },
     enabled: !!user?.organization_id,
   });
@@ -316,7 +320,11 @@ export default function Dashboard() {
     queryKey: ['bids', user?.organization_id],
     queryFn: async () => {
       if (!user?.organization_id) return [];
-      return await base44.entities.BidOpportunity.filter({ organization_id: user.organization_id });
+      try {
+        const { base44: b44 } = await import('@/api/base44Client');
+        if (b44?.entities?.BidOpportunity?.filter) return await b44.entities.BidOpportunity.filter({ organization_id: user.organization_id });
+      } catch (_) {}
+      return [];
     },
     enabled: !!user?.organization_id,
   });

@@ -153,7 +153,7 @@ export const PAGES = {
     "CostLibrary": CostLibrary,
     "CostPlusInvoicing": CostPlusInvoicing,
     "DailyLog": DailyLog,
-    "Dashboard": dashboardImprovedVersion,
+    "Dashboard": dashboardImprovedVersion, // DO NOT replace with ./Dashboard — use improved version. App.jsx also enforces this.
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
     "Documents": Documents,
