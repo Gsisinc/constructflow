@@ -32,7 +32,9 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { parseLlmJsonResponse } from '@/lib/llmResponse';
 import { searchBidsFromSam } from '@/lib/bidDiscoverySearch';
+import { fetchRealBidOpportunities } from '@/services/realBidDiscoveryService';
 import { callAgent } from '@/services/llmService';
+import { useState } from 'react';
 
 const marketIntelligenceAgent = {
   id: 'market_intelligence',
@@ -217,29 +219,27 @@ export default function BidDiscovery() {
     setSearching(true);
     const workTypeDisplay = workType.replace('_', ' ');
     if (!silent) {
-      toast.info(`🔍 Searching SAM.gov for ${searchQuery?.trim() || workTypeDisplay} in ${state} (page ${page})...`);
+      toast.info(`🔍 Searching SAM.gov & County Portals for ${searchQuery?.trim() || workTypeDisplay} in ${state}...`);
     }
 
     try {
-      const result = await searchBidsFromSam({
+      // Use unified real bid discovery service (SAM.gov + county scrapers)
+      const result = await fetchRealBidOpportunities({
         state,
-        workType,
-        classification,
-        keyword: searchQuery?.trim() || undefined,
+        workType: workType && workType !== 'all' ? workType : undefined,
+        classification: classification && classification !== 'all' ? classification : undefined,
+        cityCounty: cityCounty || undefined,
+        searchTerm: searchQuery?.trim() || undefined,
         page,
         pageSize: 250
       });
 
-      setSourceSummary([{
-        source: 'SAM.gov',
-        success: result.opportunities.length > 0,
-        count: result.opportunities.length,
-        error: result.message || null
-      }]);
+      // Display source summary from real discovery service
+      setSourceSummary(result.sources || []);
 
-      if (result.opportunities.length > 0) {
+      if (result.opportunities && result.opportunities.length > 0) {
         const nextResults = page === 1 ? result.opportunities : [...searchResults, ...result.opportunities];
-        const deduped = Array.from(new Map(nextResults.map((item) => [item.id || item.url || item.title, item])).values());
+        const deduped = Array.from(new Map(nextResults.map((item) => [item.id || item.external_id || item.url || item.title, item])).values());
 
         setSearchResults(deduped);
         setTotalPages(Math.max(page, totalPages));
@@ -247,7 +247,8 @@ export default function BidDiscovery() {
         setHasMore(result.opportunities.length >= 250);
         setCurrentPage(page);
         if (!silent) {
-          toast.success(`✓ Found ${deduped.length} opportunities from SAM.gov (all with source URL).`);
+          const sourceNames = result.sources?.map(s => s.name).join(', ') || 'multiple sources';
+          toast.success(`✓ Found ${deduped.length} real opportunities from ${sourceNames}.`);
         }
       } else {
         setSearchResults([]);
@@ -256,12 +257,17 @@ export default function BidDiscovery() {
           if (result.message) {
             toast.warning(result.message);
           } else {
-            toast.info(`No SAM.gov opportunities found. Try different filters or add VITE_SAM_GOV_API_KEY.`);
+            toast.info(`No opportunities found. Try different filters or check back later.`);
           }
         }
       }
+
+      // Log any errors from sources
+      if (result.errors && result.errors.length > 0) {
+        console.warn('⚠️ Errors from bid discovery sources:', result.errors);
+      }
     } catch (error) {
-      console.error('❌ SAM search error:', error);
+      console.error('❌ Bid discovery error:', error);
       toast.error('Search failed: ' + error.message);
     } finally {
       setSearching(false);

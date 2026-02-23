@@ -22,46 +22,26 @@ export default function BidDiscoveryMobile() {
 
     setLoading(true);
     try {
-      // Mock data for demonstration
-      const mockBids = [
-        {
-          id: 1,
-          title: 'Commercial Building Renovation - California',
-          location: searchLocation || 'California',
-          budget: '$2.5M - $3.5M',
-          type: 'General Construction',
-          deadline: '2026-03-15',
-          source: 'SAM.gov',
-          agency: 'GSA'
-        },
-        {
-          id: 2,
-          title: 'HVAC System Installation',
-          location: searchLocation || 'California',
-          budget: '$150K - $250K',
-          type: 'HVAC',
-          deadline: '2026-03-20',
-          source: 'SAM.gov',
-          agency: 'Federal'
-        },
-        {
-          id: 3,
-          title: 'Infrastructure Repair Project',
-          location: searchLocation || 'California',
-          budget: '$1M - $2M',
-          type: 'Infrastructure',
-          deadline: '2026-03-25',
-          source: 'SAM.gov',
-          agency: 'State'
-        }
-      ];
-
-      setBids(mockBids);
+      // Use real bid discovery service (no mock data)
+      const { fetchRealBidOpportunities } = await import('@/services/realBidDiscoveryService');
+      const result = await fetchRealBidOpportunities({
+        state: searchLocation || 'California',
+        workType: workType || undefined,
+        pageSize: 20
+      });
+      
+      if (result.opportunities && result.opportunities.length > 0) {
+        setBids(result.opportunities);
+      } else {
+        setBids([]);
+        alert(result.message || 'No opportunities found. Try different filters or check back later.');
+      }
     } catch (error) {
       console.error('Error fetching bids:', error);
-      alert('Error fetching bids. Please check your API key.');
+      alert('Error fetching bids. Please check your API key and try again.');
     } finally {
       setLoading(false);
+    }
     }
   };
 
