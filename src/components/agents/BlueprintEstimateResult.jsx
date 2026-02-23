@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -108,6 +107,16 @@ export default function BlueprintEstimateResult({ result, imageUrl, onClose }) {
   const [editRow, setEditRow] = useState(null);
   const [saving, setSaving] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [canSaveToEstimates, setCanSaveToEstimates] = useState(false);
+
+  useEffect(() => {
+    import('@/api/base44Client')
+      .then((m) => {
+        const b = m?.base44;
+        setCanSaveToEstimates(!!(b?.entities?.BidOpportunity?.create && b?.entities?.BidEstimate?.create));
+      })
+      .catch(() => setCanSaveToEstimates(false));
+  }, []);
 
   const summary = result.summary || {};
   const fmt = (n) => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
@@ -139,8 +148,17 @@ export default function BlueprintEstimateResult({ result, imageUrl, onClose }) {
   };
 
   const handleAddToEstimates = async () => {
+    if (!canSaveToEstimates) {
+      toast.error('Saving to Estimates is unavailable. You can still export to CSV or Word.');
+      return;
+    }
     setSaving(true);
     try {
+      const { base44: b44 } = await import('@/api/base44Client');
+      if (!b44?.entities?.BidOpportunity?.create || !b44?.entities?.BidEstimate?.create) {
+        toast.error('Saving to Estimates is unavailable.');
+        return;
+      }
       // Compute live totals from edited items
       const matTotal = items.filter(i => i.category === 'material').reduce((s, i) => s + (i.total_cost || 0), 0);
       const labTotal = items.filter(i => i.category === 'labor').reduce((s, i) => s + (i.total_cost || 0), 0);
@@ -154,7 +172,7 @@ export default function BlueprintEstimateResult({ result, imageUrl, onClose }) {
       const total = base + ohAmt + prAmt;
 
       // Create a BidOpportunity placeholder and a BidEstimate
-      const bid = await base44.entities.BidOpportunity.create({
+      const bid = await b44.entities.BidOpportunity.create({
         title: `Blueprint Estimate — ${result.drawing_overview?.type || 'Drawing'} (${result.drawing_overview?.trade || ''})`,
         project_type: result.drawing_overview?.trade === 'low_voltage' ? 'low_voltage' :
           result.drawing_overview?.trade === 'electrical' ? 'electrical' :
@@ -165,7 +183,7 @@ export default function BlueprintEstimateResult({ result, imageUrl, onClose }) {
         estimated_value: total,
       });
 
-      await base44.entities.BidEstimate.create({
+      await b44.entities.BidEstimate.create({
         bid_opportunity_id: bid.id,
         line_items: items,
         material_cost: matTotal,
@@ -279,7 +297,7 @@ export default function BlueprintEstimateResult({ result, imageUrl, onClose }) {
 
           {/* Actions */}
           <div className="flex flex-wrap gap-2 pt-1">
-            <Button size="sm" onClick={handleAddToEstimates} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5">
+            <Button size="sm" onClick={handleAddToEstimates} disabled={saving || !canSaveToEstimates} title={!canSaveToEstimates ? 'Save to Estimates unavailable' : undefined} className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5">
               <Plus className="h-3.5 w-3.5" />
               {saving ? 'Saving...' : 'Add to Estimates'}
             </Button>

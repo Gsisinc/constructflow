@@ -5,6 +5,9 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   logLevel: 'error', // Suppress warnings, only show errors
+  optimizeDeps: {
+    include: ['pdfjs-dist/build/pdf.mjs'],
+  },
   server: {
     proxy: {
       // Forward /api to Base44 backend so auth and public-settings work locally

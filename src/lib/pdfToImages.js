@@ -1,22 +1,33 @@
 /**
  * Render PDF file to one image per page (data URLs) for vision API.
- * Uses pdfjs-dist; worker is configured on first use (CDN).
+ * Uses pdfjs-dist v4; worker configured for Vite (bundled) or CDN fallback.
  */
 
 let workerInitialized = false;
+let pdfjsModule = null;
+
+async function getPdfJs() {
+  if (pdfjsModule) return pdfjsModule;
+  try {
+    pdfjsModule = await import('pdfjs-dist/build/pdf.mjs');
+  } catch (e1) {
+    try {
+      pdfjsModule = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    } catch (e2) {
+      throw new Error('pdfjs-dist could not be loaded. Run: npm install pdfjs-dist');
+    }
+  }
+  pdfjsModule = pdfjsModule?.default || pdfjsModule;
+  return pdfjsModule;
+}
 
 async function initWorker() {
   if (workerInitialized) return;
-  try {
-    const pdfjs = await import('pdfjs-dist/build/pdf.mjs');
-    if (pdfjs.GlobalWorkerOptions && !pdfjs.GlobalWorkerOptions.workerSrc) {
-      pdfjs.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs';
-    }
-    workerInitialized = true;
-  } catch (e) {
-    console.warn('pdfjs-dist worker init:', e);
-    throw e;
+  const pdfjs = await getPdfJs();
+  if (pdfjs.GlobalWorkerOptions && !pdfjs.GlobalWorkerOptions.workerSrc) {
+    pdfjs.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs';
   }
+  workerInitialized = true;
 }
 
 /**
@@ -28,12 +39,12 @@ async function initWorker() {
 export async function pdfToPageDataUrls(pdfFile, options = {}) {
   const { scale = 2, maxPages = 50 } = options;
   await initWorker();
-  const pdfjs = await import('pdfjs-dist/build/pdf.mjs');
+  const pdfjs = await getPdfJs();
   const getDocument = pdfjs.getDocument || pdfjs.default?.getDocument;
   if (!getDocument) throw new Error('pdfjs-dist: getDocument not found');
   const arrayBuffer = await pdfFile.arrayBuffer();
   const loadingTask = getDocument({ data: new Uint8Array(arrayBuffer) });
-  const pdf = await loadingTask.promise;
+  const pdf = await (loadingTask.promise || loadingTask);
   const numPages = Math.min(pdf.numPages, maxPages);
   const out = [];
 
@@ -44,10 +55,11 @@ export async function pdfToPageDataUrls(pdfFile, options = {}) {
     canvas.width = viewport.width;
     canvas.height = viewport.height;
     const ctx = canvas.getContext('2d');
-    await page.render({
+    const renderTask = page.render({
       canvasContext: ctx,
       viewport,
-    }).promise;
+    });
+    await (renderTask.promise || renderTask);
     const dataUrl = canvas.toDataURL('image/png');
     out.push({ pageIndex: i, dataUrl });
   }
