@@ -129,6 +129,7 @@ export default function Layout({ children, currentPageName }) {
 
   const isHomePage = currentPageName === 'Home';
   const isOnboardingPage = currentPageName === 'Onboarding';
+  const isLandingPage = currentPageName === 'Landing';
   const isRootPage = location.pathname === '/';
 
   useEffect(() => {
@@ -138,7 +139,7 @@ export default function Layout({ children, currentPageName }) {
         const isCallback = urlParams.has('code') || urlParams.has('state') || window.location.hash.includes('access_token');
         
         const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth && !isHomePage && !isCallback) {
+        if (!isAuth && !isHomePage && !isLandingPage && !isCallback) {
           navigate(createPageUrl('Home'));
           return;
         }
@@ -146,7 +147,7 @@ export default function Layout({ children, currentPageName }) {
         const userData = await base44.auth.me();
         setUser(userData);
         
-        if (!userData?.organization_id && currentPageName !== 'Onboarding' && !isHomePage) {
+        if (!userData?.organization_id && currentPageName !== 'Onboarding' && !isHomePage && !isLandingPage) {
           navigate(createPageUrl('Onboarding'));
           return;
         }
@@ -212,7 +213,8 @@ export default function Layout({ children, currentPageName }) {
     return `${h} ${s}% ${l}%`;
   }
 
-  if (isHomePage || isOnboardingPage) {
+  // Full-bleed pages (no sidebar): Home, Onboarding, Landing (marketing website)
+  if (isHomePage || isOnboardingPage || isLandingPage) {
     return children;
   }
 
@@ -428,7 +430,7 @@ export default function Layout({ children, currentPageName }) {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      {!isHomePage && <MobileBottomNav currentPageName={currentPageName} />}
+      {!isHomePage && !isLandingPage && <MobileBottomNav currentPageName={currentPageName} />}
     </div>
   );
 }

@@ -23,8 +23,9 @@ export default function Landing() {
     }
   };
 
+  // Open the app (same origin). Do not use external Manus dev URLs — they break the app flow.
   const openApp = () => {
-    window.open('https://5173-ibv0ufipzhz4ioehqbrog-abad2830.us2.manus.computer', '_blank');
+    window.location.href = window.location.origin + '/';
   };
 
   // Services data
