@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { BidListSkeleton } from '@/components/skeleton/SkeletonComponents';
@@ -34,7 +34,6 @@ import { parseLlmJsonResponse } from '@/lib/llmResponse';
 import { searchBidsFromSam } from '@/lib/bidDiscoverySearch';
 import { fetchRealBidOpportunities } from '@/services/realBidDiscoveryService';
 import { callAgent } from '@/services/llmService';
-import { useState } from 'react';
 
 const marketIntelligenceAgent = {
   id: 'market_intelligence',
