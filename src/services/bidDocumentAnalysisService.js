@@ -140,7 +140,7 @@ export async function extractTextFromPDF(pdfFile) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'user',
@@ -244,7 +244,7 @@ export async function analyzeBidDocument(document, isImage = false) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: imageBase64 ? 'gpt-4-vision' : 'gpt-4-mini',
+        model: imageBase64 ? 'gpt-4o' : 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -304,7 +304,7 @@ export async function analyzeDrawing(drawingFile) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',

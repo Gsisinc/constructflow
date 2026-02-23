@@ -6,14 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles, ChevronRight } from 'lucide-react';
+import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles, ChevronRight, Upload, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import EmptyState from '@/components/ui/EmptyState';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
+import { normalizeBidAnalysis } from '@/lib/bidAnalysis';
 
 const statusColors = {
   new: 'bg-blue-100 text-blue-800',
@@ -323,12 +325,145 @@ function BidForm({ bid, onSubmit }) {
     url: '',
     win_probability: 50
   });
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [aiPreview, setAiPreview] = useState(null);
+  const [activeTab, setActiveTab] = useState(bid ? 'manual' : 'upload');
+
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setUploading(true);
+    setAiPreview(null);
+    try {
+      const uploadedList = [];
+      for (const file of files) {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        uploadedList.push({ name: file.name, url: file_url, type: file.type, size: file.size });
+      }
+      setUploadedFiles((prev) => [...prev, ...uploadedList]);
+      toast.info('AI analyzing document...');
+      const llmResponse = await base44.integrations.Core.InvokeLLM({
+        prompt: `Analyze this bid/RFP document and extract: project title, agency/client name, location, estimated contract value (number), bid due date (YYYY-MM-DD), scope of work description, and project type (commercial/residential/industrial/government/infrastructure). Return JSON only.`,
+        file_urls: uploadedList.map((f) => f.url),
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            project_name: { type: 'string' },
+            agency: { type: 'string' },
+            client_name: { type: 'string' },
+            location: { type: 'string' },
+            estimated_value: { type: 'number' },
+            due_date: { type: 'string' },
+            description: { type: 'string' },
+            scope_of_work: { type: 'string' },
+            project_type: { type: 'string' }
+          }
+        }
+      });
+      let parsed = llmResponse;
+      if (typeof llmResponse === 'string') { try { parsed = JSON.parse(llmResponse); } catch { parsed = {}; } }
+      else if (llmResponse?.output) { parsed = typeof llmResponse.output === 'string' ? JSON.parse(llmResponse.output) : llmResponse.output; }
+      else if (llmResponse?.result) { parsed = typeof llmResponse.result === 'string' ? JSON.parse(llmResponse.result) : llmResponse.result; }
+      setAiPreview(parsed);
+      toast.success('AI extraction ready. Click Apply to fill form.');
+    } catch (err) {
+      toast.error('AI analysis failed: ' + (err.message || 'Unknown error'));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleApplyAi = () => {
+    if (!aiPreview) return;
+    setFormData((prev) => ({
+      ...prev,
+      title: aiPreview.title || aiPreview.project_name || prev.title,
+      project_name: aiPreview.project_name || aiPreview.title || prev.project_name,
+      agency: aiPreview.agency || prev.agency,
+      client_name: aiPreview.client_name || aiPreview.agency || prev.client_name,
+      location: aiPreview.location || prev.location,
+      estimated_value: aiPreview.estimated_value || prev.estimated_value,
+      due_date: aiPreview.due_date || prev.due_date,
+      description: aiPreview.description || prev.description,
+      scope_of_work: aiPreview.scope_of_work || aiPreview.description || prev.scope_of_work
+    }));
+    setAiPreview(null);
+    setActiveTab('manual');
+    toast.success('Form filled from AI extraction!');
+  };
 
   return (
-    <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+    <div className="space-y-4 max-h-[80vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>{bid ? 'Edit Bid' : 'Create New Bid'}</DialogTitle>
       </DialogHeader>
+      {!bid && (
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-2 w-full">
+            <TabsTrigger value="upload" className="gap-1.5">
+              <Sparkles className="h-3.5 w-3.5" /> Upload &amp; AI Fill
+            </TabsTrigger>
+            <TabsTrigger value="manual" className="gap-1.5">
+              <FileText className="h-3.5 w-3.5" /> Manual Entry
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="upload" className="space-y-3 mt-3">
+            <label className="cursor-pointer block">
+              <div className="border-2 border-dashed border-amber-300 rounded-xl p-6 hover:border-amber-500 hover:bg-amber-50 transition-all text-center">
+                {uploading ? (
+                  <div className="space-y-2">
+                    <Loader2 className="h-8 w-8 mx-auto text-amber-600 animate-spin" />
+                    <p className="text-sm text-slate-600">Uploading &amp; analyzing...</p>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="h-8 w-8 mx-auto text-amber-500 mb-2" />
+                    <p className="font-semibold text-slate-800">Drop bid document here</p>
+                    <p className="text-xs text-slate-500 mt-1">PDF, Word, Excel &middot; AI auto-fills all fields</p>
+                  </>
+                )}
+                <input type="file" multiple onChange={handleFileUpload} className="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" />
+              </div>
+            </label>
+            {uploadedFiles.length > 0 && (
+              <div className="space-y-1">
+                {uploadedFiles.map((f, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 rounded px-2 py-1">
+                    <FileText className="h-3.5 w-3.5 text-amber-600" />{f.name}
+                  </div>
+                ))}
+              </div>
+            )}
+            {aiPreview && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-sm font-semibold text-amber-800">
+                    <Sparkles className="h-4 w-4" /> AI Extracted
+                  </div>
+                  <Button size="sm" onClick={handleApplyAi} className="bg-amber-600 hover:bg-amber-700 text-white h-7 text-xs gap-1">
+                    <CheckCircle className="h-3.5 w-3.5" /> Apply
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {aiPreview.title && <div><span className="text-slate-500">Title:</span> <span className="font-medium">{aiPreview.title}</span></div>}
+                  {aiPreview.agency && <div><span className="text-slate-500">Agency:</span> <span className="font-medium">{aiPreview.agency}</span></div>}
+                  {aiPreview.estimated_value > 0 && <div><span className="text-slate-500">Value:</span> <span className="font-medium">${Number(aiPreview.estimated_value).toLocaleString()}</span></div>}
+                  {aiPreview.due_date && <div><span className="text-slate-500">Due:</span> <span className="font-medium">{aiPreview.due_date}</span></div>}
+                  {aiPreview.location && <div><span className="text-slate-500">Location:</span> <span className="font-medium">{aiPreview.location}</span></div>}
+                </div>
+              </div>
+            )}
+          </TabsContent>
+          <TabsContent value="manual" className="mt-0">
+            {/* manual fields rendered below */}
+          </TabsContent>
+        </Tabs>
+      )}
+      {/* Manual fields always shown when editing, or when on manual tab */}
+      {(bid || activeTab === 'manual') && (
+      <div className="space-y-4">
       <div>
         <label className="text-sm font-semibold">Bid Title *</label>
         <Input
@@ -440,7 +575,9 @@ function BidForm({ bid, onSubmit }) {
           placeholder="https://..."
         />
       </div>
-      <Button onClick={() => onSubmit(formData)} className="w-full bg-amber-600 hover:bg-amber-700">
+      </div>
+      )}
+      <Button onClick={() => onSubmit({ ...formData, source_files: uploadedFiles })} className="w-full bg-amber-600 hover:bg-amber-700 mt-4">
         {bid ? 'Update Bid' : 'Create Bid'}
       </Button>
     </div>
