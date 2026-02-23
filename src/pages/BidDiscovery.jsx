@@ -681,7 +681,7 @@ Provide:
               </div>
               <div className="min-w-0">
                 <h1 className="text-2xl sm:text-3xl font-bold truncate">Bid Discovery</h1>
-                <p className="text-blue-100 mt-1 text-sm sm:text-base">Search SAM.gov for real opportunities (all results include source URL)</p>
+                <p className="text-blue-100 mt-1 text-sm sm:text-base">Search federal (SAM.gov) and local (county) bid opportunities - real data only</p>
               </div>
             </div>
           </div>
@@ -920,18 +920,26 @@ Provide:
               {sourceSummary.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Source health</CardTitle>
-                    <CardDescription>SAM.gov search status.</CardDescription>
+                    <CardTitle className="text-base">Search Sources Status</CardTitle>
+                    <CardDescription>Real data from federal and local bid portals</CardDescription>
                   </CardHeader>
-                  <CardContent className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                  <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {sourceSummary.map((entry) => (
-                      <div key={entry.functionName} className="rounded-md border p-3 text-sm">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{entry.source}</span>
-                          <Badge variant={entry.success ? 'default' : 'outline'}>{entry.success ? 'ok' : 'issue'}</Badge>
+                      <div key={entry.name || entry.source} className={`rounded-lg border p-4 text-sm ${entry.success ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-semibold text-slate-900">{entry.name || entry.source}</span>
+                          <Badge variant={entry.success ? 'default' : 'secondary'} className={entry.success ? 'bg-green-600' : 'bg-amber-600'}>
+                            {entry.success ? '✓ Active' : '⚠ Limited'}
+                          </Badge>
                         </div>
-                        <p className="text-slate-500 mt-1">{entry.count} results</p>
-                        {entry.error && <p className="text-red-500 text-xs mt-1">{entry.error}</p>}
+                        <p className={`text-sm font-medium ${entry.success ? 'text-green-700' : 'text-amber-700'}`}>
+                          {entry.count} {entry.count === 1 ? 'opportunity' : 'opportunities'}
+                        </p>
+                        {entry.error && (
+                          <p className="text-amber-600 text-xs mt-2 bg-white/50 rounded px-2 py-1">
+                            {entry.error}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </CardContent>
