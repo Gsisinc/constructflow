@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Menu, X, ArrowRight, Star, CheckCircle2, Phone, Mail, MapPin, ExternalLink, Zap, Shield, Wifi, Volume2, Lock, Cable } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function Landing() {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [scrollY, setScrollY] = useState(0);
@@ -23,9 +25,9 @@ export default function Landing() {
     }
   };
 
-  // Open the app (same origin). Do not use external Manus dev URLs — they break the app flow.
+  // Navigate to the app dashboard
   const openApp = () => {
-    window.location.href = window.location.origin + '/';
+    navigate('/Home');
   };
 
   // Services data

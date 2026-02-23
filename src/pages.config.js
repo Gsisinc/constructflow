@@ -70,7 +70,7 @@ import ClientPortal from './pages/ClientPortal';
 import CostLibrary from './pages/CostLibrary';
 import CostPlusInvoicing from './pages/CostPlusInvoicing';
 import DailyLog from './pages/DailyLog';
-import dashboardImprovedVersion from './pages/Dashboard.ImprovedVersion';
+import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
 import Directory from './pages/Directory';
 import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
@@ -153,7 +153,7 @@ export const PAGES = {
     "CostLibrary": CostLibrary,
     "CostPlusInvoicing": CostPlusInvoicing,
     "DailyLog": DailyLog,
-    "Dashboard": dashboardImprovedVersion, // DO NOT replace with ./Dashboard — use improved version. App.jsx also enforces this.
+    "Dashboard": dashboardImprovedversion,
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
     "Documents": Documents,

@@ -152,10 +152,10 @@ export default function Layout({ children, currentPageName }) {
           return;
         }
 
-        if (isHomePage) {
-          navigate(createPageUrl('Bids'));
-          return;
-        }
+        if (isHomePage && isAuth) {
+            navigate(createPageUrl('Bids'));
+            return;
+          }
         
         if (userData?.organization_id) {
           const org = await base44.entities.Organization.filter({ id: userData.organization_id });
