@@ -51,9 +51,20 @@ export default function Bids() {
 
   const { data: bids = [], isLoading } = useQuery({
     queryKey: ['bids', user?.organization_id],
-    queryFn: () => base44.entities.BidOpportunity.filter({ 
-      organization_id: user.organization_id 
-    }),
+    queryFn: async () => {
+      const list = await base44.entities.BidOpportunity.filter({ 
+        organization_id: user.organization_id 
+      });
+      // Filter out demo bids
+      return list.filter(b => 
+        !b.title?.includes('Downtown Plaza') && 
+        !b.title?.includes('Highway 101') &&
+        !b.title?.includes('Springfield') &&
+        !b.project_name?.includes('Downtown Plaza') && 
+        !b.project_name?.includes('Highway 101') &&
+        !b.project_name?.includes('Springfield')
+      );
+    },
     enabled: !!user?.organization_id
   });
 

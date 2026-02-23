@@ -687,7 +687,7 @@ Provide:
           <div className="flex gap-2 shrink-0">
             <Button 
               variant="secondary"
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
               onClick={() => {
                 setAnalysisPrompt(null);
                 setShowAgentChat(true);
@@ -702,7 +702,7 @@ Provide:
 
         {/* Search Filters & Bar */}
         <div className="mt-4 sm:mt-6 space-y-3">
-          <div className="flex flex-wrap gap-2 sm:gap-3">
+          <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-2 sm:gap-3">
             <Select value={classification} onValueChange={setClassification}>
               <SelectTrigger className="w-full min-w-0 sm:w-[220px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="Classification" />
@@ -811,7 +811,7 @@ Provide:
             <p className="text-white text-sm font-medium">{buildSearchQuery()}</p>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -823,7 +823,7 @@ Provide:
               size="lg"
               onClick={handleSearch}
               disabled={searching}
-              className="bg-white text-blue-600 hover:bg-blue-50 gap-2 min-w-[140px]"
+              className="bg-white text-blue-600 hover:bg-blue-50 gap-2 w-full sm:min-w-[140px]"
             >
               {searching ? (
                 <>

@@ -4,22 +4,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
+import { base44 } from '@/api/base44Client';
 
 // UI Components
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 
 // Icons
 import {
-  LayoutDashboard,
   Briefcase,
   FileText,
   Users,
@@ -40,9 +37,6 @@ import {
   AlertCircle,
   Timer,
   Target,
-  BarChart3,
-  MessageSquare,
-  Star,
   Filter,
   Search,
 } from 'lucide-react';
@@ -76,10 +70,6 @@ const cardHoverVariants = {
   },
 };
 
-// ========================================
-// KPI Card Component
-// ========================================
-
 function KPICard({ title, value, change, changeType, icon: Icon, color, subtitle, onClick, trend }) {
   const isPositive = changeType === 'positive';
   
@@ -90,7 +80,6 @@ function KPICard({ title, value, change, changeType, icon: Icon, color, subtitle
           className="relative overflow-hidden cursor-pointer group border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-slate-800"
           onClick={onClick}
         >
-          {/* Background Gradient */}
           <div className={`absolute top-0 right-0 w-40 h-40 opacity-5 rounded-full -translate-y-1/2 translate-x-1/2 ${color}`} />
           
           <CardContent className="p-6">
@@ -98,7 +87,7 @@ function KPICard({ title, value, change, changeType, icon: Icon, color, subtitle
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</p>
-                  {trend && (
+                  {change && (
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
@@ -124,8 +113,7 @@ function KPICard({ title, value, change, changeType, icon: Icon, color, subtitle
               </div>
             </div>
             
-            {/* Progress Bar (if provided) */}
-            {trend && (
+            {trend !== undefined && (
               <div className="mt-4">
                 <div className="flex items-center justify-between text-xs mb-1">
                   <span className="text-slate-400">Progress</span>
@@ -140,10 +128,6 @@ function KPICard({ title, value, change, changeType, icon: Icon, color, subtitle
     </motion.div>
   );
 }
-
-// ========================================
-// Quick Action Button
-// ========================================
 
 function QuickAction({ icon: Icon, label, description, color, onClick, badge }) {
   return (
@@ -173,12 +157,8 @@ function QuickAction({ icon: Icon, label, description, color, onClick, badge }) 
   );
 }
 
-// ========================================
-// Project Card Component
-// ========================================
-
 function ProjectCard({ project, onClick }) {
-  const progress = project.progress || Math.round(Math.random() * 100);
+  const progress = project.progress || 0;
   const isOverdue = project.end_date && isPast(new Date(project.end_date)) && project.status !== 'completed';
   
   const statusConfig = {
@@ -197,7 +177,6 @@ function ProjectCard({ project, onClick }) {
         className="group cursor-pointer border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-white dark:bg-slate-800 overflow-hidden"
         onClick={onClick}
       >
-        {/* Status Bar */}
         <div className={`h-1 w-full ${progress === 100 ? 'bg-emerald-500' : progress > 50 ? 'bg-blue-500' : 'bg-amber-500'}`} />
         
         <CardContent className="p-5">
@@ -215,7 +194,6 @@ function ProjectCard({ project, onClick }) {
           </div>
           
           <div className="space-y-3">
-            {/* Progress */}
             <div>
               <div className="flex items-center justify-between text-sm mb-1.5">
                 <span className="text-slate-500 dark:text-slate-400">Progress</span>
@@ -229,7 +207,6 @@ function ProjectCard({ project, onClick }) {
               </div>
             </div>
             
-            {/* Footer */}
             <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
               <div className="flex items-center gap-2">
                 <Avatar className="h-7 w-7 border-2 border-white dark:border-slate-800">
@@ -262,10 +239,6 @@ function ProjectCard({ project, onClick }) {
     </motion.div>
   );
 }
-
-// ========================================
-// Activity Item Component
-// ========================================
 
 function ActivityItem({ activity }) {
   const iconConfig = {
@@ -303,18 +276,11 @@ function ActivityItem({ activity }) {
   );
 }
 
-// ========================================
-// Main Dashboard Component
-// ========================================
-
 export default function Dashboard() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [greeting, setGreeting] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
 
-  // Time and greeting
   useEffect(() => {
     const hour = currentTime.getHours();
     if (hour < 12) setGreeting('Good morning');
@@ -325,19 +291,11 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch user data (never throw so dashboard never goes blank)
   const { data: user, isLoading: loadingUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
       try {
-        return {
-          id: '1',
-          full_name: 'John Smith',
-          email: 'john@constructflow.com',
-          role: 'admin',
-          organization_id: 'org-1',
-          avatar: null,
-        };
+        return await base44.auth.me();
       } catch (e) {
         return { id: '1', full_name: 'User', email: '', role: 'user', organization_id: 'org-1', avatar: null };
       }
@@ -345,44 +303,23 @@ export default function Dashboard() {
     retry: false,
   });
 
-  // Fetch projects
   const { data: projects = [], isLoading: loadingProjects } = useQuery({
-    queryKey: ['projects', user?.organization_id ?? 'org-1'],
+    queryKey: ['projects', user?.organization_id],
     queryFn: async () => {
-      // Replace with actual API call
-      return [
-        { id: '1', name: 'Downtown Plaza Renovation', client_name: 'City of Springfield', status: 'in_progress', progress: 65, manager: 'Mike Johnson', end_date: '2024-06-15' },
-        { id: '2', name: 'Highway 101 Expansion', client_name: 'State DOT', status: 'in_progress', progress: 42, manager: 'Sarah Chen', end_date: '2024-08-30' },
-        { id: '3', name: 'Metro Office Complex', client_name: 'Metro Development', status: 'planning', progress: 15, manager: 'Tom Wilson', end_date: '2024-12-01' },
-        { id: '4', name: 'Harbor Bridge Repair', client_name: 'Port Authority', status: 'completed', progress: 100, manager: 'Lisa Park', end_date: '2024-01-20' },
-      ];
+      if (!user?.organization_id) return [];
+      return await base44.entities.Project.filter({ organization_id: user.organization_id });
     },
-    enabled: !!(user?.organization_id ?? 'org-1'),
+    enabled: !!user?.organization_id,
   });
 
-  // Fetch bids
   const { data: bids = [], isLoading: loadingBids } = useQuery({
-    queryKey: ['bids', user?.organization_id ?? 'org-1'],
+    queryKey: ['bids', user?.organization_id],
     queryFn: async () => {
-      // Replace with actual API call
-      return [
-        { id: '1', title: 'School District HVAC Upgrade', value: 2500000, status: 'new', deadline: '2024-03-15' },
-        { id: '2', title: 'Community Center Construction', value: 4500000, status: 'analyzing', deadline: '2024-03-20' },
-        { id: '3', title: 'Water Treatment Facility', value: 8200000, status: 'estimating', deadline: '2024-04-01' },
-      ];
+      if (!user?.organization_id) return [];
+      return await base44.entities.BidOpportunity.filter({ organization_id: user.organization_id });
     },
-    enabled: !!(user?.organization_id ?? 'org-1'),
+    enabled: !!user?.organization_id,
   });
-
-  // Mock activity data
-  const activities = useMemo(() => [
-    { id: '1', type: 'bid', title: 'New bid opportunity found', description: 'City Hall Renovation - $2.5M project in your area', timestamp: new Date(Date.now() - 1000 * 60 * 30) },
-    { id: '2', type: 'project', title: 'Project milestone completed', description: 'Foundation work completed for Downtown Plaza', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2) },
-    { id: '3', type: 'ai', title: 'AI Agent completed analysis', description: 'Market Intelligence found 3 new opportunities matching your criteria', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4) },
-    { id: '4', type: 'task', title: 'Task assigned to you', description: 'Review Q1 budget projections for Highway 101', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6) },
-    { id: '5', type: 'message', title: 'New message from Sarah Chen', description: 'Updated timeline for Metro Office Complex project', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8) },
-    { id: '6', type: 'alert', title: 'Budget alert', description: 'Downtown Plaza project approaching budget limit', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12) },
-  ], []);
 
   const isLoading = loadingUser || loadingProjects || loadingBids;
 
@@ -390,79 +327,56 @@ export default function Dashboard() {
   const newBids = bids.filter((b) => b.status === 'new');
   const completedProjects = projects.filter((p) => p.status === 'completed');
 
-  // KPI Data
   const kpiData = useMemo(() => [
     {
       title: 'Active Projects',
       value: activeProjects.length,
-      change: '+2',
-      changeType: 'positive',
       icon: Briefcase,
       color: 'bg-blue-500',
-      subtitle: `${completedProjects.length} completed this year`,
-      trend: Math.round((activeProjects.length / (projects.length || 1)) * 100),
+      subtitle: `${completedProjects.length} completed`,
+      trend: projects.length > 0 ? Math.round((activeProjects.length / projects.length) * 100) : 0,
       onClick: () => navigate(createPageUrl('Projects')),
     },
     {
       title: 'New Bids',
       value: newBids.length,
-      change: '+5',
-      changeType: 'positive',
       icon: FileText,
       color: 'bg-emerald-500',
-      subtitle: `$${(bids.reduce((acc, b) => acc + (b.value || 0), 0) / 1000000).toFixed(1)}M total value`,
-      trend: 78,
+      subtitle: `${bids.length} total bids`,
       onClick: () => navigate(createPageUrl('Bids')),
     },
     {
       title: 'Team Members',
-      value: '24',
-      change: '+3',
-      changeType: 'positive',
+      value: '0',
       icon: Users,
       color: 'bg-purple-500',
-      subtitle: '8 on field, 16 in office',
-      trend: 92,
-      onClick: () => navigate(createPageUrl('TeamManagement')),
+      subtitle: 'Directory',
+      onClick: () => navigate(createPageUrl('Directory')),
     },
     {
-      title: 'Monthly Revenue',
-      value: '$1.2M',
-      change: '+12%',
-      changeType: 'positive',
+      title: 'Revenue',
+      value: '$0',
       icon: DollarSign,
       color: 'bg-amber-500',
-      subtitle: 'On track for $14.4M annual',
-      trend: 85,
+      subtitle: 'Estimates',
       onClick: () => navigate(createPageUrl('Estimates')),
     },
-  ], [activeProjects.length, completedProjects.length, newBids.length, bids, projects.length, navigate]);
+  ], [activeProjects.length, completedProjects.length, newBids.length, bids.length, projects.length, navigate]);
 
-  // Quick actions
   const quickActions = [
     {
       icon: Plus,
       label: 'New Bid',
       description: 'Create a new bid opportunity',
       color: 'bg-blue-500',
-      badge: null,
-      onClick: () => {
-        toast.info('Create bid dialog coming soon!', {
-          description: 'This feature is under development',
-        });
-      },
+      onClick: () => navigate(createPageUrl('AddBid')),
     },
     {
       icon: Briefcase,
       label: 'New Project',
       description: 'Start a new project',
       color: 'bg-emerald-500',
-      badge: null,
-      onClick: () => {
-        toast.info('Create project dialog coming soon!', {
-          description: 'This feature is under development',
-        });
-      },
+      onClick: () => navigate(createPageUrl('Projects')),
     },
     {
       icon: Sparkles,
@@ -477,7 +391,6 @@ export default function Dashboard() {
       label: 'Find Bids',
       description: 'Discover new opportunities',
       color: 'bg-amber-500',
-      badge: null,
       onClick: () => navigate(createPageUrl('BidDiscovery')),
     },
   ];
@@ -490,7 +403,6 @@ export default function Dashboard() {
             <div className="h-8 w-64 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
             <div className="h-4 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
           </div>
-          <div className="h-10 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -501,12 +413,10 @@ export default function Dashboard() {
     );
   }
 
-  // Fallback so we never render blank (e.g. if user query failed)
-  const safeUser = user || { full_name: 'User', organization_id: 'org-1' };
+  const safeUser = user || { full_name: 'User' };
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-900/50">
-      {/* Header Section */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -532,11 +442,7 @@ export default function Dashboard() {
               <Button 
                 size="sm" 
                 className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
-                onClick={() => {
-                  toast.info('Create project coming soon!', {
-                    description: 'This feature is under development',
-                  });
-                }}
+                onClick={() => navigate(createPageUrl('Projects'))}
               >
                 <Plus className="h-4 w-4" />
                 New Project
@@ -546,21 +452,18 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      {/* Main Content */}
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"
       >
-        {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {kpiData.map((kpi, index) => (
             <KPICard key={index} {...kpi} />
           ))}
         </div>
 
-        {/* Quick Actions */}
         <motion.div variants={itemVariants}>
           <Card className="border-0 shadow-md bg-white dark:bg-slate-800">
             <CardHeader className="pb-3">
@@ -579,9 +482,7 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Projects Section */}
           <motion.div variants={itemVariants} className="lg:col-span-2 space-y-4">
             <Card className="border-0 shadow-md bg-white dark:bg-slate-800">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -595,10 +496,6 @@ export default function Dashboard() {
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" className="gap-1">
-                    <Filter className="h-4 w-4" />
-                    Filter
-                  </Button>
                   <Link to={createPageUrl('Projects')}>
                     <Button variant="ghost" size="sm" className="gap-1">
                       View all
@@ -619,7 +516,7 @@ export default function Dashboard() {
                     <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
                       Get started by creating your first project
                     </p>
-                    <Button>Create Project</Button>
+                    <Button onClick={() => navigate(createPageUrl('Projects'))}>Create Project</Button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -636,7 +533,6 @@ export default function Dashboard() {
             </Card>
           </motion.div>
 
-          {/* Activity Feed */}
           <motion.div variants={itemVariants}>
             <Card className="border-0 shadow-md bg-white dark:bg-slate-800 h-full">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -647,39 +543,18 @@ export default function Dashboard() {
                   </CardTitle>
                   <CardDescription>Latest updates from your team</CardDescription>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => toast.info('Mark all as read')}>Mark all as read</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => toast.info('Notification settings')}>Notification settings</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="space-y-1">
-                    {activities.map((activity) => (
-                      <ActivityItem key={activity.id} activity={activity} />
-                    ))}
-                  </div>
-                </ScrollArea>
-                <Button variant="ghost" className="w-full mt-4" size="sm">
-                  View all activity
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
+                <div className="text-center py-12">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No recent activity</p>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
         </div>
 
-        {/* AI Agents Banner */}
         <motion.div variants={itemVariants}>
           <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 text-white overflow-hidden relative">
-            {/* Decorative elements */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
             
@@ -699,10 +574,6 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                    <span className="text-sm font-medium">All agents active</span>
-                  </div>
                   <Link to={createPageUrl('AIAgents')}>
                     <Button 
                       variant="secondary" 

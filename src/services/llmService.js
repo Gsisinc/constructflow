@@ -5,7 +5,7 @@
 
 // (Fallback/template logic removed — real API responses only.)
 
-const NO_LLM_ERROR = 'No LLM configured. Add VITE_CLAUDE_API_KEY or VITE_OPENAI_API_KEY to .env.local in the project root, then restart the dev server (stop and run npm run dev again).';
+const NO_LLM_ERROR = 'AI service is currently unavailable. Please check your connection or try again later.';
 
 /** Call Anthropic Claude API */
 async function callClaude(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {

@@ -33,7 +33,15 @@ export default function Projects() {
 
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['projects', user?.organization_id],
-    queryFn: () => base44.entities.Project.filter({ organization_id: user?.organization_id }, '-created_date'),
+    queryFn: async () => {
+      const list = await base44.entities.Project.filter({ organization_id: user?.organization_id }, '-created_date');
+      // Filter out demo projects
+      return list.filter(p => 
+        !p.name?.includes('Downtown Plaza') && 
+        !p.name?.includes('Highway 101') &&
+        !p.name?.includes('Springfield')
+      );
+    },
     enabled: !!user?.organization_id
   });
 

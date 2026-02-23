@@ -145,7 +145,7 @@ export default function AIAgents() {
           <section>
             <div className="mb-6 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white p-6 shadow-xl">
               <h2 className="text-xl font-bold flex items-center gap-2">Custom Agents</h2>
-              <p className="text-white/90 text-sm mt-1">Real AI (Claude or OpenAI). Add API keys in .env.local for live responses.</p>
+              <p className="text-white/90 text-sm mt-1">Specialized AI agents for construction workflows.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {customAgents.map((agent) => (

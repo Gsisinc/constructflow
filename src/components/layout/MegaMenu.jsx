@@ -169,18 +169,25 @@ export default function MegaMenu({ isOpen, onClose }) {
       />
       
       {/* Mega Menu - Professional Design */}
-      <div className="fixed left-0 right-0 top-14 sm:top-16 lg:left-64 lg:right-auto z-50 bg-white border-b lg:border-r border-slate-200 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto shadow-lg" role="dialog" aria-modal="true" aria-label="Quick access navigation">
-        <div className="p-3 sm:p-4 lg:p-5">
+      <div className="fixed left-0 right-0 top-14 sm:top-16 lg:left-64 lg:right-0 z-50 bg-white border-b border-slate-200 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto shadow-2xl" role="dialog" aria-modal="true" aria-label="Quick access navigation">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900">Quick Access</h2>
-            <button onClick={onClose} className="h-8 w-8 lg:hidden rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors">
-              <X className="h-4 w-4" />
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Quick Access</h2>
+              <p className="text-sm text-slate-500 mt-1">Navigate to any feature across the platform</p>
+            </div>
+            <button 
+              onClick={onClose} 
+              className="h-10 w-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-95"
+              title="Close menu"
+            >
+              <X className="h-6 w-6" />
             </button>
           </div>
           
           {/* Menu Grid - Professional card layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {menuSections.map((section, idx) => (
               <div key={idx} className="bg-slate-50 rounded-lg p-3 border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
                 <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-2">{section.title}</h3>

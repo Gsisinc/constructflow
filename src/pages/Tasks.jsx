@@ -65,7 +65,15 @@ export default function Tasks() {
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['tasks'],
-    queryFn: () => base44.entities.Task.list('-created_date'),
+    queryFn: async () => {
+      const list = await base44.entities.Task.list('-created_date');
+      // Filter out demo tasks
+      return list.filter(t => 
+        !t.name?.includes('Downtown Plaza') && 
+        !t.name?.includes('Highway 101') &&
+        !t.name?.includes('Springfield')
+      );
+    },
   });
 
   const { data: projects = [] } = useQuery({
