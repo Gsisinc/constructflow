@@ -492,6 +492,38 @@ export default function AddBid() {
   const [createdProjectId, setCreatedProjectId] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [activeTab, setActiveTab] = useState('upload');
+  const [validationErrors, setValidationErrors] = useState({});
+
+  // Validation function
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.project_name?.trim()) errors.project_name = 'Project name is required';
+    if (!formData.agency?.trim()) errors.agency = 'Agency/Client name is required';
+    if (formData.estimated_value && (isNaN(formData.estimated_value) || formData.estimated_value <= 0)) {
+      errors.estimated_value = 'Estimated value must be a positive number';
+    }
+    if (formData.due_date && new Date(formData.due_date) < new Date()) {
+      errors.due_date = 'Due date cannot be in the past';
+    }
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Check for duplicate bids
+  const checkDuplicateBid = async () => {
+    try {
+      const existingBids = await base44.records.Bid.read({ limit: 1000 });
+      const isDuplicate = existingBids?.some(bid => 
+        bid.project_name?.toLowerCase() === formData.project_name?.toLowerCase() &&
+        bid.agency?.toLowerCase() === formData.agency?.toLowerCase()
+      );
+      if (isDuplicate) {
+        toast.warning('A bid with this project name and agency already exists. Continuing anyway...');
+      }
+    } catch (err) {
+      console.error('Error checking for duplicates:', err);
+    }
+  };
 
   // ── Upload & AI Pre-fill ──────────────────────────────────────────────────
   const handleFileUpload = async (files) => {

@@ -172,7 +172,6 @@ export async function extractTextFromPDF(pdfFile) {
     const data = await response.json();
     return data.choices[0].message.content;
   } catch (error) {
-    console.error('PDF extraction error:', error);
     throw error;
   }
 }
@@ -284,7 +283,6 @@ export async function analyzeBidDocument(document, isImage = false) {
       };
     }
   } catch (error) {
-    console.error('Bid document analysis error:', error);
     throw error;
   }
 }
@@ -359,7 +357,6 @@ export async function analyzeDrawing(drawingFile) {
       };
     }
   } catch (error) {
-    console.error('Drawing analysis error:', error);
     throw error;
   }
 }
