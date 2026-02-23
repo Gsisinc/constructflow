@@ -11,6 +11,13 @@ const NO_LLM_ERROR = 'No LLM configured. Add VITE_CLAUDE_API_KEY or VITE_OPENAI_
 async function callClaude(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
   const key = import.meta.env.VITE_CLAUDE_API_KEY ?? import.meta.env.VITE_ANTHROPIC_API_KEY ?? import.meta.env.REACT_APP_CLAUDE_API_KEY;
   if (!key) return null;
+
+  // If using a proxy (like Manus), we should use the OpenAI-compatible endpoint
+  const apiBase = import.meta.env.VITE_OPENAI_API_BASE;
+  if (apiBase && apiBase.includes('manus.im')) {
+    return callOpenAIAPI(systemPrompt, userMessage, temperature, maxTokens);
+  }
+
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -40,7 +47,11 @@ async function callClaude(systemPrompt, userMessage, temperature = 0.7, maxToken
 async function callOpenAIAPI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
   const key = import.meta.env.VITE_OPENAI_API_KEY ?? import.meta.env.REACT_APP_OPENAI_API_KEY;
   if (!key) return null;
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  
+  const apiBase = import.meta.env.VITE_OPENAI_API_BASE || 'https://api.openai.com/v1';
+  const url = `${apiBase.replace(/\/$/, '')}/chat/completions`;
+
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -127,7 +127,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: `Error: ${err.message}. Add an API key in Settings → AI Agents (OpenAI or Claude), or set VITE_OPENAI_API_KEY / VITE_CLAUDE_API_KEY in .env.local and restart the dev server.`,
+        content: `Error: ${err.message}. Please check your connection or try again later.`,
         error: true,
       }]);
       toast.error(err.message);

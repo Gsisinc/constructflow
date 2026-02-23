@@ -8,7 +8,7 @@
 import { fetchWithRetry, buildBotAvoidanceHeaders } from './botBypassService';
 
 const SAM_GOV_API_BASE = 'https://api.sam.gov/opportunities/v2/search';
-const SAM_GOV_API_KEY = import.meta.env.VITE_SAM_GOV_API_KEY || process.env.SAM_GOV_API_KEY;
+const SAM_GOV_API_KEY = import.meta.env.VITE_SAM_GOV_API_KEY || process.env.SAM_GOV_API_KEY || 'DEMO_KEY';
 
 /**
  * Map work types to SAM.GOV NAICS codes
