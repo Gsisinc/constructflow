@@ -16,6 +16,7 @@ import './styles/mobile-optimization.css';
 import './styles/design-system.css';
 import ErrorBoundary from '@/components/feedback/ErrorBoundary';
 import { PageTransition } from '@/components/layout/PageTransition';
+import GSISWebsite from './pages/GSISWebsite';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -131,7 +132,15 @@ function App() {
             <Router>
               <NavigationTracker />
               <PageTransition>
-                <AuthenticatedApp />
+                <Routes>
+                  <Route path="/" element={<GSISWebsite />} />
+                  <Route path="/services" element={<GSISWebsite />} />
+                  <Route path="/services/:slug" element={<GSISWebsite />} />
+                  <Route path="/about" element={<GSISWebsite />} />
+                  <Route path="/contact" element={<GSISWebsite />} />
+                  <Route path="/projects" element={<GSISWebsite />} />
+                  <Route path="/*" element={<AuthenticatedApp />} />
+                </Routes>
               </PageTransition>
             </Router>
             <Toaster />

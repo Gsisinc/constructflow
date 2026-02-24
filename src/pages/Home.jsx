@@ -29,7 +29,7 @@ export default function Home() {
     if (isAuth) {
       navigate(createPageUrl('Bids'));
     } else {
-      base44.auth.redirectToLogin(createPageUrl('Bids'));
+      navigate('/Login?redirect=' + encodeURIComponent(createPageUrl('Bids')));
     }
   };
 
@@ -38,7 +38,7 @@ export default function Home() {
     if (isAuth) {
       navigate(createPageUrl('Bids'));
     } else {
-      base44.auth.redirectToLogin(createPageUrl('Bids'));
+      navigate('/Login?redirect=' + encodeURIComponent(createPageUrl('Bids')));
     }
   };
 
