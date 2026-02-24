@@ -138,4 +138,4 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
       />
     </div>
   );
-}
+}// Force rebuild Mon Feb 23 20:20:03 EST 2026
