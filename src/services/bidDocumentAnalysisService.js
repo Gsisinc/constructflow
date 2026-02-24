@@ -481,6 +481,7 @@ function getOpenAIKey() {
   return (
     import.meta.env.VITE_OPENAI_API_KEY ||
     import.meta.env.REACT_APP_OPENAI_API_KEY ||
+    import.meta.env.VITE_FRONTEND_FORGE_API_KEY ||
     (typeof localStorage !== 'undefined' ? localStorage.getItem('openai_api_key') : null) ||
     (typeof localStorage !== 'undefined' ? localStorage.getItem('VITE_OPENAI_API_KEY') : null)
   );
@@ -491,16 +492,19 @@ function getClaudeKey() {
     import.meta.env.VITE_CLAUDE_API_KEY ||
     import.meta.env.VITE_ANTHROPIC_API_KEY ||
     import.meta.env.REACT_APP_CLAUDE_API_KEY ||
+    import.meta.env.VITE_FRONTEND_FORGE_API_KEY ||
     (typeof localStorage !== 'undefined' ? localStorage.getItem('claude_api_key') : null)
   );
 }
 
-/** Returns which vision provider has a key: 'claude' | 'openai' | null. Use in UI to show status. */
+/** Returns which vision provider has a key: 'claude' | 'openai' | 'manus' | null. Use in UI to show status. */
 export function getVisionKeyStatus() {
   const c = getClaudeKey();
   const o = getOpenAIKey();
   if (typeof c === 'string' && c.trim()) return 'claude';
   if (typeof o === 'string' && o.trim()) return 'openai';
+  // Manus always has a key via VITE_FRONTEND_FORGE_API_KEY
+  if (import.meta.env.VITE_FRONTEND_FORGE_API_KEY) return 'manus';
   return null;
 }
 
@@ -717,7 +721,8 @@ export async function analyzeBlueprintFromPDF(pdfFile, userPrompt = '', options 
   const rawOpenAI = getOpenAIKey();
   const claudeKey = typeof rawClaude === 'string' ? rawClaude.trim() : '';
   const openaiKey = typeof rawOpenAI === 'string' ? rawOpenAI.trim() : '';
-  if (!claudeKey && !openaiKey) {
+  // Use Manus built-in API if no external keys available
+  if (!claudeKey && !openaiKey && !import.meta.env.VITE_FRONTEND_FORGE_API_KEY) {
     throw new Error(NO_VISION_KEY_ERROR);
   }
 
