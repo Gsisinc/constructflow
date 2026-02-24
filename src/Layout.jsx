@@ -107,13 +107,13 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
       to={createPageUrl(item.page)}
       onClick={onNavigate}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 min-h-[42px] sm:min-h-[44px]",
+        "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px]",
         isActive
-          ? "bg-[var(--cf-accent)] text-white shadow-lg shadow-violet-500/20 dark:shadow-violet-500/10"
-          : "text-[var(--cf-muted)] hover:bg-[var(--cf-border)] hover:text-[var(--cf-heading)] dark:hover:bg-slate-700"
+          ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
+          : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
       )}
     >
-      <Icon className={cn("h-4 w-4 flex-shrink-0", isActive ? "text-white" : "text-slate-400")} />
+      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-gray-500")} />
       <span className="truncate">{item.name}</span>
     </Link>
   );
@@ -257,7 +257,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 h-16 sm:h-16 bg-white border-b border-slate-200 z-40 lg:pl-64">
+      <header className="fixed top-0 left-0 right-0 h-16 sm:h-16 bg-white border-b border-gray-200 shadow-sm z-40 lg:pl-64">
         <div className="h-full flex items-center justify-between px-2 sm:px-3 md:px-4 lg:px-6">
           {/* Left section: Menu & Logo */}
           <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
@@ -331,7 +331,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-14 sm:top-16 left-0 w-64 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-white border-r border-slate-200 z-40 transition-transform duration-300 lg:translate-x-0 lg:top-16 lg:h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain",
+        "fixed top-14 sm:top-16 left-0 w-64 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-white border-r border-gray-200 shadow-sm z-40 transition-transform duration-300 lg:translate-x-0 lg:top-16 lg:h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <nav className="p-3 sm:p-4 space-y-1">

@@ -12,6 +12,7 @@
 /* Additional theme imports */
 @import './styles/enhanced-theme.css';
 @import './styles/professional-theme.css';
+@import './styles/alvys-design-system.css';
 
 @layer base {
   :root {
