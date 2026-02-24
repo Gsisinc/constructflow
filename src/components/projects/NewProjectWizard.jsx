@@ -318,19 +318,22 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         budget: formData.budget ? parseFloat(formData.budget) : null,
       });
 
-      // Get template and auto-create phases + requirements
-      const template = getPhaseTemplate(selectedType);
+      // Get template and auto-create phases + requirements (same as other project types)
+      const rawTemplate = getPhaseTemplate(selectedType);
+      const template = Array.isArray(rawTemplate) ? rawTemplate : [];
       let phasesCreated = 0;
       let reqsCreated = 0;
 
-      // Helper: convert display name to slug
+      // Helper: convert display name to slug (must match backend expectations)
       const toSlug = (name) => {
-        return name.toLowerCase().replace(/[^a-z0-9\s_]/g, '').trim().replace(/\s+/g, '_');
+        return String(name).toLowerCase().replace(/[^a-z0-9\s_]/g, '').trim().replace(/\s+/g, '_') || `phase_${idx}`;
       };
 
       for (let idx = 0; idx < template.length; idx++) {
         const templatePhase = template[idx];
+        if (!templatePhase || !templatePhase.phase) continue;
         const slug = toSlug(templatePhase.phase);
+        const items = Array.isArray(templatePhase.items) ? templatePhase.items : [];
 
         // Create CustomPhase
         try {
@@ -346,13 +349,15 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
           console.warn('Phase creation error:', err);
         }
 
-        // Create PhaseRequirements for this phase
-        for (const item of templatePhase.items) {
+        // Create PhaseRequirements for this phase (item can be string or { text: string })
+        for (const item of items) {
+          const requirementText = typeof item === 'string' ? item : (item && item.text);
+          if (requirementText == null || String(requirementText).trim() === '') continue;
           try {
             await base44.entities.PhaseRequirement.create({
               project_id: project.id,
               phase_name: slug,
-              requirement_text: item,
+              requirement_text: String(requirementText).trim(),
               status: 'pending',
             });
             reqsCreated++;

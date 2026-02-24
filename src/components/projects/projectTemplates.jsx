@@ -3582,5 +3582,7 @@ export const PHASE_TEMPLATES = {
 };
 
 export function getPhaseTemplate(projectType) {
-  return PHASE_TEMPLATES[projectType] || PHASE_TEMPLATES._default;
+  if (!projectType) return PHASE_TEMPLATES._default;
+  const key = String(projectType).trim();
+  return PHASE_TEMPLATES[key] || PHASE_TEMPLATES._default;
 }
