@@ -3,7 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 // SAFEGUARD: Dashboard is always the improved version. Do not remove — Base44 auto-gen often overwrites pages.config and breaks the Dashboard route.
 import DashboardPage from './pages/Dashboard.ImprovedVersion';
@@ -11,12 +11,24 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import './styles/mobile-optimization.css';
 import './styles/design-system.css';
 import ErrorBoundary from '@/components/feedback/ErrorBoundary';
-import { PageTransition } from '@/components/layout/PageTransition';
-import GSISWebsite from './pages/GSISWebsite';
+
+/** All routes go through the app (auth + app shell). No separate public website. */
+function RouteGate() {
+  return (
+    <AuthProvider>
+      <QueryClientProvider client={queryClientInstance}>
+        <NavigationTracker />
+        <Routes>
+          <Route path="*" element={<AuthenticatedApp />} />
+        </Routes>
+        <Toaster />
+      </QueryClientProvider>
+    </AuthProvider>
+  );
+}
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -123,32 +135,21 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  const basename = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || '';
 
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <QueryClientProvider client={queryClientInstance}>
-            <Router>
-              <NavigationTracker />
-              <PageTransition>
-                <Routes>
-                  <Route path="/" element={<GSISWebsite />} />
-                  <Route path="/services" element={<GSISWebsite />} />
-                  <Route path="/services/:slug" element={<GSISWebsite />} />
-                  <Route path="/about" element={<GSISWebsite />} />
-                  <Route path="/contact" element={<GSISWebsite />} />
-                  <Route path="/projects" element={<GSISWebsite />} />
-                  <Route path="/*" element={<AuthenticatedApp />} />
-                </Routes>
-              </PageTransition>
-            </Router>
-            <Toaster />
-          </QueryClientProvider>
-        </AuthProvider>
+        <div className="min-h-screen bg-slate-100" style={{ minHeight: '100vh' }}>
+          <Router basename={basename}>
+            <Routes>
+              <Route path="*" element={<RouteGate />} />
+            </Routes>
+          </Router>
+        </div>
       </ThemeProvider>
     </ErrorBoundary>
-  )
+  );
 }
 
 export default App

@@ -115,8 +115,8 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
 
     if (shouldRedirect) {
-      const landingUrl = `${window.location.origin}${basePath()}/Landing`;
-      base44.auth.logout(landingUrl);
+      const appRoot = `${window.location.origin}${basePath()}/`;
+      base44.auth.logout(appRoot);
     } else {
       base44.auth.logout();
     }
