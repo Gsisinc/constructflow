@@ -120,7 +120,7 @@ export default function BlueprintUploader({ onAnalysis, disabled }) {
       {imageUrl && (
         <Button
           onClick={handleAnalyze}
-          disabled={disabled || !hasVisionKey}
+          disabled={disabled}
           size="sm"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2"
         >
