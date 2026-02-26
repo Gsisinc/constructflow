@@ -19,8 +19,12 @@ export default function JobCosting() {
   const [selectedProject, setSelectedProject] = useState('all');
 
   const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryKey: ['projects', user?.organization_id],
+    queryFn: () => {
+      if (!user?.organization_id) return [];
+      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
+    },
+    enabled: !!user?.organization_id,
   });
 
   const { data: expenses = [] } = useQuery({
@@ -62,7 +66,7 @@ export default function JobCosting() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Job Costing</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Job Costing</h1>
           <p className="text-slate-500 mt-1">Estimate vs. Actuals & Work In Progress (WIP)</p>
         </div>
         <Select value={selectedProject} onValueChange={setSelectedProject}>
@@ -77,7 +81,7 @@ export default function JobCosting() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Original Budget', value: `$${(totalBudget / 1000).toFixed(0)}K`, icon: DollarSign, color: 'text-slate-600', bg: 'bg-slate-100' },
           { label: 'Revised Budget', value: `$${(revisedBudget / 1000).toFixed(0)}K`, icon: BarChart3, color: 'text-blue-600', bg: 'bg-blue-100' },
@@ -141,7 +145,7 @@ export default function JobCosting() {
                   <CardContent className="py-4">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <p className="font-semibold text-slate-900">{p.name}</p>
+                        <p className="font-semibold text-slate-900 break-words">{p.name}</p>
                         <p className="text-sm text-slate-500">{p.client_name}</p>
                       </div>
                       <Badge className={over ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}>
@@ -190,7 +194,7 @@ export default function JobCosting() {
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full sm:w-auto text-sm">
                   <thead>
                     <tr className="border-b text-left">
                       <th className="pb-2 font-semibold text-slate-600">Project</th>

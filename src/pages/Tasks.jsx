@@ -126,7 +126,7 @@ export default function Tasks() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Tasks</h1>
+          <h1 className="text-2xl sm:text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Tasks</h1>
           <p className="text-slate-600 mt-1">Manage project tasks and workflow</p>
         </div>
         <Button onClick={() => { setEditingTask(null); setShowForm(true); }} className="bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 shadow-lg hover:shadow-xl">
@@ -147,7 +147,7 @@ export default function Tasks() {
           />
         </div>
         <Select value={projectFilter} onValueChange={setProjectFilter}>
-          <SelectTrigger className="w-full sm:w-56">
+          <SelectTrigger className="w-full sm:w-auto sm:w-56">
             <SelectValue placeholder="Filter by project" />
           </SelectTrigger>
           <SelectContent>
@@ -161,7 +161,7 @@ export default function Tasks() {
 
       {/* Kanban Board */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {Array(4).fill(0).map((_, i) => (
             <Skeleton key={i} className="h-96 rounded-xl" />
           ))}
@@ -176,11 +176,11 @@ export default function Tasks() {
         />
       ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {statusColumns.map((column) => (
               <div key={column.id} className="bg-slate-50 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-slate-700">{column.label}</h3>
+                  <h3 className="font-medium text-slate-700 break-words">{column.label}</h3>
                   <span className="text-sm text-slate-500 bg-white px-2 py-0.5 rounded-full">
                     {getTasksByStatus(column.id).length}
                   </span>
@@ -338,7 +338,7 @@ function TaskFormDialog({ open, onOpenChange, task, projects, onSubmit, loading 
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Status</Label>
               <Select
@@ -372,7 +372,7 @@ function TaskFormDialog({ open, onOpenChange, task, projects, onSubmit, loading 
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Due Date</Label>
               <Input

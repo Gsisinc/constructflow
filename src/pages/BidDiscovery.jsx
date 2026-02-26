@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { cn } from '@/lib/utils';
 import { BidListSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import AgentChat from '../components/agents/AgentChat';
+import BrowserProxy from '../components/BrowserProxy';
+import BidDocumentUpload from '../components/bids/BidDocumentUpload';
 import { 
   Search, 
   FileText, 
@@ -27,12 +28,7 @@ import {
   Bot,
   Loader2,
   Trash2,
-  ListChecks,
-  Globe,
-  ArrowLeft,
-  ArrowRight,
-  RefreshCw,
-  X
+  ListChecks
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -40,7 +36,6 @@ import { parseLlmJsonResponse } from '@/lib/llmResponse';
 import { searchBidsFromSam } from '@/lib/bidDiscoverySearch';
 import { fetchRealBidOpportunities } from '@/services/realBidDiscoveryService';
 import { callAgent } from '@/services/llmService';
-import { hasSamGovKey, setSamGovKey } from '@/lib/apiKeys';
 
 const marketIntelligenceAgent = {
   id: 'market_intelligence',
@@ -53,6 +48,35 @@ const marketIntelligenceAgent = {
 };
 
 export default function BidDiscovery() {
+  const [vendorLineHeight, setVendorLineHeight] = useState(600);
+  const [showVendorLine, setShowVendorLine] = useState(true);
+  const vendorLineRef = useRef(null);
+  const resizeHandleRef = useRef(null);
+
+  useEffect(() => {
+    const handleMouseDown = (e) => {
+      e.preventDefault();
+      const startY = e.clientY;
+      const startHeight = vendorLineHeight;
+      const handleMouseMove = (moveEvent) => {
+        const delta = moveEvent.clientY - startY;
+        const newHeight = Math.max(300, startHeight + delta);
+        setVendorLineHeight(newHeight);
+      };
+      const handleMouseUp = () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    };
+    const handle = resizeHandleRef.current;
+    if (handle) {
+      handle.addEventListener("mousedown", handleMouseDown);
+      return () => handle.removeEventListener("mousedown", handleMouseDown);
+    }
+  }, [vendorLineHeight]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBid, setSelectedBid] = useState(null);
   const [showAgentChat, setShowAgentChat] = useState(false);
@@ -70,51 +94,7 @@ export default function BidDiscovery() {
   const [totalAvailable, setTotalAvailable] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [samKeyInput, setSamKeyInput] = useState('');
-  const [samKeySaved, setSamKeySaved] = useState(false);
-  const defaultBrowserUrl = 'https://sam.gov/content/opportunities';
-  const [browserTabs, setBrowserTabs] = useState([
-    { id: '1', url: defaultBrowserUrl, title: 'SAM.gov', key: 0 },
-  ]);
-  const [activeBrowserTabId, setActiveBrowserTabId] = useState('1');
-  const [browserUrlInput, setBrowserUrlInput] = useState(defaultBrowserUrl);
   const queryClient = useQueryClient();
-  const activeBrowserTab = browserTabs.find((t) => t.id === activeBrowserTabId) || browserTabs[0];
-  const addBrowserTab = () => {
-    const id = String(Date.now());
-    setBrowserTabs((prev) => [...prev, { id, url: defaultBrowserUrl, title: 'New tab', key: 0 }]);
-    setActiveBrowserTabId(id);
-    setBrowserUrlInput(defaultBrowserUrl);
-  };
-  const closeBrowserTab = (id) => {
-    const idx = browserTabs.findIndex((t) => t.id === id);
-    if (idx === -1) return;
-    if (browserTabs.length <= 1) return;
-    const next = browserTabs.filter((t) => t.id !== id);
-    setBrowserTabs(next);
-    if (activeBrowserTabId === id && next.length) {
-      setActiveBrowserTabId(next[Math.max(0, idx - 1)].id);
-      const tab = next[Math.max(0, idx - 1)];
-      setBrowserUrlInput(tab.url);
-    }
-  };
-  const navigateBrowserTab = (url) => {
-    const u = /^https?:\/\//i.test(url) ? url : 'https://' + url;
-    setBrowserTabs((prev) =>
-      prev.map((t) =>
-        t.id === activeBrowserTabId ? { ...t, url: u, key: t.key + 1 } : t
-      )
-    );
-    setBrowserUrlInput(u);
-  };
-  const refreshBrowserTab = () => {
-    setBrowserTabs((prev) =>
-      prev.map((t) =>
-        t.id === activeBrowserTabId ? { ...t, key: t.key + 1 } : t
-      )
-    );
-  };
-  const samGovConfigured = hasSamGovKey();
 
   const states = [
     'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
@@ -602,7 +582,7 @@ Provide:
             {bid.win_probability && (
               <div className="text-right">
                 <p className="text-sm text-slate-500">Win Rate</p>
-                <p className="text-2xl font-bold text-green-600">{bid.win_probability}%</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{bid.win_probability}%</p>
               </div>
             )}
           </div>
@@ -620,7 +600,7 @@ Provide:
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-3 text-sm">
               {bid.estimated_value && (
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-slate-400" />
@@ -679,7 +659,7 @@ Provide:
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pt-2">
               <Button
                 size="sm"
                 variant="outline"
@@ -720,7 +700,28 @@ Provide:
   };
 
   return (
-    <div className="space-y-6">
+    <div>
+      {/* VendorLine Embed */}
+      {showVendorLine && (
+        <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+          <div className="flex items-center justify-between bg-slate-50 px-4 py-3 border-b border-slate-200">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+              <span className="font-semibold text-slate-900">VendorLine.com</span>
+            </div>
+            <button onClick={() => setShowVendorLine(false)} className="text-slate-400 hover:text-slate-600 text-xl font-bold">×</button>
+          </div>
+          <div ref={vendorLineRef} style={{ height: `${vendorLineHeight}px` }} className="relative bg-white">
+            <iframe src="https://vendorline.com" className="w-full h-full border-0" title="VendorLine" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation" />
+          </div>
+          <div ref={resizeHandleRef} className="h-1 bg-gradient-to-r from-blue-400 to-cyan-400 cursor-ns-resize hover:bg-gradient-to-r hover:from-blue-500 hover:to-cyan-500 transition-all" title="Drag to resize" />
+        </div>
+      )}
+      {!showVendorLine && (
+        <button onClick={() => setShowVendorLine(true)} className="w-full py-2 px-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-600 font-medium transition-colors">Show VendorLine</button>
+      )}
+
+      <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-4 sm:p-8 text-white">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -730,7 +731,7 @@ Provide:
                 <Search className="h-6 w-6 sm:h-8 sm:w-8" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold truncate">Bid Discovery</h1>
+                <h1 className="text-2xl sm:text-xl sm:text-2xl md:text-3xl font-bold truncate">Bid Discovery</h1>
                 <p className="text-blue-100 mt-1 text-sm sm:text-base">Search federal (SAM.gov) and local (county) bid opportunities - real data only</p>
               </div>
             </div>
@@ -753,9 +754,9 @@ Provide:
 
         {/* Search Filters & Bar */}
         <div className="mt-4 sm:mt-6 space-y-3">
-          <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-2 sm:gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
             <Select value={classification} onValueChange={setClassification}>
-              <SelectTrigger className="w-full min-w-0 sm:w-[220px] bg-white text-slate-900 h-12">
+              <SelectTrigger className="w-full sm:w-auto min-w-0 sm:w-[220px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="Classification" />
               </SelectTrigger>
               <SelectContent>
@@ -768,7 +769,7 @@ Provide:
             </Select>
 
             <Select value={workType} onValueChange={setWorkType}>
-              <SelectTrigger className="w-full min-w-0 sm:w-[220px] bg-white text-slate-900 h-12">
+              <SelectTrigger className="w-full sm:w-auto min-w-0 sm:w-[220px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="Type of Work" />
               </SelectTrigger>
               <SelectContent className="max-h-[400px]">
@@ -806,7 +807,7 @@ Provide:
             </Select>
 
             <Select value={state} onValueChange={setState}>
-              <SelectTrigger className="w-full min-w-0 sm:w-[200px] bg-white text-slate-900 h-12">
+              <SelectTrigger className="w-full sm:w-auto min-w-0 sm:w-[200px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder="State" />
               </SelectTrigger>
               <SelectContent className="max-h-[400px]">
@@ -817,7 +818,7 @@ Provide:
             </Select>
 
             <Select value={cityCounty} onValueChange={setCityCounty}>
-              <SelectTrigger className="w-full min-w-0 sm:w-[250px] bg-white text-slate-900 h-12">
+              <SelectTrigger className="w-full sm:w-auto min-w-0 sm:w-[250px] bg-white text-slate-900 h-12">
                 <SelectValue placeholder={`City in ${state} (optional)`} />
               </SelectTrigger>
               <SelectContent className="max-h-[400px]">
@@ -843,7 +844,7 @@ Provide:
             <div className="flex items-center gap-2">
               <span>Interval</span>
               <Select value={autoAlertIntervalMin} onValueChange={setAutoAlertIntervalMin}>
-                <SelectTrigger className="w-[100px] sm:w-[110px] h-9 bg-white text-slate-900">
+                <SelectTrigger className="w-[100px] sm:w-[110px] h-9 bg-white text-slate-900 break-words">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -893,13 +894,13 @@ Provide:
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">Total Opportunities</p>
-                <p className="text-2xl font-bold">{opportunities.length}</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold">{opportunities.length}</p>
               </div>
               <FileText className="h-8 w-8 text-blue-500" />
             </div>
@@ -911,7 +912,7 @@ Provide:
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">Active Bids</p>
-                <p className="text-2xl font-bold">{bids.filter(b => b.status === 'draft' || b.status === 'submitted').length}</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold">{bids.filter(b => b.status === 'draft' || b.status === 'submitted').length}</p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-500" />
             </div>
@@ -923,7 +924,7 @@ Provide:
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">Win Rate</p>
-                <p className="text-2xl font-bold">42%</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold">42%</p>
               </div>
               <CheckCircle2 className="h-8 w-8 text-emerald-500" />
             </div>
@@ -935,7 +936,7 @@ Provide:
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">Avg. Bid Value</p>
-                <p className="text-2xl font-bold">$2.3M</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold">$2.3M</p>
               </div>
               <DollarSign className="h-8 w-8 text-purple-500" />
             </div>
@@ -943,49 +944,8 @@ Provide:
         </Card>
       </div>
 
-      {/* SAM.gov API key — show when not configured so users can set key without .env */}
-      {!samGovConfigured && (
-        <Card className="border-amber-200 bg-amber-50/80">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-amber-600" />
-              SAM.gov API key (optional)
-            </CardTitle>
-            <CardDescription>
-              For live federal bid results, add <code className="text-xs bg-white px-1 rounded">VITE_SAM_GOV_API_KEY</code> to .env, or paste your key below and click Save. Get a key at <a href="https://sam.gov/content/opportunities" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">sam.gov</a>.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap items-end gap-3">
-            <Input
-              type="password"
-              placeholder="Paste SAM.gov API key"
-              value={samKeyInput}
-              onChange={(e) => setSamKeyInput(e.target.value)}
-              className="max-w-sm bg-white"
-            />
-            <Button
-              size="sm"
-              onClick={() => {
-                const trimmed = (samKeyInput || '').trim();
-                if (trimmed) {
-                  setSamGovKey(trimmed);
-                  setSamKeyInput('');
-                  setSamKeySaved(true);
-                  toast.success('SAM.gov key saved. Click AI Search again for live results.');
-                  setTimeout(() => setSamKeySaved(false), 3000);
-                } else {
-                  toast.error('Enter a key first.');
-                }
-              }}
-            >
-              {samKeySaved ? 'Saved' : 'Save key'}
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Tabs */}
-      <Tabs defaultValue="discovered" className="w-full">
+      <Tabs defaultValue="discovered" className="w-full sm:w-auto">
         <TabsList>
           <TabsTrigger value="discovered">Discovered Opportunities ({opportunities.length})</TabsTrigger>
           <TabsTrigger value="pipeline">Your Pipeline ({bids.length})</TabsTrigger>
@@ -998,7 +958,7 @@ Provide:
                 <Search className="h-16 w-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No opportunities yet</h3>
                 <p className="text-slate-600 mb-4">
-                  Enter a keyword above (e.g. &quot;electrical&quot;, &quot;HVAC&quot;) or select a work type and state, then click &quot;AI Search&quot;. If no SAM.gov key is set, use the key box above to paste and save one for live federal results. Pipeline shows only bids with a real source URL.
+                  Enter a keyword above (e.g. &quot;electrical&quot;, &quot;HVAC&quot;) or select a work type and state, then click &quot;AI Search&quot;. Add VITE_SAM_GOV_API_KEY to .env.local for live SAM.gov results. Pipeline shows only bids with a real source URL (no fake data).
                 </p>
                 <Button onClick={() => setShowAgentChat(true)} className="gap-2">
                   <Sparkles className="h-4 w-4" />
@@ -1014,11 +974,11 @@ Provide:
                     <CardTitle className="text-base">Search Sources Status</CardTitle>
                     <CardDescription>Real data from federal and local bid portals</CardDescription>
                   </CardHeader>
-                  <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  <CardContent className="grid gap-3 md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {sourceSummary.map((entry) => (
                       <div key={entry.name || entry.source} className={`rounded-lg border p-4 text-sm ${entry.success ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-semibold text-slate-900">{entry.name || entry.source}</span>
+                          <span className="font-semibold text-slate-900 break-words">{entry.name || entry.source}</span>
                           <Badge variant={entry.success ? 'default' : 'secondary'} className={entry.success ? 'bg-green-600' : 'bg-amber-600'}>
                             {entry.success ? '✓ Active' : '⚠ Limited'}
                           </Badge>
@@ -1046,7 +1006,7 @@ Provide:
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {opportunities.map((opp, idx) => (
                   <BidCard key={`${opp.id || idx}-${opp.title}`} bid={opp} />
                 ))}
@@ -1170,7 +1130,7 @@ Provide:
                               <button
                                 key={idx}
                                 onClick={() => handleToggleChecklistItem(bid, idx)}
-                                className="w-full text-left px-3 py-2 rounded hover:bg-slate-50 transition-colors text-sm flex items-start gap-2"
+                                className="w-full sm:w-auto text-left px-3 py-2 rounded hover:bg-slate-50 transition-colors text-sm flex items-start gap-2"
                               >
                                 <span className={item.startsWith('☑') ? 'text-green-600' : 'text-slate-400'}>
                                   {item.startsWith('☑') ? '☑' : '☐'}
@@ -1216,104 +1176,6 @@ Provide:
         </Dialog>
       )}
 
-      {/* Embedded Browser - at the bottom */}
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Globe className="h-4 w-4 text-blue-600" />
-            Embedded Browser
-          </CardTitle>
-          <p className="text-xs text-slate-500">Browse any website directly. Some sites block embedding — use "Open in new tab" if needed.</p>
-        </CardHeader>
-        <div className="bg-slate-100 border-b flex flex-col">
-          {/* Tabs row */}
-          <div className="flex items-center gap-1 overflow-x-auto min-h-[40px] px-2 py-1.5 border-b border-slate-200">
-            {browserTabs.map((tab) => (
-              <div
-                key={tab.id}
-                className={cn(
-                  'flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-t-lg border border-b-0 shrink-0 max-w-[180px] min-w-0',
-                  tab.id === activeBrowserTabId
-                    ? 'bg-white border-slate-200 shadow-sm'
-                    : 'bg-slate-200/80 border-slate-300 hover:bg-slate-200'
-                )}
-              >
-                <button
-                  type="button"
-                  onClick={() => { setActiveBrowserTabId(tab.id); setBrowserUrlInput(tab.url); }}
-                  className="flex-1 min-w-0 truncate text-left text-sm font-medium text-slate-700"
-                >
-                  {tab.title}
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); closeBrowserTab(tab.id); }}
-                  className="p-0.5 rounded hover:bg-slate-300 text-slate-500 hover:text-slate-700"
-                  title="Close tab"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addBrowserTab}
-              className="p-2 rounded hover:bg-slate-200 text-slate-600 shrink-0"
-              title="New tab"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          </div>
-          {/* Address bar */}
-          <div className="flex items-center gap-2 p-2 flex-wrap">
-            <Button type="button" variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={refreshBrowserTab} title="Refresh">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-            <Input
-              value={browserUrlInput}
-              onChange={(e) => setBrowserUrlInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), navigateBrowserTab(browserUrlInput))}
-              placeholder="Enter URL (e.g. https://sam.gov)"
-              className="flex-1 min-w-[200px] h-9 bg-white font-mono text-sm"
-            />
-            <Button type="button" size="sm" className="shrink-0 h-9" onClick={() => navigateBrowserTab(browserUrlInput)}>
-              Go
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="shrink-0 gap-1.5 h-9"
-              onClick={() => window.open(activeBrowserTab?.url || browserUrlInput, '_blank')}
-            >
-              <ExternalLink className="h-4 w-4" />
-              Open in new tab
-            </Button>
-          </div>
-        </div>
-        <CardContent className="p-0">
-          <div className="relative" style={{ height: '500px' }}>
-            {browserTabs.map((tab) => (
-              <div key={tab.id} className={tab.id === activeBrowserTabId ? 'block h-full' : 'hidden'}>
-                {tab.url && (
-                  <iframe
-                    key={tab.key}
-                    src={/^https?:\/\//i.test(tab.url) ? tab.url : 'https://' + tab.url}
-                    title={tab.title}
-                    className="w-full h-full rounded-b-lg border-0 bg-white"
-                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-popups-to-escape-sandbox"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                )}
-              </div>
-            ))}
-            <p className="absolute bottom-2 left-2 text-xs text-slate-500 bg-white/90 px-2 py-1 rounded pointer-events-none">
-              Some sites may block embedding. Use "Open in new tab" if the page does not load.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Bid Detail Dialog */}
       {selectedBid && (
         <Dialog open={!!selectedBid} onOpenChange={() => setSelectedBid(null)}>
@@ -1324,7 +1186,7 @@ Provide:
             
             <div className="space-y-6">
               {/* Key Info */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-slate-500">Client/Agency</p>
                   <p className="font-medium">{selectedBid.agency || selectedBid.client_name}</p>
@@ -1399,6 +1261,25 @@ Provide:
           </DialogContent>
         </Dialog>
       )}
+      
+      {/* Bid Document Upload Section */}
+      <div className="mt-8 border-t pt-8">
+        <h2 className="text-2xl font-bold mb-4">Upload & Analyze Bid Documents</h2>
+        <BidDocumentUpload projectId={projectId} onAnalysisComplete={(result) => {
+          // Handle analysis result - could create estimate or add to pipeline
+          toast.success('Bid document analyzed successfully!');
+        }} />
+      </div>
+      
+      {/* Browser Section */}
+      <div className="mt-8 border-t pt-8">
+        <h2 className="text-2xl font-bold mb-4">GSISweb Browser</h2>
+        <p className="text-gray-600 mb-4">Browse websites directly within the app. Try sam.gov to search for bids.</p>
+        <div className="h-[600px] rounded-lg overflow-hidden border border-gray-300">
+          <BrowserProxy />
+        </div>
+      </div>
+    </div>
     </div>
   );
 }

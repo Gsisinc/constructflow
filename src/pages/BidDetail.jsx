@@ -99,7 +99,7 @@ export default function BidDetail() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{bid.title || bid.project_name || 'Untitled Bid'}</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 break-words">{bid.title || bid.project_name || 'Untitled Bid'}</h1>
             <p className="text-sm text-slate-600 mt-1">{bid.agency || bid.client_name || 'Unknown Agency'}</p>
           </div>
         </div>
@@ -119,7 +119,7 @@ export default function BidDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? format(new Date(bid.due_date), 'MMM d, yyyy') : 'Not set'} />
         <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={`$${Number(bid.estimated_value || bid.value || 0).toLocaleString()}`} />
         <StatCard icon={<TrendingUp className="h-8 w-8 text-blue-600" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
@@ -136,8 +136,8 @@ export default function BidDetail() {
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="w-full overflow-x-auto flex flex-nowrap gap-1 p-1 h-auto bg-slate-100 rounded-lg sm:inline-flex">
+      <Tabs defaultValue="overview" className="w-full sm:w-auto">
+        <TabsList className="w-full sm:w-auto overflow-x-auto flex flex-nowrap gap-1 p-1 h-auto bg-slate-100 rounded-lg sm:inline-flex">
           <TabsTrigger value="overview" className="flex-shrink-0">Overview</TabsTrigger>
           <TabsTrigger value="boq" className="flex-shrink-0">BOQ</TabsTrigger>
           <TabsTrigger value="requirements" className="flex-shrink-0">Requirements</TabsTrigger>
@@ -190,7 +190,7 @@ export default function BidDetail() {
                         <div className="bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                           Version {est.version ?? 1} · Subtotal ${Number(est.subtotal || 0).toLocaleString()} · Total bid ${Number(est.total_bid_amount || 0).toLocaleString()}
                         </div>
-                        <table className="w-full text-sm">
+                        <table className="w-full sm:w-auto text-sm">
                           <thead>
                             <tr className="border-b bg-slate-100 dark:bg-slate-800">
                               <th className="text-left p-2">Description</th>
@@ -235,7 +235,7 @@ export default function BidDetail() {
 
           {documents.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-slate-900">Uploaded Documents</h3>
+              <h3 className="text-sm font-semibold text-slate-900 break-words">Uploaded Documents</h3>
               {documents.map((doc) => (
                 <Card key={doc.id}>
                   <CardContent className="p-4">
@@ -291,7 +291,7 @@ export default function BidDetail() {
                   <CardHeader><CardTitle className="text-base">Complexity Score</CardTitle></CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-4">
-                      <div className="text-4xl font-bold text-amber-600">{analysis.complexityScore}/10</div>
+                      <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-600">{analysis.complexityScore}/10</div>
                       <p className="text-sm text-slate-600">{analysis.complexityLabel}</p>
                     </div>
                   </CardContent>
@@ -314,7 +314,7 @@ export default function BidDetail() {
               {analysis.recommendedMarkup !== null && (
                 <Card>
                   <CardHeader><CardTitle className="text-base">Recommended Markup</CardTitle></CardHeader>
-                  <CardContent><p className="text-2xl font-bold text-green-600">{analysis.recommendedMarkup}%</p></CardContent>
+                  <CardContent><p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{analysis.recommendedMarkup}%</p></CardContent>
                 </Card>
               )}
 

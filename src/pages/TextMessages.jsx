@@ -95,7 +95,7 @@ export default function TextMessages() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Text Messages</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Text Messages</h1>
           <p className="text-slate-500 mt-1">Send SMS to project contacts and subcontractors</p>
         </div>
         <Button onClick={() => setShowNewThread(true)} className="gap-2">
@@ -104,7 +104,7 @@ export default function TextMessages() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-4 pb-3 flex items-center gap-3">
             <MessageSquare className="h-7 w-7 text-blue-600" />
@@ -221,7 +221,7 @@ export default function TextMessages() {
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>New Text Message</DialogTitle></DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Contact Name *</Label>
                 <Input placeholder="John Smith" value={newContact.name}
@@ -243,7 +243,7 @@ export default function TextMessages() {
               <div className="space-y-1">
                 {QUICK_TEMPLATES.slice(0, 3).map((t, i) => (
                   <button key={i} onClick={() => setNewContact({ ...newContact, message: t })}
-                    className="w-full text-left text-xs p-2 rounded border border-slate-200 hover:bg-slate-50 text-slate-600">
+                    className="w-full sm:w-auto text-left text-xs p-2 rounded border border-slate-200 hover:bg-slate-50 text-slate-600">
                     {t}
                   </button>
                 ))}

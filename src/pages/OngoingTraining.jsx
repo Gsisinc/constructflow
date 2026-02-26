@@ -13,7 +13,7 @@ export default function OngoingTraining() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Ongoing Training</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Ongoing Training</h1>
         <p className="text-slate-600 mt-1">Videos, guides, and support for your team.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-3">

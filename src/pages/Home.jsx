@@ -29,7 +29,7 @@ export default function Home() {
     if (isAuth) {
       navigate(createPageUrl('Bids'));
     } else {
-      navigate(createPageUrl('Login') + '?redirect=' + encodeURIComponent(createPageUrl('Bids')));
+      navigate('/Login?redirect=' + encodeURIComponent(createPageUrl('Bids')));
     }
   };
 
@@ -38,7 +38,7 @@ export default function Home() {
     if (isAuth) {
       navigate(createPageUrl('Bids'));
     } else {
-      navigate(createPageUrl('Login') + '?redirect=' + encodeURIComponent(createPageUrl('Bids')));
+      navigate('/Login?redirect=' + encodeURIComponent(createPageUrl('Bids')));
     }
   };
 
@@ -126,7 +126,7 @@ export default function Home() {
           </div>
 
           {/* Service Icons */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 sm:gap-4 max-w-3xl mx-auto mt-10 sm:mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 md:grid-cols-6 gap-3 sm:gap-4 max-w-3xl mx-auto mt-10 sm:mt-16">
             {[
                 { icon: Network, label: 'Cabling', color: 'from-amber-500 to-yellow-500' },
                 { icon: Lock, label: 'Access', color: 'from-orange-500 to-amber-600' },
@@ -153,7 +153,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8 sm:mb-12 px-2">
             <Badge className="mb-2 sm:mb-3 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">Features</Badge>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1.5 sm:mb-2 lg:mb-3">
+            <h2 className="text-xl sm:text-2xl lg:text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1.5 sm:mb-2 lg:mb-3">
               Everything You Need
             </h2>
             <p className="text-xs text-slate-400 max-w-2xl mx-auto">
@@ -161,7 +161,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
             {[
               {
                 icon: Users,
@@ -221,7 +221,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.1),transparent_70%)]"></div>
 
         <div className="relative max-w-3xl mx-auto text-center px-2">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
             Ready to Get Started?
           </h2>
           <p className="text-sm text-slate-300 mb-6 sm:mb-8">

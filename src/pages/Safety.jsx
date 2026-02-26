@@ -63,8 +63,8 @@ export default function Safety() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-900">Safety Management</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Safety Management</h1>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
             <Button className="bg-red-600 hover:bg-red-700">
@@ -79,7 +79,7 @@ export default function Safety() {
               <select
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
-                className="w-full p-2 border rounded-lg"
+                className="w-full sm:w-auto p-2 border rounded-lg"
               >
                 <option value="">Select Project</option>
                 {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -87,7 +87,7 @@ export default function Safety() {
               <select
                 value={formData.incident_type}
                 onChange={(e) => setFormData({ ...formData, incident_type: e.target.value })}
-                className="w-full p-2 border rounded-lg"
+                className="w-full sm:w-auto p-2 border rounded-lg"
               >
                 <option value="near_miss">Near Miss</option>
                 <option value="injury">Injury</option>
@@ -97,7 +97,7 @@ export default function Safety() {
               <select
                 value={formData.severity}
                 onChange={(e) => setFormData({ ...formData, severity: e.target.value })}
-                className="w-full p-2 border rounded-lg"
+                className="w-full sm:w-auto p-2 border rounded-lg"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -129,7 +129,7 @@ export default function Safety() {
                   }
                 }}
                 disabled={!selectedProject || !formData.description || !formData.location || !formData.incident_type || createMutation.isPending}
-                className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {createMutation.isPending ? 'Submitting...' : 'Report Incident'}
               </Button>
@@ -177,7 +177,7 @@ export default function Safety() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-700">{incident.description}</p>
+              <p className="text-slate-700 break-words">{incident.description}</p>
             </CardContent>
           </Card>
         ))}

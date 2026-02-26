@@ -35,10 +35,10 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-100">
-      <Card className="w-full max-w-md">
+      <Card className="w-full sm:w-auto max-w-md">
         <CardHeader>
-          <CardTitle>Sign in to MYGSIS</CardTitle>
-          <p className="text-sm text-slate-500">Sign in at mygsis.com</p>
+          <CardTitle>Sign in to ConstructFlow</CardTitle>
+          <p className="text-sm text-slate-500">Use your Supabase-backed account</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -66,7 +66,7 @@ export default function Login() {
                 className="mt-1"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>

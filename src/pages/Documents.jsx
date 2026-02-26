@@ -233,7 +233,7 @@ export default function Documents() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap justify-between items-center gap-3">
-        <h1 className="text-3xl font-bold text-slate-900">Project Documents</h1>
+        <h1 className="text-2xl md:text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Project Documents</h1>
         <div className="flex gap-2">
           <Dialog open={showForm} onOpenChange={setShowForm}>
             <DialogTrigger asChild>
@@ -274,14 +274,14 @@ export default function Documents() {
                 </Select>
 
                 <label className="block text-sm">
-                  <span className="text-slate-700">File</span>
+                  <span className="text-slate-700 break-words">File</span>
                   <Input type="file" className="mt-1" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
                 </label>
 
                 <Button
                   onClick={() => createMutation.mutate()}
                   disabled={!selectedProject || !formData.name || createMutation.isPending || !canCreateDocuments}
-                  className="w-full bg-amber-600 hover:bg-amber-700"
+                  className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700"
                 >
                   {createMutation.isPending ? 'Uploading...' : 'Upload Document'}
                 </Button>
@@ -306,7 +306,7 @@ export default function Documents() {
                 </Select>
                 <Input type="file" onChange={(e) => setNewVersionFile(e.target.files?.[0] || null)} />
                 <Button
-                  className="w-full"
+                  className="w-full sm:w-auto"
                   disabled={!newVersionDoc || !newVersionFile || uploadVersionMutation.isPending}
                   onClick={() => uploadVersionMutation.mutate()}
                 >
@@ -379,7 +379,7 @@ export default function Documents() {
             <p className="text-sm text-slate-500">No version history available.</p>
           ) : (
             <div className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-3">
                 <Select value={compareLeft} onValueChange={setCompareLeft}>
                   <SelectTrigger><SelectValue placeholder="Left version" /></SelectTrigger>
                   <SelectContent>
@@ -398,7 +398,7 @@ export default function Documents() {
                 </Select>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-4">
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2"><GitCompare className="h-4 w-4" /> Left</CardTitle>

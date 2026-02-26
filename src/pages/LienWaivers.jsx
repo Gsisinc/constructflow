@@ -25,7 +25,7 @@ export default function LienWaivers() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Lien Waivers</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Lien Waivers</h1>
         <p className="text-slate-600 mt-1">Send and collect lien waivers; manage sub-tier waivers and custom templates.</p>
       </div>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -35,7 +35,7 @@ export default function LienWaivers() {
           <TabsTrigger value="templates" className="gap-2"><FileText className="h-4 w-4" /> Templates</TabsTrigger>
         </TabsList>
         <TabsContent value="send" className="space-y-4 mt-4">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-xl font-semibold">Send Lien Waivers</h2>
             <Button><Plus className="h-4 w-4 mr-2" /> Send Waiver</Button>
           </div>
@@ -56,7 +56,7 @@ export default function LienWaivers() {
           </Card>
         </TabsContent>
         <TabsContent value="collect" className="space-y-4 mt-4">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-xl font-semibold">Collect Lien Waivers</h2>
             <Button variant="outline"><Upload className="h-4 w-4 mr-2" /> Request Waiver</Button>
           </div>
@@ -83,7 +83,7 @@ export default function LienWaivers() {
           </Card>
         </TabsContent>
         <TabsContent value="templates" className="space-y-4 mt-4">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-xl font-semibold">Custom Lien Waiver Templates</h2>
             <Button><Plus className="h-4 w-4 mr-2" /> New Template</Button>
           </div>

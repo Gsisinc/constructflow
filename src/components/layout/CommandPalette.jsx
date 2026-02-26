@@ -29,7 +29,6 @@ import {
   Keyboard,
   ArrowRight,
   Sparkles,
-  Mail,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -116,14 +115,6 @@ const navigationItems = [
     page: 'Estimates',
     shortcut: 'E',
     keywords: 'budget pricing cost',
-  },
-  {
-    id: 'webmail',
-    name: 'Webmail',
-    icon: Mail,
-    page: 'Webmail',
-    shortcut: 'M',
-    keywords: 'email inbox compose mail',
   },
   {
     id: 'settings',

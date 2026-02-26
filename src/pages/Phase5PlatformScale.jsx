@@ -229,7 +229,7 @@ export default function Phase5PlatformScale() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Platform & Tenant Control Hub</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Platform & Tenant Control Hub</h1>
         <p className="text-sm text-slate-600 mt-1">Integration marketplace, tenant administration, and executive reporting command center.</p>
       </div>
 
@@ -253,7 +253,7 @@ export default function Phase5PlatformScale() {
                   <div key={provider.id} className="border rounded-lg p-3 space-y-3">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="font-medium text-slate-900">{provider.name}</p>
+                        <p className="font-medium text-slate-900 break-words">{provider.name}</p>
                         <p className="text-xs text-slate-500">{provider.category} • {provider.tier.toUpperCase()} tier</p>
                       </div>
                       <Badge className={cfg.connected ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'}>
@@ -261,7 +261,7 @@ export default function Phase5PlatformScale() {
                       </Badge>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-3">
+                    <div className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                       <div className="md:col-span-2">
                         <Label>Connected account</Label>
                         <Input
@@ -333,7 +333,7 @@ export default function Phase5PlatformScale() {
               <CardTitle>Production Connector Operations</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-3 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 <div>
                   <Label>Provider</Label>
                   <Select value={selectedProvider} onValueChange={setSelectedProvider}>
@@ -350,14 +350,14 @@ export default function Phase5PlatformScale() {
                   <Input value={providerState[selectedProvider]?.sync_mode || 'ingest_only'} readOnly />
                 </div>
                 <div className="flex items-end">
-                  <Button className="w-full" onClick={() => runConnectorSync.mutate()} disabled={runConnectorSync.isPending}>
+                  <Button className="w-full sm:w-auto" onClick={() => runConnectorSync.mutate()} disabled={runConnectorSync.isPending}>
                     {runConnectorSync.isPending ? 'Running sync...' : 'Run bi-directional sync job'}
                   </Button>
                 </div>
               </div>
 
               <div className="border rounded-lg p-3 space-y-2">
-                <p className="font-medium text-slate-900">Sync run history</p>
+                <p className="font-medium text-slate-900 break-words">Sync run history</p>
                 {syncResults.length === 0 ? (
                   <p className="text-sm text-slate-500">No sync jobs run yet.</p>
                 ) : syncResults.map((job) => (
@@ -369,7 +369,7 @@ export default function Phase5PlatformScale() {
               </div>
 
               <div className="border rounded-lg p-3 space-y-2">
-                <p className="font-medium text-slate-900">Reconciliation queue</p>
+                <p className="font-medium text-slate-900 break-words">Reconciliation queue</p>
                 {conflicts.length === 0 ? (
                   <p className="text-sm text-slate-500">No conflicts detected from latest sync.</p>
                 ) : conflicts.map((conflict) => (
@@ -394,13 +394,13 @@ export default function Phase5PlatformScale() {
               <CardTitle>Tenant Admin Console</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-3 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 <Metric title="Active users" value={usage.active_users} />
                 <Metric title="Documents" value={usage.documents_count} />
                 <Metric title="AI tokens used" value={usage.ai_tokens_used.toLocaleString()} />
               </div>
 
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="tenant-slug">Tenant slug</Label>
                   <Input id="tenant-slug" value={tenantPolicy.tenant_slug} onChange={(event) => setTenantPolicy((prev) => ({ ...prev, tenant_slug: event.target.value }))} />
@@ -445,7 +445,7 @@ export default function Phase5PlatformScale() {
               <CardTitle>Executive Command Center</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-5 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <Metric title="Active projects" value={kpis.active_projects} />
                 <Metric title="Budget" value={`$${kpis.total_budget.toLocaleString()}`} />
                 <Metric title="Spend" value={`$${kpis.total_spend.toLocaleString()}`} />
@@ -454,7 +454,7 @@ export default function Phase5PlatformScale() {
               </div>
 
               <div className="border rounded-lg p-3 space-y-2">
-                <p className="font-medium text-slate-900">Revenue forecast by start month</p>
+                <p className="font-medium text-slate-900 break-words">Revenue forecast by start month</p>
                 {revenueForecast.length === 0 ? (
                   <p className="text-sm text-slate-500">No project dates available yet.</p>
                 ) : (
@@ -468,7 +468,7 @@ export default function Phase5PlatformScale() {
               </div>
 
               <div className="border rounded-lg p-3 bg-slate-50">
-                <p className="text-sm text-slate-700">
+                <p className="text-sm text-slate-700 break-words">
                   Focus: tenant-level policy controls, production connector ops with reconciliation, and portfolio command center metrics for multi-company SaaS operations.
                 </p>
               </div>

@@ -107,7 +107,7 @@ export default function Materials() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Materials</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 tracking-tight">Materials</h1>
           <p className="text-slate-500 mt-1">Track inventory and material costs</p>
         </div>
         <Button onClick={() => { setEditingMaterial(null); setShowForm(true); }} className="bg-slate-900 hover:bg-slate-800">
@@ -117,12 +117,12 @@ export default function Materials() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-slate-200 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-500">Total Items</p>
-              <p className="text-2xl font-semibold mt-1">{materials.length}</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1">{materials.length}</p>
             </div>
             <div className="p-3 rounded-xl bg-blue-100">
               <Package className="h-5 w-5 text-blue-600" />
@@ -133,7 +133,7 @@ export default function Materials() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-500">Inventory Value</p>
-              <p className="text-2xl font-semibold mt-1">${totalValue.toLocaleString()}</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1">${totalValue.toLocaleString()}</p>
             </div>
             <div className="p-3 rounded-xl bg-green-100">
               <Package className="h-5 w-5 text-green-600" />
@@ -145,8 +145,8 @@ export default function Materials() {
             <div>
               <p className="text-sm text-slate-500">Low Stock Alerts</p>
               <p className={cn(
-                "text-2xl font-semibold mt-1",
-                lowStockItems.length > 0 ? "text-red-600" : "text-slate-900"
+                "text-lg sm:text-xl md:text-2xl font-semibold mt-1",
+                lowStockItems.length > 0 ? "text-red-600" : "text-slate-900 break-words"
               )}>
                 {lowStockItems.length}
               </p>
@@ -176,7 +176,7 @@ export default function Materials() {
           />
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-auto sm:w-48">
             <SelectValue placeholder="Filter by category" />
           </SelectTrigger>
           <SelectContent>
@@ -326,7 +326,7 @@ function MaterialFormDialog({ open, onOpenChange, material, onSubmit, loading })
               required
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Category *</Label>
               <Select
@@ -353,7 +353,7 @@ function MaterialFormDialog({ open, onOpenChange, material, onSubmit, loading })
               />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Unit Price ($)</Label>
               <Input

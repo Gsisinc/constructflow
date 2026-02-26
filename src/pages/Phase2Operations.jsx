@@ -67,7 +67,7 @@ export default function Phase2Operations() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Bid Leveling & Forecast Operations</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Bid Leveling & Forecast Operations</h1>
         <p className="text-sm text-slate-600 mt-1">Bid leveling, change order approvals, and cost-to-complete forecasting.</p>
       </div>
 
@@ -89,9 +89,9 @@ export default function Phase2Operations() {
               ) : (
                 <div className="space-y-2">
                   {leveledBids.map((bid, index) => (
-                    <div key={bid.id || `${bid.vendor}-${index}`} className="border rounded-lg p-3 flex justify-between items-center">
+                    <div key={bid.id || `${bid.vendor}-${index}`} className="border rounded-lg p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
-                        <p className="font-semibold text-slate-900">#{index + 1} {bid.vendor || bid.subcontractor_name || 'Vendor'}</p>
+                        <p className="font-semibold text-slate-900 break-words">#{index + 1} {bid.vendor || bid.subcontractor_name || 'Vendor'}</p>
                         <p className="text-xs text-slate-500">Amount: ${(bid.bid_amount || 0).toLocaleString()} • Compliance: {bid.compliance_score || 0}</p>
                       </div>
                       <Badge>{bid.weighted_score}</Badge>
@@ -112,7 +112,7 @@ export default function Phase2Operations() {
               ) : (
                 <div className="space-y-2">
                   {vendorScorecards.map((vendor) => (
-                    <div key={vendor.vendor} className="border rounded-lg p-3 flex justify-between items-center">
+                    <div key={vendor.vendor} className="border rounded-lg p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
                         <p className="font-medium">{vendor.vendor}</p>
                         <p className="text-xs text-slate-500">POs: {vendor.po_count} • On-time: {vendor.on_time_deliveries} • Invoices: ${vendor.invoice_total.toLocaleString()}</p>
@@ -142,7 +142,7 @@ export default function Phase2Operations() {
                     <div key={co.id} className="border rounded-lg p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-semibold text-slate-900">{co.title || co.change_order_number || 'Change Order'}</p>
+                          <p className="font-semibold text-slate-900 break-words">{co.title || co.change_order_number || 'Change Order'}</p>
                           <p className="text-sm text-slate-600">{co.description || 'No description provided.'}</p>
                           <p className="text-xs text-slate-500 mt-1">Cost impact: ${(co.cost_impact || 0).toLocaleString()} • Schedule: {co.schedule_impact_days || 0} days</p>
                         </div>
@@ -184,7 +184,7 @@ export default function Phase2Operations() {
               ) : (
                 <div className="space-y-2">
                   {costForecast.map((row) => (
-                    <div key={row.project_id} className="border rounded-lg p-3 flex justify-between items-center">
+                    <div key={row.project_id} className="border rounded-lg p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
                         <p className="font-semibold">{row.project_name}</p>
                         <p className="text-xs text-slate-500">Budget: ${row.budget.toLocaleString()} • Forecast total: ${row.forecast_total.toLocaleString()} • CTC: ${row.cost_to_complete.toLocaleString()}</p>

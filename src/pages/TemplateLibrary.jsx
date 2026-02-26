@@ -83,7 +83,7 @@ export default function TemplateLibrary() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-3xl font-bold text-slate-900">Template Library</h1>
+          <h1 className="text-xl sm:text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Template Library</h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Manage construction templates for your projects</p>
         </div>
         <div className="flex gap-2">
@@ -129,7 +129,7 @@ export default function TemplateLibrary() {
       </div>
 
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-12">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:grid-cols-6 lg:grid-cols-12">
           {CATEGORIES.map(cat => (
             <TabsTrigger key={cat.value} value={cat.value} className="text-xs">
               {cat.label}
@@ -146,7 +146,7 @@ export default function TemplateLibrary() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {filteredTemplates.map(template => (
                   <Card key={template.id} className="hover:shadow-lg transition-shadow">
                     <CardHeader>
@@ -332,7 +332,7 @@ function TemplateForm({ template, onSubmit }) {
         <select
           value={formData.category}
           onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-          className="w-full border rounded p-2"
+          className="w-full sm:w-auto border rounded p-2"
         >
           {CATEGORIES.map(cat => (
             <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -353,10 +353,10 @@ function TemplateForm({ template, onSubmit }) {
           value={formData.content}
           onChange={(e) => setFormData({ ...formData, content: e.target.value })}
           placeholder="Template content..."
-          className="w-full border rounded p-2 h-48 font-mono text-xs"
+          className="w-full sm:w-auto border rounded p-2 h-48 font-mono text-xs"
         />
       </div>
-      <Button onClick={() => onSubmit(formData)} className="w-full">
+      <Button onClick={() => onSubmit(formData)} className="w-full sm:w-auto">
         {template ? 'Update Template' : 'Create Template'}
       </Button>
     </div>

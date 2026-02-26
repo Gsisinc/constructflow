@@ -67,7 +67,7 @@ export default function QuickBooksSync() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">QuickBooks Online Sync</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">QuickBooks Online Sync</h1>
           <p className="text-slate-500 mt-1">Two-way sync with QuickBooks Online accounting</p>
         </div>
         <div className="flex items-center gap-3">
@@ -112,7 +112,7 @@ export default function QuickBooksSync() {
         </TabsList>
 
         <TabsContent value="overview" className="mt-4 space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: 'Projects → Customers', count: projects.length, icon: Users },
               { label: 'Expenses → Bills', count: expenses.length, icon: FileText },
@@ -171,7 +171,7 @@ export default function QuickBooksSync() {
                   <div key={i} className="flex items-center gap-3 py-2 border-b last:border-0">
                     <Badge variant="outline" className="flex-shrink-0">{m.app}</Badge>
                     <ArrowRight className="h-4 w-4 text-slate-400 flex-shrink-0" />
-                    <span className="text-sm font-mono text-slate-700">{m.qb}</span>
+                    <span className="text-sm font-mono text-slate-700 break-words">{m.qb}</span>
                     <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto flex-shrink-0" />
                   </div>
                 ))}

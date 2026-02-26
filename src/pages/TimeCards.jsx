@@ -20,7 +20,7 @@ export default function TimeCards() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Time Cards</h1>
+          <h1 className="text-xl sm:text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Time Cards</h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Track and manage crew time</p>
         </div>
         <div className="flex gap-1.5 sm:gap-2 flex-wrap">
@@ -31,7 +31,7 @@ export default function TimeCards() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {/* Calendar */}
         <Card className="lg:col-span-1">
           <CardHeader>
@@ -76,28 +76,28 @@ export default function TimeCards() {
               <CardTitle>Time Cards Stats</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-slate-600 mb-1">Last Week vs This Week</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold">0:00</span>
-                    <span className="text-slate-600">Me</span>
+                  <p className="text-xs sm:text-sm text-slate-600 mb-2">Last Week vs This Week</p>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-xl sm:text-lg sm:text-xl md:text-2xl font-bold">0:00</span>
+                    <span className="text-xs sm:text-sm text-slate-600">Me</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold">0:00</span>
-                    <span className="text-slate-600">Team</span>
+                    <span className="text-xl sm:text-lg sm:text-xl md:text-2xl font-bold">0:00</span>
+                    <span className="text-xs sm:text-sm text-slate-600">Team</span>
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-600 mb-1">Total (Hrs)</p>
+                  <p className="text-xs sm:text-sm text-slate-600 mb-2">Total (Hrs)</p>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Regular Time</span>
-                      <span className="font-medium">0:00</span>
+                      <span className="text-xs sm:text-sm text-slate-600">Regular Time</span>
+                      <span className="text-xs sm:text-sm font-medium">0:00</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Overtime</span>
-                      <span className="font-medium">0:00</span>
+                      <span className="text-xs sm:text-sm text-slate-600">Overtime</span>
+                      <span className="text-xs sm:text-sm font-medium">0:00</span>
                     </div>
                     <div className="flex justify-between font-semibold">
                       <span>Total (Hrs)</span>
@@ -132,21 +132,23 @@ export default function TimeCards() {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>
-                Current Week Timesheet
-                <p className="text-sm font-normal text-slate-500">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <CardTitle className="text-base sm:text-lg">
+                  Current Week Timesheet
+                </CardTitle>
+                <p className="text-xs sm:text-sm font-normal text-slate-500 mt-1">
                   {format(new Date(), 'MMM dd')} - {format(new Date(), 'MMM dd, yyyy')}
                 </p>
-              </CardTitle>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">Current Week Timesheet</Button>
-                <Button variant="outline" size="sm">Detailed Activity Log</Button>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm">Current Week Timesheet</Button>
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm">Detailed Activity Log</Button>
               </div>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto text-xs sm:text-sm">
-                <table className="w-full">
+                <table className="w-full sm:w-auto">
                   <thead>
                     <tr className="border-b">
                       <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-slate-600">Employee</th>

@@ -2,13 +2,18 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, Key } from 'lucide-react';
-import { hasClaudeKey, hasOpenAIKey, hasSamGovKey } from '@/lib/apiKeys';
+
+const hasKey = (key) => Boolean(key && String(key).trim().length > 0);
 
 export default function ApiStatusCard() {
+  const claude = import.meta.env.VITE_CLAUDE_API_KEY ?? import.meta.env.VITE_ANTHROPIC_API_KEY ?? process.env.REACT_APP_CLAUDE_API_KEY;
+  const openai = import.meta.env.VITE_OPENAI_API_KEY ?? process.env.OPENAI_API_KEY;
+  const samGov = import.meta.env.VITE_SAM_GOV_API_KEY ?? process.env.SAM_GOV_API_KEY;
+
   const items = [
-    { name: 'Claude (AI agents & estimate generator)', configured: hasClaudeKey() },
-    { name: 'OpenAI (bid/doc & blueprint analysis)', configured: hasOpenAIKey() },
-    { name: 'SAM.gov (live bid discovery)', configured: hasSamGovKey() },
+    { name: 'Claude (AI agents & estimate generator)', configured: hasKey(claude) },
+    { name: 'OpenAI (bid/doc & drawing analysis)', configured: hasKey(openai) },
+    { name: 'SAM.gov (live bid discovery)', configured: hasKey(samGov) },
   ];
 
   return (
@@ -19,7 +24,7 @@ export default function ApiStatusCard() {
           API status
         </CardTitle>
         <p className="text-xs text-slate-500">
-          Keys from .env (VITE_*) or set in AI Agents → OpenAI/Claude or Bid Discovery. Never shown.
+          Keys are read from .env.local (VITE_*). Values are never shown here.
         </p>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -40,7 +45,7 @@ export default function ApiStatusCard() {
           </div>
         ))}
         <p className="text-xs text-slate-500 pt-2">
-          Add to .env and restart, or set in AI Agents (OpenAI/Claude) and Bid Discovery (SAM.gov).
+          Add keys to .env.local and restart the dev server. See .env.example.
         </p>
       </CardContent>
     </Card>

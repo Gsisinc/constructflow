@@ -111,7 +111,6 @@ export default function PhaseGateChecklist({
                   )}
                 >
                   <Checkbox
-                    size="sm"
                     checked={item.completed}
                     onCheckedChange={(checked) => handleCheckItem(index, checked)}
                     disabled={gate.status === 'approved'}
