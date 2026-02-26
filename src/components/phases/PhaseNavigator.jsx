@@ -405,7 +405,7 @@ export default function PhaseNavigator({
                                   data: { status: e.target.checked ? 'completed' : 'pending' }
                                 });
                               }}
-                              className="h-4 w-4"
+                              className="h-3 w-3 rounded border-slate-300"
                             />
                             <span className={cn(req.status === 'completed' && 'line-through text-slate-400', 'flex-1')}>
                               {req.requirement_text}
@@ -433,7 +433,7 @@ export default function PhaseNavigator({
                                     data: { status: e.target.checked ? 'completed' : 'pending' }
                                   });
                                 }}
-                                className="h-3.5 w-3.5"
+                                className="h-3 w-3 rounded border-slate-300"
                               />
                               <span className={cn(subReq.status === 'completed' && 'line-through text-slate-400', 'text-xs text-slate-600')}>
                                 {subReq.requirement_text}

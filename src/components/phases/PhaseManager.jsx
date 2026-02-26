@@ -579,6 +579,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                     <GripVertical className="h-5 w-5 text-slate-400 hover:text-slate-600" />
                                   </div>
                                   <Checkbox
+                                    size="sm"
                                     checked={req.status === 'completed'}
                                     onCheckedChange={(checked) => onToggle.mutate({ id: req.id, completed: checked })}
                                   />
@@ -641,6 +642,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                                                   <GripVertical className="h-4 w-4 text-slate-400 hover:text-slate-600" />
                                                 </div>
                                                 <Checkbox
+                                                  size="sm"
                                                   checked={subReq.status === 'completed'}
                                                   onCheckedChange={(checked) => onToggle.mutate({ id: subReq.id, completed: checked })}
                                                   className="mt-0.5"

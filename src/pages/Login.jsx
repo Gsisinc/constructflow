@@ -37,8 +37,8 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-100">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Sign in to ConstructFlow</CardTitle>
-          <p className="text-sm text-slate-500">Use your Supabase-backed account</p>
+          <CardTitle>Sign in to MYGSIS</CardTitle>
+          <p className="text-sm text-slate-500">Sign in at mygsis.com</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

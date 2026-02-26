@@ -126,6 +126,7 @@ import TrainingMaterials from './pages/TrainingMaterials';
 import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
+import Webmail from './pages/Webmail';
 import __Layout from './Layout.jsx';
 
 
@@ -209,6 +210,7 @@ export const PAGES = {
     "TrainingSchedule": TrainingSchedule,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
+    "Webmail": Webmail,
 }
 
 export const pagesConfig = {

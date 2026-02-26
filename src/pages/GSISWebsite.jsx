@@ -17,6 +17,8 @@ export default function GSISWebsite() {
         <Route path="/about" element={<GSISAboutPage />} />
         <Route path="/contact" element={<GSISContactPage />} />
         <Route path="/projects" element={<GSISProjectsPage />} />
+        {/* Fallback so we never show blank (e.g. trailing slash or base path) */}
+        <Route path="*" element={<GSISHomePage />} />
       </Routes>
     </GSISLayout>
   );

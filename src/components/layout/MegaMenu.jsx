@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   Package,
   MessageSquare,
+  Mail,
   DollarSign,
   FileStack,
   TrendingUp,
@@ -65,6 +66,7 @@ const menuSections = [
       { icon: FileText, label: 'Cost Library', page: 'CostLibrary' },
       { icon: FileText, label: 'AI Estimate Generator', page: 'EstimateGenerator' },
       { icon: MessageSquare, label: 'Send Text Messages', page: 'TextMessages' },
+      { icon: Mail, label: 'Webmail', page: 'Webmail' },
       { icon: FileText, label: 'E-signatures', page: 'ESignatures' },
     ]
   },

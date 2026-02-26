@@ -16,6 +16,7 @@ import ChangeOrderManager from '../components/changeorders/ChangeOrderManager';
 import SafetyManager from '../components/safety/SafetyManager';
 import DecisionManager from '../components/decisions/DecisionManager';
 import TeamRoleManager from '../components/team/TeamRoleManager';
+import GanttChart from '../components/project/GanttChart';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -32,7 +33,12 @@ import {
   AlertTriangle,
   Clock,
   Trash2,
-  FileStack
+  FileStack,
+  Phone,
+  Cloud,
+  ExternalLink,
+  CheckCircle2,
+  Activity
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -72,6 +78,7 @@ export default function ProjectDetail() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showGateChecklist, setShowGateChecklist] = useState(false);
   const [selectedGate, setSelectedGate] = useState(null);
+  const [activeTab, setActiveTab] = useState('home');
 
   const { data: project, isLoading } = useQuery({
     queryKey: ['project', projectId],
@@ -168,6 +175,40 @@ export default function ProjectDetail() {
       window.location.href = createPageUrl('Projects');
     },
   });
+
+  const taskCreateMutation = useMutation({
+    mutationFn: (data) => base44.entities.Task.create({
+      project_id: projectId,
+      organization_id: project?.organization_id,
+      title: data.name,
+      due_date: data.endDate || null,
+      status: data.status || 'todo',
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks', projectId] }),
+  });
+  const taskUpdateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Task.update(id, {
+      title: data.name,
+      due_date: data.endDate || null,
+      status: data.status,
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks', projectId] }),
+  });
+  const taskDeleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.Task.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks', projectId] }),
+  });
+
+  const ganttTasks = (tasks || []).map((t) => ({
+    id: t.id,
+    name: t.title || t.name || 'Task',
+    startDate: t.start_date || project?.start_date || new Date().toISOString().split('T')[0],
+    endDate: t.end_date || t.due_date || project?.end_date || new Date().toISOString().split('T')[0],
+    progress: t.progress ?? 0,
+    assignee: t.assignee_id || '',
+    status: (t.status === 'completed' ? 'completed' : t.status === 'in_progress' ? 'in-progress' : t.status === 'blocked' ? 'blocked' : 'todo'),
+    dependencies: t.dependencies || [],
+  }));
 
   const createGateMutation = useMutation({
     mutationFn: (data) => base44.entities.PhaseGate.create(data),
@@ -405,9 +446,11 @@ export default function ProjectDetail() {
         <ProjectDeadlines projectId={projectId} />
       )}
 
-      {/* Tabs for detailed views */}
-      <Tabs defaultValue="phases" className="w-full">
+      {/* Tabs for detailed views (Home first, like SCM) */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-slate-100 rounded-lg">
+          <TabsTrigger value="home">Home</TabsTrigger>
+          <TabsTrigger value="goals">Goals / Timeline</TabsTrigger>
           <TabsTrigger value="phases">Phases</TabsTrigger>
           <TabsTrigger value="changeorders">Change Orders</TabsTrigger>
           <TabsTrigger value="safety">Safety</TabsTrigger>
@@ -418,6 +461,198 @@ export default function ProjectDetail() {
           <TabsTrigger value="logs">Logs</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
         </TabsList>
+
+        {/* Home tab: overview widgets (SCM-style) */}
+        <TabsContent value="home" className="mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              {/* Live site / Today's activity */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  <Activity className="h-4 w-4" />
+                  Live Site Status
+                </h3>
+                <p className="text-slate-600 text-sm mb-3">No employees currently clocked in.</p>
+                <div className="grid grid-cols-4 gap-2 text-center">
+                  <div className="rounded-lg bg-slate-50 p-2">
+                    <p className="text-lg font-semibold text-slate-900">{expenses.filter(e => {
+                      const d = e.date || e.created_date;
+                      return d && new Date(d).toDateString() === new Date().toDateString();
+                    }).length}</p>
+                    <p className="text-xs text-slate-500">Expenses</p>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 p-2">
+                    <p className="text-lg font-semibold text-slate-900">{clientUpdates.filter(u => {
+                      const d = u.created_date;
+                      return d && new Date(d).toDateString() === new Date().toDateString();
+                    }).length}</p>
+                    <p className="text-xs text-slate-500">Photos</p>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 p-2">
+                    <p className="text-lg font-semibold text-slate-900">{dailyLogs.filter(l => {
+                      const d = l.log_date || l.created_date;
+                      return d && new Date(d).toDateString() === new Date().toDateString();
+                    }).length}</p>
+                    <p className="text-xs text-slate-500">Logs</p>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 p-2">
+                    <p className="text-lg font-semibold text-slate-900">0</p>
+                    <p className="text-xs text-slate-500">Files</p>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">Today&apos;s Activity</p>
+              </div>
+              {/* Earlier activity */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-semibold text-slate-700 mb-3">Earlier Activity</h3>
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <div>
+                    <span className="text-slate-500">Weekly Hours:</span>{' '}
+                    <span className="font-medium">0 hrs</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">Est. Cost:</span>{' '}
+                    <span className="font-medium">${totalExpenses.toLocaleString()}</span>
+                  </div>
+                </div>
+                <Button variant="link" className="px-0 mt-2 text-xs" onClick={() => setActiveTab('logs')}>
+                  View All
+                </Button>
+              </div>
+              {/* Recent logs */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-slate-700">Recent Logs</h3>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to={createPageUrl('DailyLog') + `?project=${projectId}`}>View All</Link>
+                  </Button>
+                </div>
+                {dailyLogs.length === 0 ? (
+                  <p className="text-slate-500 text-sm">No logs yet.</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {dailyLogs
+                      .sort((a, b) => new Date(b.log_date || 0) - new Date(a.log_date || 0))
+                      .slice(0, 3)
+                      .map((log) => (
+                        <li key={log.id} className="text-sm text-slate-600 truncate">
+                          {log.work_performed || log.notes || 'Log entry'} — {log.log_date ? format(new Date(log.log_date), 'MMM d') : ''}
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+            <div className="space-y-6">
+              {/* Primary / Secondary contact */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-semibold text-slate-700 mb-3">Contacts</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-xs text-slate-500">Primary Contact</p>
+                      <p className="font-medium text-slate-900">{project.project_manager || project.client_name || '—'} (PM)</p>
+                    </div>
+                    {project.primary_contact_phone && (
+                      <Button variant="outline" size="icon" asChild>
+                        <a href={`tel:${project.primary_contact_phone}`}><Phone className="h-4 w-4" /></a>
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-xs text-slate-500">Secondary Contact</p>
+                      <p className="font-medium text-slate-900">{project.secondary_contact_name || '—'} {project.secondary_contact_role ? `(${project.secondary_contact_role})` : ''}</p>
+                    </div>
+                    {project.secondary_contact_phone && (
+                      <Button variant="outline" size="icon" asChild>
+                        <a href={`tel:${project.secondary_contact_phone}`}><Phone className="h-4 w-4" /></a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {/* Weather */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                  <Cloud className="h-4 w-4" />
+                  Weather
+                </h3>
+                <Button variant="outline" size="sm" className="w-full gap-2" asChild>
+                  <a href={`https://www.google.com/search?q=weather+${encodeURIComponent(project.address || project.name || '')}`} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4" />
+                    View forecast for site
+                  </a>
+                </Button>
+              </div>
+              {/* Project location / View Site Map */}
+              {project.address && (
+                <div className="bg-white rounded-xl border border-slate-200 p-4">
+                  <h3 className="text-sm font-semibold text-slate-700 mb-2">Project Location</h3>
+                  <Button variant="outline" size="sm" className="w-full gap-2" asChild>
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.address)}`} target="_blank" rel="noopener noreferrer">
+                      <MapPin className="h-4 w-4" />
+                      Open in Google Maps
+                    </a>
+                  </Button>
+                </div>
+              )}
+              {/* Finish Project */}
+              {project.status !== 'completed' && (
+                <div className="bg-white rounded-xl border border-slate-200 p-4">
+                  <Button
+                    className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700"
+                    onClick={() => {
+                      if (window.confirm('Mark this project as finished?')) {
+                        updateMutation.mutate({ status: 'completed' });
+                      }
+                    }}
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Finish Project?
+                  </Button>
+                </div>
+              )}
+              {/* Schedule of Values (from change orders) */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-slate-700">Schedule of Values</h3>
+                  <Button variant="outline" size="sm" onClick={() => setActiveTab('changeorders')}>
+                    Add Value
+                  </Button>
+                </div>
+                {changeOrders.length === 0 ? (
+                  <p className="text-slate-500 text-sm">No line items. Use Change Orders to add.</p>
+                ) : (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {changeOrders.slice(0, 5).map((co) => (
+                      <div key={co.id} className="flex justify-between text-sm border-b border-slate-100 pb-2">
+                        <span className="truncate">{co.description || co.title || 'Change order'}</span>
+                        <span className="font-medium shrink-0">${(co.cost_impact || 0).toLocaleString()}</span>
+                      </div>
+                    ))}
+                    {changeOrders.length > 5 && (
+                      <Button variant="link" className="px-0 text-xs" onClick={() => setActiveTab('changeorders')}>
+                        View all ({changeOrders.length})
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="goals" className="mt-6">
+          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <GanttChart
+              tasks={ganttTasks}
+              onTaskAdd={(task) => taskCreateMutation.mutate(task)}
+              onTaskUpdate={(task) => taskUpdateMutation.mutate({ id: task.id, data: task })}
+              onTaskDelete={(id) => taskDeleteMutation.mutate(id)}
+            />
+          </div>
+        </TabsContent>
 
         <TabsContent value="phases" className="mt-6">
           <div className="space-y-6">

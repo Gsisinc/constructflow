@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Menu, X, ArrowRight, Star, CheckCircle2, Phone, Mail, MapPin, ExternalLink, Zap, Shield, Wifi, Volume2, Lock, Cable } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { createPageUrl } from '@/utils';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function Landing() {
 
   // Navigate to the app dashboard
   const openApp = () => {
-    navigate('/Home');
+    navigate(createPageUrl('Home'));
   };
 
   // Services data

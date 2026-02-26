@@ -26,6 +26,7 @@ import {
   Grid3x3,
   ArrowLeft,
   Wrench,
+  Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,15 +39,16 @@ import MegaMenu from '@/components/layout/MegaMenu';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 // import ApiKeyBanner from '@/components/settings/ApiKeyBanner';
 
-// Primary navigation items (shown in sidebar and mobile bottom nav)
+// Primary navigation (main sidebar – most important)
 const primaryNavItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Bids', icon: FileText, page: 'Bids' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
   { name: 'Tasks', icon: FileStack, page: 'TaskTracker' },
+  { name: 'Webmail', icon: Mail, page: 'Webmail' },
 ];
 
-// Secondary navigation items
+// Quick access (sidebar section with bigger icons)
 const secondaryNavItems = [
   { name: 'Labor Force', icon: Users, page: 'TeamManagement' },
   { name: 'Templates', icon: FileText, page: 'TemplateLibrary' },
@@ -113,7 +115,7 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
           : "text-gray-700 hover:bg-accent hover:text-accent-foreground"
       )}
     >
-      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-gray-500")} />
+      <Icon className={cn("h-6 w-6 flex-shrink-0", isActive ? "text-primary-foreground" : "text-gray-500")} />
       <span className="truncate">{item.name}</span>
     </Link>
   );
@@ -307,10 +309,11 @@ export default function Layout({ children, currentPageName }) {
               variant="ghost"
               size="sm"
               onClick={() => setMegaMenuOpen(!megaMenuOpen)}
-              className="h-8 sm:h-9 px-1.5 sm:px-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 flex-shrink-0"
-              title="Quick Access"
+              className="h-9 sm:h-10 px-2 sm:px-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 flex-shrink-0 gap-1.5"
+              title="Quick access"
             >
-              <Grid3x3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <Grid3x3 className="h-5 w-5 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline text-sm font-medium">Quick access</span>
             </Button>
             <ThemeToggle />
             {user && <UserMenu user={user} onLogout={handleLogout} />}
@@ -348,9 +351,9 @@ export default function Layout({ children, currentPageName }) {
           {/* Divider */}
           <div className="h-px bg-slate-200 my-2 sm:my-3" />
 
-          {/* Secondary navigation */}
+          {/* Quick access */}
           <div className="text-xs font-semibold text-slate-400 px-3 py-2 uppercase tracking-widest">
-            Tools
+            Quick access
           </div>
           {secondaryNavItems.map((item) => (
             <SidebarNavItem

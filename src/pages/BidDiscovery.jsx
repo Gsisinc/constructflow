@@ -26,7 +26,12 @@ import {
   Bot,
   Loader2,
   Trash2,
-  ListChecks
+  ListChecks,
+  Globe,
+  ArrowLeft,
+  ArrowRight,
+  RefreshCw,
+  X
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -66,7 +71,48 @@ export default function BidDiscovery() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [samKeyInput, setSamKeyInput] = useState('');
   const [samKeySaved, setSamKeySaved] = useState(false);
+  const defaultBrowserUrl = 'https://sam.gov/content/opportunities';
+  const [browserTabs, setBrowserTabs] = useState([
+    { id: '1', url: defaultBrowserUrl, title: 'SAM.gov', key: 0 },
+  ]);
+  const [activeBrowserTabId, setActiveBrowserTabId] = useState('1');
+  const [browserUrlInput, setBrowserUrlInput] = useState(defaultBrowserUrl);
   const queryClient = useQueryClient();
+  const activeBrowserTab = browserTabs.find((t) => t.id === activeBrowserTabId) || browserTabs[0];
+  const addBrowserTab = () => {
+    const id = String(Date.now());
+    setBrowserTabs((prev) => [...prev, { id, url: defaultBrowserUrl, title: 'New tab', key: 0 }]);
+    setActiveBrowserTabId(id);
+    setBrowserUrlInput(defaultBrowserUrl);
+  };
+  const closeBrowserTab = (id) => {
+    const idx = browserTabs.findIndex((t) => t.id === id);
+    if (idx === -1) return;
+    if (browserTabs.length <= 1) return;
+    const next = browserTabs.filter((t) => t.id !== id);
+    setBrowserTabs(next);
+    if (activeBrowserTabId === id && next.length) {
+      setActiveBrowserTabId(next[Math.max(0, idx - 1)].id);
+      const tab = next[Math.max(0, idx - 1)];
+      setBrowserUrlInput(tab.url);
+    }
+  };
+  const navigateBrowserTab = (url) => {
+    const u = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+    setBrowserTabs((prev) =>
+      prev.map((t) =>
+        t.id === activeBrowserTabId ? { ...t, url: u, key: t.key + 1 } : t
+      )
+    );
+    setBrowserUrlInput(u);
+  };
+  const refreshBrowserTab = () => {
+    setBrowserTabs((prev) =>
+      prev.map((t) =>
+        t.id === activeBrowserTabId ? { ...t, key: t.key + 1 } : t
+      )
+    );
+  };
   const samGovConfigured = hasSamGovKey();
 
   const states = [
@@ -674,6 +720,106 @@ Provide:
 
   return (
     <div className="space-y-6">
+      {/* Embedded browser at top (Chrome-like, multiple tabs) */}
+      <Card className="overflow-hidden">
+        <div className="bg-slate-100 border-b flex flex-col">
+          <div className="flex items-center gap-1 overflow-x-auto min-h-[40px] px-2 py-1.5 border-b border-slate-200">
+            {browserTabs.map((tab) => (
+              <div
+                key={tab.id}
+                className={cn(
+                  'flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-t-lg border border-b-0 shrink-0 max-w-[180px] min-w-0',
+                  tab.id === activeBrowserTabId
+                    ? 'bg-white border-slate-200 shadow-sm'
+                    : 'bg-slate-200/80 border-slate-300 hover:bg-slate-200'
+                )}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveBrowserTabId(tab.id);
+                    setBrowserUrlInput(tab.url);
+                  }}
+                  className="flex-1 min-w-0 truncate text-left text-sm font-medium text-slate-700"
+                >
+                  {tab.title}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeBrowserTab(tab.id);
+                  }}
+                  className="p-0.5 rounded hover:bg-slate-300 text-slate-500 hover:text-slate-700"
+                  title="Close tab"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addBrowserTab}
+              className="p-2 rounded hover:bg-slate-200 text-slate-600 shrink-0"
+              title="New tab"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="flex items-center gap-2 p-2 flex-wrap">
+            <Button type="button" variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={refreshBrowserTab} title="Refresh">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Input
+              value={browserUrlInput}
+              onChange={(e) => setBrowserUrlInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), navigateBrowserTab(browserUrlInput))}
+              placeholder="Enter URL or search"
+              className="flex-1 min-w-[200px] h-9 bg-white font-mono text-sm"
+            />
+            <Button type="button" size="sm" className="shrink-0 h-9" onClick={() => navigateBrowserTab(browserUrlInput)}>
+              Go
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0 gap-1.5 h-9"
+              onClick={() => window.open(activeBrowserTab?.url || browserUrlInput, '_blank')}
+            >
+              <ExternalLink className="h-4 w-4" />
+              Open in new tab
+            </Button>
+          </div>
+        </div>
+        <CardContent className="p-0">
+          <div className="bg-slate-200 rounded-b-lg relative" style={{ minHeight: '320px' }}>
+            {browserTabs.map((tab) => (
+              <div
+                key={tab.id}
+                className={tab.id === activeBrowserTabId ? 'block' : 'hidden'}
+                style={{ height: '400px' }}
+              >
+                {tab.url && (
+                  <iframe
+                    key={tab.key}
+                    src={/^https?:\/\//i.test(tab.url) ? tab.url : 'https://' + tab.url}
+                    title={tab.title}
+                    className="w-full rounded-b-lg border-0 bg-white"
+                    style={{ height: '400px' }}
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-popups-to-escape-sandbox"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                )}
+              </div>
+            ))}
+            <p className="absolute bottom-2 left-2 text-xs text-slate-500 bg-white/90 px-2 py-1 rounded">
+              Some sites may block embedding. Use &quot;Open in new tab&quot; if the page does not load.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Header */}
       <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-4 sm:p-8 text-white">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
