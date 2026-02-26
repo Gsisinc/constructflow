@@ -129,13 +129,13 @@ import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import Webmail from './pages/Webmail';
+import Dashboard from './pages/Dashboard';
 import GSISAboutPage from './pages/GSISAboutPage';
 import GSISContactPage from './pages/GSISContactPage';
 import GSISHomePage from './pages/GSISHomePage';
 import GSISProjectsPage from './pages/GSISProjectsPage';
 import GSISServiceDetailPage from './pages/GSISServiceDetailPage';
 import GSISServicesPage from './pages/GSISServicesPage';
-import Dashboard from './pages/Dashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -222,13 +222,13 @@ export const PAGES = {
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
     "Webmail": Webmail,
+    "Dashboard": Dashboard,
     "GSISAboutPage": GSISAboutPage,
     "GSISContactPage": GSISContactPage,
     "GSISHomePage": GSISHomePage,
     "GSISProjectsPage": GSISProjectsPage,
     "GSISServiceDetailPage": GSISServiceDetailPage,
     "GSISServicesPage": GSISServicesPage,
-    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {
