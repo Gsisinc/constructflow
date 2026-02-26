@@ -113,6 +113,7 @@ import Settings from './pages/Settings';
 import SubcontractorPortal from './pages/SubcontractorPortal';
 import Submittals from './pages/Submittals';
 import SupportChannels from './pages/SupportChannels';
+import SystemBuilder from './pages/SystemBuilder';
 import TaskTracker from './pages/TaskTracker';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
@@ -128,7 +129,6 @@ import TrainingMaterials from './pages/TrainingMaterials';
 import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import SystemBuilder from './pages/SystemBuilder';
 import GSISAboutPage from './pages/GSISAboutPage';
 import GSISContactPage from './pages/GSISContactPage';
 import GSISHomePage from './pages/GSISHomePage';
@@ -206,6 +206,7 @@ export const PAGES = {
     "SubcontractorPortal": SubcontractorPortal,
     "Submittals": Submittals,
     "SupportChannels": SupportChannels,
+    "SystemBuilder": SystemBuilder,
     "TaskTracker": TaskTracker,
     "Tasks": Tasks,
     "Team": Team,
@@ -221,7 +222,6 @@ export const PAGES = {
     "TrainingSchedule": TrainingSchedule,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "SystemBuilder": SystemBuilder,
     "GSISAboutPage": GSISAboutPage,
     "GSISContactPage": GSISContactPage,
     "GSISHomePage": GSISHomePage,
