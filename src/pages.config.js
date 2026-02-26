@@ -99,7 +99,6 @@ import Home from './pages/Home';
 import Implementation from './pages/Implementation';
 import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
-import Dashboard from './pages/Dashboard';
 import SubcontractorPortal from './pages/SubcontractorPortal';
 import TrainingManagement from './pages/TrainingManagement';
 import TrainingMaterials from './pages/TrainingMaterials';
@@ -193,7 +192,6 @@ export const PAGES = {
     "Implementation": Implementation,
     "AlertSettings": AlertSettings,
     "AuditTrail": AuditTrail,
-    "Dashboard": Dashboard,
     "SubcontractorPortal": SubcontractorPortal,
     "TrainingManagement": TrainingManagement,
     "TrainingMaterials": TrainingMaterials,
