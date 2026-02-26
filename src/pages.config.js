@@ -71,6 +71,7 @@ import CostLibrary from './pages/CostLibrary';
 import CostPlusInvoicing from './pages/CostPlusInvoicing';
 import DailyLog from './pages/DailyLog';
 import dashboardImprovedversion from './pages/Dashboard.ImprovedVersion';
+import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
@@ -79,6 +80,7 @@ import EstimateGenerator from './pages/EstimateGenerator';
 import Estimates from './pages/Estimates';
 import FeatureTesting from './pages/FeatureTesting';
 import FieldHoursApproval from './pages/FieldHoursApproval';
+import GSISWebsite from './pages/GSISWebsite';
 import Home from './pages/Home';
 import Implementation from './pages/Implementation';
 import Invoices from './pages/Invoices';
@@ -127,6 +129,12 @@ import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import Webmail from './pages/Webmail';
+import GSISAboutPage from './pages/GSISAboutPage';
+import GSISContactPage from './pages/GSISContactPage';
+import GSISHomePage from './pages/GSISHomePage';
+import GSISProjectsPage from './pages/GSISProjectsPage';
+import GSISServiceDetailPage from './pages/GSISServiceDetailPage';
+import GSISServicesPage from './pages/GSISServicesPage';
 import __Layout from './Layout.jsx';
 
 
@@ -154,7 +162,8 @@ export const PAGES = {
     "CostLibrary": CostLibrary,
     "CostPlusInvoicing": CostPlusInvoicing,
     "DailyLog": DailyLog,
-    "Dashboard": dashboardImprovedversion,
+    "Dashboard.ImprovedVersion": dashboardImprovedversion,
+    "Dashboard": Dashboard,
     "Directory": Directory,
     "DocumentTracking": DocumentTracking,
     "Documents": Documents,
@@ -163,6 +172,7 @@ export const PAGES = {
     "Estimates": Estimates,
     "FeatureTesting": FeatureTesting,
     "FieldHoursApproval": FieldHoursApproval,
+    "GSISWebsite": GSISWebsite,
     "Home": Home,
     "Implementation": Implementation,
     "Invoices": Invoices,
@@ -211,6 +221,12 @@ export const PAGES = {
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
     "Webmail": Webmail,
+    "GSISAboutPage": GSISAboutPage,
+    "GSISContactPage": GSISContactPage,
+    "GSISHomePage": GSISHomePage,
+    "GSISProjectsPage": GSISProjectsPage,
+    "GSISServiceDetailPage": GSISServiceDetailPage,
+    "GSISServicesPage": GSISServicesPage,
 }
 
 export const pagesConfig = {
