@@ -77,9 +77,9 @@ export default function LessonPlanTemplates() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">Lesson Plan Templates</h1>
+            <h1 className="text-4xl font-bold text-slate-900">Lesson Plan Templates</h1>
             <p className="text-slate-600">Standardized teaching plans for each module</p>
           </div>
           {user?.role === 'admin' && (
@@ -89,7 +89,7 @@ export default function LessonPlanTemplates() {
           )}
         </motion.div>
 
-        <Tabs defaultValue="templates" className="w-full sm:w-auto">
+        <Tabs defaultValue="templates" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="templates">Lesson Plans ({sampleLessonPlans.length})</TabsTrigger>
             <TabsTrigger value="structure">Plan Structure</TabsTrigger>
@@ -121,12 +121,12 @@ export default function LessonPlanTemplates() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-6">
                       <div>
                         <h4 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
                           <BookOpen className="w-4 h-4" /> Learning Objectives
                         </h4>
-                        <ul className="space-y-1 text-sm text-slate-700 break-words">
+                        <ul className="space-y-1 text-sm text-slate-700">
                           {plan.objectives.map((obj, i) => (
                             <li key={i} className="flex gap-2">
                               <span className="text-blue-600">•</span>
@@ -139,7 +139,7 @@ export default function LessonPlanTemplates() {
                         <h4 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
                           <FileText className="w-4 h-4" /> Materials Required
                         </h4>
-                        <ul className="space-y-1 text-sm text-slate-700 break-words">
+                        <ul className="space-y-1 text-sm text-slate-700">
                           {plan.materials.map((mat, i) => (
                             <li key={i} className="flex gap-2">
                               <span className="text-green-600">✓</span>
@@ -172,7 +172,7 @@ export default function LessonPlanTemplates() {
                       <p className="text-sm text-slate-600 mb-3">Define what students will be able to do after the lesson:</p>
                       <div className="space-y-2">
                         {lessonPlanTemplate.objectivesStructure.map((obj, i) => (
-                          <div key={i} className="flex items-center gap-2 text-sm text-slate-700 break-words">
+                          <div key={i} className="flex items-center gap-2 text-sm text-slate-700">
                             <div className="w-2 h-2 bg-blue-600 rounded-full" />
                             <span>{obj}</span>
                           </div>
@@ -208,7 +208,7 @@ export default function LessonPlanTemplates() {
 
                     <div className="border rounded-lg p-4">
                       <h4 className="font-semibold text-slate-900 mb-3">4. Assessment Methods</h4>
-                      <ul className="space-y-1 text-sm text-slate-700 break-words">
+                      <ul className="space-y-1 text-sm text-slate-700">
                         <li className="flex gap-2">
                           <span>✓</span> <span>Practical demonstration</span>
                         </li>
@@ -226,7 +226,7 @@ export default function LessonPlanTemplates() {
 
                     <div className="border rounded-lg p-4">
                       <h4 className="font-semibold text-slate-900 mb-3">5. Required Materials</h4>
-                      <ul className="space-y-1 text-sm text-slate-700 break-words">
+                      <ul className="space-y-1 text-sm text-slate-700">
                         <li className="flex gap-2">
                           <span>•</span> <span>Lesson plan document</span>
                         </li>

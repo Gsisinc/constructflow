@@ -60,18 +60,18 @@ export default function TrainingManagement() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2">Training Management</h1>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Training Management</h1>
           <p className="text-slate-600">Manage courses, assign technicians, and track progress</p>
         </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">Total Courses</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{courses.length}</p>
+              <p className="text-3xl font-bold text-blue-600">{courses.length}</p>
               <p className="text-xs text-slate-500 mt-1">across {levels.length} levels</p>
             </CardContent>
           </Card>
@@ -80,7 +80,7 @@ export default function TrainingManagement() {
               <CardTitle className="text-sm font-medium text-slate-600">Active Technicians</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600">{technicians.length}</p>
+              <p className="text-3xl font-bold text-green-600">{technicians.length}</p>
               <p className="text-xs text-slate-500 mt-1">in training program</p>
             </CardContent>
           </Card>
@@ -89,15 +89,15 @@ export default function TrainingManagement() {
               <CardTitle className="text-sm font-medium text-slate-600">Assignments</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-purple-600">{assignments.length}</p>
+              <p className="text-3xl font-bold text-purple-600">{assignments.length}</p>
               <p className="text-xs text-slate-500 mt-1">active & completed</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="assignments" className="w-full sm:w-auto">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mb-6">
+        <Tabs defaultValue="assignments" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="assignments">Assign Courses</TabsTrigger>
             <TabsTrigger value="courses">Course Library</TabsTrigger>
             <TabsTrigger value="technicians">Technicians</TabsTrigger>
@@ -170,7 +170,7 @@ function AssignmentsSection({ assignments, technicians, courses, org }) {
           <CardTitle>Assign New Course</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select value={selectedTech} onValueChange={setSelectedTech}>
               <SelectTrigger>
                 <SelectValue placeholder="Select technician..." />
@@ -201,7 +201,7 @@ function AssignmentsSection({ assignments, technicians, courses, org }) {
             placeholder="Due date"
           />
 
-          <Button onClick={handleAssign} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleAssign} className="w-full bg-blue-600 hover:bg-blue-700">
             <Plus className="w-4 h-4 mr-2" />
             Assign Course
           </Button>
@@ -229,7 +229,7 @@ function AssignmentsSection({ assignments, technicians, courses, org }) {
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50"
                 >
                   <div className="flex-1">
-                    <p className="font-medium text-slate-900 break-words">{assignment.technician_name}</p>
+                    <p className="font-medium text-slate-900">{assignment.technician_name}</p>
                     <p className="text-sm text-slate-600">{assignment.course_title}</p>
                   </div>
                   <Badge variant="outline">{assignment.status}</Badge>
@@ -258,7 +258,7 @@ function CourseLibrarySection({ courses, levels, org }) {
             </CardHeader>
             <CardContent>
               {levelCourses.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {levelCourses.map((course) => (
                     <Card key={course.id} className="bg-slate-50">
                       <CardHeader className="pb-3">
@@ -310,18 +310,18 @@ function TechniciansSection({ technicians, assignments, org }) {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <p className="text-slate-600">Assignments</p>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold">{techAssignments.length}</p>
+                    <p className="text-2xl font-bold">{techAssignments.length}</p>
                   </div>
                   <div>
                     <p className="text-slate-600">Completed</p>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{completed}</p>
+                    <p className="text-2xl font-bold text-green-600">{completed}</p>
                   </div>
                   <div>
                     <p className="text-slate-600">Field Hours</p>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold">{tech.total_field_hours || 0}</p>
+                    <p className="text-2xl font-bold">{tech.total_field_hours || 0}</p>
                   </div>
                 </div>
               </CardContent>

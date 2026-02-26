@@ -21,7 +21,7 @@ export default function DocumentTracking() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Document Tracking</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Document Tracking</h1>
         <p className="text-slate-600 mt-1">Insurance, W9s, and licenses.</p>
       </div>
       <Tabs defaultValue="insurance">
@@ -31,7 +31,7 @@ export default function DocumentTracking() {
           <TabsTrigger value="licenses" className="gap-2"><Award className="h-4 w-4" /> Licenses</TabsTrigger>
         </TabsList>
         <TabsContent value="insurance" className="mt-4 space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Insurance Certificates</h2>
             <Button><Plus className="h-4 w-4 mr-2" /> Add</Button>
           </div>
@@ -50,7 +50,7 @@ export default function DocumentTracking() {
           </Card>
         </TabsContent>
         <TabsContent value="w9" className="mt-4 space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">W9s</h2>
             <Button><Plus className="h-4 w-4 mr-2" /> Request W9</Button>
           </div>
@@ -69,7 +69,7 @@ export default function DocumentTracking() {
           </Card>
         </TabsContent>
         <TabsContent value="licenses" className="mt-4 space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Licenses</h2>
             <Button><Plus className="h-4 w-4 mr-2" /> Add License</Button>
           </div>

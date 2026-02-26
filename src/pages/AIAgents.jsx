@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import AgentChat from '@/components/agents/AgentChat';
 import MinibrowserLauncher, { openMinibrowser } from '@/components/MinibrowserLauncher';
 import { AGENT_WORKFLOWS } from '@/config/agentWorkflows';
-import { Maximize2, Bot, Sparkles } from 'lucide-react';
+import { createPageUrl } from '@/utils';
+import { hasAnyLLMKey } from '@/lib/apiKeys';
+import { Maximize2, Bot, Sparkles, Key } from 'lucide-react';
 
 const WORKFLOW_ICONS = {
   central_orchestrator: '👔',
@@ -44,7 +47,6 @@ export default function AIAgents() {
       name: 'DeepSeek', 
       icon: '🟣', 
       url: 'https://chat.deepseek.com/',
-      image: '/deepseek-hero.png',
       color: 'from-purple-500 to-purple-600',
       desc: 'Advanced reasoning and code generation'
     },
@@ -52,7 +54,6 @@ export default function AIAgents() {
       name: 'ChatGPT', 
       icon: '🟢', 
       url: 'https://chat.openai.com/',
-      image: '/chatgpt-hero.png',
       color: 'from-green-500 to-green-600',
       desc: 'OpenAI GPT-4 powered assistant'
     },
@@ -60,7 +61,6 @@ export default function AIAgents() {
       name: 'Grok', 
       icon: '🟡', 
       url: 'https://grok.com/',
-      image: '/grok-hero.png',
       color: 'from-yellow-500 to-yellow-600',
       desc: 'Real-time AI with web knowledge'
     },
@@ -68,7 +68,6 @@ export default function AIAgents() {
       name: 'Claude', 
       icon: '🔵', 
       url: 'https://claude.ai/',
-      image: '/claude-hero.png',
       color: 'from-blue-500 to-blue-600',
       desc: 'Anthropic Claude AI assistant'
     },
@@ -76,7 +75,6 @@ export default function AIAgents() {
       name: 'Manus AMS', 
       icon: '🔴', 
       url: 'https://www.manus.ai/',
-      image: '/manus-hero.png',
       color: 'from-red-500 to-red-600',
       desc: 'Manus AI management system'
     },
@@ -106,8 +104,19 @@ export default function AIAgents() {
     <div className="min-h-screen bg-[var(--cf-page-bg)] p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
+        {!hasAnyLLMKey() && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-amber-800">
+              <Key className="inline h-4 w-4 mr-1.5 -mt-0.5" />
+              No API key set. Custom agents and Blueprint Analyzer need an OpenAI or Claude key.
+            </p>
+            <Button asChild variant="outline" size="sm" className="border-amber-300 text-amber-800 hover:bg-amber-100">
+              <Link to={createPageUrl('AIAgents-OpenAI-Claude')}>Set API keys</Link>
+            </Button>
+          </div>
+        )}
         <header className="mb-8">
-          <h1 className="text-3xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--cf-heading)] tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--cf-heading)] tracking-tight flex items-center gap-3">
             <span className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-lg">
               <Bot className="h-8 w-8" />
             </span>
@@ -152,7 +161,7 @@ export default function AIAgents() {
               <h2 className="text-xl font-bold flex items-center gap-2">Custom Agents</h2>
               <p className="text-white/90 text-sm mt-1">Specialized AI agents for construction workflows.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {customAgents.map((agent) => (
                 <Card
                   key={agent.id}
@@ -214,26 +223,42 @@ export default function AIAgents() {
                   url={currentAgent.url}
                   label="Open in new window"
                   variant="default"
-                  className="w-full sm:w-auto sm:w-auto bg-amber-600 hover:bg-amber-700 text-white border-0 px-6 py-3 text-base font-medium"
+                  className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white border-0 px-6 py-3 text-base font-medium"
                   icon={Maximize2}
                 />
               </CardContent>
             </Card>
 
-                {/* AI Agent Visualization */}
+            {/* Optional embedded frame (often blank due to X-Frame-Options) */}
             <Card className="overflow-hidden border border-[var(--cf-border)]">
-              <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 min-h-[200px] sm:min-h-[360px]" style={{ minHeight: 'min(480px, 50vh)' }}>
-                <img
-                  src={currentAgent.image}
-                  alt={`${currentAgent.name} visualization`}
-                  className="w-full sm:w-auto h-full object-cover"
+              <div className="bg-[var(--cf-surface)] px-3 py-2 border-b border-[var(--cf-border)] flex flex-wrap items-center justify-between gap-2">
+                <span className="text-sm font-medium text-[var(--cf-muted)]">Embedded preview (may be blocked)</span>
+                <MinibrowserLauncher
+                  url={currentAgent.url}
+                  label="Open in new window"
+                  variant="outline"
+                  className="text-xs shrink-0"
+                  icon={Maximize2}
                 />
               </div>
+              <div className="relative bg-slate-100 dark:bg-slate-900 min-h-[200px] sm:min-h-[360px]" style={{ minHeight: 'min(480px, 50vh)' }}>
+                <iframe
+                  src={currentAgent.url}
+                  title={`${currentAgent.name} embedded`}
+                  className="w-full border-0 rounded-b-md"
+                  style={{ height: 'min(480px, 50vh)', minHeight: 200 }}
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
+                  allow="clipboard-read; clipboard-write"
+                />
+              </div>
+              <p className="text-xs text-[var(--cf-muted)] px-3 py-2 bg-[var(--cf-surface)] border-t border-[var(--cf-border)]">
+                If the frame is blank, the site blocks embedding — use &quot;Open in new window&quot; above.
+              </p>
             </Card>
 
             <div>
               <h3 className="text-xs font-semibold text-[var(--cf-muted)] uppercase tracking-wider mb-3">All AI services</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {Object.entries(agents).map(([key, agent]) => (
                   <Card
                     key={key}

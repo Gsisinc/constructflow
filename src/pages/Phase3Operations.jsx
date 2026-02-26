@@ -162,7 +162,7 @@ export default function Phase3Operations() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Enterprise Integrations Hub</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Enterprise Integrations Hub</h1>
         <p className="text-sm text-slate-600 mt-1">Integrations, SSO/compliance controls, and portfolio BI reporting.</p>
       </div>
 
@@ -185,7 +185,7 @@ export default function Phase3Operations() {
                   <div key={provider.id} className="border rounded-lg p-3">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="font-medium text-slate-900 break-words">{provider.label}</p>
+                        <p className="font-medium text-slate-900">{provider.label}</p>
                         <p className="text-xs text-slate-500">
                           {state.last_sync_at ? `Last sync: ${new Date(state.last_sync_at).toLocaleString()}` : 'Never synced'}
                         </p>
@@ -256,7 +256,7 @@ export default function Phase3Operations() {
                 <Switch checked={compliance.scim_provisioning} onCheckedChange={(checked) => setCompliance((prev) => ({ ...prev, scim_provisioning: checked }))} />
               </div>
 
-              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-2 gap-3">
                 <div>
                   <Label>Session timeout (minutes)</Label>
                   <Input
@@ -284,18 +284,18 @@ export default function Phase3Operations() {
 
         <TabsContent value="reporting">
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Card>
                 <CardHeader className="pb-2"><CardTitle className="text-sm">Active Projects</CardTitle></CardHeader>
-                <CardContent><p className="text-lg sm:text-xl md:text-2xl font-bold">{metrics.active_projects}</p></CardContent>
+                <CardContent><p className="text-2xl font-bold">{metrics.active_projects}</p></CardContent>
               </Card>
               <Card>
                 <CardHeader className="pb-2"><CardTitle className="text-sm">Bid Win Rate</CardTitle></CardHeader>
-                <CardContent><p className="text-lg sm:text-xl md:text-2xl font-bold">{metrics.bid_win_rate}%</p></CardContent>
+                <CardContent><p className="text-2xl font-bold">{metrics.bid_win_rate}%</p></CardContent>
               </Card>
               <Card>
                 <CardHeader className="pb-2"><CardTitle className="text-sm">Projected Profit</CardTitle></CardHeader>
-                <CardContent><p className="text-lg sm:text-xl md:text-2xl font-bold">${metrics.projected_profit.toLocaleString()}</p></CardContent>
+                <CardContent><p className="text-2xl font-bold">${metrics.projected_profit.toLocaleString()}</p></CardContent>
               </Card>
             </div>
 
@@ -312,7 +312,7 @@ export default function Phase3Operations() {
                 ) : (
                   <div className="space-y-2">
                     {portfolioRows.map((row) => (
-                      <div key={row.project_id} className="border rounded-lg p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                      <div key={row.project_id} className="border rounded-lg p-3 flex justify-between items-center">
                         <div>
                           <p className="font-medium">{row.project_name}</p>
                           <p className="text-xs text-slate-500">Status: {row.status} • Budget: ${row.budget.toLocaleString()} • Spend: ${row.spend.toLocaleString()}</p>

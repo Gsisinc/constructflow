@@ -44,7 +44,7 @@ export default function TechnicianTraining() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Technician Training Portal</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Technician Training Portal</h1>
           <p className="text-gray-600">Complete your certification levels and build expertise</p>
         </motion.div>
 
@@ -59,26 +59,26 @@ export default function TechnicianTraining() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600 mb-1">Current Level</p>
-                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{techProfile.current_level || 0}</p>
+                    <p className="text-3xl font-bold text-blue-600">{techProfile.current_level || 0}</p>
                     <p className="text-xs text-gray-500 mt-1">of 6 levels</p>
                   </div>
                   <div className="bg-green-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600 mb-1">Field Hours</p>
-                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600">{techProfile.total_field_hours || 0}</p>
+                    <p className="text-3xl font-bold text-green-600">{techProfile.total_field_hours || 0}</p>
                     <p className="text-xs text-gray-500 mt-1">hours logged</p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600 mb-1">Certifications</p>
-                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-purple-600">{techProfile.certifications?.length || 0}</p>
+                    <p className="text-3xl font-bold text-purple-600">{techProfile.certifications?.length || 0}</p>
                     <p className="text-xs text-gray-500 mt-1">earned</p>
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
+                  <div className="flex justify-between items-center mb-2">
                     <p className="text-sm font-medium text-gray-700">Level {techProfile.current_level} Progress</p>
                     <p className="text-xs text-gray-500">{Math.round((completedCourses.length / (assignments.length || 1)) * 100)}%</p>
                   </div>
@@ -90,15 +90,15 @@ export default function TechnicianTraining() {
         )}
 
         {/* Tabs */}
-        <Tabs defaultValue="active" className="w-full sm:w-auto">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-6">
+        <Tabs defaultValue="active" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="active">Active Courses ({activeCourses.length})</TabsTrigger>
             <TabsTrigger value="completed">Completed ({completedCourses.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="active">
             {activeCourses.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {activeCourses.map((assignment, idx) => (
                   <motion.div
                     key={assignment.id}
@@ -122,7 +122,7 @@ export default function TechnicianTraining() {
 
           <TabsContent value="completed">
             {completedCourses.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {completedCourses.map((assignment, idx) => (
                   <motion.div
                     key={assignment.id}
@@ -190,19 +190,19 @@ function CourseCard({ assignment, isActive }) {
           {assignment.written_exam_score && (
             <div className="bg-blue-50 p-3 rounded-lg">
               <p className="text-sm font-medium text-gray-700">Written Exam Score</p>
-              <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">{assignment.written_exam_score}%</p>
+              <p className="text-2xl font-bold text-blue-600">{assignment.written_exam_score}%</p>
             </div>
           )}
 
           {assignment.practical_exam_score && (
             <div className="bg-green-50 p-3 rounded-lg">
               <p className="text-sm font-medium text-gray-700">Practical Exam Score</p>
-              <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{assignment.practical_exam_score}%</p>
+              <p className="text-2xl font-bold text-green-600">{assignment.practical_exam_score}%</p>
             </div>
           )}
 
           {isActive && (
-            <Button className="w-full sm:w-auto mt-4 bg-blue-600 hover:bg-blue-700">
+            <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700">
               <BookOpen className="w-4 h-4 mr-2" />
               Continue Learning
             </Button>

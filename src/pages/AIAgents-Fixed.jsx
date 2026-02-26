@@ -94,7 +94,7 @@ export default function AIAgentFixed() {
   return (
     <div className="space-y-6 p-4 sm:p-6">
       <div>
-        <h1 className="text-lg sm:text-xl md:text-2xl font-bold">AI Agents Configuration</h1>
+        <h1 className="text-2xl font-bold">AI Agents Configuration</h1>
         <p className="text-gray-600">Configure API keys to enable AI features</p>
       </div>
 
@@ -129,7 +129,7 @@ export default function AIAgentFixed() {
             <p className="text-xs text-gray-500 mt-1">Get from https://api.sam.gov</p>
           </div>
 
-          <Button onClick={handleSaveKeys} className="w-full sm:w-auto">
+          <Button onClick={handleSaveKeys} className="w-full">
             Save Configuration
           </Button>
 
@@ -165,7 +165,7 @@ export default function AIAgentFixed() {
       {/* Agents Grid */}
       <div>
         <h2 className="text-xl font-bold mb-4">Available Agents</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {agents.map((agent) => (
             <Card key={agent.id}>
               <CardHeader>
@@ -184,7 +184,7 @@ export default function AIAgentFixed() {
               <CardContent>
                 <Button
                   variant={agent.status === 'configured' ? 'default' : 'outline'}
-                  className="w-full sm:w-auto"
+                  className="w-full"
                   disabled={agent.status !== 'configured'}
                 >
                   {agent.status === 'configured' ? 'Use Agent' : 'Configure First'}

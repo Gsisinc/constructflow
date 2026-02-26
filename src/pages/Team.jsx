@@ -137,7 +137,7 @@ export default function Team() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 tracking-tight">Team Management</h1>
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Team Management</h1>
           <p className="text-slate-500 mt-1">Skills matrix, certifications & workforce optimization</p>
         </div>
         <Button onClick={() => { setEditingWorker(null); setShowForm(true); }} className="bg-slate-900 hover:bg-slate-800">
@@ -147,39 +147,39 @@ export default function Team() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Total Team</p>
-          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1">{workers.length}</p>
+          <p className="text-2xl font-semibold mt-1">{workers.length}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Available</p>
-          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1 text-green-600">
+          <p className="text-2xl font-semibold mt-1 text-green-600">
             {workers.filter(w => w.status === 'available').length}
           </p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Assigned</p>
-          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1 text-blue-600">
+          <p className="text-2xl font-semibold mt-1 text-blue-600">
             {workers.filter(w => w.status === 'assigned').length}
           </p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Avg Productivity</p>
-          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1">{avgProductivity.toFixed(0)}%</p>
+          <p className="text-2xl font-semibold mt-1">{avgProductivity.toFixed(0)}%</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Cert. Expiring</p>
           <p className={cn(
-            "text-lg sm:text-xl md:text-2xl font-semibold mt-1",
-            expiringCerts.length > 0 ? "text-amber-600" : "text-slate-900 break-words"
+            "text-2xl font-semibold mt-1",
+            expiringCerts.length > 0 ? "text-amber-600" : "text-slate-900"
           )}>
             {expiringCerts.length}
           </p>
         </div>
       </div>
 
-      <Tabs defaultValue="directory" className="w-full sm:w-auto">
+      <Tabs defaultValue="directory" className="w-full">
         <TabsList>
           <TabsTrigger value="directory">Directory</TabsTrigger>
           <TabsTrigger value="skills">Skills & Certifications</TabsTrigger>
@@ -204,7 +204,7 @@ export default function Team() {
               />
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-full sm:w-auto sm:w-40">
+              <SelectTrigger className="w-full sm:w-40">
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
               <SelectContent>
@@ -215,7 +215,7 @@ export default function Team() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-auto sm:w-40">
+              <SelectTrigger className="w-full sm:w-40">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -229,7 +229,7 @@ export default function Team() {
 
           {/* Team Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array(6).fill(0).map((_, i) => (
                 <Skeleton key={i} className="h-48 rounded-xl" />
               ))}
@@ -243,7 +243,7 @@ export default function Team() {
               onAction={() => setShowForm(true)}
             />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredWorkers.map((worker) => (
                 <div
                   key={worker.id}
@@ -258,7 +258,7 @@ export default function Team() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <h3 className="font-medium text-slate-900 break-words">{worker.name}</h3>
+                        <h3 className="font-medium text-slate-900">{worker.name}</h3>
                         <p className="text-sm text-slate-500 capitalize">{worker.role?.replace('_', ' ')}</p>
                       </div>
                     </div>
@@ -286,23 +286,23 @@ export default function Team() {
                     </DropdownMenu>
                   </div>
 
-                  <div className="mt-4 space-y-3">
+                  <div className="mt-4 space-y-2">
                     {worker.company && (
-                      <div className="flex items-start gap-2 text-sm">
-                        <Building2 className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-slate-600 break-words">{worker.company}</span>
+                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <Building2 className="h-3.5 w-3.5" />
+                        <span>{worker.company}</span>
                       </div>
                     )}
                     {worker.email && (
-                      <div className="flex items-start gap-2 text-sm">
-                        <Mail className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-slate-600 break-all">{worker.email}</span>
+                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <Mail className="h-3.5 w-3.5" />
+                        <span className="truncate">{worker.email}</span>
                       </div>
                     )}
                     {worker.hourly_rate && (
-                      <div className="flex items-start gap-2 text-sm">
-                        <DollarSign className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-slate-600">${worker.hourly_rate}/hr</span>
+                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <DollarSign className="h-3.5 w-3.5" />
+                        <span>${worker.hourly_rate}/hr</span>
                       </div>
                     )}
                   </div>
@@ -460,7 +460,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, projects, onSubmit, load
               required
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Role *</Label>
               <Select
@@ -502,7 +502,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, projects, onSubmit, load
               placeholder="Company name if subcontractor"
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Email</Label>
               <Input
@@ -521,7 +521,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, projects, onSubmit, load
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Hourly Rate ($)</Label>
               <Input

@@ -67,7 +67,7 @@ export default function TeamSkillsMatrix() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">Team Skills Matrix</h1>
+          <h1 className="text-4xl font-bold text-slate-900">Team Skills Matrix</h1>
           <p className="text-slate-600">Track technician competencies across all skill areas</p>
         </motion.div>
 
@@ -108,10 +108,10 @@ export default function TeamSkillsMatrix() {
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
-                      <table className="w-full sm:w-auto text-sm">
+                      <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b">
-                            <th className="text-left p-2 font-semibold text-slate-700 break-words">Skill</th>
+                            <th className="text-left p-2 font-semibold text-slate-700">Skill</th>
                             {technicians.slice(0, 6).map(tech => (
                               <th key={tech.id} className="text-center p-2 font-semibold text-slate-700 max-w-12">
                                 <div className="text-xs text-slate-600 truncate">{tech.full_name.split(' ')[0]}</div>

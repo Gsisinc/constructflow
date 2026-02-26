@@ -15,12 +15,6 @@ import { toast } from 'sonner';
 
 export default function CostPlusInvoicing() {
   const queryClient = useQueryClient();
-
-  // Get current user for organization filtering
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
   const [showForm, setShowForm] = useState(false);
   const [selectedProject, setSelectedProject] = useState('');
   const [markup, setMarkup] = useState(15);
@@ -29,12 +23,8 @@ export default function CostPlusInvoicing() {
   const [invoiceTitle, setInvoiceTitle] = useState('');
 
   const { data: projects = [] } = useQuery({
-    queryKey: ['projects', user?.organization_id],
-    queryFn: () => {
-      if (!user?.organization_id) return [];
-      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
-    },
-    enabled: !!user?.organization_id,
+    queryKey: ['projects'],
+    queryFn: () => base44.entities.Project.list(),
   });
 
   const { data: expenses = [] } = useQuery({
@@ -93,7 +83,7 @@ export default function CostPlusInvoicing() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Cost Plus Invoicing</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Cost Plus Invoicing</h1>
           <p className="text-slate-500 mt-1">Include bills, expenses, and time entries directly on invoices</p>
         </div>
         <Button onClick={() => setShowForm(true)} className="gap-2">
@@ -176,7 +166,7 @@ export default function CostPlusInvoicing() {
             <DialogTitle>New Cost Plus Invoice</DialogTitle>
           </DialogHeader>
           <div className="space-y-5 py-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Invoice Title *</Label>
                 <Input placeholder="Invoice #001 - March 2026"

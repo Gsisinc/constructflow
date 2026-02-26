@@ -90,7 +90,7 @@ Respond with a JSON object with this exact structure:
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Scheduling AI Assistant</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">Scheduling AI Assistant</h1>
         <p className="text-slate-500 mt-1">AI-powered schedule analysis, critical path detection, and optimization</p>
       </div>
 
@@ -133,7 +133,7 @@ Respond with a JSON object with this exact structure:
             </div>
           )}
 
-          <Button onClick={handleAnalyze} disabled={loading || !selectedProject} className="w-full sm:w-auto gap-2">
+          <Button onClick={handleAnalyze} disabled={loading || !selectedProject} className="w-full gap-2">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             {loading ? 'Analyzing Schedule...' : 'Analyze Schedule with AI'}
           </Button>
@@ -162,7 +162,7 @@ Respond with a JSON object with this exact structure:
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Critical Path */}
             {result.critical_path?.length > 0 && (
               <Card>

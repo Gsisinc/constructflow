@@ -129,7 +129,7 @@ export default function Bids() {
             <Sparkles className="h-4 w-4" />
             Intelligence Center
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
             Bid Opportunities
           </h1>
           <p className="text-slate-500 mt-2 text-lg">
@@ -164,7 +164,7 @@ export default function Bids() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total Bids', value: stats.total, icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
           { label: 'Won Bids', value: stats.won, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
@@ -178,7 +178,7 @@ export default function Bids() {
               </div>
               <div>
                 <p className="text-sm font-medium text-slate-500">{stat.label}</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 break-words">{stat.value}</p>
+                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
               </div>
             </CardContent>
           </Card>
@@ -220,7 +220,7 @@ export default function Bids() {
       </Card>
 
       {/* Bids List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {filteredBids.length === 0 ? (
           <div className="py-20">
             <EmptyState
@@ -292,13 +292,13 @@ export default function Bids() {
                         <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
                           <div className="h-full bg-primary" style={{ width: '65%' }} />
                         </div>
-                        <span className="text-sm font-bold text-slate-900 break-words">65%</span>
+                        <span className="text-sm font-bold text-slate-900">65%</span>
                       </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-12 w-12 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-900 break-words"
+                      className="h-12 w-12 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-900"
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingBid(bid);
@@ -412,7 +412,7 @@ function BidForm({ bid, onSubmit }) {
       </DialogHeader>
       {!bid && (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 w-full">
+          <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="upload" className="gap-1.5">
               <Sparkles className="h-3.5 w-3.5" /> Upload &amp; AI Fill
             </TabsTrigger>
@@ -457,7 +457,7 @@ function BidForm({ bid, onSubmit }) {
                     <CheckCircle className="h-3.5 w-3.5" /> Apply
                   </Button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-2 gap-2 text-xs">
                   {aiPreview.title && <div><span className="text-slate-500">Title:</span> <span className="font-medium">{aiPreview.title}</span></div>}
                   {aiPreview.agency && <div><span className="text-slate-500">Agency:</span> <span className="font-medium">{aiPreview.agency}</span></div>}
                   {aiPreview.estimated_value > 0 && <div><span className="text-slate-500">Value:</span> <span className="font-medium">${Number(aiPreview.estimated_value).toLocaleString()}</span></div>}
@@ -491,7 +491,7 @@ function BidForm({ bid, onSubmit }) {
           placeholder="Official project name"
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-semibold">Client Name</label>
           <Input
@@ -527,13 +527,13 @@ function BidForm({ bid, onSubmit }) {
           className="h-24"
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-semibold">Status</label>
           <select
             value={formData.status}
             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-            className="w-full sm:w-auto border rounded p-2"
+            className="w-full border rounded p-2"
           >
             {bidStatuses.filter(s => s !== 'All').map((status) => (
               <option key={status} value={status}>{status}</option>
@@ -550,7 +550,7 @@ function BidForm({ bid, onSubmit }) {
           />
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-semibold">Due Date</label>
           <Input
@@ -588,7 +588,7 @@ function BidForm({ bid, onSubmit }) {
       </div>
       </div>
       )}
-      <Button onClick={() => onSubmit({ ...formData, source_files: uploadedFiles })} className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 mt-4">
+      <Button onClick={() => onSubmit({ ...formData, source_files: uploadedFiles })} className="w-full bg-amber-600 hover:bg-amber-700 mt-4">
         {bid ? 'Update Bid' : 'Create Bid'}
       </Button>
     </div>

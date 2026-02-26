@@ -52,7 +52,7 @@ export default function TrainingSchedule() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">26-Week Training Schedule</h1>
+          <h1 className="text-4xl font-bold text-slate-900">26-Week Training Schedule</h1>
           <p className="text-slate-600">Level 1 through Level 6 certification roadmap</p>
         </motion.div>
 
@@ -75,7 +75,7 @@ export default function TrainingSchedule() {
                         <div key={week.id || `${week.month}-${week.week}`} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                           <div className="flex items-start justify-between mb-3">
                             <div>
-                              <h3 className="font-semibold text-slate-900 break-words">Week {week.week_number}</h3>
+                              <h3 className="font-semibold text-slate-900">Week {week.week_number}</h3>
                               <p className="text-sm text-slate-600">{week.course_title || 'Training Week'}</p>
                             </div>
                             <div className="flex gap-2">
@@ -88,7 +88,7 @@ export default function TrainingSchedule() {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                          <div className="grid grid-cols-5 gap-2">
                             {['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].map((day, idx) => (
                               <div key={day} className="bg-slate-50 p-2 rounded text-xs">
                                 <p className="font-semibold text-slate-700 capitalize mb-1">{day.slice(0, 3)}</p>
@@ -119,18 +119,18 @@ export default function TrainingSchedule() {
             <CardTitle>Training Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
                 <p className="text-slate-600 mb-1">Total Weeks</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">26</p>
+                <p className="text-2xl font-bold text-blue-600">26</p>
               </div>
               <div>
                 <p className="text-slate-600 mb-1">Total Classroom Hours</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">520+</p>
+                <p className="text-2xl font-bold text-blue-600">520+</p>
               </div>
               <div>
                 <p className="text-slate-600 mb-1">Total Field Hours</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">320+</p>
+                <p className="text-2xl font-bold text-blue-600">320+</p>
               </div>
             </div>
           </CardContent>

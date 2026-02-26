@@ -14,7 +14,7 @@ export default function Implementation() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Implementation</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Implementation</h1>
         <p className="text-slate-600 mt-1">Structured rollout and migration support.</p>
       </div>
       <Card>

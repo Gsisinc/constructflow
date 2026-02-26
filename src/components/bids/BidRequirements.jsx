@@ -112,38 +112,38 @@ export default function BidRequirements({ bidId, organizationId }) {
   };
 
   return (
-    <div className="space-y-4 p-2 md:p-4">
-      {/* Stats - Responsive Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-        <Card className="border-amber-100 shadow-sm">
-          <CardContent className="p-3 md:p-4">
+    <div className="space-y-4">
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-3">
+        <Card className="border-amber-100">
+          <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-xl md:text-2xl font-bold text-amber-700">{stats.total}</p>
-              <p className="text-xs text-slate-500 mt-1">Total</p>
+              <p className="text-2xl font-bold">{stats.total}</p>
+              <p className="text-xs text-slate-500">Total</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-green-100 shadow-sm">
-          <CardContent className="p-3 md:p-4">
+        <Card className="border-green-100">
+          <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-xl md:text-2xl font-bold text-green-600">{stats.completed}</p>
-              <p className="text-xs text-slate-500 mt-1">Done</p>
+              <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
+              <p className="text-xs text-slate-500">Done</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-slate-100 shadow-sm hidden md:block">
-          <CardContent className="p-3 md:p-4">
+        <Card className="border-slate-100">
+          <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-xl md:text-2xl font-bold text-slate-600">{stats.pending}</p>
-              <p className="text-xs text-slate-500 mt-1">Pending</p>
+              <p className="text-2xl font-bold text-slate-600">{stats.pending}</p>
+              <p className="text-xs text-slate-500">Pending</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-red-100 shadow-sm hidden md:block">
-          <CardContent className="p-3 md:p-4">
+        <Card className="border-red-100">
+          <CardContent className="p-4">
             <div className="text-center">
-              <p className="text-xl md:text-2xl font-bold text-red-600">{stats.critical}</p>
-              <p className="text-xs text-slate-500 mt-1">Critical</p>
+              <p className="text-2xl font-bold text-red-600">{stats.critical}</p>
+              <p className="text-xs text-slate-500">Critical</p>
             </div>
           </CardContent>
         </Card>
@@ -153,60 +153,57 @@ export default function BidRequirements({ bidId, organizationId }) {
       {!showAddForm && (
         <Button 
           onClick={() => setShowAddForm(true)}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 md:py-3 text-sm md:text-base rounded-lg shadow-md hover:shadow-lg transition-all"
+          className="w-full bg-amber-600 hover:bg-amber-700"
         >
-          <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+          <Plus className="h-4 w-4 mr-2" />
           Add Requirement
         </Button>
       )}
 
       {/* Add form */}
       {showAddForm && (
-        <Card className="border-blue-200 shadow-md">
-          <CardContent className="p-3 md:p-4 space-y-3">
+        <Card className="border-amber-200">
+          <CardContent className="p-4 space-y-3">
             <textarea
-              placeholder="Describe the requirement..."
+              placeholder="Requirement description..."
               value={newReq.requirement_text}
               onChange={(e) => setNewReq({ ...newReq, requirement_text: e.target.value })}
-              className="w-full border border-slate-300 rounded-lg p-3 h-24 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full border rounded p-2 h-20 text-sm"
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <select
                 value={newReq.category}
                 onChange={(e) => setNewReq({ ...newReq, category: e.target.value })}
-                className="border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="border rounded p-2 text-sm"
               >
-                <option value="">Select category</option>
                 {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
+                  <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
               <select
                 value={newReq.priority}
                 onChange={(e) => setNewReq({ ...newReq, priority: e.target.value })}
-                className="border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="border rounded p-2 text-sm"
               >
-                <option value="">Select priority</option>
                 {PRIORITIES.map(pri => (
-                  <option key={pri} value={pri}>{pri.charAt(0).toUpperCase() + pri.slice(1)}</option>
+                  <option key={pri} value={pri}>{pri}</option>
                 ))}
               </select>
             </div>
-            <div className="flex gap-2 flex-col md:flex-row">
+            <div className="flex gap-2">
               <Button
                 onClick={() => createMutation.mutate({
                   ...newReq,
                   bid_opportunity_id: bidId,
                   organization_id: organizationId
                 })}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg"
+                className="flex-1 bg-amber-600 hover:bg-amber-700"
               >
-                Save Requirement
+                Save
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setShowAddForm(false)}
-                className="flex-1 md:flex-none py-2 rounded-lg"
               >
                 Cancel
               </Button>
@@ -218,45 +215,39 @@ export default function BidRequirements({ bidId, organizationId }) {
       {/* Requirements list */}
       <div className="space-y-2">
         {requirements.length === 0 ? (
-          <Card className="shadow-sm">
+          <Card>
             <CardContent className="py-12 text-center text-slate-500 text-sm">
-              <p>No requirements yet.</p>
-              <p className="text-xs mt-1">Upload a document or add manually.</p>
+              No requirements yet. Upload a document or add manually.
             </CardContent>
           </Card>
         ) : (
           requirements.map(req => (
-            <Card key={req.id} className="hover:shadow-md transition-all shadow-sm border-slate-200">
-              <CardContent className="p-3 md:p-4">
-                <div className="flex items-start gap-2 md:gap-3">
+            <Card key={req.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
                   <button
                     onClick={() => toggleStatus(req)}
-                    className="mt-1 hover:opacity-70 transition flex-shrink-0"
-                    title="Click to change status"
+                    className="mt-1 hover:opacity-70 transition"
                   >
                     {req.status === 'completed' ? (
-                      <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-green-500" />
+                      <CheckCircle2 className="h-5 w-5 text-green-500" />
                     ) : req.status === 'in_progress' ? (
-                      <AlertCircle className="h-5 w-5 md:h-6 md:w-6 text-blue-500" />
+                      <AlertCircle className="h-5 w-5 text-blue-500" />
                     ) : (
-                      <Circle className="h-5 w-5 md:h-6 md:w-6 text-slate-300" />
+                      <Circle className="h-5 w-5 text-slate-400" />
                     )}
                   </button>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm md:text-base leading-relaxed break-words ${
-                      req.status === 'completed' ? 'line-through text-slate-400' : 'text-slate-900'
-                    }`}>
-                      {req.requirement_text}
-                    </p>
+                  <div className="flex-1">
+                    <p className="text-sm text-slate-900">{req.requirement_text}</p>
                     <div className="flex flex-wrap gap-1.5 mt-2">
-                      <Badge className={`text-xs font-medium ${categoryColors[req.category]}`}>
-                        {req.category.charAt(0).toUpperCase() + req.category.slice(1)}
+                      <Badge className={`text-xs ${categoryColors[req.category]}`}>
+                        {req.category}
                       </Badge>
-                      <Badge className={`text-xs font-medium ${priorityColors[req.priority]}`}>
-                        {req.priority.charAt(0).toUpperCase() + req.priority.slice(1)}
+                      <Badge className={`text-xs ${priorityColors[req.priority]}`}>
+                        {req.priority}
                       </Badge>
                       {req.ai_extracted && (
-                        <Badge variant="outline" className="text-xs bg-purple-50">
+                        <Badge variant="outline" className="text-xs">
                           <Sparkles className="h-3 w-3 mr-1" />
                           AI
                         </Badge>
@@ -266,13 +257,12 @@ export default function BidRequirements({ bidId, organizationId }) {
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                    className="text-red-600"
                     onClick={() => {
-                      if (confirm('Delete this requirement?')) {
+                      if (confirm('Delete requirement?')) {
                         deleteMutation.mutate(req.id);
                       }
                     }}
-                    title="Delete requirement"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

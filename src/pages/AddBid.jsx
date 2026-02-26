@@ -78,7 +78,7 @@ function AiExtractionPreview({ extracted, onApply, onDiscard }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {extracted.project_name && (
             <div className="flex items-start gap-2">
               <Building2 className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
@@ -133,7 +133,7 @@ function AiExtractionPreview({ extracted, onApply, onDiscard }) {
             </p>
           </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-center">
+        <div className="grid grid-cols-3 gap-2 text-center">
           <div className="bg-white border border-amber-200 rounded p-2">
             <p className="text-lg font-bold text-amber-700">{extracted.requirementsCount || 0}</p>
             <p className="text-xs text-slate-500">Requirements</p>
@@ -152,7 +152,7 @@ function AiExtractionPreview({ extracted, onApply, onDiscard }) {
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-1">Top Risks Identified</p>
             <ul className="space-y-1">
               {extracted.risks.slice(0, 3).map((r, i) => (
-                <li key={i} className="flex items-start gap-1.5 text-xs text-slate-700 break-words">
+                <li key={i} className="flex items-start gap-1.5 text-xs text-slate-700">
                   <AlertTriangle className="h-3.5 w-3.5 text-orange-500 mt-0.5 shrink-0" />
                   <span>{r.risk || r}</span>
                   {r.severity && <Badge className="text-xs ml-1 py-0 px-1 h-4">{r.severity}</Badge>}
@@ -193,7 +193,7 @@ function PhaseEditor({ phases, setPhases }) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="flex justify-between items-center">
           <CardTitle className="flex items-center gap-2">
             <ClipboardList className="h-5 w-5 text-amber-600" />
             Project Phases &amp; Requirements
@@ -208,10 +208,10 @@ function PhaseEditor({ phases, setPhases }) {
           <div key={phaseIdx} className="border rounded-lg overflow-hidden">
             <button
               onClick={() => setExpandedPhase(expandedPhase === phaseIdx ? -1 : phaseIdx)}
-              className="w-full sm:w-auto p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:bg-slate-50 transition-colors"
+              className="w-full p-3 flex justify-between items-center hover:bg-slate-50 transition-colors"
             >
               <div className="text-left flex-1">
-                <p className="font-semibold text-slate-900 break-words">{phase.name}</p>
+                <p className="font-semibold text-slate-900">{phase.name}</p>
                 <p className="text-sm text-slate-500">{phase.duration_days} days &middot; {phase.requirements.length} requirements</p>
               </div>
               <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ function PhaseEditor({ phases, setPhases }) {
             </button>
             {expandedPhase === phaseIdx && (
               <div className="p-4 border-t bg-slate-50 space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs font-medium text-slate-600 block mb-1">Phase Name</label>
                     <Input
@@ -276,7 +276,7 @@ function PhaseEditor({ phases, setPhases }) {
                     {phase.requirements.map((req, reqIdx) => (
                       <div key={reqIdx} className="flex items-center gap-2 bg-white border rounded px-2 py-1">
                         <CheckCircle className="h-3.5 w-3.5 text-green-500 shrink-0" />
-                        <span className="text-sm flex-1 text-slate-700 break-words">{req}</span>
+                        <span className="text-sm flex-1 text-slate-700">{req}</span>
                         <button
                           onClick={() => handleDeleteRequirement(phaseIdx, reqIdx)}
                           className="text-red-400 hover:text-red-600"
@@ -357,12 +357,12 @@ function UploadZone({ uploadedFiles, setUploadedFiles, uploading, onUpload }) {
       </label>
       {uploadedFiles.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-slate-700 break-words">Uploaded Files ({uploadedFiles.length})</p>
+          <p className="text-sm font-semibold text-slate-700">Uploaded Files ({uploadedFiles.length})</p>
           {uploadedFiles.map((file, idx) => (
             <div key={idx} className="flex items-center justify-between p-2.5 bg-slate-50 border rounded-lg">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-amber-600" />
-                <span className="text-sm text-slate-700 break-words">{file.name}</span>
+                <span className="text-sm text-slate-700">{file.name}</span>
                 <span className="text-xs text-slate-400">({(file.size / 1024).toFixed(0)} KB)</span>
               </div>
               <Button
@@ -394,7 +394,7 @@ function AnalysisResultCard({ analysisResult, createdBidId, createdProjectId, na
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-slate-700 bg-white border border-green-200 rounded p-3">{analysisResult.summary}</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="bg-white border border-green-200 rounded-lg p-3 text-center">
             <p className="text-xl font-bold text-green-700">${Number(analysisResult.estimatedBudget || 0).toLocaleString()}</p>
             <p className="text-xs text-slate-500 mt-0.5">Estimated Budget</p>
@@ -417,7 +417,7 @@ function AnalysisResultCard({ analysisResult, createdBidId, createdProjectId, na
             <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Detected Deadlines</p>
             <ul className="space-y-1">
               {analysisResult.deadlines.map((d, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-slate-700 break-words">
+                <li key={i} className="flex items-center gap-2 text-sm text-slate-700">
                   <Calendar className="h-3.5 w-3.5 text-blue-500" />
                   <span className="font-medium">{d.name || 'Deadline'}</span>
                   <span className="text-slate-500">&mdash; {d.date || 'Unknown date'}</span>
@@ -441,7 +441,7 @@ function AnalysisResultCard({ analysisResult, createdBidId, createdProjectId, na
             <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Top Risks</p>
             <ul className="space-y-1">
               {analysisResult.risks.slice(0, 5).map((r, i) => (
-                <li key={i} className="flex items-start gap-1.5 text-xs text-slate-700 break-words">
+                <li key={i} className="flex items-start gap-1.5 text-xs text-slate-700">
                   <AlertTriangle className="h-3.5 w-3.5 text-orange-500 mt-0.5 shrink-0" />
                   <span>{r.risk || 'Risk identified'}</span>
                   {r.severity && <Badge className="text-xs ml-1 py-0 px-1 h-4">{r.severity}</Badge>}
@@ -904,7 +904,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Add Bid</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Add Bid</h1>
           <p className="text-slate-500 mt-1">Create a bid manually or upload a document for AI-powered auto-fill</p>
         </div>
         <Button
@@ -919,7 +919,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
 
       {/* Mode Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 w-full max-w-md">
+        <TabsList className="grid grid-cols-2 w-full max-w-md">
           <TabsTrigger value="upload" className="gap-2">
             <Sparkles className="h-4 w-4" />
             Upload &amp; AI Fill
@@ -1006,7 +1006,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
                   onChange={(e) => setFormData({ ...formData, project_name: e.target.value })}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-slate-700 block mb-1">Agency / Client</label>
                   <Input
@@ -1020,7 +1020,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
                   <select
                     value={formData.project_type}
                     onChange={(e) => setFormData({ ...formData, project_type: e.target.value })}
-                    className="w-full sm:w-auto border rounded-md p-2 text-sm bg-white"
+                    className="w-full border rounded-md p-2 text-sm bg-white"
                   >
                     {['commercial', 'residential', 'industrial', 'government', 'infrastructure'].map((t) => (
                       <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
@@ -1037,7 +1037,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
                   className="h-24"
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-slate-700 block mb-1">Estimated Value ($)</label>
                   <Input
@@ -1056,7 +1056,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-slate-700 block mb-1">Location</label>
                   <Input
@@ -1114,7 +1114,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
       <Button
         onClick={handleSubmit}
         disabled={analyzing || !canSubmit}
-        className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 h-14 text-base font-semibold gap-3"
+        className="w-full bg-amber-600 hover:bg-amber-700 h-14 text-base font-semibold gap-3"
       >
         {analyzing ? (
           <>

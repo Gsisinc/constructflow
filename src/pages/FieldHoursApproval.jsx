@@ -49,17 +49,17 @@ export default function FieldHoursApproval() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">Field Hours Approval</h1>
+          <h1 className="text-4xl font-bold text-slate-900">Field Hours Approval</h1>
           <p className="text-slate-600">Review and approve technician field hours</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">Pending</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-600">{pending.length}</p>
+              <p className="text-3xl font-bold text-amber-600">{pending.length}</p>
             </CardContent>
           </Card>
           <Card>
@@ -67,7 +67,7 @@ export default function FieldHoursApproval() {
               <CardTitle className="text-sm font-medium text-slate-600">Approved</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600">{approved.length}</p>
+              <p className="text-3xl font-bold text-green-600">{approved.length}</p>
             </CardContent>
           </Card>
           <Card>
@@ -75,7 +75,7 @@ export default function FieldHoursApproval() {
               <CardTitle className="text-sm font-medium text-slate-600">Total Hours</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{(fieldHours.reduce((sum, fh) => sum + (fh.hours || 0), 0)).toFixed(1)}</p>
+              <p className="text-3xl font-bold text-blue-600">{(fieldHours.reduce((sum, fh) => sum + (fh.hours || 0), 0)).toFixed(1)}</p>
             </CardContent>
           </Card>
         </div>
@@ -100,7 +100,7 @@ export default function FieldHoursApproval() {
                       className="flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-lg"
                     >
                       <div className="flex-1">
-                        <p className="font-semibold text-slate-900 break-words">{entry.technician_name}</p>
+                        <p className="font-semibold text-slate-900">{entry.technician_name}</p>
                         <p className="text-sm text-slate-600">{entry.project_name} • {entry.task_type}</p>
                         <p className="text-xs text-slate-500">{new Date(entry.date).toLocaleDateString()}</p>
                       </div>
@@ -146,7 +146,7 @@ export default function FieldHoursApproval() {
                   {approved.map(entry => (
                     <div key={entry.id} className="flex items-center justify-between p-3 border rounded-lg bg-green-50">
                       <div className="flex-1">
-                        <p className="font-medium text-slate-900 break-words">{entry.technician_name}</p>
+                        <p className="font-medium text-slate-900">{entry.technician_name}</p>
                         <p className="text-xs text-slate-600">{entry.project_name}</p>
                       </div>
                       <div className="text-right">

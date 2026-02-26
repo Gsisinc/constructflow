@@ -97,7 +97,7 @@ export default function AlertSettings() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
             <Settings className="h-8 w-8 text-amber-600" />
             Alert Settings
           </h1>
@@ -181,7 +181,7 @@ export default function AlertSettings() {
               dismissedAlerts.map(alert => (
                 <div key={alert.id} className="flex items-center justify-between p-3 bg-slate-50 rounded">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-700 break-words">{alert.message}</p>
+                    <p className="text-sm font-medium text-slate-700">{alert.message}</p>
                     <p className="text-xs text-slate-500 mt-1">
                       Dismissed by {alert.dismissed_by} on {new Date(alert.dismissed_at).toLocaleDateString()}
                     </p>

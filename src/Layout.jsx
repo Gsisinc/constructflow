@@ -18,8 +18,6 @@ import {
   X,
   LogOut,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Clock,
   Settings,
   User,
@@ -50,7 +48,6 @@ const primaryNavItems = [
 
 // Secondary navigation items
 const secondaryNavItems = [
-  { name: 'System Builder', icon: Grid3x3, page: 'SystemBuilder' },
   { name: 'Labor Force', icon: Users, page: 'TeamManagement' },
   { name: 'Templates', icon: FileText, page: 'TemplateLibrary' },
   { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
@@ -112,11 +109,11 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
       className={cn(
         "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px]",
         isActive
-          ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
-          : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+          ? "bg-primary text-primary-foreground shadow-md hover:opacity-90"
+          : "text-gray-700 hover:bg-accent hover:text-accent-foreground"
       )}
     >
-      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-gray-500")} />
+      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-gray-500")} />
       <span className="truncate">{item.name}</span>
     </Link>
   );
@@ -124,11 +121,9 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
 
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [organization, setOrganization] = useState(null);
-  const [previousPage, setPreviousPage] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -177,38 +172,7 @@ export default function Layout({ children, currentPageName }) {
     loadUser();
   }, [currentPageName]);
 
-  // Track page changes for back navigation
-  useEffect(() => {
-    if (currentPageName !== previousPage) {
-      setPreviousPage(currentPageName);
-    }
-  }, [currentPageName, previousPage]);
-
-  const handleBack = () => {
-    // Map of pages to their parent pages
-    const pageHierarchy = {
-      'ProjectDetail': 'Projects',
-      'BidDetail': 'Bids',
-      'TaskDetail': 'Tasks',
-      'DocumentDetail': 'Documents',
-      'EstimateDetail': 'Estimates',
-      'InvoiceDetail': 'Invoices',
-      'ExpenseBillingDetail': 'ExpenseBilling',
-    };
-    
-    // If current page has a parent, go to parent
-    if (pageHierarchy[currentPageName]) {
-      navigate(createPageUrl(pageHierarchy[currentPageName]));
-    } 
-    // Otherwise, try browser back
-    else if (previousPage && previousPage !== currentPageName) {
-      navigate(-1);
-    }
-    // Fallback to Bids page
-    else {
-      navigate(createPageUrl('Bids'));
-    }
-  };
+  const handleBack = () => navigate(-1);
 
   const handleLogout = async () => {
     try {
@@ -293,7 +257,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Header */}
-      <header className={cn("fixed top-0 left-0 right-0 h-16 sm:h-16 bg-white border-b border-gray-200 shadow-sm z-40 transition-all duration-300", sidebarCollapsed ? "lg:pl-20" : "lg:pl-64")}>
+      <header className="fixed top-0 left-0 right-0 h-16 sm:h-16 bg-white border-b border-gray-200 shadow-sm z-40 lg:pl-64">
         <div className="h-full flex items-center justify-between px-2 sm:px-3 md:px-4 lg:px-6">
           {/* Left section: Menu & Logo */}
           <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
@@ -339,16 +303,6 @@ export default function Layout({ children, currentPageName }) {
 
           {/* Right section: Menu & User */}
           <div className="flex items-center gap-1 sm:gap-1.5 ml-auto flex-shrink-0">
-            {/* Desktop sidebar toggle - visible on all screens */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="inline-flex h-8 sm:h-9 px-1.5 sm:px-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 flex-shrink-0"
-              title="Toggle sidebar"
-            >
-              {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -377,11 +331,8 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-14 sm:top-16 left-0 bg-white border-r border-gray-200 shadow-sm z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
-        "h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)]",
-        sidebarCollapsed ? "lg:w-20" : "lg:w-64",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full",
-        "lg:translate-x-0"
+        "fixed top-14 sm:top-16 left-0 w-64 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-white border-r border-gray-200 shadow-sm z-40 transition-transform duration-300 lg:translate-x-0 lg:top-16 lg:h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <nav className="p-3 sm:p-4 space-y-1">
           {/* Primary navigation */}
@@ -462,7 +413,7 @@ export default function Layout({ children, currentPageName }) {
       </aside>
 
       {/* Main Content */}
-      <main className={cn("flex-1 pt-14 sm:pt-16 pb-16 sm:pb-0 overflow-y-auto transition-all duration-300", sidebarCollapsed ? "lg:pl-20" : "lg:pl-64")}>
+      <main className="flex-1 lg:pl-64 pt-14 sm:pt-16 pb-16 sm:pb-0 overflow-y-auto">
         {/* <ApiKeyBanner /> */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -471,7 +422,7 @@ export default function Layout({ children, currentPageName }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="p-2 sm:p-3 md:p-4 lg:p-6 w-full max-w-7xl mx-auto"
+            className="p-2 sm:p-3 md:p-4 lg:p-6 max-w-7xl mx-auto w-full"
           >
             {children}
           </motion.div>

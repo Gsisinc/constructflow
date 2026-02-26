@@ -115,7 +115,7 @@ export default function TeamManagement() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
             <Users className="h-8 w-8 text-amber-600" />
             Labor Force Management
           </h1>
@@ -134,13 +134,13 @@ export default function TeamManagement() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">Total Team</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold mt-1">{workers.length}</p>
+                <p className="text-2xl font-bold mt-1">{workers.length}</p>
               </div>
               <Users className="h-10 w-10 text-amber-600" />
             </div>
@@ -151,7 +151,7 @@ export default function TeamManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">Assigned</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-blue-600">
+                <p className="text-2xl font-bold mt-1 text-blue-600">
                   {workers.filter(w => w.status === 'assigned').length}
                 </p>
               </div>
@@ -164,7 +164,7 @@ export default function TeamManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">Available</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-green-600">
+                <p className="text-2xl font-bold mt-1 text-green-600">
                   {workers.filter(w => w.status === 'available').length}
                 </p>
               </div>
@@ -177,7 +177,7 @@ export default function TeamManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">On Leave</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-yellow-600">
+                <p className="text-2xl font-bold mt-1 text-yellow-600">
                   {workers.filter(w => w.status === 'on_leave').length}
                 </p>
               </div>
@@ -203,7 +203,7 @@ export default function TeamManagement() {
       </Card>
 
       {/* Team List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {filteredWorkers.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center text-slate-500">
@@ -238,30 +238,30 @@ export default function TeamManagement() {
                           {worker.name?.[0]?.toUpperCase()}
                         </div>
                         <div>
-                          <h3 className="font-semibold text-lg text-slate-900 break-words">{worker.name}</h3>
+                          <h3 className="font-semibold text-lg text-slate-900">{worker.name}</h3>
                           <p className="text-sm text-slate-600">{worker.role}</p>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4 mt-4">
+                      <div className="grid grid-cols-2 gap-4 mt-4">
                         <div>
                           <p className="text-xs text-slate-500">Email</p>
-                          <p className="text-sm text-slate-900 break-words">{worker.email || 'N/A'}</p>
+                          <p className="text-sm text-slate-900">{worker.email || 'N/A'}</p>
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">Phone</p>
-                          <p className="text-sm text-slate-900 break-words">{worker.phone || 'N/A'}</p>
+                          <p className="text-sm text-slate-900">{worker.phone || 'N/A'}</p>
                         </div>
                         {worker.hourly_rate && (
                           <div>
                             <p className="text-xs text-slate-500">Hourly Rate</p>
-                            <p className="text-sm text-slate-900 break-words">${worker.hourly_rate}/hr</p>
+                            <p className="text-sm text-slate-900">${worker.hourly_rate}/hr</p>
                           </div>
                         )}
                         {worker.current_project_id && (
                           <div>
                             <p className="text-xs text-slate-500">Current Project</p>
-                            <p className="text-sm text-slate-900 break-words">
+                            <p className="text-sm text-slate-900">
                               {projects.find(p => p.id === worker.current_project_id)?.name || 'Unknown'}
                             </p>
                           </div>
@@ -387,7 +387,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, onSubmit }) {
           <DialogTitle>{worker ? 'Edit Team Member' : 'Add Team Member'}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-semibold">Name *</label>
               <Input
@@ -401,7 +401,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, onSubmit }) {
               <select
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="w-full sm:w-auto border rounded p-2"
+                className="w-full border rounded p-2"
               >
                 <option value="laborer">Laborer</option>
                 <option value="foreman">Foreman</option>
@@ -416,7 +416,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, onSubmit }) {
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-semibold">Email</label>
               <Input
@@ -435,7 +435,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, onSubmit }) {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-semibold">Hourly Rate</label>
               <Input
@@ -450,7 +450,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, onSubmit }) {
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full sm:w-auto border rounded p-2"
+                className="w-full border rounded p-2"
               >
                 <option value="available">Available</option>
                 <option value="assigned">Assigned</option>
@@ -459,7 +459,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, onSubmit }) {
               </select>
             </div>
           </div>
-          <Button onClick={() => onSubmit(formData)} className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700">
+          <Button onClick={() => onSubmit(formData)} className="w-full bg-amber-600 hover:bg-amber-700">
             {worker ? 'Update' : 'Add'} Team Member
           </Button>
         </div>
@@ -512,7 +512,7 @@ function AssignmentDialog({ open, onOpenChange, worker, projects, organizationId
             <select
               value={assignmentData.project_id}
               onChange={(e) => setAssignmentData({ ...assignmentData, project_id: e.target.value })}
-              className="w-full sm:w-auto border rounded p-2"
+              className="w-full border rounded p-2"
             >
               <option value="">Select project</option>
               {projects.map(p => (
@@ -546,7 +546,7 @@ function AssignmentDialog({ open, onOpenChange, worker, projects, organizationId
           <Button 
             onClick={() => createAssignmentMutation.mutate(assignmentData)}
             disabled={!assignmentData.project_id || createAssignmentMutation.isPending}
-            className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700"
+            className="w-full bg-amber-600 hover:bg-amber-700"
           >
             {createAssignmentMutation.isPending ? 'Creating...' : 'Create Assignment'}
           </Button>

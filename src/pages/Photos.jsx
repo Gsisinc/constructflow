@@ -8,23 +8,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 export default function Photos() {
   const queryClient = useQueryClient();
-
-  // Get current user for organization filtering
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
   const [selectedProject, setSelectedProject] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const { data: projects = [] } = useQuery({
-    queryKey: ['projects', user?.organization_id],
-    queryFn: () => {
-      if (!user?.organization_id) return [];
-      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
-    },
-    enabled: !!user?.organization_id
+    queryKey: ['projects'],
+    queryFn: () => base44.entities.Project.list()
   });
 
   const { data: documents = [] } = useQuery({
@@ -61,8 +51,8 @@ export default function Photos() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl md:text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Photo Gallery</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-slate-900">Photo Gallery</h1>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
             <Button className="bg-amber-600 hover:bg-amber-700">
@@ -77,7 +67,7 @@ export default function Photos() {
               <select
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
-                className="w-full sm:w-auto p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg"
               >
                 <option value="">Select Project</option>
                 {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -107,14 +97,14 @@ export default function Photos() {
         </select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {documents.map(doc => (
           <Card key={doc.id} className="overflow-hidden hover:shadow-lg transition-shadow">
             <div className="aspect-square bg-slate-100 overflow-hidden relative group">
               <img
                 src={doc.file_url}
                 alt={doc.name}
-                className="w-full sm:w-auto h-full object-cover group-hover:scale-105 transition-transform"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                 <a href={doc.file_url} download className="p-2 bg-white rounded-full text-slate-900 hover:bg-slate-100">

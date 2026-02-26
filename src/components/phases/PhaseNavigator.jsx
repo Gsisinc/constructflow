@@ -395,7 +395,7 @@ export default function PhaseNavigator({
                       const subReqs = allRequirements.filter(sr => sr.parent_requirement_id === req.id);
                       return (
                         <div key={req.id} className="space-y-1">
-                          <div className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm group py-2 sm:py-3 hover:bg-slate-50 px-2 rounded transition-colors">
+                          <div className="flex items-center gap-2 text-sm group">
                             <input
                               type="checkbox"
                               checked={req.status === 'completed'}
@@ -405,29 +405,26 @@ export default function PhaseNavigator({
                                   data: { status: e.target.checked ? 'completed' : 'pending' }
                                 });
                               }}
-                              className="flex-shrink-0 cursor-pointer mt-0.5 accent-blue-600 rounded"
-                              style={{ width: '14px', height: '14px', minWidth: '14px', minHeight: '14px' }}
+                              className="h-4 w-4"
                             />
-                            <span className={cn(req.status === 'completed' && 'line-through text-slate-500', 'flex-1 break-words leading-snug text-slate-700')}>
+                            <span className={cn(req.status === 'completed' && 'line-through text-slate-400', 'flex-1')}>
                               {req.requirement_text}
                             </span>
-                            <div className="flex gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-5 px-1.5 sm:h-6 sm:px-2 text-xs opacity-100 hover:bg-blue-50 text-blue-600 whitespace-nowrap"
-                                onClick={() => {
-                                  setSelectedParentReq(req);
-                                  setRequirements('');
-                                }}
-                              >
-                                + Sub
-                              </Button>
-                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 px-2 text-xs opacity-0 group-hover:opacity-100"
+                              onClick={() => {
+                                setSelectedParentReq(req);
+                                setRequirements('');
+                              }}
+                            >
+                              + Sub
+                            </Button>
                           </div>
                           {subReqs.map(subReq => (
-                            <div key={subReq.id} className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm ml-4 sm:ml-6 py-1 sm:py-2">
-                                <input
+                            <div key={subReq.id} className="flex items-center gap-2 text-sm ml-6">
+                              <input
                                 type="checkbox"
                                 checked={subReq.status === 'completed'}
                                 onChange={(e) => {
@@ -436,10 +433,9 @@ export default function PhaseNavigator({
                                     data: { status: e.target.checked ? 'completed' : 'pending' }
                                   });
                                 }}
-                                className="flex-shrink-0 cursor-pointer mt-0.5 accent-blue-600 rounded"
-                                style={{ width: '12px', height: '12px', minWidth: '12px', minHeight: '12px' }}
+                                className="h-3.5 w-3.5"
                               />
-                              <span className={cn(subReq.status === 'completed' && 'line-through text-slate-500', 'text-xs sm:text-sm text-slate-700 break-words leading-snug')}>
+                              <span className={cn(subReq.status === 'completed' && 'line-through text-slate-400', 'text-xs text-slate-600')}>
                                 {subReq.requirement_text}
                               </span>
                             </div>

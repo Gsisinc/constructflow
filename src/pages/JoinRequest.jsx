@@ -47,16 +47,16 @@ export default function JoinRequest() {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-600/10 via-orange-600/5 to-slate-950 pointer-events-none"></div>
-        <Card className="w-full sm:w-auto max-w-md text-center bg-slate-900/50 backdrop-blur-md border-white/10 relative z-10">
+        <Card className="w-full max-w-md text-center bg-slate-900/50 backdrop-blur-md border-white/10 relative z-10">
           <CardContent className="pt-12 pb-8">
             <div className="h-16 w-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6 border border-green-500/30">
               <CheckCircle2 className="h-8 w-8 text-green-400" />
             </div>
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3">Application Submitted!</h2>
+            <h2 className="text-2xl font-bold text-white mb-3">Application Submitted!</h2>
             <p className="text-slate-400 mb-6">
               Your signup request has been received. An admin will review your application and send you an invite email once approved.
             </p>
-            <Button onClick={() => navigate(createPageUrl('Home'))} variant="outline" className="w-full sm:w-auto border-white/10 text-white hover:bg-white/5 hover:text-white">
+            <Button onClick={() => navigate(createPageUrl('Home'))} variant="outline" className="w-full border-white/10 text-white hover:bg-white/5 hover:text-white">
               Back to Home
             </Button>
           </CardContent>
@@ -68,7 +68,7 @@ export default function JoinRequest() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-amber-600/10 via-orange-600/5 to-slate-950 pointer-events-none"></div>
-      <Card className="w-full sm:w-auto max-w-2xl bg-slate-900/50 backdrop-blur-md border-white/10 relative z-10">
+      <Card className="w-full max-w-2xl bg-slate-900/50 backdrop-blur-md border-white/10 relative z-10">
         <CardHeader>
           <div className="flex items-center gap-4 mb-2">
             <img 

@@ -104,7 +104,7 @@ export default function TaskTracker() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Task Tracker</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Task Tracker</h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Manage your operational tasks</p>
         </div>
         <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
@@ -122,12 +122,12 @@ export default function TaskTracker() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
         <Card className="border-amber-100">
           <CardContent className="pt-3 sm:pt-6 p-2 sm:p-6">
             <div className="text-center">
               <Circle className="h-5 sm:h-8 w-5 sm:w-8 text-slate-400 mx-auto mb-1.5 sm:mb-2" />
-              <p className="text-lg sm:text-xl sm:text-2xl md:text-3xl font-bold">{stats.pending}</p>
+              <p className="text-lg sm:text-3xl font-bold">{stats.pending}</p>
               <p className="text-xs text-slate-500">Pending</p>
             </div>
           </CardContent>
@@ -136,7 +136,7 @@ export default function TaskTracker() {
           <CardContent className="pt-3 sm:pt-6 p-2 sm:p-6">
             <div className="text-center">
               <AlertCircle className="h-5 sm:h-8 w-5 sm:w-8 text-blue-500 mx-auto mb-1.5 sm:mb-2" />
-              <p className="text-lg sm:text-xl sm:text-2xl md:text-3xl font-bold">{stats.inProgress}</p>
+              <p className="text-lg sm:text-3xl font-bold">{stats.inProgress}</p>
               <p className="text-xs text-slate-500">In Progress</p>
             </div>
           </CardContent>
@@ -145,7 +145,7 @@ export default function TaskTracker() {
           <CardContent className="pt-3 sm:pt-6 p-2 sm:p-6">
             <div className="text-center">
               <CheckCircle2 className="h-5 sm:h-8 w-5 sm:w-8 text-green-500 mx-auto mb-1.5 sm:mb-2" />
-              <p className="text-lg sm:text-xl sm:text-2xl md:text-3xl font-bold">{stats.completed}</p>
+              <p className="text-lg sm:text-3xl font-bold">{stats.completed}</p>
               <p className="text-xs text-slate-500">Completed</p>
             </div>
           </CardContent>
@@ -154,7 +154,7 @@ export default function TaskTracker() {
           <CardContent className="pt-3 sm:pt-6 p-2 sm:p-6">
             <div className="text-center">
               <AlertCircle className="h-5 sm:h-8 w-5 sm:w-8 text-red-500 mx-auto mb-1.5 sm:mb-2" />
-              <p className="text-lg sm:text-xl sm:text-2xl md:text-3xl font-bold">{stats.blocked}</p>
+              <p className="text-lg sm:text-3xl font-bold">{stats.blocked}</p>
               <p className="text-xs text-slate-500">Blocked</p>
             </div>
           </CardContent>
@@ -184,7 +184,7 @@ export default function TaskTracker() {
 
       {/* Tasks by Status */}
       <Tabs value={selectedStatus} onValueChange={setSelectedStatus}>
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 h-auto">
+        <TabsList className="grid w-full grid-cols-4 h-auto">
           <TabsTrigger value="pending" className="text-xs sm:text-sm py-2">Pending</TabsTrigger>
           <TabsTrigger value="in_progress" className="text-xs sm:text-sm py-2">In</TabsTrigger>
           <TabsTrigger value="completed" className="text-xs sm:text-sm py-2">Done</TabsTrigger>
@@ -303,7 +303,7 @@ function TaskForm({ task, projects, onSubmit }) {
         <select
           value={formData.project_id}
           onChange={(e) => setFormData({ ...formData, project_id: e.target.value })}
-          className="w-full sm:w-auto border rounded p-2"
+          className="w-full border rounded p-2"
         >
           <option value="">Select project</option>
           {projects.map(p => (
@@ -325,16 +325,16 @@ function TaskForm({ task, projects, onSubmit }) {
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           placeholder="Task details..."
-          className="w-full sm:w-auto border rounded p-2 h-20"
+          className="w-full border rounded p-2 h-20"
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-semibold">Category</label>
           <select
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            className="w-full sm:w-auto border rounded p-2"
+            className="w-full border rounded p-2"
           >
             <option value="bid_analysis">Bid Analysis</option>
             <option value="documentation">Documentation</option>
@@ -353,7 +353,7 @@ function TaskForm({ task, projects, onSubmit }) {
           <select
             value={formData.priority}
             onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-            className="w-full sm:w-auto border rounded p-2"
+            className="w-full border rounded p-2"
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -362,7 +362,7 @@ function TaskForm({ task, projects, onSubmit }) {
           </select>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-semibold">Assigned To</label>
           <Input
@@ -381,7 +381,7 @@ function TaskForm({ task, projects, onSubmit }) {
           />
         </div>
       </div>
-      <Button onClick={() => onSubmit(formData)} className="w-full sm:w-auto">
+      <Button onClick={() => onSubmit(formData)} className="w-full">
         {task ? 'Update Task' : 'Create Task'}
       </Button>
     </div>

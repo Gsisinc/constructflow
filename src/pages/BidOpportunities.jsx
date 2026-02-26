@@ -107,9 +107,9 @@ Return as JSON.`,
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Bid Opportunities</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Bid Opportunities</h1>
           <p className="text-slate-500 mt-1">Track and estimate project bids</p>
         </div>
         <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
@@ -129,13 +129,13 @@ Return as JSON.`,
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-slate-600">Total Bids</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-xl md:text-2xl font-bold">{stats.total}</div>
+            <div className="text-2xl font-bold">{stats.total}</div>
           </CardContent>
         </Card>
         <Card>
@@ -143,7 +143,7 @@ Return as JSON.`,
             <CardTitle className="text-sm font-medium text-slate-600">New</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">{stats.new}</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.new}</div>
           </CardContent>
         </Card>
         <Card>
@@ -151,7 +151,7 @@ Return as JSON.`,
             <CardTitle className="text-sm font-medium text-slate-600">In Progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-xl md:text-2xl font-bold text-yellow-600">{stats.active}</div>
+            <div className="text-2xl font-bold text-yellow-600">{stats.active}</div>
           </CardContent>
         </Card>
         <Card>
@@ -159,7 +159,7 @@ Return as JSON.`,
             <CardTitle className="text-sm font-medium text-slate-600">Submitted</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600">{stats.submitted}</div>
+            <div className="text-2xl font-bold text-purple-600">{stats.submitted}</div>
           </CardContent>
         </Card>
         <Card>
@@ -167,7 +167,7 @@ Return as JSON.`,
             <CardTitle className="text-sm font-medium text-slate-600">Won</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{stats.won}</div>
+            <div className="text-2xl font-bold text-green-600">{stats.won}</div>
           </CardContent>
         </Card>
       </div>
@@ -220,7 +220,7 @@ Return as JSON.`,
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                 {bid.project_type && (
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-slate-400" />
@@ -311,7 +311,7 @@ function BidForm({ onSubmit }) {
         value={formData.due_date}
         onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
       />
-      <Button type="submit" className="w-full sm:w-auto">Create Opportunity</Button>
+      <Button type="submit" className="w-full">Create Opportunity</Button>
     </form>
   );
 }

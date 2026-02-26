@@ -103,7 +103,7 @@ function KPICard({ title, value, change, changeType, icon: Icon, color, subtitle
                     </TooltipProvider>
                   )}
                 </div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{value}</h3>
+                <h3 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{value}</h3>
                 {subtitle && (
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{subtitle}</p>
                 )}
@@ -412,7 +412,7 @@ export default function Dashboard() {
             <div className="h-4 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="h-32 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
           ))}
@@ -433,7 +433,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
                 {greeting}, {safeUser?.full_name?.split(' ')[0] || 'User'}! 👋
               </h1>
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -464,9 +464,9 @@ export default function Dashboard() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 sm:px-6 md:px-8 py-4 sm:py-6 space-y-6"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {kpiData.map((kpi, index) => (
             <KPICard key={index} {...kpi} />
           ))}
@@ -481,7 +481,7 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {quickActions.map((action, index) => (
                   <QuickAction key={index} {...action} />
                 ))}
@@ -490,7 +490,7 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <motion.div variants={itemVariants} className="lg:col-span-2 space-y-4">
             <Card className="border-0 shadow-md bg-white dark:bg-slate-800">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -527,7 +527,7 @@ export default function Dashboard() {
                     <Button onClick={() => navigate(createPageUrl('Projects'))}>Create Project</Button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {activeProjects.slice(0, 4).map((project) => (
                       <ProjectCard 
                         key={project.id} 

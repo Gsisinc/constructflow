@@ -38,7 +38,7 @@ export default function AuditTrail() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Audit Trail</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Audit Trail</h1>
         <p className="text-sm text-slate-600 mt-1">Immutable-style activity feed for Phase 1 governance.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Badge className={chainStatus.valid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
@@ -68,7 +68,7 @@ export default function AuditTrail() {
                   <span className="text-slate-500 text-sm">#{log.entity_id || 'n/a'}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm text-slate-700 break-words">
+              <CardContent className="space-y-2 text-sm text-slate-700">
                 <p>
                   {log.logged_at || log.created_date
                     ? formatDistanceToNow(new Date(log.logged_at || log.created_date), { addSuffix: true })

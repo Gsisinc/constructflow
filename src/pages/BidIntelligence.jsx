@@ -106,7 +106,7 @@ function DocumentAnalysisTab() {
               <div className="flex items-center gap-3">
                 <FileText className="h-5 w-5 text-amber-600" />
                 <div>
-                  <p className="font-medium text-slate-900 break-words">{file.name}</p>
+                  <p className="font-medium text-slate-900">{file.name}</p>
                   <p className="text-sm text-slate-500">
                     {(file.size / 1024).toFixed(2)} KB
                   </p>
@@ -135,7 +135,7 @@ function DocumentAnalysisTab() {
             <div className="flex items-center gap-3">
               <Loader className="h-5 w-5 text-blue-600 animate-spin" />
               <div>
-                <p className="font-medium text-slate-900 break-words">Analyzing document...</p>
+                <p className="font-medium text-slate-900">Analyzing document...</p>
                 <p className="text-sm text-slate-600">
                   Using AI to extract key information
                 </p>
@@ -166,7 +166,7 @@ function DocumentAnalysisTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <h3 className="font-semibold text-slate-900 break-words">Analysis Results</h3>
+              <h3 className="font-semibold text-slate-900">Analysis Results</h3>
             </div>
             <div className="flex gap-2">
               <Button
@@ -200,7 +200,7 @@ function DocumentAnalysisTab() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries(analysis).map(([key, value]) => (
                 <Card key={key} className="border-amber-100">
                   <CardHeader className="pb-3">
@@ -307,7 +307,7 @@ function DrawingMeasurementTab() {
               <div className="flex items-center gap-3">
                 <FileText className="h-5 w-5 text-blue-600" />
                 <div>
-                  <p className="font-medium text-slate-900 break-words">{file.name}</p>
+                  <p className="font-medium text-slate-900">{file.name}</p>
                   <p className="text-sm text-slate-500">
                     {(file.size / 1024).toFixed(2)} KB
                   </p>
@@ -336,7 +336,7 @@ function DrawingMeasurementTab() {
             <div className="flex items-center gap-3">
               <Loader className="h-5 w-5 text-blue-600 animate-spin" />
               <div>
-                <p className="font-medium text-slate-900 break-words">Analyzing drawing...</p>
+                <p className="font-medium text-slate-900">Analyzing drawing...</p>
                 <p className="text-sm text-slate-600">
                   Extracting measurements and takeoff items
                 </p>
@@ -425,7 +425,7 @@ function DrawingMeasurementTab() {
                           className="mt-1"
                         />
                         <div className="flex-1">
-                          <p className="font-medium text-slate-900 break-words">
+                          <p className="font-medium text-slate-900">
                             {item.quantity} {item.unit}
                           </p>
                           <p className="text-sm text-slate-600">{item.description}</p>
@@ -642,7 +642,7 @@ function DesignerTab() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Left Panel - Symbol Selection */}
         <div className="space-y-4">
           {/* Category Selector */}
@@ -678,7 +678,7 @@ function DesignerTab() {
                 variant={tool === 'select' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setTool('select')}
-                className="w-full sm:w-auto justify-start"
+                className="w-full justify-start"
               >
                 <Grid3x3 className="h-4 w-4 mr-2" />
                 Select
@@ -687,7 +687,7 @@ function DesignerTab() {
                 variant={tool === 'draw-line' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setTool('draw-line')}
-                className="w-full sm:w-auto justify-start"
+                className="w-full justify-start"
               >
                 <Minus className="h-4 w-4 mr-2" />
                 Line
@@ -696,7 +696,7 @@ function DesignerTab() {
                 variant={tool === 'draw-rect' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setTool('draw-rect')}
-                className="w-full sm:w-auto justify-start"
+                className="w-full justify-start"
               >
                 <SquareIcon className="h-4 w-4 mr-2" />
                 Rectangle
@@ -705,7 +705,7 @@ function DesignerTab() {
                 variant={tool === 'draw-text' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setTool('draw-text')}
-                className="w-full sm:w-auto justify-start"
+                className="w-full justify-start"
               >
                 <Type className="h-4 w-4 mr-2" />
                 Text
@@ -720,7 +720,7 @@ function DesignerTab() {
                 variant="outline"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full sm:w-auto justify-start"
+                className="w-full justify-start"
               >
                 <Upload className="h-4 w-4 mr-2" />
                 Upload Plan
@@ -736,7 +736,7 @@ function DesignerTab() {
                 variant="outline"
                 size="sm"
                 onClick={handleDownloadDesign}
-                className="w-full sm:w-auto justify-start"
+                className="w-full justify-start"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Download
@@ -745,7 +745,7 @@ function DesignerTab() {
                 variant="outline"
                 size="sm"
                 onClick={handleClearCanvas}
-                className="w-full sm:w-auto justify-start text-red-600 hover:text-red-700"
+                className="w-full justify-start text-red-600 hover:text-red-700"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Clear
@@ -794,7 +794,7 @@ function DesignerTab() {
                 ref={canvasRef}
                 onMouseDown={handleCanvasMouseDown}
                 onMouseUp={handleCanvasMouseUp}
-                className="w-full sm:w-auto border-2 border-slate-200 rounded-lg bg-white cursor-crosshair"
+                className="w-full border-2 border-slate-200 rounded-lg bg-white cursor-crosshair"
                 style={{ height: '500px' }}
               />
               <p className="text-xs text-slate-500 mt-2">
@@ -819,7 +819,7 @@ export default function BidIntelligence() {
       {/* Header */}
       <div className="flex items-center justify-between pb-2">
         <div>
-          <h1 className="text-3xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 flex items-center gap-3 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 flex items-center gap-3 tracking-tight">
             <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg">
               <Sparkles className="h-7 w-7 text-purple-700" />
             </div>

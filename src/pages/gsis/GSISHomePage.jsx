@@ -65,14 +65,14 @@ export default function GSISHomePage() {
                 From structured cabling and security systems to fire alarm installations and ISP services, we deliver enterprise-grade low voltage solutions.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/contact" className="w-full sm:w-auto sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto sm:w-auto min-h-[48px] bg-gold-500 hover:bg-gold-600 text-white font-semibold text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 shadow-xl hover:shadow-2xl transition-all touch-manipulation">
+                <Link to="/contact" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto min-h-[48px] bg-gold-500 hover:bg-gold-600 text-white font-semibold text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 shadow-xl hover:shadow-2xl transition-all touch-manipulation">
                     Get a Quote
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
-                <Link to="/projects" className="w-full sm:w-auto sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto sm:w-auto min-h-[48px] border-2 border-white/30 text-white hover:bg-white/10 font-semibold text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 touch-manipulation">
+                <Link to="/projects" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto min-h-[48px] border-2 border-white/30 text-white hover:bg-white/10 font-semibold text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 touch-manipulation">
                     View Our Work
                   </Button>
                 </Link>
@@ -92,7 +92,7 @@ export default function GSISHomePage() {
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full sm:w-auto">
+          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
             <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white" />
           </svg>
         </div>

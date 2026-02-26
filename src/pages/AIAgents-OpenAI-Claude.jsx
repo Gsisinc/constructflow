@@ -194,7 +194,7 @@ export default function AIAgentsOpenAIClaude() {
   return (
     <div className="space-y-6 p-4 sm:p-6">
       <div>
-        <h1 className="text-lg sm:text-xl md:text-2xl font-bold">AI Agents - OpenAI & Claude</h1>
+        <h1 className="text-2xl font-bold">AI Agents - OpenAI & Claude</h1>
         <p className="text-gray-600">Configure and use AI agents powered by OpenAI GPT-4 and Claude</p>
       </div>
 
@@ -229,7 +229,7 @@ export default function AIAgentsOpenAIClaude() {
             <p className="text-xs text-gray-500 mt-1">Get from https://console.anthropic.com/account/keys</p>
           </div>
 
-          <Button onClick={handleSaveKeys} className="w-full sm:w-auto">
+          <Button onClick={handleSaveKeys} className="w-full">
             Save Configuration
           </Button>
 
@@ -256,7 +256,7 @@ export default function AIAgentsOpenAIClaude() {
       {/* Agents Grid */}
       <div>
         <h2 className="text-xl font-bold mb-4">10 AI Agents Available</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {agents.map((agent) => (
             <Card
               key={agent.id}
@@ -288,7 +288,7 @@ export default function AIAgentsOpenAIClaude() {
                     <Button
                       onClick={() => handleAgentQuery(agent)}
                       disabled={loading}
-                      className="w-full sm:w-auto"
+                      className="w-full"
                     >
                       {loading ? 'Processing...' : 'Run Agent'}
                     </Button>

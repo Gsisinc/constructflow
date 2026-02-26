@@ -82,13 +82,13 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="w-full sm:w-auto max-w-md">
+      <div className="w-full max-w-md">
         {/* Welcome Header */}
         <div className="text-center mb-8">
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100 mb-4">
             <Building2 className="h-6 w-6 text-amber-600" />
           </div>
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 break-words">Welcome to Nexus Construct</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Welcome to Nexus Construct</h1>
           <p className="text-slate-600 mt-2">Let's get your workspace set up</p>
           {user && <p className="text-sm text-slate-500 mt-2">Signed in as {user.email}</p>}
         </div>
@@ -133,7 +133,7 @@ export default function Onboarding() {
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 break-words">Organization Name</label>
+                <label className="text-sm font-medium text-slate-700">Organization Name</label>
                 <Input
                   placeholder="e.g., Golden State Integrated Systems"
                   value={orgName}
@@ -190,7 +190,7 @@ export default function Onboarding() {
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 break-words">Invite Code</label>
+                <label className="text-sm font-medium text-slate-700">Invite Code</label>
                 <Input
                   placeholder="Enter invite code"
                   value={inviteCode}

@@ -22,22 +22,9 @@ export default function DailyLog() {
     notes: ''
   });
 
-  // Get current user to access organization_id
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
-
-  // SECURITY FIX: Filter projects by organization_id
   const { data: projects = [] } = useQuery({
-    queryKey: ['projects', user?.organization_id],
-    queryFn: () => {
-      if (!user?.organization_id) return [];
-      return base44.entities.Project.filter({ 
-        organization_id: user.organization_id 
-      }, '-created_date');
-    },
-    enabled: !!user?.organization_id
+    queryKey: ['projects'],
+    queryFn: () => base44.entities.Project.list()
   });
 
   const { data: logs = [] } = useQuery({
@@ -50,9 +37,8 @@ export default function DailyLog() {
     mutationFn: (data) => base44.entities.DailyLog.create({
       ...data,
       project_id: selectedProject,
-      organization_id: user?.organization_id,
       log_date: format(new Date(), 'yyyy-MM-dd'),
-      submitted_by: user?.email
+      submitted_by: (base44.auth.me()).email
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dailyLogs'] });
@@ -67,17 +53,13 @@ export default function DailyLog() {
   });
 
   const handleSubmit = () => {
-    if (!selectedProject) {
-      alert('Please select a project');
-      return;
-    }
     createMutation.mutate(formData);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Daily Logs</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-slate-900">Daily Logs</h1>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
             <Button className="bg-amber-600 hover:bg-amber-700">
@@ -89,17 +71,14 @@ export default function DailyLog() {
               <DialogTitle>Create Daily Log</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Select Project *</label>
-                <select
-                  value={selectedProject || ''}
-                  onChange={(e) => setSelectedProject(e.target.value)}
-                  className="w-full sm:w-auto p-2 border rounded-lg mt-1"
-                >
-                  <option value="">Select Project</option>
-                  {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
-              </div>
+              <select
+                value={selectedProject}
+                onChange={(e) => setSelectedProject(e.target.value)}
+                className="w-full p-2 border rounded-lg"
+              >
+                <option value="">Select Project</option>
+                {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
               <Textarea
                 placeholder="Work Performed"
                 value={formData.work_performed}
@@ -122,7 +101,7 @@ export default function DailyLog() {
                 onChange={(e) => setFormData({ ...formData, safety_issues: e.target.value })}
               />
               <Textarea
-                placeholder="Delays"
+                placeholder="Delays (if any)"
                 value={formData.delays}
                 onChange={(e) => setFormData({ ...formData, delays: e.target.value })}
               />
@@ -131,55 +110,72 @@ export default function DailyLog() {
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               />
-              <Button onClick={handleSubmit} className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700" disabled={createMutation.isPending}>
-                {createMutation.isPending ? 'Creating...' : 'Create Log'}
+              <Button onClick={handleSubmit} className="w-full bg-amber-600 hover:bg-amber-700">
+                Save Log
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daily Logs</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {logs.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
-              <p>No daily logs yet. Create one to get started!</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {logs.map(log => (
-                <div key={log.id} className="border rounded-lg p-4 hover:bg-slate-50">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <p className="font-semibold text-slate-900 break-words">{log.work_performed?.substring(0, 50)}</p>
-                      <div className="flex items-center gap-2 text-sm text-slate-500 mt-1">
-                        <Calendar className="h-4 w-4" />
-                        {format(new Date(log.log_date), 'MMM d, yyyy')}
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteMutation.mutate(log.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="text-sm text-slate-600 space-y-1">
-                    {log.weather?.conditions && <p><strong>Weather:</strong> {log.weather.conditions} ({log.weather.temperature}°)</p>}
-                    {log.safety_issues && <p><strong>Safety Issues:</strong> {log.safety_issues}</p>}
-                    {log.delays && <p><strong>Delays:</strong> {log.delays}</p>}
-                    {log.notes && <p><strong>Notes:</strong> {log.notes}</p>}
-                  </div>
+      <div className="mb-6">
+        <select
+          value={selectedProject}
+          onChange={(e) => setSelectedProject(e.target.value)}
+          className="p-2 border rounded-lg"
+        >
+          <option value="">Select a Project</option>
+          {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+      </div>
+
+      <div className="grid gap-4">
+        {logs.map(log => (
+          <Card key={log.id}>
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-amber-600" />
+                  <CardTitle className="text-lg">{format(new Date(log.log_date), 'MMMM d, yyyy')}</CardTitle>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deleteMutation.mutate(log.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {log.work_performed && (
+                <div>
+                  <p className="font-semibold text-slate-700">Work Performed</p>
+                  <p className="text-slate-600">{log.work_performed}</p>
+                </div>
+              )}
+              {log.weather && (
+                <div>
+                  <p className="font-semibold text-slate-700">Weather</p>
+                  <p className="text-slate-600">{log.weather.conditions} • {log.weather.temperature}°</p>
+                </div>
+              )}
+              {log.safety_issues && (
+                <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                  <p className="font-semibold text-red-900">Safety Issues</p>
+                  <p className="text-red-800">{log.safety_issues}</p>
+                </div>
+              )}
+              {log.notes && (
+                <div>
+                  <p className="font-semibold text-slate-700">Notes</p>
+                  <p className="text-slate-600">{log.notes}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

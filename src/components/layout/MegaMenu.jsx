@@ -92,8 +92,6 @@ const menuSections = [
       { icon: Users, label: 'Directory', page: 'Directory' },
       { icon: Search, label: 'Opportunities', page: 'BidDiscovery' },
       { icon: Users, label: 'Technicians', page: 'Directory' },
-      { icon: Users, label: 'Tech Portal', page: 'TechnicianPortal' },
-      { icon: Users, label: 'Client Portal', page: 'ClientPortal' },
       { icon: Users, label: 'Subcontractor Portal', page: 'SubcontractorPortal' },
       { icon: Calendar, label: 'Calendar', page: 'Calendar' },
       { icon: Smartphone, label: 'Vehicles', page: 'VehicleLogs' },

@@ -64,7 +64,7 @@ export default function TechnicianPortal() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">Your Training Portal</h1>
+          <h1 className="text-4xl font-bold text-slate-900">Your Training Portal</h1>
           <p className="text-slate-600">Track your progress, certifications, and skills</p>
         </motion.div>
 
@@ -79,14 +79,14 @@ export default function TechnicianPortal() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-slate-600">Current Level</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{profile.current_level || 0}/6</p>
+                <p className="text-3xl font-bold text-blue-600">{profile.current_level || 0}/6</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -97,7 +97,7 @@ export default function TechnicianPortal() {
                 <CardTitle className="text-sm font-medium text-slate-600">Certifications</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600">{validCerts}</p>
+                <p className="text-3xl font-bold text-green-600">{validCerts}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -108,7 +108,7 @@ export default function TechnicianPortal() {
                 <CardTitle className="text-sm font-medium text-slate-600">Field Hours</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-purple-600">{totalFieldHours}</p>
+                <p className="text-3xl font-bold text-purple-600">{totalFieldHours}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -119,14 +119,14 @@ export default function TechnicianPortal() {
                 <CardTitle className="text-sm font-medium text-slate-600">Active Courses</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-orange-600">{activeCourses.length}</p>
+                <p className="text-3xl font-bold text-orange-600">{activeCourses.length}</p>
               </CardContent>
             </Card>
           </motion.div>
         </div>
 
-        <Tabs defaultValue="overview" className="w-full sm:w-auto">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 mb-6">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="certifications">Certifications</TabsTrigger>
             <TabsTrigger value="skills">Skills</TabsTrigger>
@@ -169,7 +169,7 @@ export default function TechnicianPortal() {
                     {activeCourses.map(course => (
                       <div key={course.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                         <div>
-                          <p className="font-medium text-slate-900 break-words">{course.course_title}</p>
+                          <p className="font-medium text-slate-900">{course.course_title}</p>
                           <p className="text-xs text-slate-600">Due: {new Date(course.due_date).toLocaleDateString()}</p>
                         </div>
                         <Badge className="bg-blue-100 text-blue-800">In Progress</Badge>
@@ -210,7 +210,7 @@ export default function TechnicianPortal() {
                       >
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="font-semibold text-slate-900 break-words">{cert.cert_name}</p>
+                            <p className="font-semibold text-slate-900">{cert.cert_name}</p>
                             <p className="text-sm text-slate-600">{cert.issuing_body}</p>
                             <p className="text-xs text-slate-500 mt-1">
                               Earned: {new Date(cert.date_earned).toLocaleDateString()}
@@ -268,7 +268,7 @@ export default function TechnicianPortal() {
                             {categorySkills.map(skill => (
                               <div key={skill.id}>
                                 <div className="flex items-center justify-between mb-1">
-                                  <p className="text-sm font-medium text-slate-700 break-words">{skill.skill_name}</p>
+                                  <p className="text-sm font-medium text-slate-700">{skill.skill_name}</p>
                                   <div className="flex gap-2">
                                     <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                                       You: {skill.self_rating}/5
@@ -323,7 +323,7 @@ export default function TechnicianPortal() {
                         className="flex items-center justify-between p-3 border rounded-lg"
                       >
                         <div>
-                          <p className="font-medium text-slate-900 break-words">{log.project_name}</p>
+                          <p className="font-medium text-slate-900">{log.project_name}</p>
                           <p className="text-xs text-slate-600">
                             {new Date(log.date).toLocaleDateString()} • {log.task_type}
                           </p>

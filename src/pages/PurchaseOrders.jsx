@@ -74,7 +74,7 @@ export default function PurchaseOrders() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Purchase Orders</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Purchase Orders</h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-0.5">Manage vendor orders and receipts</p>
         </div>
         <div className="flex gap-2">
@@ -94,7 +94,7 @@ export default function PurchaseOrders() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs sm:text-sm text-slate-600">Total PO Value</p>
-            <p className="text-lg sm:text-lg sm:text-xl md:text-2xl font-semibold mt-0.5">${totalValue.toLocaleString()}</p>
+            <p className="text-lg sm:text-2xl font-semibold mt-0.5">${totalValue.toLocaleString()}</p>
           </div>
           <div className="text-right text-xs sm:text-sm text-slate-600">
             <p className="font-medium">{pos.length} orders</p>
@@ -130,7 +130,7 @@ export default function PurchaseOrders() {
                   {po.status?.replace('_', ' ')}
                 </Badge>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-2 text-xs">
                 <div><p className="text-slate-500">Total</p><p className="font-semibold">${(po.total || 0).toLocaleString()}</p></div>
                 <div><p className="text-slate-500">Date</p><p className="font-semibold">{po.po_date ? format(new Date(po.po_date), 'MMM d') : '-'}</p></div>
               </div>
@@ -163,21 +163,21 @@ export default function PurchaseOrders() {
       {!isLoading && pos.length > 0 && (
         <div className="hidden sm:block bg-white rounded-xl border border-amber-100 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full sm:w-auto text-sm">
+            <table className="w-full text-sm">
               <thead className="border-b border-amber-100 bg-amber-50/30">
                 <tr>
-                  <th className="text-left p-4 font-semibold text-xs text-slate-900 break-words">PO Number</th>
-                  <th className="text-left p-4 font-semibold text-xs text-slate-900 break-words">Vendor</th>
-                  <th className="text-left p-4 font-semibold text-xs text-slate-900 break-words">Date</th>
-                  <th className="text-left p-4 font-semibold text-xs text-slate-900 break-words">Total</th>
-                  <th className="text-left p-4 font-semibold text-xs text-slate-900 break-words">Status</th>
-                  <th className="text-right p-4 font-semibold text-xs text-slate-900 break-words">Actions</th>
+                  <th className="text-left p-4 font-semibold text-xs text-slate-900">PO Number</th>
+                  <th className="text-left p-4 font-semibold text-xs text-slate-900">Vendor</th>
+                  <th className="text-left p-4 font-semibold text-xs text-slate-900">Date</th>
+                  <th className="text-left p-4 font-semibold text-xs text-slate-900">Total</th>
+                  <th className="text-left p-4 font-semibold text-xs text-slate-900">Status</th>
+                  <th className="text-right p-4 font-semibold text-xs text-slate-900">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {pos.map((po) => (
                   <tr key={po.id} className="border-b border-slate-100 hover:bg-amber-50/30">
-                    <td className="p-4 font-medium text-slate-900 break-words">{po.po_number || '-'}</td>
+                    <td className="p-4 font-medium text-slate-900">{po.po_number || '-'}</td>
                     <td className="p-4 text-slate-600">{po.vendor}</td>
                     <td className="p-4 text-slate-600">{po.po_date ? format(new Date(po.po_date), 'MMM d, yyyy') : '-'}</td>
                     <td className="p-4 font-semibold">${(po.total || 0).toLocaleString()}</td>
@@ -354,7 +354,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
           <DialogTitle>{po ? 'Edit PO' : 'Create Purchase Order'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>PO Number</Label>
               <Input
@@ -391,7 +391,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
             <Input type="date" value={formData.po_date} onChange={(e) => setFormData({ ...formData, po_date: e.target.value })} />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
               <Label>Subtotal</Label>
               <Input type="number" value={formData.subtotal} onChange={(e) => setFormData({ ...formData, subtotal: e.target.value })} placeholder="0.00" />
@@ -467,13 +467,13 @@ function UploadDialog({ open, onOpenChange, projects, onUpload }) {
               />
               <label htmlFor="file-upload" className="cursor-pointer block">
                 <Upload className="h-8 w-8 mx-auto mb-2 text-slate-400" />
-                <p className="text-sm font-medium text-slate-700 break-words">Drop file here or click to browse</p>
+                <p className="text-sm font-medium text-slate-700">Drop file here or click to browse</p>
                 <p className="text-xs text-slate-500 mt-1">{file?.name || 'No file selected'}</p>
               </label>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>PO Number</Label>
               <Input value={formData.po_number} onChange={(e) => setFormData({ ...formData, po_number: e.target.value })} placeholder="PO-001" />

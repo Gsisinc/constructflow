@@ -89,7 +89,7 @@ export default function BidOpportunityDetail() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 break-words">{bid.title || bid.project_name || 'Untitled Bid'}</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{bid.title || bid.project_name || 'Untitled Bid'}</h1>
             <p className="text-sm text-slate-600 mt-1">{bid.agency || bid.client_name || 'Unknown Agency'}</p>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function BidOpportunityDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? format(new Date(bid.due_date), 'MMM d, yyyy') : 'Not set'} />
         <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={`$${Number(bid.estimated_value || bid.value || 0).toLocaleString()}`} />
         <StatCard icon={<TrendingUp className="h-8 w-8 text-blue-600" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
@@ -126,7 +126,7 @@ export default function BidOpportunityDetail() {
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full sm:w-auto">
+      <Tabs defaultValue="overview" className="w-full">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="estimate">Estimate</TabsTrigger>
@@ -173,7 +173,7 @@ export default function BidOpportunityDetail() {
 
           {documents.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-slate-900 break-words">Uploaded Documents</h3>
+              <h3 className="text-sm font-semibold text-slate-900">Uploaded Documents</h3>
               {documents.map((doc) => (
                 <Card key={doc.id}>
                   <CardContent className="p-4">
@@ -229,7 +229,7 @@ export default function BidOpportunityDetail() {
                   <CardHeader><CardTitle className="text-base">Complexity Score</CardTitle></CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-4">
-                      <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-600">{analysis.complexityScore}/10</div>
+                      <div className="text-4xl font-bold text-amber-600">{analysis.complexityScore}/10</div>
                       <p className="text-sm text-slate-600">{analysis.complexityLabel}</p>
                     </div>
                   </CardContent>
@@ -252,7 +252,7 @@ export default function BidOpportunityDetail() {
               {analysis.recommendedMarkup !== null && (
                 <Card>
                   <CardHeader><CardTitle className="text-base">Recommended Markup</CardTitle></CardHeader>
-                  <CardContent><p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{analysis.recommendedMarkup}%</p></CardContent>
+                  <CardContent><p className="text-2xl font-bold text-green-600">{analysis.recommendedMarkup}%</p></CardContent>
                 </Card>
               )}
 

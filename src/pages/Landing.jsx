@@ -272,7 +272,7 @@ export default function Landing() {
               ))}
               <Button
                 onClick={openApp}
-                className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white gap-2 mt-2"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white gap-2 mt-2"
               >
                 MyGSIS
                 <ExternalLink className="h-4 w-4" />
@@ -513,7 +513,7 @@ export default function Landing() {
                   <label className="block text-sm font-medium mb-2">Full Name</label>
                   <input
                     type="text"
-                    className="w-full sm:w-auto px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     placeholder="Your name"
                   />
                 </div>
@@ -521,7 +521,7 @@ export default function Landing() {
                   <label className="block text-sm font-medium mb-2">Company</label>
                   <input
                     type="text"
-                    className="w-full sm:w-auto px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     placeholder="Your company"
                   />
                 </div>
@@ -529,18 +529,18 @@ export default function Landing() {
                   <label className="block text-sm font-medium mb-2">Email</label>
                   <input
                     type="email"
-                    className="w-full sm:w-auto px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     placeholder="your@email.com"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Project Details</label>
                   <textarea
-                    className="w-full sm:w-auto px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 h-24"
+                    className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 h-24"
                     placeholder="Tell us about your project..."
                   />
                 </div>
-                <Button className="w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 font-semibold gap-2">
+                <Button className="w-full bg-white text-blue-600 hover:bg-blue-50 font-semibold gap-2">
                   Send Request
                   <ArrowRight className="h-4 w-4" />
                 </Button>

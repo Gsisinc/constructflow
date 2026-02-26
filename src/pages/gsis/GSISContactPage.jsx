@@ -135,7 +135,7 @@ export default function GSISContactPage() {
                     <Label htmlFor="projectDescription">Project description</Label>
                     <Textarea id="projectDescription" value={formData.projectDescription} onChange={(e) => handleChange('projectDescription', e.target.value)} placeholder="Tell us about your project..." rows={4} className="border-navy-200" />
                   </div>
-                  <Button type="submit" className="w-full sm:w-auto min-h-[48px] bg-gold-500 hover:bg-gold-600 text-white font-semibold touch-manipulation">
+                  <Button type="submit" className="w-full min-h-[48px] bg-gold-500 hover:bg-gold-600 text-white font-semibold touch-manipulation">
                     <Send className="w-4 h-4 mr-2" />
                     Send Message
                   </Button>
