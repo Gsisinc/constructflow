@@ -3,21 +3,10 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
-// For GitHub Pages: set base to your repo name, e.g. base: '/constructflow/'
-// Or set env: VITE_BASE_PATH=/your-repo-name/ when building
-const base = process.env.VITE_BASE_PATH || '/';
-
 export default defineConfig({
-  base,
   logLevel: 'error', // Suppress warnings, only show errors
   optimizeDeps: {
-    include: ['pdfjs-dist'],
-  },
-  resolve: {
-    alias: {
-      'pdfjs-dist/build/pdf.mjs': 'pdfjs-dist',
-      'pdfjs-dist/legacy/build/pdf.mjs': 'pdfjs-dist',
-    },
+    include: ['pdfjs-dist/build/pdf.mjs'],
   },
   server: {
     proxy: {
