@@ -129,7 +129,6 @@ import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
 import Webmail from './pages/Webmail';
-import Dashboard from './pages/Dashboard';
 import GSISAboutPage from './pages/GSISAboutPage';
 import GSISContactPage from './pages/GSISContactPage';
 import GSISHomePage from './pages/GSISHomePage';
@@ -222,7 +221,6 @@ export const PAGES = {
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
     "Webmail": Webmail,
-    "Dashboard": Dashboard,
     "GSISAboutPage": GSISAboutPage,
     "GSISContactPage": GSISContactPage,
     "GSISHomePage": GSISHomePage,
