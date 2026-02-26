@@ -135,6 +135,7 @@ import GSISHomePage from './pages/GSISHomePage';
 import GSISProjectsPage from './pages/GSISProjectsPage';
 import GSISServiceDetailPage from './pages/GSISServiceDetailPage';
 import GSISServicesPage from './pages/GSISServicesPage';
+import Dashboard from './pages/Dashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -227,6 +228,7 @@ export const PAGES = {
     "GSISProjectsPage": GSISProjectsPage,
     "GSISServiceDetailPage": GSISServiceDetailPage,
     "GSISServicesPage": GSISServicesPage,
+    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {
