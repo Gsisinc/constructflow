@@ -109,11 +109,11 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
       className={cn(
         "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px]",
         isActive
-          ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
-          : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+          ? "bg-primary text-primary-foreground shadow-md hover:opacity-90"
+          : "text-gray-700 hover:bg-accent hover:text-accent-foreground"
       )}
     >
-      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-gray-500")} />
+      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-primary-foreground" : "text-gray-500")} />
       <span className="truncate">{item.name}</span>
     </Link>
   );

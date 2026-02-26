@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle, Upload, Loader2, FileText, X, Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import { getClaudeKey } from '@/lib/apiKeys';
 
 export default function EstimateGenerator() {
   const [scopeOfWork, setScopeOfWork] = useState('');
@@ -43,10 +44,9 @@ export default function EstimateGenerator() {
     setError(null);
 
     try {
-      const apiKey = import.meta.env.VITE_CLAUDE_API_KEY ?? process.env.REACT_APP_CLAUDE_API_KEY;
-      
+      const apiKey = getClaudeKey();
       if (!apiKey) {
-        throw new Error('Claude API key not configured. Add VITE_CLAUDE_API_KEY to .env.local and restart the dev server. See Settings → Preferences → API status.');
+        throw new Error('Claude API key not configured. Add it in Settings → API status or AI Agents (OpenAI/Claude) and save.');
       }
 
       const prompt = `Generate a detailed construction estimate based on the following scope of work:

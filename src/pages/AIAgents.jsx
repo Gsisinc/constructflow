@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import AgentChat from '@/components/agents/AgentChat';
 import MinibrowserLauncher, { openMinibrowser } from '@/components/MinibrowserLauncher';
 import { AGENT_WORKFLOWS } from '@/config/agentWorkflows';
-import { Maximize2, Bot, Sparkles } from 'lucide-react';
+import { createPageUrl } from '@/utils';
+import { hasAnyLLMKey } from '@/lib/apiKeys';
+import { Maximize2, Bot, Sparkles, Key } from 'lucide-react';
 
 const WORKFLOW_ICONS = {
   central_orchestrator: '👔',
@@ -101,6 +104,17 @@ export default function AIAgents() {
     <div className="min-h-screen bg-[var(--cf-page-bg)] p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
+        {!hasAnyLLMKey() && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-amber-800">
+              <Key className="inline h-4 w-4 mr-1.5 -mt-0.5" />
+              No API key set. Custom agents and Blueprint Analyzer need an OpenAI or Claude key.
+            </p>
+            <Button asChild variant="outline" size="sm" className="border-amber-300 text-amber-800 hover:bg-amber-100">
+              <Link to={createPageUrl('AIAgents-OpenAI-Claude')}>Set API keys</Link>
+            </Button>
+          </div>
+        )}
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-[var(--cf-heading)] tracking-tight flex items-center gap-3">
             <span className="p-2 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-lg">

@@ -5,6 +5,7 @@
  */
 
 import { callOpenAI, parseLLMResponse } from './llmService';
+import { getOpenAIKey, getClaudeKey } from '@/lib/apiKeys';
 
 const BID_ANALYSIS_SYSTEM_PROMPT = `You are an expert construction bid analyzer. Your task is to analyze bid documents and extract:
 1. Project Overview (name, location, type, scope)
@@ -477,25 +478,6 @@ async function fetchImageAsBase64(imageUrl) {
  * @param {{ previewDataUrl?: string }} options - Optional previewDataUrl (data URL with base64 image)
  * @returns {Promise<Object>} Structured result: drawing_overview, line_items, summary, assumptions, notes, confidence
  */
-function getOpenAIKey() {
-  return (
-    import.meta.env.VITE_OPENAI_API_KEY ||
-    import.meta.env.REACT_APP_OPENAI_API_KEY ||
-    import.meta.env.VITE_FRONTEND_FORGE_API_KEY ||
-    (typeof localStorage !== 'undefined' ? localStorage.getItem('openai_api_key') : null) ||
-    (typeof localStorage !== 'undefined' ? localStorage.getItem('VITE_OPENAI_API_KEY') : null)
-  );
-}
-
-function getClaudeKey() {
-  return (
-    import.meta.env.VITE_CLAUDE_API_KEY ||
-    import.meta.env.VITE_ANTHROPIC_API_KEY ||
-    import.meta.env.REACT_APP_CLAUDE_API_KEY ||
-    import.meta.env.VITE_FRONTEND_FORGE_API_KEY ||
-    (typeof localStorage !== 'undefined' ? localStorage.getItem('claude_api_key') : null)
-  );
-}
 
 /** Returns which vision provider has a key: 'claude' | 'openai' | 'manus' | null. Use in UI to show status. */
 export function getVisionKeyStatus() {

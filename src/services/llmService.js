@@ -1,15 +1,16 @@
 /**
  * LLM Service - Real AI only (Claude / OpenAI). No fallback templates.
  * Agent purpose is enforced via the system prompt passed from agentWorkflows.
+ * Keys: env vars first, then localStorage (set in Settings or AI Agents → OpenAI/Claude).
  */
 
-// (Fallback/template logic removed — real API responses only.)
+import { getClaudeKey, getOpenAIKey } from '@/lib/apiKeys';
 
-const NO_LLM_ERROR = 'AI service is currently unavailable. Please check your connection or try again later.';
+const NO_LLM_ERROR = 'AI service is currently unavailable. Add an API key in Settings → API status or AI Agents (OpenAI/Claude) and try again.';
 
 /** Call Anthropic Claude API */
 async function callClaude(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
-  const key = import.meta.env.VITE_CLAUDE_API_KEY ?? import.meta.env.VITE_ANTHROPIC_API_KEY ?? import.meta.env.REACT_APP_CLAUDE_API_KEY;
+  const key = getClaudeKey();
   if (!key) return null;
 
   // If using a proxy (like Manus), we should use the OpenAI-compatible endpoint
@@ -45,7 +46,7 @@ async function callClaude(systemPrompt, userMessage, temperature = 0.7, maxToken
 
 /** Call OpenAI Chat Completions API */
 async function callOpenAIAPI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
-  const key = import.meta.env.VITE_OPENAI_API_KEY ?? import.meta.env.REACT_APP_OPENAI_API_KEY;
+  const key = getOpenAIKey();
   if (!key) return null;
   
   const apiBase = import.meta.env.VITE_OPENAI_API_BASE || 'https://api.openai.com/v1';
@@ -94,9 +95,7 @@ export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, m
   } catch (e) {
     lastError = e;
   }
-  const keyClaude = import.meta.env.VITE_CLAUDE_API_KEY ?? import.meta.env.VITE_ANTHROPIC_API_KEY ?? import.meta.env.REACT_APP_CLAUDE_API_KEY;
-  const keyOpenAI = import.meta.env.VITE_OPENAI_API_KEY ?? import.meta.env.REACT_APP_OPENAI_API_KEY;
-  if (!keyClaude && !keyOpenAI) {
+  if (!getClaudeKey() && !getOpenAIKey()) {
     throw new Error(NO_LLM_ERROR);
   }
   throw new Error(lastError?.message || 'LLM request failed. Check your API keys and try again.');

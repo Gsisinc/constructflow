@@ -31,7 +31,8 @@ import {
   FileText,
   AlertTriangle,
   Clock,
-  Trash2
+  Trash2,
+  FileStack
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -114,6 +115,12 @@ export default function ProjectDetail() {
   const { data: calendarEvents = [] } = useQuery({
     queryKey: ['calendarEvents', projectId],
     queryFn: () => base44.entities.CalendarEvent.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
+
+  const { data: dailyLogs = [] } = useQuery({
+    queryKey: ['dailyLogs', projectId],
+    queryFn: () => (projectId ? base44.entities.DailyLog.filter({ project_id: projectId }) : Promise.resolve([])),
     enabled: !!projectId,
   });
 
@@ -408,6 +415,7 @@ export default function ProjectDetail() {
           <TabsTrigger value="team">Team & Roles</TabsTrigger>
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="permits">Permits</TabsTrigger>
+          <TabsTrigger value="logs">Logs</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
         </TabsList>
 
@@ -460,6 +468,44 @@ export default function ProjectDetail() {
               <PermitUploader projectId={projectId} />
             </div>
             <PermitDashboard permits={permits} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="logs" className="mt-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Daily Logs</h3>
+              <Button variant="outline" size="sm" asChild>
+                <Link to={createPageUrl('DailyLog') + `?project=${projectId}`}>
+                  <FileStack className="h-4 w-4 mr-2" />
+                  Add log
+                </Link>
+              </Button>
+            </div>
+            {dailyLogs.length === 0 ? (
+              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-8 text-center text-slate-600">
+                <FileStack className="h-10 w-10 mx-auto mb-2 text-slate-400" />
+                <p>No daily logs yet. Add a log to track work, weather, and notes.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {dailyLogs
+                  .sort((a, b) => new Date(b.log_date || 0) - new Date(a.log_date || 0))
+                  .map((log) => (
+                    <div key={log.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                      <div className="flex items-center justify-between text-sm text-slate-500 mb-2">
+                        <span>{log.log_date ? format(new Date(log.log_date), 'MMM d, yyyy') : '—'}</span>
+                        {log.submitted_by && <span>{log.submitted_by}</span>}
+                      </div>
+                      {log.work_performed && <p className="text-slate-800 whitespace-pre-wrap">{log.work_performed}</p>}
+                      {(log.weather?.conditions || log.weather?.temperature) && (
+                        <p className="text-slate-600 text-sm mt-1">Weather: {[log.weather?.conditions, log.weather?.temperature && `${log.weather.temperature}°`].filter(Boolean).join(' ')}</p>
+                      )}
+                      {log.notes && <p className="text-slate-600 text-sm mt-1">{log.notes}</p>}
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         </TabsContent>
 

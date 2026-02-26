@@ -34,6 +34,7 @@ import { parseLlmJsonResponse } from '@/lib/llmResponse';
 import { searchBidsFromSam } from '@/lib/bidDiscoverySearch';
 import { fetchRealBidOpportunities } from '@/services/realBidDiscoveryService';
 import { callAgent } from '@/services/llmService';
+import { hasSamGovKey, setSamGovKey } from '@/lib/apiKeys';
 
 const marketIntelligenceAgent = {
   id: 'market_intelligence',
@@ -63,7 +64,10 @@ export default function BidDiscovery() {
   const [totalAvailable, setTotalAvailable] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [samKeyInput, setSamKeyInput] = useState('');
+  const [samKeySaved, setSamKeySaved] = useState(false);
   const queryClient = useQueryClient();
+  const samGovConfigured = hasSamGovKey();
 
   const states = [
     'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
@@ -892,6 +896,47 @@ Provide:
         </Card>
       </div>
 
+      {/* SAM.gov API key — show when not configured so users can set key without .env */}
+      {!samGovConfigured && (
+        <Card className="border-amber-200 bg-amber-50/80">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-amber-600" />
+              SAM.gov API key (optional)
+            </CardTitle>
+            <CardDescription>
+              For live federal bid results, add <code className="text-xs bg-white px-1 rounded">VITE_SAM_GOV_API_KEY</code> to .env, or paste your key below and click Save. Get a key at <a href="https://sam.gov/content/opportunities" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">sam.gov</a>.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-end gap-3">
+            <Input
+              type="password"
+              placeholder="Paste SAM.gov API key"
+              value={samKeyInput}
+              onChange={(e) => setSamKeyInput(e.target.value)}
+              className="max-w-sm bg-white"
+            />
+            <Button
+              size="sm"
+              onClick={() => {
+                const trimmed = (samKeyInput || '').trim();
+                if (trimmed) {
+                  setSamGovKey(trimmed);
+                  setSamKeyInput('');
+                  setSamKeySaved(true);
+                  toast.success('SAM.gov key saved. Click AI Search again for live results.');
+                  setTimeout(() => setSamKeySaved(false), 3000);
+                } else {
+                  toast.error('Enter a key first.');
+                }
+              }}
+            >
+              {samKeySaved ? 'Saved' : 'Save key'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Tabs */}
       <Tabs defaultValue="discovered" className="w-full">
         <TabsList>
@@ -906,7 +951,7 @@ Provide:
                 <Search className="h-16 w-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No opportunities yet</h3>
                 <p className="text-slate-600 mb-4">
-                  Enter a keyword above (e.g. &quot;electrical&quot;, &quot;HVAC&quot;) or select a work type and state, then click &quot;AI Search&quot;. Add VITE_SAM_GOV_API_KEY to .env.local for live SAM.gov results. Pipeline shows only bids with a real source URL (no fake data).
+                  Enter a keyword above (e.g. &quot;electrical&quot;, &quot;HVAC&quot;) or select a work type and state, then click &quot;AI Search&quot;. If no SAM.gov key is set, use the key box above to paste and save one for live federal results. Pipeline shows only bids with a real source URL.
                 </p>
                 <Button onClick={() => setShowAgentChat(true)} className="gap-2">
                   <Sparkles className="h-4 w-4" />

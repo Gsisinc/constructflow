@@ -6,9 +6,13 @@
  */
 
 import { fetchWithRetry, buildBotAvoidanceHeaders } from './botBypassService';
+import { getSamGovKey } from '@/lib/apiKeys';
 
 const SAM_GOV_API_BASE = 'https://api.sam.gov/opportunities/v2/search';
-const SAM_GOV_API_KEY = import.meta.env.VITE_SAM_GOV_API_KEY || process.env.SAM_GOV_API_KEY || 'DEMO_KEY';
+function getSamGovApiKey() {
+  const k = getSamGovKey();
+  return k || 'DEMO_KEY';
+}
 
 /**
  * Map work types to SAM.GOV NAICS codes
@@ -120,11 +124,12 @@ function buildSamGovQuery(filters = {}) {
  * Fetch opportunities from SAM.GOV with bot avoidance
  */
 export async function fetchSamGovOpportunities(filters = {}) {
-  if (!SAM_GOV_API_KEY) {
+  const apiKey = getSamGovApiKey();
+  if (!apiKey || apiKey === 'DEMO_KEY') {
     console.warn('SAM.GOV API key not configured');
     return {
       opportunities: [],
-      error: 'SAM.GOV API key not configured',
+      error: 'SAM.GOV API key not configured. Add VITE_SAM_GOV_API_KEY to .env or set it in Bid Discovery.',
       source: 'sam_gov'
     };
   }
@@ -134,7 +139,7 @@ export async function fetchSamGovOpportunities(filters = {}) {
     
     // Build query string with proper state filtering
     const params = new URLSearchParams();
-    params.append('api_key', SAM_GOV_API_KEY);
+    params.append('api_key', apiKey);
     params.append('limit', query.limit);
     params.append('offset', query.offset);
     
@@ -201,13 +206,14 @@ export async function fetchSamGovOpportunities(filters = {}) {
  * Search SAM.GOV with custom query and bot avoidance
  */
 export async function searchSamGov(searchTerm = '', filters = {}) {
-  if (!SAM_GOV_API_KEY) {
+  const apiKey = getSamGovApiKey();
+  if (!apiKey || apiKey === 'DEMO_KEY') {
     return { opportunities: [], error: 'API key not configured' };
   }
 
   try {
     const params = new URLSearchParams();
-    params.append('api_key', SAM_GOV_API_KEY);
+    params.append('api_key', apiKey);
     params.append('keyword', searchTerm);
     params.append('limit', 100);
 
