@@ -1192,6 +1192,112 @@ Provide:
         </TabsContent>
       </Tabs>
 
+      {/* Embedded Browser */}
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Globe className="h-4 w-4 text-blue-600" />
+            Embedded Browser — Visit Any Bid Portal
+          </CardTitle>
+        </CardHeader>
+        <div className="bg-slate-100 border-t border-b flex flex-col">
+          <div className="flex items-center gap-1 overflow-x-auto min-h-[40px] px-2 py-1.5 border-b border-slate-200">
+            {browserTabs.map((tab) => (
+              <div
+                key={tab.id}
+                className={cn(
+                  'flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-t-lg border border-b-0 shrink-0 max-w-[180px] min-w-0',
+                  tab.id === activeBrowserTabId
+                    ? 'bg-white border-slate-200 shadow-sm'
+                    : 'bg-slate-200/80 border-slate-300 hover:bg-slate-200'
+                )}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveBrowserTabId(tab.id);
+                    setBrowserUrlInput(tab.url);
+                  }}
+                  className="flex-1 min-w-0 truncate text-left text-sm font-medium text-slate-700"
+                >
+                  {tab.title}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeBrowserTab(tab.id);
+                  }}
+                  className="p-0.5 rounded hover:bg-slate-300 text-slate-500 hover:text-slate-700"
+                  title="Close tab"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addBrowserTab}
+              className="p-2 rounded hover:bg-slate-200 text-slate-600 shrink-0"
+              title="New tab"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="flex items-center gap-2 p-2 flex-wrap">
+            <Button type="button" variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={refreshBrowserTab} title="Refresh">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Input
+              value={browserUrlInput}
+              onChange={(e) => setBrowserUrlInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), navigateBrowserTab(browserUrlInput))}
+              placeholder="Enter URL (e.g. https://sam.gov)"
+              className="flex-1 min-w-[200px] h-9 bg-white font-mono text-sm"
+            />
+            <Button type="button" size="sm" className="shrink-0 h-9" onClick={() => navigateBrowserTab(browserUrlInput)}>
+              Go
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0 gap-1.5 h-9"
+              onClick={() => window.open(activeBrowserTab?.url || browserUrlInput, '_blank')}
+            >
+              <ExternalLink className="h-4 w-4" />
+              Open in new tab
+            </Button>
+          </div>
+        </div>
+        <CardContent className="p-0">
+          <div className="bg-slate-200 rounded-b-lg relative" style={{ minHeight: '500px' }}>
+            {browserTabs.map((tab) => (
+              <div
+                key={tab.id}
+                className={tab.id === activeBrowserTabId ? 'block' : 'hidden'}
+                style={{ height: '500px' }}
+              >
+                {tab.url && (
+                  <iframe
+                    key={tab.key}
+                    src={/^https?:\/\//i.test(tab.url) ? tab.url : 'https://' + tab.url}
+                    title={tab.title}
+                    className="w-full rounded-b-lg border-0 bg-white"
+                    style={{ height: '500px' }}
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-popups-to-escape-sandbox"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                )}
+              </div>
+            ))}
+            <p className="absolute bottom-2 left-2 text-xs text-slate-500 bg-white/90 px-2 py-1 rounded">
+              Some sites may block embedding. Use &quot;Open in new tab&quot; if the page does not load.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Agent Chat Dialog */}
       {showAgentChat && (
         <Dialog open={showAgentChat} onOpenChange={(open) => {
