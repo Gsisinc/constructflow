@@ -118,7 +118,7 @@ export default function AIAgentsMultiPlatform() {
 
   const CustomAgents = () => (
     <div className="space-y-4 p-4 overflow-y-auto">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
         {[
           { title: 'Central Orchestrator', desc: 'Project coordination' },
           { title: 'Market Intelligence', desc: 'Bid discovery' },
@@ -205,7 +205,7 @@ export default function AIAgentsMultiPlatform() {
                 <p className="text-xs text-amber-900 dark:text-amber-200 mb-2">Most AI sites block embedding. Use the button below to open in a new window.</p>
                 <Button
                   size="sm"
-                  className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white gap-1"
+                  className="w-full sm:w-auto sm:w-auto bg-amber-600 hover:bg-amber-700 text-white gap-1"
                   onClick={() => config.url && openMinibrowser(config.url, config.name)}
                 >
                   <ExternalLink className="h-3 w-3" /> Open in new window
@@ -261,15 +261,15 @@ export default function AIAgentsMultiPlatform() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-4 sm:mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-1 sm:mb-2">AI Agent Platform</h1>
+          <h1 className="text-2xl sm:text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1 sm:mb-2">AI Agent Platform</h1>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Multiple AI services + ConstructFlow agents</p>
         </div>
 
         {/* Tab Navigation */}
         <Card className="mb-4 sm:mb-6">
           <CardContent className="pt-4 sm:pt-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 sm:gap-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
+              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1 sm:gap-2">
                 <TabsTrigger value="deepseek" className="text-xs sm:text-sm">DeepSeek</TabsTrigger>
                 <TabsTrigger value="chatgpt" className="text-xs sm:text-sm">ChatGPT</TabsTrigger>
                 <TabsTrigger value="grok" className="text-xs sm:text-sm">Grok</TabsTrigger>
@@ -286,7 +286,7 @@ export default function AIAgentsMultiPlatform() {
                     <CardContent>
                       <Button
                         onClick={() => setWindows(prev => ({...prev, [key]: {...prev[key], visible: true}}))}
-                        className="w-full"
+                        className="w-full sm:w-auto"
                       >
                         Open {config.name}
                       </Button>
@@ -305,7 +305,7 @@ export default function AIAgentsMultiPlatform() {
             <CardTitle className="text-lg">Active Windows</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
               {Object.entries(windows).map(([id, state]) => (
                 <Button
                   key={id}

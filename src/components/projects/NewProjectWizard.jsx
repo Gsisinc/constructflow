@@ -318,56 +318,42 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         budget: formData.budget ? parseFloat(formData.budget) : null,
       });
 
-      // Get template and auto-create phases + requirements (same as other project types)
-      const rawTemplate = getPhaseTemplate(selectedType);
-      const template = Array.isArray(rawTemplate) ? rawTemplate : [];
-      let phasesCreated = 0;
-      let reqsCreated = 0;
+      // Create CustomPhases for each phase
+      const customPhases = [];
+      phases.forEach((phase, idx) => {
+        customPhases.push({
+          project_id: project.id,
+          phase_name: phase.phase,
+          display_name: phase.phase,
+          order: idx,
+          status: 'pending',
+        });
+      });
 
-      // Helper: convert display name to slug (must match backend expectations)
-      const toSlug = (name) => {
-        return String(name).toLowerCase().replace(/[^a-z0-9\s_]/g, '').trim().replace(/\s+/g, '_') || `phase_${idx}`;
-      };
-
-      for (let idx = 0; idx < template.length; idx++) {
-        const templatePhase = template[idx];
-        if (!templatePhase || !templatePhase.phase) continue;
-        const slug = toSlug(templatePhase.phase);
-        const items = Array.isArray(templatePhase.items) ? templatePhase.items : [];
-
-        // Create CustomPhase
-        try {
-          await base44.entities.CustomPhase.create({
-            project_id: project.id,
-            phase_name: slug,
-            display_name: templatePhase.phase,
-            order: idx,
-            status: 'pending',
-          });
-          phasesCreated++;
-        } catch (err) {
-          console.warn('Phase creation error:', err);
-        }
-
-        // Create PhaseRequirements for this phase (item can be string or { text: string })
-        for (const item of items) {
-          const requirementText = typeof item === 'string' ? item : (item && item.text);
-          if (requirementText == null || String(requirementText).trim() === '') continue;
-          try {
-            await base44.entities.PhaseRequirement.create({
-              project_id: project.id,
-              phase_name: slug,
-              requirement_text: String(requirementText).trim(),
-              status: 'pending',
-            });
-            reqsCreated++;
-          } catch (err) {
-            console.warn('Requirement creation error:', err);
-          }
-        }
+      if (customPhases.length > 0) {
+        await base44.entities.CustomPhase.bulkCreate(customPhases);
       }
 
-      toast.success(`Project created with ${phasesCreated} phases and ${reqsCreated} requirements`);
+      // Create PhaseRequirements
+      const allRequirements = [];
+      phases.forEach((phase) => {
+        phase.items.forEach((item) => {
+          if (item.text.trim()) {
+            allRequirements.push({
+              project_id: project.id,
+              phase_name: phase.phase,
+              requirement_text: item.text.trim(),
+              status: item.completed ? 'completed' : 'pending',
+            });
+          }
+        });
+      });
+
+      if (allRequirements.length > 0) {
+        await base44.entities.PhaseRequirement.bulkCreate(allRequirements);
+      }
+
+      toast.success(`Project created with ${customPhases.length} phases and ${allRequirements.length} requirements`);
       onCreated(project);
       setStep(1);
       setSelectedType('');
@@ -386,7 +372,16 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
   const canProceedStep2 = !!formData.name && !!formData.client_name;
 
   const handleStep1Next = () => {
-     // Skip loading phases into state - we'll auto-create from template on step 2
+     if (selectedType) {
+       const template = getPhaseTemplate(selectedType);
+       const formattedPhases = template.map(p => ({ 
+         ...p, 
+         items: p.items.map(item => ({ text: item, completed: false })) 
+       }));
+       setPhases(formattedPhases);
+     } else {
+       setPhases([]);
+     }
      setStep(2);
    };
 

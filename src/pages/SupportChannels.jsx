@@ -14,7 +14,7 @@ export default function SupportChannels() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Support Channels</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Support Channels</h1>
         <p className="text-slate-600 mt-1">Get help via email, chat, or phone.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

@@ -73,7 +73,7 @@ export default function UserApprovals() {
       <div className="p-8">
         <div className="max-w-4xl mx-auto text-center">
           <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Access Denied</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2">Access Denied</h1>
           <p className="text-slate-600">Only admins can access user approvals.</p>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function UserApprovals() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">User Approvals</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-2">User Approvals</h1>
         <p className="text-slate-600">Review and approve pending user applications</p>
       </div>
 
@@ -144,7 +144,7 @@ export default function UserApprovals() {
                   )}
                   {pendingUser.message && (
                     <div className="mt-4 p-3 bg-slate-50 rounded-lg">
-                      <p className="text-sm text-slate-700">{pendingUser.message}</p>
+                      <p className="text-sm text-slate-700 break-words">{pendingUser.message}</p>
                     </div>
                   )}
                 </div>

@@ -121,11 +121,11 @@ export default function Phase6ReliabilityOps() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Reliability & Customer Operations</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Reliability & Customer Operations</h1>
         <p className="text-sm text-slate-600 mt-1">Operational excellence for uptime, support SLA, release quality, and disaster-recovery readiness.</p>
       </div>
 
-      <div className="grid md:grid-cols-5 gap-3">
+      <div className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         <Metric title="Open incidents" value={sla.open_incidents} icon={ShieldAlert} />
         <Metric title="Critical open" value={sla.critical_open_incidents} icon={ShieldAlert} />
         <Metric title="SLA breaches" value={sla.sla_breach_count} icon={LifeBuoy} />
@@ -134,7 +134,7 @@ export default function Phase6ReliabilityOps() {
       </div>
 
       <Tabs defaultValue="reliability" className="space-y-4">
-        <TabsList className="grid md:grid-cols-3 w-full">
+        <TabsList className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full">
           <TabsTrigger value="reliability">Reliability</TabsTrigger>
           <TabsTrigger value="release">Release Quality</TabsTrigger>
           <TabsTrigger value="support">Support & DR</TabsTrigger>
@@ -146,11 +146,11 @@ export default function Phase6ReliabilityOps() {
               <CardTitle>Incident + SLA Reliability Console</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Auto escalation policy</Label>
                   <div className="border rounded-md p-3 mt-1 flex items-center justify-between">
-                    <span className="text-sm text-slate-700">Escalate unresolved critical incidents automatically</span>
+                    <span className="text-sm text-slate-700 break-words">Escalate unresolved critical incidents automatically</span>
                     <Switch checked={autoEscalationEnabled} onCheckedChange={setAutoEscalationEnabled} />
                   </div>
                 </div>
@@ -173,7 +173,7 @@ export default function Phase6ReliabilityOps() {
               <CardTitle>Release Quality Gate</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="grid md:grid-cols-4 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 <MetricFlat title="Releases (last 12)" value={releaseQuality.releases_last_12} />
                 <MetricFlat title="Failed/rollback" value={releaseQuality.failed_or_rollback_count} />
                 <MetricFlat title="Deploy success" value={`${releaseQuality.deployment_success_rate}%`} />
@@ -182,7 +182,7 @@ export default function Phase6ReliabilityOps() {
 
               <div className="border rounded-lg p-3">
                 <p className="font-medium text-slate-900 mb-2">Quality gate recommendation</p>
-                <p className="text-sm text-slate-700">
+                <p className="text-sm text-slate-700 break-words">
                   {releaseQuality.change_failure_rate > 15
                     ? 'Hold release trains until change-failure rate drops below 15% and complete postmortem actions.'
                     : 'Release quality is within acceptable threshold. Continue canary deployment strategy.'}
@@ -202,7 +202,7 @@ export default function Phase6ReliabilityOps() {
                 {runbooks.map((runbook) => (
                   <div key={runbook.id} className="border rounded-lg p-3">
                     <div className="flex items-center justify-between">
-                      <p className="font-medium text-slate-900">{runbook.title}</p>
+                      <p className="font-medium text-slate-900 break-words">{runbook.title}</p>
                       <Badge>{runbook.owner_role}</Badge>
                     </div>
                     <p className="text-xs text-slate-500 mt-1">Target recovery: {runbook.target_mins} minutes</p>
@@ -248,7 +248,7 @@ function Metric({ title, value, icon: Icon }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-slate-500">{title}</p>
-            <p className="text-2xl font-semibold text-slate-900">{value}</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">{value}</p>
           </div>
           <Icon className="h-5 w-5 text-indigo-500" />
         </div>

@@ -16,6 +16,7 @@ import ChangeOrderManager from '../components/changeorders/ChangeOrderManager';
 import SafetyManager from '../components/safety/SafetyManager';
 import DecisionManager from '../components/decisions/DecisionManager';
 import TeamRoleManager from '../components/team/TeamRoleManager';
+import ProjectMaterials from '../components/project/ProjectMaterials';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -31,8 +32,7 @@ import {
   FileText,
   AlertTriangle,
   Clock,
-  Trash2,
-  FileStack
+  Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -118,12 +118,6 @@ export default function ProjectDetail() {
     enabled: !!projectId,
   });
 
-  const { data: dailyLogs = [] } = useQuery({
-    queryKey: ['dailyLogs', projectId],
-    queryFn: () => (projectId ? base44.entities.DailyLog.filter({ project_id: projectId }) : Promise.resolve([])),
-    enabled: !!projectId,
-  });
-
   const { data: clientUpdates = [] } = useQuery({
     queryKey: ['clientUpdates', projectId],
     queryFn: () => base44.entities.ClientUpdate.filter({ project_id: projectId }),
@@ -181,7 +175,7 @@ export default function ProjectDetail() {
       <div className="space-y-6">
         <Skeleton className="h-10 w-48" />
         <Skeleton className="h-64 rounded-2xl" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {Array(3).fill(0).map((_, i) => (
             <Skeleton key={i} className="h-32 rounded-2xl" />
           ))}
@@ -259,14 +253,14 @@ export default function ProjectDetail() {
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         {project.image_url && (
           <div className="h-32 sm:h-48 bg-slate-100">
-            <img src={project.image_url} alt={project.name} className="w-full h-full object-cover" />
+            <img src={project.image_url} alt={project.name} className="w-full sm:w-auto h-full object-cover" />
           </div>
         )}
         <div className="p-4 sm:p-6">
           <div className="flex flex-col gap-4">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-lg sm:text-2xl font-semibold text-slate-900 break-words">{project.name}</h1>
+                <h1 className="text-lg sm:text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">{project.name}</h1>
                 <Badge className={cn("border text-xs", statusColors[project.status])}>
                   {project.status?.replace('_', ' ')}
                 </Badge>
@@ -305,7 +299,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* Meta Info */}
-          <div className="mt-4 sm:mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+          <div className="mt-4 sm:mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
             {project.start_date && (
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-slate-400" />
@@ -347,7 +341,7 @@ export default function ProjectDetail() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white rounded-xl border border-slate-200 p-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-lg bg-blue-100">
@@ -406,8 +400,8 @@ export default function ProjectDetail() {
       )}
 
       {/* Tabs for detailed views */}
-      <Tabs defaultValue="phases" className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-slate-100 rounded-lg">
+      <Tabs defaultValue="phases" className="w-full sm:w-auto">
+        <TabsList className="w-full sm:w-auto justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-slate-100 rounded-lg">
           <TabsTrigger value="phases">Phases</TabsTrigger>
           <TabsTrigger value="changeorders">Change Orders</TabsTrigger>
           <TabsTrigger value="safety">Safety</TabsTrigger>
@@ -415,7 +409,7 @@ export default function ProjectDetail() {
           <TabsTrigger value="team">Team & Roles</TabsTrigger>
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="permits">Permits</TabsTrigger>
-          <TabsTrigger value="logs">Logs</TabsTrigger>
+          <TabsTrigger value="materials">Materials</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
         </TabsList>
 
@@ -471,42 +465,8 @@ export default function ProjectDetail() {
           </div>
         </TabsContent>
 
-        <TabsContent value="logs" className="mt-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Daily Logs</h3>
-              <Button variant="outline" size="sm" asChild>
-                <Link to={createPageUrl('DailyLog') + `?project=${projectId}`}>
-                  <FileStack className="h-4 w-4 mr-2" />
-                  Add log
-                </Link>
-              </Button>
-            </div>
-            {dailyLogs.length === 0 ? (
-              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-8 text-center text-slate-600">
-                <FileStack className="h-10 w-10 mx-auto mb-2 text-slate-400" />
-                <p>No daily logs yet. Add a log to track work, weather, and notes.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {dailyLogs
-                  .sort((a, b) => new Date(b.log_date || 0) - new Date(a.log_date || 0))
-                  .map((log) => (
-                    <div key={log.id} className="rounded-xl border border-slate-200 bg-white p-4">
-                      <div className="flex items-center justify-between text-sm text-slate-500 mb-2">
-                        <span>{log.log_date ? format(new Date(log.log_date), 'MMM d, yyyy') : '—'}</span>
-                        {log.submitted_by && <span>{log.submitted_by}</span>}
-                      </div>
-                      {log.work_performed && <p className="text-slate-800 whitespace-pre-wrap">{log.work_performed}</p>}
-                      {(log.weather?.conditions || log.weather?.temperature) && (
-                        <p className="text-slate-600 text-sm mt-1">Weather: {[log.weather?.conditions, log.weather?.temperature && `${log.weather.temperature}°`].filter(Boolean).join(' ')}</p>
-                      )}
-                      {log.notes && <p className="text-slate-600 text-sm mt-1">{log.notes}</p>}
-                    </div>
-                  ))}
-              </div>
-            )}
-          </div>
+        <TabsContent value="materials" className="mt-6">
+          <ProjectMaterials projectId={projectId} organizationId={project.organization_id} />
         </TabsContent>
 
         <TabsContent value="client" className="mt-6">

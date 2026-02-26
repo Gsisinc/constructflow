@@ -47,7 +47,7 @@ export default function BidDiscoveryMobile() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Bid Discovery</h1>
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold">Bid Discovery</h1>
         <p className="text-gray-600 text-sm">Find and track construction bid opportunities</p>
       </div>
 
@@ -81,7 +81,7 @@ export default function BidDiscoveryMobile() {
             <select
               value={workType}
               onChange={(e) => setWorkType(e.target.value)}
-              className="w-full mt-1 text-sm p-2 border rounded"
+              className="w-full sm:w-auto mt-1 text-sm p-2 border rounded"
             >
               <option value="">All Types</option>
               <option value="general">General Construction</option>
@@ -105,7 +105,7 @@ export default function BidDiscoveryMobile() {
           <Button
             onClick={fetchBids}
             disabled={loading || !samGovKey}
-            className="w-full text-sm"
+            className="w-full sm:w-auto text-sm"
           >
             {loading ? 'Searching...' : 'Search Bids'}
           </Button>
@@ -131,7 +131,7 @@ export default function BidDiscoveryMobile() {
                     <p className="text-xs text-gray-600 mt-1">{bid.source}</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-2 text-xs">
                     <div className="flex items-center gap-1">
                       <MapPin className="h-3 w-3 text-gray-500" />
                       <span>{bid.location}</span>
@@ -152,7 +152,7 @@ export default function BidDiscoveryMobile() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full text-xs"
+                    className="w-full sm:w-auto text-xs"
                   >
                     View Details
                   </Button>

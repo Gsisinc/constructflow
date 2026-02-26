@@ -102,11 +102,11 @@ export default function ServiceDesk() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Advanced Service Desk</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Advanced Service Desk</h1>
         <p className="text-sm text-slate-600 mt-1">Service calls + maintenance ticketing with SLA visibility, queue filters, and dispatch status.</p>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-3">
+      <div className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         <Metric title="Total Tickets" value={metrics.total} icon={ClipboardList} />
         <Metric title="Open" value={metrics.open} icon={Wrench} />
         <Metric title="Critical Open" value={metrics.critical_open} icon={AlertTriangle} />
@@ -125,7 +125,7 @@ export default function ServiceDesk() {
               <CardTitle>Dispatch Queue</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Status filter</Label>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -201,7 +201,7 @@ export default function ServiceDesk() {
                 <Label>Description</Label>
                 <Input value={form.description} onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))} />
               </div>
-              <div className="grid md:grid-cols-3 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 <div>
                   <Label>Priority</Label>
                   <Select value={form.priority} onValueChange={(value) => setForm((prev) => ({ ...prev, priority: value }))}>
@@ -254,7 +254,7 @@ function Metric({ title, value, icon: Icon }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-slate-500">{title}</p>
-            <p className="text-2xl font-semibold text-slate-900">{value}</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">{value}</p>
           </div>
           <Icon className="h-5 w-5 text-indigo-500" />
         </div>

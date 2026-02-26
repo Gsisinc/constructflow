@@ -26,6 +26,12 @@ const DOC_TYPES = ['Contract', 'Change Order', 'Subcontract', 'Lien Waiver', 'ND
 
 export default function ESignatures() {
   const queryClient = useQueryClient();
+
+  // Get current user for organization filtering
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
+  });
   const [showForm, setShowForm] = useState(false);
   const [tab, setTab] = useState('all');
   const [formData, setFormData] = useState({
@@ -33,8 +39,12 @@ export default function ESignatures() {
   });
 
   const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryKey: ['projects', user?.organization_id],
+    queryFn: () => {
+      if (!user?.organization_id) return [];
+      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
+    },
+    enabled: !!user?.organization_id,
   });
 
   // Use Document entity to track e-signature requests
@@ -85,7 +95,7 @@ export default function ESignatures() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">E-Signature Collection</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">E-Signature Collection</h1>
           <p className="text-slate-500 mt-1">Send contracts for e-signature and track signing status</p>
         </div>
         <Button onClick={() => setShowForm(true)} className="gap-2">
@@ -94,7 +104,7 @@ export default function ESignatures() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Total', value: stats.all, icon: FileText, color: 'text-slate-600' },
           { label: 'Awaiting', value: stats.sent, icon: Clock, color: 'text-blue-600' },
@@ -105,7 +115,7 @@ export default function ESignatures() {
             <CardContent className="pt-4 pb-3 flex items-center gap-3">
               <s.icon className={`h-8 w-8 ${s.color}`} />
               <div>
-                <p className="text-2xl font-bold">{s.value}</p>
+                <p className="text-xl md:text-lg sm:text-xl md:text-2xl font-bold">{s.value}</p>
                 <p className="text-xs text-slate-500">{s.label}</p>
               </div>
             </CardContent>
@@ -145,7 +155,7 @@ export default function ESignatures() {
                           <FileText className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-slate-900">{doc.name}</h3>
+                          <h3 className="font-semibold text-slate-900 break-words">{doc.name}</h3>
                           <p className="text-sm text-slate-500">
                             To: {doc.recipient_name || 'Unknown'} ({doc.email || 'No email'})
                           </p>
@@ -204,7 +214,7 @@ export default function ESignatures() {
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Document Type</Label>
                 <Select value={formData.document_type} onValueChange={v => setFormData({ ...formData, document_type: v })}>
@@ -224,7 +234,7 @@ export default function ESignatures() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Recipient Name *</Label>
                 <Input placeholder="John Smith"

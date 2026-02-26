@@ -82,8 +82,8 @@ export default function Submittals() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-900">Submittals</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Submittals</h1>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
             <Button className="bg-purple-600 hover:bg-purple-700">
@@ -98,7 +98,7 @@ export default function Submittals() {
               <select
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
-                className="w-full p-2 border rounded-lg"
+                className="w-full sm:w-auto p-2 border rounded-lg"
               >
                 <option value="">Select Project</option>
                 {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -116,7 +116,7 @@ export default function Submittals() {
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full p-2 border rounded-lg"
+                className="w-full sm:w-auto p-2 border rounded-lg"
               >
                 <option value="materials">Materials</option>
                 <option value="equipment">Equipment</option>
@@ -137,14 +137,14 @@ export default function Submittals() {
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full p-2 border rounded-lg"
+                className="w-full sm:w-auto p-2 border rounded-lg"
               >
                 <option value="pending">Pending</option>
                 <option value="submitted">Submitted</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
               </select>
-              <Button onClick={handleSubmit} className="w-full bg-purple-600 hover:bg-purple-700">
+              <Button onClick={handleSubmit} className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700">
                 Create Submittal
               </Button>
             </div>
@@ -163,13 +163,13 @@ export default function Submittals() {
         </select>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-slate-600">Pending Review</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-yellow-600">{pending}</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-600">{pending}</p>
           </CardContent>
         </Card>
         <Card>
@@ -177,7 +177,7 @@ export default function Submittals() {
             <CardTitle className="text-sm text-slate-600">Approved</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-600">{approved}</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600">{approved}</p>
           </CardContent>
         </Card>
       </div>
@@ -207,7 +207,7 @@ export default function Submittals() {
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              <p className="text-slate-700">{submittal.description}</p>
+              <p className="text-slate-700 break-words">{submittal.description}</p>
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1 text-slate-600">
                   <Calendar className="h-4 w-4" />

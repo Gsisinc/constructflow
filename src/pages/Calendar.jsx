@@ -107,7 +107,7 @@ export default function Calendar() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Project Calendar</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 tracking-tight">Project Calendar</h1>
           <p className="text-slate-500 mt-1">Multi-layer scheduling with conflict detection</p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -181,26 +181,26 @@ export default function Calendar() {
       )}
 
       {/* Calendar Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Total Events</p>
-          <p className="text-2xl font-semibold mt-1">{filteredEvents.length}</p>
+          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1">{filteredEvents.length}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Inspections</p>
-          <p className="text-2xl font-semibold mt-1 text-amber-600">
+          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1 text-amber-600">
             {filteredEvents.filter(e => e.event_type === 'inspection').length}
           </p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Deliveries</p>
-          <p className="text-2xl font-semibold mt-1 text-green-600">
+          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1 text-green-600">
             {filteredEvents.filter(e => e.event_type === 'delivery').length}
           </p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Milestones</p>
-          <p className="text-2xl font-semibold mt-1 text-purple-600">
+          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1 text-purple-600">
             {filteredEvents.filter(e => e.event_type === 'milestone').length}
           </p>
         </div>
@@ -298,7 +298,7 @@ function EventFormDialog({ open, onOpenChange, event, selectedDate, projects, on
               required
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Project *</Label>
               <Select
@@ -332,7 +332,7 @@ function EventFormDialog({ open, onOpenChange, event, selectedDate, projects, on
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Start Date *</Label>
               <Input
@@ -351,7 +351,7 @@ function EventFormDialog({ open, onOpenChange, event, selectedDate, projects, on
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Start Time</Label>
               <Input
@@ -369,7 +369,7 @@ function EventFormDialog({ open, onOpenChange, event, selectedDate, projects, on
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Location</Label>
               <Input

@@ -142,7 +142,7 @@ export default function ClientPortal() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center py-12">
             <Home className="h-16 w-16 mx-auto mb-4 text-slate-300" />
-            <h2 className="text-2xl font-semibold mb-2">No Projects Found</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2">No Projects Found</h2>
             <p className="text-slate-500">You don't have any active projects yet.</p>
           </div>
         </div>
@@ -156,7 +156,7 @@ export default function ClientPortal() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Welcome, {user.full_name}</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Welcome, {user.full_name}</h1>
             <p className="text-slate-500 mt-1">Track your project progress and stay updated</p>
           </div>
           {projects.length > 1 && (
@@ -176,7 +176,7 @@ export default function ClientPortal() {
         {selectedProject && (
           <>
             {/* Project Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               <Card className="md:col-span-2 border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
                 <CardHeader>
                   <CardTitle className="text-2xl">{selectedProject.name}</CardTitle>
@@ -195,7 +195,7 @@ export default function ClientPortal() {
                     </div>
                     <Progress value={selectedProject.progress} className="h-3" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4 pt-4 border-t">
                     <div>
                       <p className="text-sm text-slate-500">Start Date</p>
                       <p className="font-semibold">{selectedProject.start_date ? format(new Date(selectedProject.start_date), 'MMM dd, yyyy') : 'Not set'}</p>
@@ -215,7 +215,7 @@ export default function ClientPortal() {
                 <CardContent className="space-y-2">
                   <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
                     <DialogTrigger asChild>
-                      <Button className="w-full" variant="outline">
+                      <Button className="w-full sm:w-auto" variant="outline">
                         <MessageSquare className="h-4 w-4 mr-2" />
                         Post Comment
                       </Button>
@@ -238,7 +238,7 @@ export default function ClientPortal() {
                             message: commentForm.message,
                             sent_by: user.email
                           })}
-                          className="w-full"
+                          className="w-full sm:w-auto"
                         >
                           <Send className="h-4 w-4 mr-2" />
                           Post Comment
@@ -249,7 +249,7 @@ export default function ClientPortal() {
 
                   <Dialog open={showChangeOrderDialog} onOpenChange={setShowChangeOrderDialog}>
                     <DialogTrigger asChild>
-                      <Button className="w-full" variant="outline">
+                      <Button className="w-full sm:w-auto" variant="outline">
                         <FileText className="h-4 w-4 mr-2" />
                         Request Change
                       </Button>
@@ -291,7 +291,7 @@ export default function ClientPortal() {
                             cost_impact: 0,
                             status: 'proposed'
                           })}
-                          className="w-full"
+                          className="w-full sm:w-auto"
                         >
                           Submit Request
                         </Button>
@@ -301,7 +301,7 @@ export default function ClientPortal() {
 
                   <Dialog open={showServiceDialog} onOpenChange={setShowServiceDialog}>
                     <DialogTrigger asChild>
-                      <Button className="w-full mt-2" variant="secondary">
+                      <Button className="w-full sm:w-auto mt-2" variant="secondary">
                         <Wrench className="h-4 w-4 mr-2" />
                         Request Service/Maintenance
                       </Button>
@@ -311,7 +311,7 @@ export default function ClientPortal() {
                       <div className="space-y-4">
                         <div><Label>Subject</Label><Input value={serviceForm.subject} onChange={(e)=>setServiceForm({ ...serviceForm, subject: e.target.value })} /></div>
                         <div><Label>Description</Label><Textarea rows={4} value={serviceForm.description} onChange={(e)=>setServiceForm({ ...serviceForm, description: e.target.value })} /></div>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-3">
                           <div>
                             <Label>Priority</Label>
                             <Select value={serviceForm.priority} onValueChange={(value)=>setServiceForm({ ...serviceForm, priority: value })}>
@@ -337,7 +337,7 @@ export default function ClientPortal() {
                           </div>
                         </div>
                         <div><Label>Requested date</Label><Input type="date" value={serviceForm.target_date} onChange={(e)=>setServiceForm({ ...serviceForm, target_date: e.target.value })} /></div>
-                        <Button className="w-full" onClick={() => createServiceTicketMutation.mutate({
+                        <Button className="w-full sm:w-auto" onClick={() => createServiceTicketMutation.mutate({
                           project_id: selectedProject.id,
                           subject: serviceForm.subject,
                           description: serviceForm.description,
@@ -361,8 +361,8 @@ export default function ClientPortal() {
             )}
 
             {/* Tabs */}
-            <Tabs defaultValue="updates" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
+            <Tabs defaultValue="updates" className="w-full sm:w-auto">
+              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                 <TabsTrigger value="updates">Updates</TabsTrigger>
                 <TabsTrigger value="photos">Photos</TabsTrigger>
                 <TabsTrigger value="calendar">Calendar</TabsTrigger>
@@ -398,7 +398,7 @@ export default function ClientPortal() {
                                 {format(new Date(update.created_date), 'MMM dd, yyyy')}
                               </span>
                             </div>
-                            <p className="text-slate-700">{update.message}</p>
+                            <p className="text-slate-700 break-words">{update.message}</p>
                             {update.photo_urls && update.photo_urls.length > 0 && (
                               <div className="flex gap-2 mt-3">
                                 {update.photo_urls.map((url, idx) => (
@@ -426,13 +426,13 @@ export default function ClientPortal() {
                         <p>No photos uploaded yet</p>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         {updates
                           .filter(u => u.photo_urls?.length > 0)
                           .flatMap(u => u.photo_urls)
                           .map((url, idx) => (
                             <div key={idx} className="relative group cursor-pointer">
-                              <img src={url} alt="Project" className="w-full h-48 object-cover rounded-lg" />
+                              <img src={url} alt="Project" className="w-full sm:w-auto h-48 object-cover rounded-lg" />
                               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all rounded-lg flex items-center justify-center">
                                 <Button size="sm" variant="secondary" className="opacity-0 group-hover:opacity-100">
                                   View Full
@@ -462,7 +462,7 @@ export default function ClientPortal() {
                         {calendarEvents.slice(0, 10).map(event => (
                           <div key={event.id} className="flex items-start gap-4 p-4 border rounded-lg hover:bg-slate-50">
                             <div className="bg-blue-100 rounded-lg p-3 text-center min-w-16">
-                              <p className="text-2xl font-bold text-blue-600">
+                              <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
                                 {format(new Date(event.start_date), 'd')}
                               </p>
                               <p className="text-xs text-slate-500">
@@ -526,7 +526,7 @@ export default function ClientPortal() {
                                 </p>
                               )}
                             </div>
-                            <p className="text-sm text-slate-700">{co.description}</p>
+                            <p className="text-sm text-slate-700 break-words">{co.description}</p>
                             <p className="text-xs text-slate-500 mt-2">
                               Submitted {co.submitted_date && format(new Date(co.submitted_date), 'MMM dd, yyyy')}
                             </p>

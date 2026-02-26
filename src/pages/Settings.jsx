@@ -102,11 +102,11 @@ export default function Settings() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Settings</h1>
+        <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Settings</h1>
         <p className="text-slate-500 mt-1">Manage your company profile and preferences</p>
       </div>
 
-      <Tabs defaultValue="company" className="w-full">
+      <Tabs defaultValue="company" className="w-full sm:w-auto">
         <TabsList>
           <TabsTrigger value="company">Company Profile</TabsTrigger>
           <TabsTrigger value="branding">White Label & Branding</TabsTrigger>
@@ -122,7 +122,7 @@ export default function Settings() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Company Name *</Label>
                   <Input
@@ -158,7 +158,7 @@ export default function Settings() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Phone</Label>
                   <Input
@@ -220,7 +220,7 @@ export default function Settings() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <Label>Primary Color</Label>
                   <div className="flex gap-2 mt-2">
@@ -289,7 +289,7 @@ export default function Settings() {
               <CardTitle>General Preferences</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Timezone</Label>
                   <Select value={orgForm.timezone} onValueChange={(value) => setOrgForm({ ...orgForm, timezone: value })}>
@@ -319,7 +319,7 @@ export default function Settings() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Work Hours Start</Label>
                   <Input

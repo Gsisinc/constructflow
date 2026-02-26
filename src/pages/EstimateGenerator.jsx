@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle, Upload, Loader2, FileText, X, Copy } from 'lucide-react';
 import { toast } from 'sonner';
-import { getClaudeKey } from '@/lib/apiKeys';
 
 export default function EstimateGenerator() {
   const [scopeOfWork, setScopeOfWork] = useState('');
@@ -44,9 +43,10 @@ export default function EstimateGenerator() {
     setError(null);
 
     try {
-      const apiKey = getClaudeKey();
+      const apiKey = import.meta.env.VITE_CLAUDE_API_KEY ?? process.env.REACT_APP_CLAUDE_API_KEY;
+      
       if (!apiKey) {
-        throw new Error('Claude API key not configured. Add it in Settings → API status or AI Agents (OpenAI/Claude) and save.');
+        throw new Error('Claude API key not configured. Add VITE_CLAUDE_API_KEY to .env.local and restart the dev server. See Settings → Preferences → API status.');
       }
 
       const prompt = `Generate a detailed construction estimate based on the following scope of work:
@@ -105,7 +105,7 @@ Format as a professional estimate document.`;
         
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">
             💡 AI Estimate Generator
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
@@ -208,7 +208,7 @@ Format as a professional estimate document.`;
                 <Button
                   onClick={generateEstimate}
                   disabled={loading || !scopeOfWork.trim()}
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white text-lg py-6"
+                  className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white text-lg py-6"
                 >
                   {loading ? (
                     <>

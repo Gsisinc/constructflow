@@ -65,9 +65,9 @@ export default function TrainingMaterials() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex justify-between items-center">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900">Training Materials Library</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">Training Materials Library</h1>
             <p className="text-slate-600">Presentations, handouts, videos, and exams</p>
           </div>
           {user?.role === 'admin' && (
@@ -77,7 +77,7 @@ export default function TrainingMaterials() {
           )}
         </motion.div>
 
-        <Tabs defaultValue="level1" className="w-full">
+        <Tabs defaultValue="level1" className="w-full sm:w-auto">
           <TabsList className="grid w-full grid-cols-6 mb-6">
             {levels.map(level => (
               <TabsTrigger key={level.id} value={`level${level.level_number}`}>
@@ -116,7 +116,7 @@ export default function TrainingMaterials() {
                             >
                               <div className="flex items-start justify-between mb-4">
                                 <div>
-                                  <h3 className="font-semibold text-slate-900">{course.module_number} - {course.title}</h3>
+                                  <h3 className="font-semibold text-slate-900 break-words">{course.module_number} - {course.title}</h3>
                                   <p className="text-sm text-slate-600 mt-1">{course.description}</p>
                                 </div>
                                 <div className="text-right text-xs text-slate-500">
@@ -125,12 +125,12 @@ export default function TrainingMaterials() {
                               </div>
 
                               {Object.keys(materialsByType).length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                   {Object.entries(materialsByType).map(([type, mats]) => (
                                     <div key={type} className="space-y-2">
                                       <div className="flex items-center gap-2 mb-2">
                                         {materialIcons[type]}
-                                        <span className="text-sm font-semibold capitalize text-slate-700">{type.replace('_', ' ')}</span>
+                                        <span className="text-sm font-semibold capitalize text-slate-700 break-words">{type.replace('_', ' ')}</span>
                                       </div>
                                       {mats.map(mat => (
                                         <div key={mat.id} className="flex items-center justify-between bg-slate-50 p-2 rounded">

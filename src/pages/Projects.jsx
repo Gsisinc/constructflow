@@ -75,7 +75,7 @@ export default function Projects() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-2">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Projects</h1>
+            <h1 className="text-2xl sm:text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Projects</h1>
             <p className="text-sm text-slate-600 mt-1">Manage your construction work efficiently</p>
           </div>
         <Button onClick={() => setShowForm(true)} className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 shadow-lg hover:shadow-xl min-h-[44px] select-none text-sm sm:text-base">
@@ -97,7 +97,7 @@ export default function Projects() {
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-auto sm:w-48">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -133,7 +133,7 @@ export default function Projects() {
       {isLoading ? (
         <div className={cn(
           "grid gap-4",
-          viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
+          viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
         )}>
           {Array(6).fill(0).map((_, i) => (
             <ProjectCardSkeleton key={i} />
@@ -154,7 +154,7 @@ export default function Projects() {
       ) : (
         <div className={cn(
           "grid gap-4",
-          viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
+          viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
         )}>
           {filteredProjects.map((project) => (
             <ProjectCard key={project.id} project={project} />

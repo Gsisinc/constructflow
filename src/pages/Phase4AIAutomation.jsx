@@ -153,13 +153,13 @@ export default function Phase4AIAutomation() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">AI Governance + Automation Center</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 break-words">AI Governance + Automation Center</h1>
           <p className="text-sm text-slate-500">Model policy, AI traceability, and autonomous workflow previews.</p>
         </div>
         <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">AI Ops</Badge>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-3">
+      <div className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard title="AI Runs" value={reliabilityStats.total_runs} icon={Bot} />
         <MetricCard title="Avg Confidence" value={`${Math.round(reliabilityStats.avg_confidence * 100)}%`} icon={Sparkles} />
         <MetricCard title="Low Confidence" value={reliabilityStats.low_confidence_runs} icon={ShieldCheck} />
@@ -167,7 +167,7 @@ export default function Phase4AIAutomation() {
       </div>
 
       <Tabs defaultValue="governance" className="space-y-4">
-        <TabsList className="grid md:grid-cols-3 w-full">
+        <TabsList className="grid md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full">
           <TabsTrigger value="governance">Governance Policy</TabsTrigger>
           <TabsTrigger value="traceability">Prompt Traceability</TabsTrigger>
           <TabsTrigger value="automation">Automation Studio</TabsTrigger>
@@ -179,14 +179,14 @@ export default function Phase4AIAutomation() {
               <CardTitle>AI Governance Policy</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-3">
                 <PolicySwitch label="Require citations" checked={aiPolicy.require_citations} onChange={(checked) => setAiPolicy((prev) => ({ ...prev, require_citations: checked }))} />
                 <PolicySwitch label="Block unverified claims" checked={aiPolicy.block_unverified_claims} onChange={(checked) => setAiPolicy((prev) => ({ ...prev, block_unverified_claims: checked }))} />
                 <PolicySwitch label="Restrict live discovery to Market Intelligence" checked={aiPolicy.allow_live_discovery_only_for_market_intelligence} onChange={(checked) => setAiPolicy((prev) => ({ ...prev, allow_live_discovery_only_for_market_intelligence: checked }))} />
                 <PolicySwitch label="Redact PII in logs" checked={aiPolicy.redact_pii_in_logs} onChange={(checked) => setAiPolicy((prev) => ({ ...prev, redact_pii_in_logs: checked }))} />
               </div>
 
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Confidence threshold</Label>
                   <Input
@@ -209,7 +209,7 @@ export default function Phase4AIAutomation() {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Cost-sensitive model</Label>
                   <Input value={modelPolicy.cost_sensitive} onChange={(event) => setModelPolicy((prev) => ({ ...prev, cost_sensitive: event.target.value }))} />
@@ -242,7 +242,7 @@ export default function Phase4AIAutomation() {
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full sm:w-auto text-sm">
                   <thead>
                     <tr className="text-left text-slate-500 border-b">
                       <th className="py-2 pr-3">Time</th>
@@ -312,7 +312,7 @@ export default function Phase4AIAutomation() {
               ))}
 
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
-                <p className="font-medium text-slate-900">Trigger Preview</p>
+                <p className="font-medium text-slate-900 break-words">Trigger Preview</p>
                 {automationPreview.map((row) => (
                   <div key={row.id} className="flex items-center justify-between text-sm">
                     <div>
@@ -344,7 +344,7 @@ function MetricCard({ title, value, icon: Icon }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-slate-500">{title}</p>
-            <p className="text-2xl font-semibold text-slate-900">{value}</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">{value}</p>
           </div>
           <Icon className="h-5 w-5 text-indigo-500" />
         </div>

@@ -61,11 +61,11 @@ export default function CertificationRoadmap() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900">Certification Roadmap</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">Certification Roadmap</h1>
           <p className="text-slate-600">Industry certifications required for each training level</p>
         </motion.div>
 
-        <Tabs defaultValue="safety" className="w-full">
+        <Tabs defaultValue="safety" className="w-full sm:w-auto">
           <TabsList className="grid w-full grid-cols-6 mb-6">
             {Object.entries(certificationTracks).map(([key, { title }]) => (
               <TabsTrigger key={key} value={key} className="text-xs sm:text-sm">{title.split(' ')[0]}</TabsTrigger>
@@ -81,7 +81,7 @@ export default function CertificationRoadmap() {
                     <CardDescription>{certs.length} certifications in this track</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
                       {certs.map(cert => {
                         const assigned = techCertifications.filter(tc => tc.certification_id === cert.id);
                         const earned = assigned.filter(tc => tc.status === 'valid').length;
@@ -93,7 +93,7 @@ export default function CertificationRoadmap() {
                             className="border rounded-lg p-4 hover:shadow-md transition-shadow"
                           >
                             <div className="flex items-start justify-between mb-3">
-                              <h3 className="font-semibold text-slate-900">{cert.cert_name}</h3>
+                              <h3 className="font-semibold text-slate-900 break-words">{cert.cert_name}</h3>
                               <Badge variant="outline">{assigned.length} earned</Badge>
                             </div>
 
@@ -127,7 +127,7 @@ export default function CertificationRoadmap() {
                                     style={{ width: `${(earned / Math.max(technicians.length, 1)) * 100}%` }}
                                   />
                                 </div>
-                                <span className="text-xs font-semibold text-slate-700">{earned}/{technicians.length}</span>
+                                <span className="text-xs font-semibold text-slate-700 break-words">{earned}/{technicians.length}</span>
                               </div>
                             </div>
                           </motion.div>

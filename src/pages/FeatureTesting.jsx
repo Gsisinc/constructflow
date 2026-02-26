@@ -186,7 +186,7 @@ export default function FeatureTesting() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-amber-50/30 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Feature Testing Dashboard</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-2">Feature Testing Dashboard</h1>
           <p className="text-slate-600">Test all latest features and verify they're working correctly</p>
         </div>
 
@@ -249,7 +249,7 @@ export default function FeatureTesting() {
                         {result.status === 'warning' && (
                           <XCircle className="h-4 w-4 text-yellow-600" />
                         )}
-                        <span className="text-sm text-slate-700">{result.message}</span>
+                        <span className="text-sm text-slate-700 break-words">{result.message}</span>
                       </div>
                     </CardContent>
                   )}

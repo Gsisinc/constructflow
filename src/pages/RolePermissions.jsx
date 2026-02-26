@@ -80,7 +80,7 @@ export default function RolePermissions() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Role & Permissions Matrix</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Role & Permissions Matrix</h1>
           <p className="text-sm text-slate-600 mt-1">Phase 1 control center for module-level access management.</p>
         </div>
         <Button onClick={handleSave} disabled={!canEdit || saving} className="bg-amber-600 hover:bg-amber-700">
@@ -109,7 +109,7 @@ export default function RolePermissions() {
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-2 font-semibold text-slate-700">Module</th>
+                    <th className="text-left p-2 font-semibold text-slate-700 break-words">Module</th>
                     {PERMISSION_ACTIONS.map((action) => (
                       <th key={action} className="text-center p-2 font-semibold text-slate-700 capitalize">{action}</th>
                     ))}
@@ -118,7 +118,7 @@ export default function RolePermissions() {
                 <tbody>
                   {PERMISSION_MODULES.map((module) => (
                     <tr key={`${role.id}-${module.id}`} className="border-b last:border-b-0">
-                      <td className="p-2 text-slate-700">{module.label}</td>
+                      <td className="p-2 text-slate-700 break-words">{module.label}</td>
                       {PERMISSION_ACTIONS.map((action) => (
                         <td key={action} className="p-2 text-center">
                           <Checkbox

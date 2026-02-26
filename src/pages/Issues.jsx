@@ -66,14 +66,24 @@ export default function Issues() {
   const [severityFilter, setSeverityFilter] = useState('all');
   const queryClient = useQueryClient();
 
+  // Get current user for organization filtering
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
+  });
+
   const { data: issues = [], isLoading } = useQuery({
     queryKey: ['issues'],
     queryFn: () => base44.entities.Issue.list('-created_date'),
   });
 
   const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryKey: ['projects', user?.organization_id],
+    queryFn: () => {
+      if (!user?.organization_id) return [];
+      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
+    },
+    enabled: !!user?.organization_id,
   });
 
   const createMutation = useMutation({
@@ -113,7 +123,7 @@ export default function Issues() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Issues</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 tracking-tight">Issues</h1>
           <p className="text-slate-500 mt-1">Track and resolve project issues</p>
         </div>
         <Button onClick={() => { setEditingIssue(null); setShowForm(true); }} className="bg-slate-900 hover:bg-slate-800">
@@ -123,27 +133,27 @@ export default function Issues() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Total Issues</p>
-          <p className="text-2xl font-semibold mt-1">{issues.length}</p>
+          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1">{issues.length}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Open</p>
-          <p className="text-2xl font-semibold mt-1 text-red-600">{openIssues}</p>
+          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1 text-red-600">{openIssues}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Critical</p>
           <p className={cn(
-            "text-2xl font-semibold mt-1",
-            criticalIssues > 0 ? "text-red-600" : "text-slate-900"
+            "text-lg sm:text-xl md:text-2xl font-semibold mt-1",
+            criticalIssues > 0 ? "text-red-600" : "text-slate-900 break-words"
           )}>
             {criticalIssues}
           </p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <p className="text-sm text-slate-500">Resolved</p>
-          <p className="text-2xl font-semibold mt-1 text-green-600">
+          <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-1 text-green-600">
             {issues.filter(i => ['resolved', 'closed'].includes(i.status)).length}
           </p>
         </div>
@@ -161,7 +171,7 @@ export default function Issues() {
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-40">
+          <SelectTrigger className="w-full sm:w-auto sm:w-40">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -172,7 +182,7 @@ export default function Issues() {
           </SelectContent>
         </Select>
         <Select value={severityFilter} onValueChange={setSeverityFilter}>
-          <SelectTrigger className="w-full sm:w-40">
+          <SelectTrigger className="w-full sm:w-auto sm:w-40">
             <SelectValue placeholder="Severity" />
           </SelectTrigger>
           <SelectContent>
@@ -210,7 +220,7 @@ export default function Issues() {
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <h3 className="font-medium text-slate-900">{issue.title}</h3>
+                    <h3 className="font-medium text-slate-900 break-words">{issue.title}</h3>
                     <Badge className={cn("border", STATUSES.find(s => s.value === issue.status)?.color)}>
                       {issue.status?.replace('_', ' ')}
                     </Badge>
@@ -244,7 +254,7 @@ export default function Issues() {
                 </div>
                 {issue.photo_url && (
                   <div className="w-24 h-24 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
-                    <img src={issue.photo_url} alt="" className="w-full h-full object-cover" />
+                    <img src={issue.photo_url} alt="" className="w-full sm:w-auto h-full object-cover" />
                   </div>
                 )}
               </div>
@@ -342,7 +352,7 @@ function IssueFormDialog({ open, onOpenChange, issue, projects, onSubmit, loadin
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Type *</Label>
               <Select
@@ -392,7 +402,7 @@ function IssueFormDialog({ open, onOpenChange, issue, projects, onSubmit, loadin
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Location</Label>
               <Input

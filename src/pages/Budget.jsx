@@ -125,12 +125,12 @@ export default function Budget() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Budget</h1>
+          <h1 className="text-xl sm:text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 tracking-tight">Budget</h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Track expenses and forecasts</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <Select value={projectFilter} onValueChange={setProjectFilter}>
-            <SelectTrigger className="w-full sm:w-40 text-sm min-h-[44px]">
+            <SelectTrigger className="w-full sm:w-auto sm:w-40 text-sm min-h-[44px]">
               <SelectValue placeholder="Select project" />
             </SelectTrigger>
             <SelectContent>
@@ -165,13 +165,13 @@ export default function Budget() {
       )}
 
       {/* Cash Flow & Change Orders */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:grid-cols-1 sm:grid-cols-2 gap-6">
         <CashFlowForecast project={selectedProject} expenses={projectExpenses} />
         <ChangeOrderImpact changeOrders={projectChangeOrders} />
       </div>
 
       {/* Expense Table */}
-      <Tabs defaultValue="expenses" className="w-full">
+      <Tabs defaultValue="expenses" className="w-full sm:w-auto">
         <TabsList>
           <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="change_orders">Change Orders</TabsTrigger>
@@ -215,7 +215,7 @@ export default function Budget() {
                         ${(expense.amount || 0).toLocaleString('en', {notation: 'compact'})}
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-2 gap-1 text-xs">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
                       <div className="text-slate-600">{expense.category}</div>
                       <div className="text-right text-slate-600">{expense.date ? format(new Date(expense.date), 'MMM d') : '-'}</div>
                     </div>
@@ -291,7 +291,7 @@ export default function Budget() {
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-slate-900">{co.title}</h3>
+                      <h3 className="font-semibold text-slate-900 break-words">{co.title}</h3>
                       <Badge variant="outline">{co.change_order_number}</Badge>
                     </div>
                     <p className="text-sm text-slate-500 mt-1">{co.description}</p>
@@ -400,7 +400,7 @@ function ExpenseFormDialog({ open, onOpenChange, expense, projects, onSubmit, lo
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Category *</Label>
               <Select
@@ -437,7 +437,7 @@ function ExpenseFormDialog({ open, onOpenChange, expense, projects, onSubmit, lo
               rows={2}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Date</Label>
               <Input
@@ -463,7 +463,7 @@ function ExpenseFormDialog({ open, onOpenChange, expense, projects, onSubmit, lo
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Vendor</Label>
               <Input

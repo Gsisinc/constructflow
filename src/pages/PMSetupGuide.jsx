@@ -7,7 +7,7 @@ export default function PMSetupGuide() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">PM System Setup Guide</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-2">PM System Setup Guide</h1>
         <p className="text-slate-600">Complete documentation for your project management system</p>
       </div>
 
@@ -21,7 +21,7 @@ export default function PMSetupGuide() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-slate-600">Your PM system integrates three main components:</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div className="border rounded p-4">
               <h3 className="font-semibold text-sm mb-2">Template Library</h3>
               <p className="text-xs text-slate-600 mb-3">100+ construction templates organized by category</p>
@@ -59,7 +59,7 @@ export default function PMSetupGuide() {
 
           <div>
             <h4 className="font-semibold text-sm mb-2">Template Categories</h4>
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-2 text-xs">
               <div className="bg-slate-50 p-3 rounded">
                 <p className="font-medium mb-1">Contracts (10)</p>
                 <p className="text-slate-600">Subcontractor, change orders, equipment, insurance</p>
@@ -124,7 +124,7 @@ export default function PMSetupGuide() {
 
           <div>
             <h4 className="font-semibold text-sm mb-2">Task vs Requirements</h4>
-            <div className="grid grid-cols-2 gap-4 text-xs">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4 text-xs">
               <div className="border-l-4 border-blue-500 pl-3">
                 <p className="font-semibold mb-1">Tasks (Operational)</p>
                 <p className="text-slate-600">Bid analysis, cost estimate, procurement, compliance</p>
@@ -251,31 +251,31 @@ export default function PMSetupGuide() {
           <div className="space-y-2 text-sm">
             <div className="flex items-start gap-2">
               <input type="checkbox" className="mt-1" id="check1" />
-              <label htmlFor="check1" className="text-slate-700">Access Template Library and review templates</label>
+              <label htmlFor="check1" className="text-slate-700 break-words">Access Template Library and review templates</label>
             </div>
             <div className="flex items-start gap-2">
               <input type="checkbox" className="mt-1" id="check2" />
-              <label htmlFor="check2" className="text-slate-700">Customize templates for your company standards</label>
+              <label htmlFor="check2" className="text-slate-700 break-words">Customize templates for your company standards</label>
             </div>
             <div className="flex items-start gap-2">
               <input type="checkbox" className="mt-1" id="check3" />
-              <label htmlFor="check3" className="text-slate-700">Create first test Project</label>
+              <label htmlFor="check3" className="text-slate-700 break-words">Create first test Project</label>
             </div>
             <div className="flex items-start gap-2">
               <input type="checkbox" className="mt-1" id="check4" />
-              <label htmlFor="check4" className="text-slate-700">Define custom Phases for your workflow</label>
+              <label htmlFor="check4" className="text-slate-700 break-words">Define custom Phases for your workflow</label>
             </div>
             <div className="flex items-start gap-2">
               <input type="checkbox" className="mt-1" id="check5" />
-              <label htmlFor="check5" className="text-slate-700">Add team members to project</label>
+              <label htmlFor="check5" className="text-slate-700 break-words">Add team members to project</label>
             </div>
             <div className="flex items-start gap-2">
               <input type="checkbox" className="mt-1" id="check6" />
-              <label htmlFor="check6" className="text-slate-700">Create operational tasks in Task Tracker</label>
+              <label htmlFor="check6" className="text-slate-700 break-words">Create operational tasks in Task Tracker</label>
             </div>
             <div className="flex items-start gap-2">
               <input type="checkbox" className="mt-1" id="check7" />
-              <label htmlFor="check7" className="text-slate-700">Add test Bid and verify auto-task generation</label>
+              <label htmlFor="check7" className="text-slate-700 break-words">Add test Bid and verify auto-task generation</label>
             </div>
           </div>
         </CardContent>
