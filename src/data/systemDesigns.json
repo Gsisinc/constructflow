@@ -1,0 +1,1017 @@
+{
+  "systems": [
+    {
+      "id": "fire_alarm",
+      "name": "Fire Alarm Systems",
+      "description": "Professional fire detection and alarm systems",
+      "color": "from-red-500 to-red-600",
+      "sizes": [
+        {
+          "id": "small",
+          "name": "Small (Up to 5,000 sq ft)",
+          "description": "Ideal for small offices and retail spaces",
+          "materials": [
+            {
+              "category": "Control Panel",
+              "items": [
+                {
+                  "part": "FA-CP-2000",
+                  "description": "2-Loop Fire Alarm Control Panel",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 2500,
+                  "manufacturer": "Notifier",
+                  "partNumber": "NFS2-3030",
+                  "notes": "Addressable control panel with battery backup"
+                },
+                {
+                  "part": "FA-PSU-24V",
+                  "description": "24V Power Supply Unit",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 800,
+                  "manufacturer": "Notifier",
+                  "partNumber": "PSUP-24",
+                  "notes": "Includes battery charging circuit"
+                }
+              ]
+            },
+            {
+              "category": "Detection Devices",
+              "items": [
+                {
+                  "part": "FA-SMOKE-ADDR",
+                  "description": "Addressable Smoke Detector",
+                  "quantity": 8,
+                  "unit": "EA",
+                  "unitCost": 150,
+                  "manufacturer": "Notifier",
+                  "partNumber": "FSP-851",
+                  "notes": "Photoelectric smoke detection"
+                },
+                {
+                  "part": "FA-HEAT-ADDR",
+                  "description": "Addressable Heat Detector",
+                  "quantity": 4,
+                  "unit": "EA",
+                  "unitCost": 120,
+                  "manufacturer": "Notifier",
+                  "partNumber": "FST-851",
+                  "notes": "Fixed temperature heat detection"
+                }
+              ]
+            },
+            {
+              "category": "Notification Devices",
+              "items": [
+                {
+                  "part": "FA-HORN-STROBE",
+                  "description": "Horn/Strobe Notification Device",
+                  "quantity": 6,
+                  "unit": "EA",
+                  "unitCost": 200,
+                  "manufacturer": "Notifier",
+                  "partNumber": "CWSS-24-90",
+                  "notes": "24V, 90dB horn with strobe"
+                }
+              ]
+            },
+            {
+              "category": "Wiring & Installation",
+              "items": [
+                {
+                  "part": "FA-WIRE-18-2",
+                  "description": "18/2 Fire Alarm Wire (500 ft)",
+                  "quantity": 1,
+                  "unit": "SPOOL",
+                  "unitCost": 350,
+                  "manufacturer": "Belden",
+                  "partNumber": "FPLP",
+                  "notes": "UL listed fire alarm cable"
+                },
+                {
+                  "part": "FA-CONDUIT-1",
+                  "description": "1\" Conduit (100 ft)",
+                  "quantity": 1,
+                  "unit": "SPOOL",
+                  "unitCost": 200,
+                  "manufacturer": "Allied Tube",
+                  "partNumber": "EMT-1",
+                  "notes": "Electrical metallic tubing"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 5,
+              "tasks": ["Site survey", "System design", "Code compliance review", "Approval"]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 7,
+              "tasks": ["Order components", "Receive equipment", "Quality inspection"]
+            },
+            {
+              "name": "Installation",
+              "duration": 10,
+              "tasks": ["Wiring installation", "Device mounting", "Panel programming", "Testing"]
+            },
+            {
+              "name": "Testing & Commissioning",
+              "duration": 3,
+              "tasks": ["System testing", "Final inspection", "Documentation"]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Permits & Compliance",
+              "items": [
+                "Building permit",
+                "Fire marshal approval",
+                "UL certification",
+                "ADA compliance"
+              ]
+            },
+            {
+              "category": "Safety",
+              "items": [
+                "Backup power (battery)",
+                "Emergency signage",
+                "Manual pull stations",
+                "Evacuation plan"
+              ]
+            },
+            {
+              "category": "Maintenance",
+              "items": [
+                "Annual inspection",
+                "Battery replacement (every 3 years)",
+                "Detector cleaning",
+                "System documentation"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "medium",
+          "name": "Medium (5,000 - 25,000 sq ft)",
+          "description": "Perfect for mid-size commercial buildings",
+          "materials": [
+            {
+              "category": "Control Panel",
+              "items": [
+                {
+                  "part": "FA-CP-4000",
+                  "description": "4-Loop Fire Alarm Control Panel",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 4500,
+                  "manufacturer": "Notifier",
+                  "partNumber": "NFS2-3030",
+                  "notes": "Addressable control panel with networking"
+                }
+              ]
+            },
+            {
+              "category": "Detection Devices",
+              "items": [
+                {
+                  "part": "FA-SMOKE-ADDR",
+                  "description": "Addressable Smoke Detector",
+                  "quantity": 25,
+                  "unit": "EA",
+                  "unitCost": 150,
+                  "manufacturer": "Notifier",
+                  "partNumber": "FSP-851",
+                  "notes": "Photoelectric smoke detection"
+                },
+                {
+                  "part": "FA-HEAT-ADDR",
+                  "description": "Addressable Heat Detector",
+                  "quantity": 12,
+                  "unit": "EA",
+                  "unitCost": 120,
+                  "manufacturer": "Notifier",
+                  "partNumber": "FST-851",
+                  "notes": "Fixed temperature heat detection"
+                }
+              ]
+            },
+            {
+              "category": "Notification Devices",
+              "items": [
+                {
+                  "part": "FA-HORN-STROBE",
+                  "description": "Horn/Strobe Notification Device",
+                  "quantity": 15,
+                  "unit": "EA",
+                  "unitCost": 200,
+                  "manufacturer": "Notifier",
+                  "partNumber": "CWSS-24-90",
+                  "notes": "24V, 90dB horn with strobe"
+                }
+              ]
+            },
+            {
+              "category": "Wiring & Installation",
+              "items": [
+                {
+                  "part": "FA-WIRE-18-2",
+                  "description": "18/2 Fire Alarm Wire (1000 ft)",
+                  "quantity": 2,
+                  "unit": "SPOOL",
+                  "unitCost": 350,
+                  "manufacturer": "Belden",
+                  "partNumber": "FPLP",
+                  "notes": "UL listed fire alarm cable"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 7,
+              "tasks": ["Site survey", "System design", "Code compliance review", "Client approval"]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 10,
+              "tasks": ["Order components", "Receive equipment", "Quality inspection"]
+            },
+            {
+              "name": "Installation",
+              "duration": 15,
+              "tasks": ["Wiring installation", "Device mounting", "Panel programming", "Integration testing"]
+            },
+            {
+              "name": "Testing & Commissioning",
+              "duration": 5,
+              "tasks": ["System testing", "Final inspection", "Training", "Documentation"]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Permits & Compliance",
+              "items": [
+                "Building permit",
+                "Fire marshal approval",
+                "UL certification",
+                "ADA compliance",
+                "Occupancy classification"
+              ]
+            },
+            {
+              "category": "Safety",
+              "items": [
+                "Backup power (battery)",
+                "Emergency signage",
+                "Manual pull stations",
+                "Evacuation plan",
+                "Staff training"
+              ]
+            },
+            {
+              "category": "Maintenance",
+              "items": [
+                "Annual inspection",
+                "Battery replacement (every 3 years)",
+                "Detector cleaning",
+                "System documentation",
+                "Service contract"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cctv",
+      "name": "CCTV Systems",
+      "description": "Surveillance and security camera systems",
+      "color": "from-blue-500 to-blue-600",
+      "sizes": [
+        {
+          "id": "small",
+          "name": "Small (4-8 Cameras)",
+          "description": "Compact surveillance solution",
+          "materials": [
+            {
+              "category": "Recording Equipment",
+              "items": [
+                {
+                  "part": "CCTV-NVR-8CH",
+                  "description": "8-Channel Network Video Recorder",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 1200,
+                  "manufacturer": "Hikvision",
+                  "partNumber": "DS-7608NI-K2",
+                  "notes": "4K capable, 2TB storage"
+                }
+              ]
+            },
+            {
+              "category": "Cameras",
+              "items": [
+                {
+                  "part": "CCTV-IP-4MP",
+                  "description": "4MP IP Bullet Camera",
+                  "quantity": 6,
+                  "unit": "EA",
+                  "unitCost": 350,
+                  "manufacturer": "Hikvision",
+                  "partNumber": "DS-2CD2143G0-I",
+                  "notes": "Fixed lens, PoE powered"
+                }
+              ]
+            },
+            {
+              "category": "Networking",
+              "items": [
+                {
+                  "part": "CCTV-POE-SWITCH",
+                  "description": "8-Port PoE Switch",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 400,
+                  "manufacturer": "Netgear",
+                  "partNumber": "GS308EP",
+                  "notes": "Gigabit PoE+ switch"
+                }
+              ]
+            },
+            {
+              "category": "Cabling",
+              "items": [
+                {
+                  "part": "CCTV-CAT6-500",
+                  "description": "Cat6 Ethernet Cable (500 ft)",
+                  "quantity": 1,
+                  "unit": "SPOOL",
+                  "unitCost": 150,
+                  "manufacturer": "Belden",
+                  "partNumber": "CAT6",
+                  "notes": "UTP, 1000 Mbps"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 3,
+              "tasks": ["Site survey", "Camera placement", "Network design"]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 5,
+              "tasks": ["Order equipment", "Receive shipment", "Inspection"]
+            },
+            {
+              "name": "Installation",
+              "duration": 5,
+              "tasks": ["Cable installation", "Camera mounting", "NVR setup", "Network configuration"]
+            },
+            {
+              "name": "Testing & Training",
+              "duration": 2,
+              "tasks": ["System testing", "Client training", "Documentation"]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Technical",
+              "items": [
+                "Network connectivity",
+                "PoE power supply",
+                "Adequate storage",
+                "Backup power"
+              ]
+            },
+            {
+              "category": "Legal",
+              "items": [
+                "Privacy compliance",
+                "Recording notice",
+                "Data retention policy",
+                "Access controls"
+              ]
+            },
+            {
+              "category": "Maintenance",
+              "items": [
+                "Regular backups",
+                "Firmware updates",
+                "Lens cleaning",
+                "Storage monitoring"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large",
+          "name": "Large (16+ Cameras)",
+          "description": "Enterprise surveillance solution",
+          "materials": [
+            {
+              "category": "Recording Equipment",
+              "items": [
+                {
+                  "part": "CCTV-NVR-32CH",
+                  "description": "32-Channel Network Video Recorder",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 3500,
+                  "manufacturer": "Hikvision",
+                  "partNumber": "DS-7732NI-K4",
+                  "notes": "4K capable, 8TB storage, redundant"
+                }
+              ]
+            },
+            {
+              "category": "Cameras",
+              "items": [
+                {
+                  "part": "CCTV-IP-8MP",
+                  "description": "8MP IP Turret Camera",
+                  "quantity": 20,
+                  "unit": "EA",
+                  "unitCost": 600,
+                  "manufacturer": "Hikvision",
+                  "partNumber": "DS-2CD2183G0-I",
+                  "notes": "Motorized lens, PoE powered"
+                }
+              ]
+            },
+            {
+              "category": "Networking",
+              "items": [
+                {
+                  "part": "CCTV-POE-SWITCH-48",
+                  "description": "48-Port PoE Switch",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 1200,
+                  "manufacturer": "Netgear",
+                  "partNumber": "M4300-52G",
+                  "notes": "Managed Gigabit PoE+ switch"
+                }
+              ]
+            },
+            {
+              "category": "Cabling",
+              "items": [
+                {
+                  "part": "CCTV-CAT6A-1000",
+                  "description": "Cat6A Ethernet Cable (1000 ft)",
+                  "quantity": 1,
+                  "unit": "SPOOL",
+                  "unitCost": 400,
+                  "manufacturer": "Belden",
+                  "partNumber": "CAT6A",
+                  "notes": "UTP, 10 Gbps capable"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 7,
+              "tasks": ["Site survey", "Camera placement", "Network design", "Redundancy planning"]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 10,
+              "tasks": ["Order equipment", "Receive shipment", "Quality inspection"]
+            },
+            {
+              "name": "Installation",
+              "duration": 15,
+              "tasks": ["Cable installation", "Camera mounting", "NVR setup", "Network configuration", "Integration"]
+            },
+            {
+              "name": "Testing & Training",
+              "duration": 5,
+              "tasks": ["System testing", "Failover testing", "Client training", "Documentation"]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Technical",
+              "items": [
+                "Network connectivity (10 Gbps)",
+                "PoE power supply (redundant)",
+                "Adequate storage (redundant)",
+                "Backup power (UPS)",
+                "Remote access capability"
+              ]
+            },
+            {
+              "category": "Legal",
+              "items": [
+                "Privacy compliance",
+                "Recording notice",
+                "Data retention policy",
+                "Access controls",
+                "Audit logging"
+              ]
+            },
+            {
+              "category": "Maintenance",
+              "items": [
+                "Regular backups",
+                "Firmware updates",
+                "Lens cleaning",
+                "Storage monitoring",
+                "24/7 support contract"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "access_control",
+      "name": "Access Control Systems",
+      "description": "Electronic door locks and access management",
+      "color": "from-green-500 to-green-600",
+      "sizes": [
+        {
+          "id": "small",
+          "name": "Small (1-4 Doors)",
+          "description": "Single entrance solution",
+          "materials": [
+            {
+              "category": "Control Equipment",
+              "items": [
+                {
+                  "part": "AC-CTRL-SINGLE",
+                  "description": "Single Door Access Controller",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 800,
+                  "manufacturer": "Salto",
+                  "partNumber": "XS2-CTRL",
+                  "notes": "Cloud-based access control"
+                }
+              ]
+            },
+            {
+              "category": "Locks",
+              "items": [
+                {
+                  "part": "AC-LOCK-ELECTRIC",
+                  "description": "Electric Strike Lock",
+                  "quantity": 2,
+                  "unit": "EA",
+                  "unitCost": 400,
+                  "manufacturer": "Salto",
+                  "partNumber": "XS4-LOCK",
+                  "notes": "Fail-safe magnetic lock"
+                }
+              ]
+            },
+            {
+              "category": "Credentials",
+              "items": [
+                {
+                  "part": "AC-CARD-MIFARE",
+                  "description": "MIFARE Classic Card (100 pack)",
+                  "quantity": 1,
+                  "unit": "PACK",
+                  "unitCost": 150,
+                  "manufacturer": "NXP",
+                  "partNumber": "MIFARE-100",
+                  "notes": "13.56 MHz RFID cards"
+                }
+              ]
+            },
+            {
+              "category": "Readers",
+              "items": [
+                {
+                  "part": "AC-READER-RFID",
+                  "description": "RFID Card Reader",
+                  "quantity": 2,
+                  "unit": "EA",
+                  "unitCost": 250,
+                  "manufacturer": "Salto",
+                  "partNumber": "XS-READER",
+                  "notes": "Wiegand output, weatherproof"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 2,
+              "tasks": ["Access requirements", "System design"]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 3,
+              "tasks": ["Order equipment", "Receive shipment"]
+            },
+            {
+              "name": "Installation",
+              "duration": 3,
+              "tasks": ["Lock installation", "Reader mounting", "Controller setup", "Credential enrollment"]
+            },
+            {
+              "name": "Testing & Training",
+              "duration": 1,
+              "tasks": ["System testing", "User training"]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Technical",
+              "items": [
+                "Power supply (24V DC)",
+                "Network connectivity",
+                "Cloud account",
+                "Backup power"
+              ]
+            },
+            {
+              "category": "Safety",
+              "items": [
+                "Emergency override",
+                "Audit logging",
+                "Visitor management",
+                "Alarm integration"
+              ]
+            },
+            {
+              "category": "Maintenance",
+              "items": [
+                "Battery replacement",
+                "Credential updates",
+                "Lock lubrication",
+                "System backups"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "structured_cabling",
+      "name": "Structured Cabling",
+      "description": "Network infrastructure and data cabling",
+      "color": "from-purple-500 to-purple-600",
+      "sizes": [
+        {
+          "id": "small",
+          "name": "Small (Up to 10,000 sq ft)",
+          "description": "Small office network infrastructure",
+          "materials": [
+            {
+              "category": "Cabling",
+              "items": [
+                {
+                  "part": "SC-CAT6A-1000",
+                  "description": "Cat6A Ethernet Cable (1000 ft)",
+                  "quantity": 2,
+                  "unit": "SPOOL",
+                  "unitCost": 400,
+                  "manufacturer": "Belden",
+                  "partNumber": "CAT6A",
+                  "notes": "10 Gbps capable"
+                }
+              ]
+            },
+            {
+              "category": "Patch Panels",
+              "items": [
+                {
+                  "part": "SC-PATCH-48",
+                  "description": "48-Port Patch Panel",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 300,
+                  "manufacturer": "Panduit",
+                  "partNumber": "PATCH-48",
+                  "notes": "Cat6A rated"
+                }
+              ]
+            },
+            {
+              "category": "Conduit & Racks",
+              "items": [
+                {
+                  "part": "SC-RACK-42U",
+                  "description": "42U Network Rack",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 800,
+                  "manufacturer": "APC",
+                  "partNumber": "AR3100",
+                  "notes": "19\" standard rack"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 5,
+              "tasks": ["Site survey", "Cable routing", "Capacity planning"]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 7,
+              "tasks": ["Order equipment", "Receive shipment", "Inspection"]
+            },
+            {
+              "name": "Installation",
+              "duration": 10,
+              "tasks": ["Conduit installation", "Cable pulling", "Termination", "Testing"]
+            },
+            {
+              "name": "Certification & Documentation",
+              "duration": 3,
+              "tasks": ["Cable certification", "Documentation", "Handover"]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Technical",
+              "items": [
+                "Proper grounding",
+                "Fire rating compliance",
+                "Future expansion capacity",
+                "Proper ventilation"
+              ]
+            },
+            {
+              "category": "Standards",
+              "items": [
+                "TIA/EIA-568B compliance",
+                "UL certification",
+                "Building codes",
+                "Safety standards"
+              ]
+            },
+            {
+              "category": "Maintenance",
+              "items": [
+                "Cable management",
+                "Documentation updates",
+                "Periodic testing",
+                "Upgrade planning"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "av_conference",
+      "name": "AV & Conference Systems",
+      "description": "Audio/video and meeting room solutions",
+      "color": "from-yellow-500 to-yellow-600",
+      "sizes": [
+        {
+          "id": "small",
+          "name": "Small (1-2 Rooms)",
+          "description": "Basic conference room setup",
+          "materials": [
+            {
+              "category": "Display",
+              "items": [
+                {
+                  "part": "AV-DISPLAY-65",
+                  "description": "65\" 4K Interactive Display",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 2500,
+                  "manufacturer": "Samsung",
+                  "partNumber": "QBR65R",
+                  "notes": "Touch-enabled, 4K resolution"
+                }
+              ]
+            },
+            {
+              "category": "Audio",
+              "items": [
+                {
+                  "part": "AV-SPEAKER-CEILING",
+                  "description": "Ceiling Speaker (Pair)",
+                  "quantity": 2,
+                  "unit": "PAIR",
+                  "unitCost": 300,
+                  "manufacturer": "Bose",
+                  "partNumber": "FreeSpace",
+                  "notes": "Stereo pair, 100W"
+                }
+              ]
+            },
+            {
+              "category": "Control",
+              "items": [
+                {
+                  "part": "AV-CONTROL-UNIT",
+                  "description": "AV Control Processor",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 1500,
+                  "manufacturer": "Crestron",
+                  "partNumber": "DM-MD64X64",
+                  "notes": "HDMI matrix switcher"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 3,
+              "tasks": ["Room assessment", "System design", "Cable routing"]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 5,
+              "tasks": ["Order equipment", "Receive shipment"]
+            },
+            {
+              "name": "Installation",
+              "duration": 5,
+              "tasks": ["Display mounting", "Audio installation", "Control setup", "Cabling"]
+            },
+            {
+              "name": "Testing & Training",
+              "duration": 2,
+              "tasks": ["System testing", "User training"]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Technical",
+              "items": [
+                "Power outlets",
+                "Network connectivity",
+                "HDMI/USB ports",
+                "Audio line level"
+              ]
+            },
+            {
+              "category": "Acoustics",
+              "items": [
+                "Proper room acoustics",
+                "Echo cancellation",
+                "Noise isolation",
+                "Speaker placement"
+              ]
+            },
+            {
+              "category": "Maintenance",
+              "items": [
+                "Firmware updates",
+                "Cable inspection",
+                "Display cleaning",
+                "Audio level checks"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "security_systems",
+      "name": "Security Systems",
+      "description": "Comprehensive security solutions",
+      "color": "from-indigo-500 to-indigo-600",
+      "sizes": [
+        {
+          "id": "small",
+          "name": "Small (Single Location)",
+          "description": "Basic security package",
+          "materials": [
+            {
+              "category": "Control Panel",
+              "items": [
+                {
+                  "part": "SEC-PANEL-4Z",
+                  "description": "4-Zone Security Panel",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 600,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "VISTA-20P",
+                  "notes": "Wireless compatible, battery backup"
+                }
+              ]
+            },
+            {
+              "category": "Sensors",
+              "items": [
+                {
+                  "part": "SEC-SENSOR-DOOR",
+                  "description": "Door/Window Sensor",
+                  "quantity": 6,
+                  "unit": "EA",
+                  "unitCost": 80,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "5816",
+                  "notes": "Wireless, 433 MHz"
+                },
+                {
+                  "part": "SEC-SENSOR-MOTION",
+                  "description": "Motion Detector",
+                  "quantity": 3,
+                  "unit": "EA",
+                  "unitCost": 120,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "5800PIR",
+                  "notes": "Wireless, pet immune"
+                }
+              ]
+            },
+            {
+              "category": "Keypad & Siren",
+              "items": [
+                {
+                  "part": "SEC-KEYPAD",
+                  "description": "Wireless Keypad",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 150,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "6160",
+                  "notes": "Backlit, wireless"
+                },
+                {
+                  "part": "SEC-SIREN",
+                  "description": "Wireless Siren",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 200,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "5800SA",
+                  "notes": "110dB, wireless"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 2,
+              "tasks": ["Site assessment", "System design"]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 3,
+              "tasks": ["Order equipment", "Receive shipment"]
+            },
+            {
+              "name": "Installation",
+              "duration": 3,
+              "tasks": ["Panel installation", "Sensor placement", "Programming"]
+            },
+            {
+              "name": "Testing & Training",
+              "duration": 1,
+              "tasks": ["System testing", "User training"]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Technical",
+              "items": [
+                "Power supply (24V DC)",
+                "Phone line (for monitoring)",
+                "Battery backup",
+                "Wireless signal"
+              ]
+            },
+            {
+              "category": "Monitoring",
+              "items": [
+                "24/7 monitoring service",
+                "Emergency response plan",
+                "User codes",
+                "Alarm logging"
+              ]
+            },
+            {
+              "category": "Maintenance",
+              "items": [
+                "Battery replacement",
+                "Sensor testing",
+                "Panel updates",
+                "Service contract"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
