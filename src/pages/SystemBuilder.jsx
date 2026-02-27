@@ -11,11 +11,10 @@ import {
   Camera,
   Lock,
   Shield,
-  Zap,
-  Tv,
   Plus,
   Trash2,
   ChevronRight,
+  Zap,
   DollarSign,
   Calendar,
   CheckCircle2,
@@ -37,8 +36,6 @@ const systemIcons = {
   cctv: Camera,
   access_control: Lock,
   security_systems: Shield,
-  structured_cabling: Zap,
-  av_conference: Tv,
 };
 
 export default function SystemBuilder() {
@@ -277,9 +274,9 @@ export default function SystemBuilder() {
   };
 
   // Step 1: System Selection
-    if (currentStep === 'systems') {
+  if (currentStep === 'systems') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6 overflow-y-auto">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-12">
             <h1 className="text-4xl font-bold text-slate-900 mb-2">System Builder</h1>
@@ -288,7 +285,7 @@ export default function SystemBuilder() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {systemDesigns.systems.map(sys => {
               const IconComponent = systemIcons[sys.id];
               return (
