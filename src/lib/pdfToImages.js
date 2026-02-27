@@ -9,12 +9,16 @@ let pdfjsModule = null;
 async function getPdfJs() {
   if (pdfjsModule) return pdfjsModule;
   try {
-    pdfjsModule = await import('pdfjs-dist/build/pdf.mjs');
+    pdfjsModule = await import('pdfjs-dist');
   } catch (e1) {
     try {
-      pdfjsModule = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      pdfjsModule = await import('pdfjs-dist/build/pdf.mjs');
     } catch (e2) {
-      throw new Error('pdfjs-dist could not be loaded. Run: npm install pdfjs-dist');
+      try {
+        pdfjsModule = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      } catch (e3) {
+        throw new Error('pdfjs-dist could not be loaded. Run: npm install pdfjs-dist');
+      }
     }
   }
   pdfjsModule = pdfjsModule?.default || pdfjsModule;

@@ -3,7 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 // SAFEGUARD: Dashboard is always the improved version. Do not remove — Base44 auto-gen often overwrites pages.config and breaks the Dashboard route.
 import DashboardPage from './pages/Dashboard.ImprovedVersion';
@@ -15,11 +15,31 @@ import './styles/mobile-optimization.css';
 import './styles/design-system.css';
 import ErrorBoundary from '@/components/feedback/ErrorBoundary';
 
+/** When static host serves 404.html we redirect to app root and store URL here; restore the intended path. */
+function SPARedirectHandler() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    try {
+      const url = sessionStorage.getItem('spaRedirect');
+      if (!url) return;
+      sessionStorage.removeItem('spaRedirect');
+      const u = new URL(url);
+      const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || '';
+      const path = base && u.pathname.startsWith(base)
+        ? u.pathname.slice(base.length) || '/'
+        : u.pathname || '/';
+      navigate(path + u.search + u.hash, { replace: true });
+    } catch (_) {}
+  }, [navigate]);
+  return null;
+}
+
 /** All routes go through the app (auth + app shell). No separate public website. */
 function RouteGate() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
+        <SPARedirectHandler />
         <NavigationTracker />
         <Routes>
           <Route path="*" element={<AuthenticatedApp />} />
