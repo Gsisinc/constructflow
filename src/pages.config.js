@@ -80,12 +80,6 @@ import EstimateGenerator from './pages/EstimateGenerator';
 import Estimates from './pages/Estimates';
 import FeatureTesting from './pages/FeatureTesting';
 import FieldHoursApproval from './pages/FieldHoursApproval';
-import GSISAboutPage from './pages/GSISAboutPage';
-import GSISContactPage from './pages/GSISContactPage';
-import GSISHomePage from './pages/GSISHomePage';
-import GSISProjectsPage from './pages/GSISProjectsPage';
-import GSISServiceDetailPage from './pages/GSISServiceDetailPage';
-import GSISServicesPage from './pages/GSISServicesPage';
 import GSISWebsite from './pages/GSISWebsite';
 import Home from './pages/Home';
 import Implementation from './pages/Implementation';
@@ -179,12 +173,6 @@ export const PAGES = {
     "Estimates": Estimates,
     "FeatureTesting": FeatureTesting,
     "FieldHoursApproval": FieldHoursApproval,
-    "GSISAboutPage": GSISAboutPage,
-    "GSISContactPage": GSISContactPage,
-    "GSISHomePage": GSISHomePage,
-    "GSISProjectsPage": GSISProjectsPage,
-    "GSISServiceDetailPage": GSISServiceDetailPage,
-    "GSISServicesPage": GSISServicesPage,
     "GSISWebsite": GSISWebsite,
     "Home": Home,
     "Implementation": Implementation,
