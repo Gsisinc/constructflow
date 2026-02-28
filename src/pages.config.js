@@ -80,7 +80,7 @@ import EstimateGenerator from './pages/EstimateGenerator';
 import Estimates from './pages/Estimates';
 import FeatureTesting from './pages/FeatureTesting';
 import FieldHoursApproval from './pages/FieldHoursApproval';
-import GSISWebsite from './pages/GSISWebsite';
+
 import Home from './pages/Home';
 import Implementation from './pages/Implementation';
 import Invoices from './pages/Invoices';
@@ -129,13 +129,7 @@ import TrainingMaterials from './pages/TrainingMaterials';
 import TrainingSchedule from './pages/TrainingSchedule';
 import UserApprovals from './pages/UserApprovals';
 import VehicleLogs from './pages/VehicleLogs';
-import GSISAboutPage from './pages/GSISAboutPage';
-import GSISContactPage from './pages/GSISContactPage';
-import GSISHomePage from './pages/GSISHomePage';
-import GSISProjectsPage from './pages/GSISProjectsPage';
-import GSISServiceDetailPage from './pages/GSISServiceDetailPage';
-import GSISServicesPage from './pages/GSISServicesPage';
-import Dashboard from './pages/Dashboard';
+
 import __Layout from './Layout.jsx';
 
 
@@ -173,7 +167,7 @@ export const PAGES = {
     "Estimates": Estimates,
     "FeatureTesting": FeatureTesting,
     "FieldHoursApproval": FieldHoursApproval,
-    "GSISWebsite": GSISWebsite,
+
     "Home": Home,
     "Implementation": Implementation,
     "Invoices": Invoices,
@@ -222,12 +216,7 @@ export const PAGES = {
     "TrainingSchedule": TrainingSchedule,
     "UserApprovals": UserApprovals,
     "VehicleLogs": VehicleLogs,
-    "GSISAboutPage": GSISAboutPage,
-    "GSISContactPage": GSISContactPage,
-    "GSISHomePage": GSISHomePage,
-    "GSISProjectsPage": GSISProjectsPage,
-    "GSISServiceDetailPage": GSISServiceDetailPage,
-    "GSISServicesPage": GSISServicesPage,
+
     "Dashboard": Dashboard,
 }
 
