@@ -29,14 +29,24 @@ export default function Directory() {
   
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', company: '', category: 'Employees' });
 
+  // Add visual indicator for selected category
+  const isAllSelected = selectedCategory === 'all';
+
   // Filter workers
   const filteredWorkers = workers.filter(w => {
+    const matchesCategory = selectedCategory === 'all' || w.category === selectedCategory;
+    
+    // If no search term, show all contacts in the selected category
+    if (!searchTerm.trim()) {
+      return matchesCategory;
+    }
+    
+    // If search term exists, filter by both category and search
     const matchesSearch = w.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       w.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       w.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       w.company?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesCategory = selectedCategory === 'all' || w.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -239,11 +249,13 @@ export default function Directory() {
           </CardHeader>
           <CardContent className="space-y-2">
             <div 
-              className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-2 rounded cursor-pointer hover:bg-slate-100"
+              className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-2 rounded cursor-pointer ${
+                isAllSelected ? 'bg-accent text-white' : 'hover:bg-slate-100'
+              }`}
               onClick={() => setSelectedCategory('all')}
             >
               <span className="text-sm font-medium">All Contacts</span>
-              <Badge variant="outline">{workers.length}</Badge>
+              <Badge variant={isAllSelected ? 'default' : 'outline'}>{workers.length}</Badge>
             </div>
             {categories.map(cat => (
               <div 
@@ -251,10 +263,12 @@ export default function Directory() {
                 className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-2 rounded hover:bg-slate-100 group"
               >
                 <div 
-                  className="flex-1 cursor-pointer"
+                  className={`flex-1 cursor-pointer p-2 rounded ${
+                    selectedCategory === cat.name ? 'bg-accent text-white' : ''
+                  }`}
                   onClick={() => setSelectedCategory(cat.name)}
                 >
-                  <span className="text-sm">{cat.name}</span>
+                  <span className="text-sm font-medium">{cat.name}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="text-xs">{getCategoryCount(cat.name)}</Badge>
