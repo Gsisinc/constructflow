@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, RotateCw, Plus, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCw, Plus, X, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -8,6 +8,7 @@ export default function BrowserProxy() {
   const [activeTabId, setActiveTabId] = useState(null);
   const [urlInput, setUrlInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const iframeRef = useRef(null);
 
   const addTab = () => {
@@ -19,6 +20,7 @@ export default function BrowserProxy() {
     setTabs([...tabs, newTab]);
     setActiveTabId(newTab.id);
     setUrlInput('');
+    setError(null);
   };
 
   const closeTab = (id) => {
@@ -39,6 +41,7 @@ export default function BrowserProxy() {
     }
 
     setLoading(true);
+    setError(null);
     
     // Update the active tab
     const updatedTabs = tabs.map(tab => {
@@ -53,7 +56,11 @@ export default function BrowserProxy() {
     });
     setTabs(updatedTabs);
     setUrlInput(fullUrl);
-    setLoading(false);
+    
+    // Simulate loading delay
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
   };
 
   const handleOpenClick = () => {
@@ -67,7 +74,6 @@ export default function BrowserProxy() {
   };
 
   const activeTab = tabs.find(tab => tab.id === activeTabId);
-  const proxyUrl = activeTab?.url ? `https://api.allorigins.win/get?url=${encodeURIComponent(activeTab.url)}` : '';
 
   return (
     <div className="w-full h-full bg-background text-foreground flex flex-col rounded-lg border border-border">
@@ -161,15 +167,30 @@ export default function BrowserProxy() {
       </div>
 
       {/* Browser Content */}
-      <div className="flex-1 overflow-hidden bg-background">
+      <div className="flex-1 overflow-hidden bg-background flex flex-col">
         {activeTab?.url ? (
-          <iframe
-            ref={iframeRef}
-            src={proxyUrl}
-            className="w-full h-full border-0"
-            title="Browser"
-            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-          />
+          <>
+            <div className="flex-1 overflow-auto bg-white">
+              <iframe
+                ref={iframeRef}
+                src={activeTab.url}
+                className="w-full h-full border-0"
+                title="Browser"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-popups-to-escape-sandbox allow-top-navigation"
+                style={{ minHeight: '100%' }}
+                onError={() => setError('Failed to load page')}
+              />
+            </div>
+            {error && (
+              <div className="bg-red-50 border-t border-red-200 p-3 flex items-center gap-2 text-sm text-red-700">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+            <div className="bg-slate-100 border-t border-slate-200 p-2 text-xs text-slate-600">
+              <p>Note: Some websites may have CORS restrictions and may not load in this embedded browser. Try: sam.gov, google.com, or other public sites.</p>
+            </div>
+          </>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground">
             <div className="text-center">

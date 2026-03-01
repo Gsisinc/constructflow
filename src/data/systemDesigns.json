@@ -10,7 +10,7 @@
           "id": "small",
           "name": "Small (Up to 5,000 sq ft)",
           "description": "Ideal for small offices and retail spaces",
-          "costRange": "$5,000 - $8,000",
+          "costRange": "$10,000 - $13,000",
           "timeline": "2-3 weeks",
           "applications": ["Small offices", "Retail stores", "Restaurants", "Medical offices"],
           "materials": [
@@ -163,7 +163,7 @@
           "id": "medium",
           "name": "Medium (5,000 - 25,000 sq ft)",
           "description": "Perfect for mid-size commercial buildings",
-          "costRange": "$12,000 - $18,000",
+          "costRange": "$18,000 - $25,000",
           "timeline": "4-5 weeks",
           "applications": ["Office buildings", "Shopping centers", "Hotels", "Warehouses"],
           "materials": [
@@ -1749,7 +1749,7 @@
           "id": "small",
           "name": "Small (1-2 Rooms)",
           "description": "Basic meeting room AV",
-          "costRange": "$5,000 - $8,000",
+          "costRange": "$10,000 - $13,000",
           "timeline": "2-3 weeks",
           "applications": ["Small offices", "Clinics", "Training rooms", "Boardrooms"],
           "materials": [
@@ -2365,7 +2365,7 @@
           "id": "large",
           "name": "Large (25,000+ sq ft)",
           "description": "Enterprise security system",
-          "costRange": "$25,000 - $60,000+",
+          "costRange": "$35,000 - $50,000",
           "timeline": "6-10 weeks",
           "applications": ["Large office complexes", "Hospitals", "Universities", "Industrial parks"],
           "materials": [
