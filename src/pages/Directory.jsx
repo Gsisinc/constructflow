@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Search, UserPlus, Users, Building2, Star, Trash2, Plus, X } from 'lucide-react';
+import { Search, UserPlus, Users, Star, Trash2, Plus, X } from 'lucide-react';
 
 export default function Directory() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,64 +14,20 @@ export default function Directory() {
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [newCategoryName, setNewCategoryName] = useState('');
+  
+  // Local state for categories and workers
+  const [categories, setCategories] = useState([
+    { id: 1, name: 'Employees' },
+    { id: 2, name: 'Contractors' },
+    { id: 3, name: 'Suppliers' }
+  ]);
+  
+  const [workers, setWorkers] = useState([
+    { id: 1, name: 'John Smith', email: 'john@example.com', phone: '(555) 123-4567', company: 'GSIS', category: 'Employees' },
+    { id: 2, name: 'Jane Doe', email: 'jane@example.com', phone: '(555) 234-5678', company: 'Tech Solutions', category: 'Contractors' }
+  ]);
+  
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', company: '', category: 'Employees' });
-  const queryClient = useQueryClient();
-
-  // Fetch workers
-  const { data: workers = [] } = useQuery({
-    queryKey: ['workers'],
-    queryFn: () => base44.entities.Worker.list('-created_date')
-  });
-
-  // Fetch categories
-  const { data: categories = [] } = useQuery({
-    queryKey: ['contactCategories'],
-    queryFn: async () => {
-      try {
-        const result = await base44.entities.ContactCategory.list();
-        return result || [];
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        return [];
-      }
-    }
-  });
-
-  // Create worker mutation
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Worker.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
-      setShowAddDialog(false);
-      setFormData({ name: '', email: '', phone: '', company: '', category: 'Employees' });
-    }
-  });
-
-  // Delete worker mutation
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Worker.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workers'] });
-    }
-  });
-
-  // Create category mutation
-  const createCategoryMutation = useMutation({
-    mutationFn: (name) => base44.entities.ContactCategory.create({ name }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contactCategories'] });
-      setNewCategoryName('');
-      setShowCategoryDialog(false);
-    }
-  });
-
-  // Delete category mutation
-  const deleteCategoryMutation = useMutation({
-    mutationFn: (id) => base44.entities.ContactCategory.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contactCategories'] });
-    }
-  });
 
   // Filter workers
   const filteredWorkers = workers.filter(w => {
@@ -97,21 +51,22 @@ export default function Directory() {
       alert('Please fill in name and email');
       return;
     }
-    try {
-      await createMutation.mutateAsync(formData);
-    } catch (error) {
-      alert(error?.message || 'Failed to add contact');
-    }
+    
+    const newWorker = {
+      id: Date.now(),
+      ...formData
+    };
+    
+    setWorkers([...workers, newWorker]);
+    setShowAddDialog(false);
+    setFormData({ name: '', email: '', phone: '', company: '', category: 'Employees' });
+    alert('Contact added successfully!');
   };
 
   const handleDeleteContact = async (worker) => {
     if (!window.confirm(`Delete contact ${worker.name || 'this contact'}?`)) return;
-    try {
-      await deleteMutation.mutateAsync(worker.id);
-    } catch (error) {
-      console.error(error);
-      alert(error?.message || 'Failed to delete contact');
-    }
+    setWorkers(workers.filter(w => w.id !== worker.id));
+    alert('Contact deleted successfully!');
   };
 
   const handleAddCategory = async (e) => {
@@ -120,20 +75,37 @@ export default function Directory() {
       alert('Please enter a category name');
       return;
     }
-    try {
-      await createCategoryMutation.mutateAsync(newCategoryName);
-    } catch (error) {
-      alert(error?.message || 'Failed to add category');
+    
+    // Check if category already exists
+    if (categories.some(c => c.name.toLowerCase() === newCategoryName.toLowerCase())) {
+      alert('This category already exists');
+      return;
     }
+    
+    const newCategory = {
+      id: Date.now(),
+      name: newCategoryName
+    };
+    
+    setCategories([...categories, newCategory]);
+    setNewCategoryName('');
+    setShowCategoryDialog(false);
+    alert('Category created successfully!');
   };
 
   const handleDeleteCategory = async (categoryId) => {
-    if (!window.confirm('Delete this category?')) return;
-    try {
-      await deleteCategoryMutation.mutateAsync(categoryId);
-    } catch (error) {
-      alert(error?.message || 'Failed to delete category');
+    const category = categories.find(c => c.id === categoryId);
+    if (!window.confirm(`Delete category "${category.name}"?`)) return;
+    
+    // Check if category has workers
+    const hasWorkers = workers.some(w => w.category === category.name);
+    if (hasWorkers) {
+      alert('Cannot delete category with assigned contacts. Please reassign contacts first.');
+      return;
     }
+    
+    setCategories(categories.filter(c => c.id !== categoryId));
+    alert('Category deleted successfully!');
   };
 
   return (
@@ -204,8 +176,8 @@ export default function Directory() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" className="w-full sm:w-auto" disabled={createMutation.isPending}>
-                {createMutation.isPending ? 'Adding...' : 'Add Contact'}
+              <Button type="submit" className="w-full sm:w-auto">
+                Add Contact
               </Button>
             </form>
           </DialogContent>
@@ -258,8 +230,8 @@ export default function Directory() {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full sm:w-auto" disabled={createCategoryMutation.isPending}>
-                    {createCategoryMutation.isPending ? 'Creating...' : 'Create Category'}
+                  <Button type="submit" className="w-full sm:w-auto">
+                    Create Category
                   </Button>
                 </form>
               </DialogContent>
@@ -340,7 +312,6 @@ export default function Directory() {
                       <p className="text-xs text-slate-500">{worker.category}</p>
                     </div>
                     <div className="flex items-center gap-1">
-                      {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />}
                       <Button size="icon" variant="ghost" className="h-7 w-7 text-red-600" onClick={() => handleDeleteContact(worker)}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
@@ -348,62 +319,53 @@ export default function Directory() {
                   </div>
                   <div className="text-xs text-slate-600 flex gap-2">
                     <span className="flex-1 truncate">{worker.phone || '-'}</span>
-                    <Badge variant="outline" className="text-xs flex-shrink-0">{worker.company ? 'Contractor' : 'Employee'}</Badge>
+                    <span className="flex-1 truncate">{worker.email}</span>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="py-8 text-center text-slate-400">No contacts found</div>
+              <div className="text-center py-8 text-slate-400">
+                <p>No contacts found</p>
+              </div>
             )}
           </div>
 
           {/* Desktop View */}
           <div className="hidden sm:block overflow-x-auto">
-            <table className="w-full sm:w-auto">
-              <thead className="bg-amber-50 border-b border-amber-100">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Company</th>
-                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Name</th>
-                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Phone</th>
-                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Category</th>
-                  <th className="text-center py-2.5 px-3 text-xs font-medium text-slate-600">Actions</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-700">Name</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-700">Email</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-700">Phone</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-700">Company</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-700">Category</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-700">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredWorkers.length > 0 ? (
                   filteredWorkers.map((worker) => (
-                    <tr key={worker.id} className="border-b border-amber-100 hover:bg-amber-50">
-                      <td className="py-2.5 px-3">
-                        <div className="flex items-center gap-1.5">
-                          {worker.company && <Building2 className="h-3 w-3 text-slate-400" />}
-                          <span className="font-medium text-xs">{worker.company || '-'}</span>
-                        </div>
+                    <tr key={worker.id} className="border-b border-slate-200 hover:bg-slate-50">
+                      <td className="px-4 py-3">{worker.name}</td>
+                      <td className="px-4 py-3">{worker.email}</td>
+                      <td className="px-4 py-3">{worker.phone || '-'}</td>
+                      <td className="px-4 py-3">{worker.company || '-'}</td>
+                      <td className="px-4 py-3">
+                        <Badge variant="secondary">{worker.category}</Badge>
                       </td>
-                      <td className="py-2.5 px-3">
-                        <div className="flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-full bg-amber-200 flex items-center justify-center text-xs font-medium">
-                            {worker.name?.[0]}
-                          </div>
-                          <span className="text-xs">{worker.name}</span>
-                        </div>
-                      </td>
-                      <td className="py-2.5 px-3 text-xs text-slate-600">{worker.phone || '-'}</td>
-                      <td className="py-2.5 px-3">
-                        <Badge variant="outline" className="text-xs">{worker.category || 'Uncategorized'}</Badge>
-                      </td>
-                      <td className="py-2.5 px-3 text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500" />}
-                          <Button size="icon" variant="ghost" className="h-7 w-7 text-red-600" onClick={() => handleDeleteContact(worker)}>
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
+                      <td className="px-4 py-3">
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600" onClick={() => handleDeleteContact(worker)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="py-8 text-center text-slate-400">No contacts found</td>
+                    <td colSpan="6" className="px-4 py-8 text-center text-slate-400">
+                      No contacts found
+                    </td>
                   </tr>
                 )}
               </tbody>
