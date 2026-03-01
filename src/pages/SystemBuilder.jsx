@@ -369,7 +369,7 @@ export default function SystemBuilder() {
                   <div className="grid grid-cols-2 gap-3 pt-3 border-t">
                     <div>
                       <p className="text-xs text-slate-600">Cost Range</p>
-                      <p className="font-bold text-accent">{size.estimatedCost}</p>
+                      <p className="font-bold text-accent">{size.costRange}</p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-600">Timeline</p>
@@ -629,7 +629,7 @@ export default function SystemBuilder() {
                       </div>
                       <div className="bg-white rounded-lg p-3 text-sm text-slate-600">
                         <p className="font-medium mb-1">Estimated Project Cost:</p>
-                        <p className="text-lg font-bold text-slate-900">{size.estimatedCost}</p>
+                        <p className="text-lg font-bold text-slate-900">{size.costRange}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -750,7 +750,7 @@ export default function SystemBuilder() {
                     <p className="text-3xl font-bold text-green-600">
                       ${totalMaterialCost.toFixed(2)}
                     </p>
-                    <p className="text-sm text-slate-600 mt-2">{size.estimatedCost}</p>
+                    <p className="text-sm text-slate-600 mt-2">{size.costRange}</p>
                   </CardContent>
                 </Card>
 
