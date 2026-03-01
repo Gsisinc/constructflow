@@ -10,6 +10,9 @@
           "id": "small",
           "name": "Small (Up to 5,000 sq ft)",
           "description": "Ideal for small offices and retail spaces",
+          "costRange": "$5,000 - $8,000",
+          "timeline": "2-3 weeks",
+          "applications": ["Small offices", "Retail stores", "Restaurants", "Medical offices"],
           "materials": [
             {
               "category": "Control Panel",
@@ -21,8 +24,7 @@
                   "unit": "EA",
                   "unitCost": 2500,
                   "manufacturer": "Notifier",
-                  "partNumber": "NFS2-3030",
-                  "notes": "Addressable control panel with battery backup"
+                  "partNumber": "NFS2-3030"
                 },
                 {
                   "part": "FA-PSU-24V",
@@ -31,8 +33,7 @@
                   "unit": "EA",
                   "unitCost": 800,
                   "manufacturer": "Notifier",
-                  "partNumber": "PSUP-24",
-                  "notes": "Includes battery charging circuit"
+                  "partNumber": "PSUP-24"
                 }
               ]
             },
@@ -46,8 +47,7 @@
                   "unit": "EA",
                   "unitCost": 150,
                   "manufacturer": "Notifier",
-                  "partNumber": "FSP-851",
-                  "notes": "Photoelectric smoke detection"
+                  "partNumber": "FSP-851"
                 },
                 {
                   "part": "FA-HEAT-ADDR",
@@ -56,8 +56,7 @@
                   "unit": "EA",
                   "unitCost": 120,
                   "manufacturer": "Notifier",
-                  "partNumber": "FST-851",
-                  "notes": "Fixed temperature heat detection"
+                  "partNumber": "FST-851"
                 }
               ]
             },
@@ -71,33 +70,21 @@
                   "unit": "EA",
                   "unitCost": 200,
                   "manufacturer": "Notifier",
-                  "partNumber": "CWSS-24-90",
-                  "notes": "24V, 90dB horn with strobe"
+                  "partNumber": "CWSS-24-90"
                 }
               ]
             },
             {
-              "category": "Wiring & Installation",
+              "category": "Installation Labor",
               "items": [
                 {
-                  "part": "FA-WIRE-18-2",
-                  "description": "18/2 Fire Alarm Wire (500 ft)",
-                  "quantity": 1,
-                  "unit": "SPOOL",
-                  "unitCost": 350,
-                  "manufacturer": "Belden",
-                  "partNumber": "FPLP",
-                  "notes": "UL listed fire alarm cable"
-                },
-                {
-                  "part": "FA-CONDUIT-1",
-                  "description": "1\" Conduit (100 ft)",
-                  "quantity": 1,
-                  "unit": "SPOOL",
-                  "unitCost": 200,
-                  "manufacturer": "Allied Tube",
-                  "partNumber": "EMT-1",
-                  "notes": "Electrical metallic tubing"
+                  "part": "FA-LABOR-INSTALL",
+                  "description": "Professional Installation (40 hours)",
+                  "quantity": 40,
+                  "unit": "HOURS",
+                  "unitCost": 85,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-FA"
                 }
               ]
             }
@@ -105,51 +92,69 @@
           "phases": [
             {
               "name": "Design & Planning",
-              "duration": 5,
-              "tasks": ["Site survey", "System design", "Code compliance review", "Approval"]
+              "duration": 3,
+              "tasks": [
+                "Site survey and assessment",
+                "System design and layout",
+                "Code compliance review",
+                "Customer approval"
+              ]
             },
             {
               "name": "Equipment Procurement",
-              "duration": 7,
-              "tasks": ["Order components", "Receive equipment", "Quality inspection"]
+              "duration": 5,
+              "tasks": [
+                "Order all components",
+                "Quality inspection",
+                "Staging and testing"
+              ]
             },
             {
               "name": "Installation",
-              "duration": 10,
-              "tasks": ["Wiring installation", "Device mounting", "Panel programming", "Testing"]
+              "duration": 7,
+              "tasks": [
+                "Panel installation",
+                "Device placement",
+                "Wiring and connections",
+                "System testing"
+              ]
             },
             {
-              "name": "Testing & Commissioning",
-              "duration": 3,
-              "tasks": ["System testing", "Final inspection", "Documentation"]
+              "name": "Commissioning & Training",
+              "duration": 2,
+              "tasks": [
+                "Final system testing",
+                "User training",
+                "Documentation handover"
+              ]
             }
           ],
           "requirements": [
             {
               "category": "Permits & Compliance",
               "items": [
+                "Local fire marshal approval",
                 "Building permit",
-                "Fire marshal approval",
-                "UL certification",
-                "ADA compliance"
+                "UL certification verification",
+                "ADA compliance check"
               ]
             },
             {
-              "category": "Safety",
+              "category": "Infrastructure",
               "items": [
-                "Backup power (battery)",
-                "Emergency signage",
-                "Manual pull stations",
-                "Evacuation plan"
+                "Electrical outlet near panel location",
+                "Backup battery space",
+                "Network connectivity (optional)",
+                "Central station monitoring setup"
               ]
             },
             {
-              "category": "Maintenance",
+              "category": "Documentation",
               "items": [
-                "Annual inspection",
-                "Battery replacement (every 3 years)",
-                "Detector cleaning",
-                "System documentation"
+                "System manual",
+                "As-built drawings",
+                "Maintenance schedule",
+                "Emergency contact list"
               ]
             }
           ]
@@ -158,6 +163,9 @@
           "id": "medium",
           "name": "Medium (5,000 - 25,000 sq ft)",
           "description": "Perfect for mid-size commercial buildings",
+          "costRange": "$12,000 - $18,000",
+          "timeline": "4-5 weeks",
+          "applications": ["Office buildings", "Shopping centers", "Hotels", "Warehouses"],
           "materials": [
             {
               "category": "Control Panel",
@@ -169,8 +177,16 @@
                   "unit": "EA",
                   "unitCost": 4500,
                   "manufacturer": "Notifier",
-                  "partNumber": "NFS2-3030",
-                  "notes": "Addressable control panel with networking"
+                  "partNumber": "NFS2-4030"
+                },
+                {
+                  "part": "FA-PSU-24V-DUAL",
+                  "description": "Dual 24V Power Supply Unit",
+                  "quantity": 2,
+                  "unit": "EA",
+                  "unitCost": 1200,
+                  "manufacturer": "Notifier",
+                  "partNumber": "PSUP-24-DUAL"
                 }
               ]
             },
@@ -180,22 +196,20 @@
                 {
                   "part": "FA-SMOKE-ADDR",
                   "description": "Addressable Smoke Detector",
-                  "quantity": 25,
+                  "quantity": 20,
                   "unit": "EA",
                   "unitCost": 150,
                   "manufacturer": "Notifier",
-                  "partNumber": "FSP-851",
-                  "notes": "Photoelectric smoke detection"
+                  "partNumber": "FSP-851"
                 },
                 {
                   "part": "FA-HEAT-ADDR",
                   "description": "Addressable Heat Detector",
-                  "quantity": 12,
+                  "quantity": 10,
                   "unit": "EA",
                   "unitCost": 120,
                   "manufacturer": "Notifier",
-                  "partNumber": "FST-851",
-                  "notes": "Fixed temperature heat detection"
+                  "partNumber": "FST-851"
                 }
               ]
             },
@@ -209,23 +223,21 @@
                   "unit": "EA",
                   "unitCost": 200,
                   "manufacturer": "Notifier",
-                  "partNumber": "CWSS-24-90",
-                  "notes": "24V, 90dB horn with strobe"
+                  "partNumber": "CWSS-24-90"
                 }
               ]
             },
             {
-              "category": "Wiring & Installation",
+              "category": "Installation Labor",
               "items": [
                 {
-                  "part": "FA-WIRE-18-2",
-                  "description": "18/2 Fire Alarm Wire (1000 ft)",
-                  "quantity": 2,
-                  "unit": "SPOOL",
-                  "unitCost": 350,
-                  "manufacturer": "Belden",
-                  "partNumber": "FPLP",
-                  "notes": "UL listed fire alarm cable"
+                  "part": "FA-LABOR-INSTALL",
+                  "description": "Professional Installation (80 hours)",
+                  "quantity": 80,
+                  "unit": "HOURS",
+                  "unitCost": 85,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-FA"
                 }
               ]
             }
@@ -233,54 +245,256 @@
           "phases": [
             {
               "name": "Design & Planning",
-              "duration": 7,
-              "tasks": ["Site survey", "System design", "Code compliance review", "Client approval"]
+              "duration": 5,
+              "tasks": [
+                "Comprehensive site survey",
+                "Multi-zone system design",
+                "Fire code compliance analysis",
+                "Stakeholder meetings"
+              ]
             },
             {
               "name": "Equipment Procurement",
+              "duration": 7,
+              "tasks": [
+                "Order all components",
+                "Factory testing",
+                "Staging and inventory"
+              ]
+            },
+            {
+              "name": "Installation Phase 1",
               "duration": 10,
-              "tasks": ["Order components", "Receive equipment", "Quality inspection"]
+              "tasks": [
+                "Panel installation",
+                "Main wiring runs",
+                "Device placement"
+              ]
             },
             {
-              "name": "Installation",
-              "duration": 15,
-              "tasks": ["Wiring installation", "Device mounting", "Panel programming", "Integration testing"]
+              "name": "Installation Phase 2 & Testing",
+              "duration": 8,
+              "tasks": [
+                "Final connections",
+                "System testing",
+                "Integration testing"
+              ]
             },
             {
-              "name": "Testing & Commissioning",
-              "duration": 5,
-              "tasks": ["System testing", "Final inspection", "Training", "Documentation"]
+              "name": "Commissioning & Training",
+              "duration": 3,
+              "tasks": [
+                "Final inspection",
+                "User training sessions",
+                "Documentation"
+              ]
             }
           ],
           "requirements": [
             {
               "category": "Permits & Compliance",
               "items": [
-                "Building permit",
                 "Fire marshal approval",
+                "Building permit",
                 "UL certification",
                 "ADA compliance",
-                "Occupancy classification"
+                "Occupancy classification review"
               ]
             },
             {
-              "category": "Safety",
+              "category": "Infrastructure",
               "items": [
-                "Backup power (battery)",
-                "Emergency signage",
-                "Manual pull stations",
-                "Evacuation plan",
-                "Staff training"
+                "Dedicated electrical circuit",
+                "Backup battery room",
+                "Network connectivity",
+                "Central station monitoring",
+                "Emergency voice system"
               ]
             },
             {
-              "category": "Maintenance",
+              "category": "Documentation",
               "items": [
-                "Annual inspection",
-                "Battery replacement (every 3 years)",
-                "Detector cleaning",
-                "System documentation",
-                "Service contract"
+                "Complete system manual",
+                "As-built drawings",
+                "Device inventory list",
+                "Maintenance schedule",
+                "Emergency procedures"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large",
+          "name": "Large (25,000+ sq ft)",
+          "description": "Enterprise-scale fire protection systems",
+          "costRange": "$25,000 - $50,000+",
+          "timeline": "8-12 weeks",
+          "applications": ["Large office complexes", "Hospitals", "Data centers", "Industrial facilities"],
+          "materials": [
+            {
+              "category": "Control Panel",
+              "items": [
+                {
+                  "part": "FA-CP-8000",
+                  "description": "8-Loop Fire Alarm Control Panel",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 8000,
+                  "manufacturer": "Notifier",
+                  "partNumber": "NFS2-8030"
+                },
+                {
+                  "part": "FA-PSU-24V-QUAD",
+                  "description": "Quad 24V Power Supply Unit",
+                  "quantity": 4,
+                  "unit": "EA",
+                  "unitCost": 1500,
+                  "manufacturer": "Notifier",
+                  "partNumber": "PSUP-24-QUAD"
+                }
+              ]
+            },
+            {
+              "category": "Detection Devices",
+              "items": [
+                {
+                  "part": "FA-SMOKE-ADDR",
+                  "description": "Addressable Smoke Detector",
+                  "quantity": 50,
+                  "unit": "EA",
+                  "unitCost": 150,
+                  "manufacturer": "Notifier",
+                  "partNumber": "FSP-851"
+                },
+                {
+                  "part": "FA-HEAT-ADDR",
+                  "description": "Addressable Heat Detector",
+                  "quantity": 25,
+                  "unit": "EA",
+                  "unitCost": 120,
+                  "manufacturer": "Notifier",
+                  "partNumber": "FST-851"
+                }
+              ]
+            },
+            {
+              "category": "Notification Devices",
+              "items": [
+                {
+                  "part": "FA-HORN-STROBE",
+                  "description": "Horn/Strobe Notification Device",
+                  "quantity": 40,
+                  "unit": "EA",
+                  "unitCost": 200,
+                  "manufacturer": "Notifier",
+                  "partNumber": "CWSS-24-90"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "FA-LABOR-INSTALL",
+                  "description": "Professional Installation (200 hours)",
+                  "quantity": 200,
+                  "unit": "HOURS",
+                  "unitCost": 95,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-FA"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 10,
+              "tasks": [
+                "Detailed site assessment",
+                "Multi-building system design",
+                "Fire code compliance review",
+                "Engineering drawings"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 14,
+              "tasks": [
+                "Order all components",
+                "Factory testing and QA",
+                "Staging and inventory management"
+              ]
+            },
+            {
+              "name": "Installation Phase 1",
+              "duration": 14,
+              "tasks": [
+                "Panel installation",
+                "Main distribution wiring",
+                "Device placement planning"
+              ]
+            },
+            {
+              "name": "Installation Phase 2",
+              "duration": 14,
+              "tasks": [
+                "Device installation",
+                "Zone wiring",
+                "Integration testing"
+              ]
+            },
+            {
+              "name": "Installation Phase 3 & Commissioning",
+              "duration": 10,
+              "tasks": [
+                "Final connections",
+                "Full system testing",
+                "Load testing"
+              ]
+            },
+            {
+              "name": "Training & Handover",
+              "duration": 5,
+              "tasks": [
+                "Comprehensive user training",
+                "Maintenance staff training",
+                "Documentation handover"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Permits & Compliance",
+              "items": [
+                "Fire marshal approval",
+                "Building permits",
+                "UL certification",
+                "ADA compliance",
+                "Occupancy classification",
+                "Insurance company approval"
+              ]
+            },
+            {
+              "category": "Infrastructure",
+              "items": [
+                "Dedicated electrical service",
+                "Large battery backup room",
+                "Network connectivity",
+                "Central station monitoring",
+                "Emergency voice system",
+                "Backup communication system"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "Complete system manual",
+                "As-built drawings",
+                "Device inventory database",
+                "Maintenance schedule",
+                "Emergency procedures",
+                "Training materials"
               ]
             }
           ]
@@ -296,20 +510,31 @@
         {
           "id": "small",
           "name": "Small (4-8 Cameras)",
-          "description": "Compact surveillance solution",
+          "description": "Ideal for small retail and offices",
+          "costRange": "$3,000 - $5,000",
+          "timeline": "1-2 weeks",
+          "applications": ["Retail stores", "Small offices", "Restaurants", "Clinics"],
           "materials": [
             {
               "category": "Recording Equipment",
               "items": [
                 {
-                  "part": "CCTV-NVR-8CH",
-                  "description": "8-Channel Network Video Recorder",
+                  "part": "CCTV-NVR-4CH",
+                  "description": "4-Channel Network Video Recorder",
                   "quantity": 1,
                   "unit": "EA",
-                  "unitCost": 1200,
+                  "unitCost": 800,
                   "manufacturer": "Hikvision",
-                  "partNumber": "DS-7608NI-K2",
-                  "notes": "4K capable, 2TB storage"
+                  "partNumber": "DS-7604NI-K1"
+                },
+                {
+                  "part": "CCTV-HDD-2TB",
+                  "description": "2TB Surveillance Hard Drive",
+                  "quantity": 2,
+                  "unit": "EA",
+                  "unitCost": 150,
+                  "manufacturer": "Seagate",
+                  "partNumber": "ST2000VE001"
                 }
               ]
             },
@@ -317,44 +542,164 @@
               "category": "Cameras",
               "items": [
                 {
-                  "part": "CCTV-IP-4MP",
-                  "description": "4MP IP Bullet Camera",
+                  "part": "CCTV-CAM-4MP",
+                  "description": "4MP IP Turret Camera",
                   "quantity": 6,
                   "unit": "EA",
-                  "unitCost": 350,
+                  "unitCost": 250,
                   "manufacturer": "Hikvision",
-                  "partNumber": "DS-2CD2143G0-I",
-                  "notes": "Fixed lens, PoE powered"
+                  "partNumber": "DS-2CD2143G0-I"
                 }
               ]
             },
             {
-              "category": "Networking",
+              "category": "Installation Labor",
               "items": [
                 {
-                  "part": "CCTV-POE-SWITCH",
-                  "description": "8-Port PoE Switch",
+                  "part": "CCTV-LABOR",
+                  "description": "Professional Installation (20 hours)",
+                  "quantity": 20,
+                  "unit": "HOURS",
+                  "unitCost": 75,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-CCTV"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Site Survey",
+              "duration": 1,
+              "tasks": [
+                "Camera placement assessment",
+                "Coverage area analysis",
+                "Lighting evaluation"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 3,
+              "tasks": [
+                "Order cameras and recorder",
+                "Quality inspection",
+                "Testing"
+              ]
+            },
+            {
+              "name": "Installation",
+              "duration": 5,
+              "tasks": [
+                "Camera mounting",
+                "Cabling",
+                "Recorder setup",
+                "System testing"
+              ]
+            },
+            {
+              "name": "Configuration & Training",
+              "duration": 2,
+              "tasks": [
+                "Network configuration",
+                "Remote access setup",
+                "User training"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Network",
+              "items": [
+                "Ethernet connectivity",
+                "PoE switch (optional)",
+                "Adequate bandwidth",
+                "Network security"
+              ]
+            },
+            {
+              "category": "Power",
+              "items": [
+                "Dedicated outlet for NVR",
+                "UPS backup recommended",
+                "Surge protection"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "System manual",
+                "Camera locations map",
+                "Access credentials",
+                "Maintenance schedule"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "medium",
+          "name": "Medium (16-32 Cameras)",
+          "description": "Mid-size commercial surveillance",
+          "costRange": "$8,000 - $15,000",
+          "timeline": "2-3 weeks",
+          "applications": ["Shopping centers", "Office buildings", "Warehouses", "Parking lots"],
+          "materials": [
+            {
+              "category": "Recording Equipment",
+              "items": [
+                {
+                  "part": "CCTV-NVR-16CH",
+                  "description": "16-Channel Network Video Recorder",
                   "quantity": 1,
                   "unit": "EA",
-                  "unitCost": 400,
-                  "manufacturer": "Netgear",
-                  "partNumber": "GS308EP",
-                  "notes": "Gigabit PoE+ switch"
+                  "unitCost": 2000,
+                  "manufacturer": "Hikvision",
+                  "partNumber": "DS-7616NI-K2"
+                },
+                {
+                  "part": "CCTV-HDD-4TB",
+                  "description": "4TB Surveillance Hard Drive",
+                  "quantity": 4,
+                  "unit": "EA",
+                  "unitCost": 250,
+                  "manufacturer": "Seagate",
+                  "partNumber": "ST4000VE001"
                 }
               ]
             },
             {
-              "category": "Cabling",
+              "category": "Cameras",
               "items": [
                 {
-                  "part": "CCTV-CAT6-500",
-                  "description": "Cat6 Ethernet Cable (500 ft)",
-                  "quantity": 1,
-                  "unit": "SPOOL",
-                  "unitCost": 150,
-                  "manufacturer": "Belden",
-                  "partNumber": "CAT6",
-                  "notes": "UTP, 1000 Mbps"
+                  "part": "CCTV-CAM-4MP",
+                  "description": "4MP IP Turret Camera",
+                  "quantity": 20,
+                  "unit": "EA",
+                  "unitCost": 250,
+                  "manufacturer": "Hikvision",
+                  "partNumber": "DS-2CD2143G0-I"
+                },
+                {
+                  "part": "CCTV-CAM-8MP",
+                  "description": "8MP IP Bullet Camera",
+                  "quantity": 8,
+                  "unit": "EA",
+                  "unitCost": 400,
+                  "manufacturer": "Hikvision",
+                  "partNumber": "DS-2CD2083G0-I"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "CCTV-LABOR",
+                  "description": "Professional Installation (50 hours)",
+                  "quantity": 50,
+                  "unit": "HOURS",
+                  "unitCost": 80,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-CCTV"
                 }
               ]
             }
@@ -363,71 +708,107 @@
             {
               "name": "Design & Planning",
               "duration": 3,
-              "tasks": ["Site survey", "Camera placement", "Network design"]
+              "tasks": [
+                "Multi-zone coverage analysis",
+                "Camera placement design",
+                "Network planning"
+              ]
             },
             {
               "name": "Equipment Procurement",
               "duration": 5,
-              "tasks": ["Order equipment", "Receive shipment", "Inspection"]
+              "tasks": [
+                "Order all equipment",
+                "Quality inspection",
+                "Testing and staging"
+              ]
             },
             {
-              "name": "Installation",
+              "name": "Installation Phase 1",
+              "duration": 7,
+              "tasks": [
+                "Camera mounting",
+                "Cabling runs",
+                "Power distribution"
+              ]
+            },
+            {
+              "name": "Installation Phase 2 & Testing",
               "duration": 5,
-              "tasks": ["Cable installation", "Camera mounting", "NVR setup", "Network configuration"]
+              "tasks": [
+                "Recorder setup",
+                "System integration",
+                "Testing and verification"
+              ]
             },
             {
-              "name": "Testing & Training",
-              "duration": 2,
-              "tasks": ["System testing", "Client training", "Documentation"]
+              "name": "Configuration & Training",
+              "duration": 3,
+              "tasks": [
+                "Network configuration",
+                "Remote access setup",
+                "User training"
+              ]
             }
           ],
           "requirements": [
             {
-              "category": "Technical",
+              "category": "Network",
               "items": [
-                "Network connectivity",
-                "PoE power supply",
-                "Adequate storage",
-                "Backup power"
+                "Dedicated network switch",
+                "PoE capability",
+                "Adequate bandwidth",
+                "Network security"
               ]
             },
             {
-              "category": "Legal",
+              "category": "Power",
               "items": [
-                "Privacy compliance",
-                "Recording notice",
-                "Data retention policy",
-                "Access controls"
+                "Dedicated electrical circuit",
+                "UPS backup system",
+                "Surge protection"
               ]
             },
             {
-              "category": "Maintenance",
+              "category": "Documentation",
               "items": [
-                "Regular backups",
-                "Firmware updates",
-                "Lens cleaning",
-                "Storage monitoring"
+                "System manual",
+                "Camera locations map",
+                "Network diagram",
+                "Access credentials",
+                "Maintenance schedule"
               ]
             }
           ]
         },
         {
           "id": "large",
-          "name": "Large (16+ Cameras)",
-          "description": "Enterprise surveillance solution",
+          "name": "Large (64+ Cameras)",
+          "description": "Enterprise surveillance systems",
+          "costRange": "$25,000 - $60,000+",
+          "timeline": "6-10 weeks",
+          "applications": ["Large complexes", "Hospitals", "Universities", "Industrial parks"],
           "materials": [
             {
               "category": "Recording Equipment",
               "items": [
                 {
-                  "part": "CCTV-NVR-32CH",
-                  "description": "32-Channel Network Video Recorder",
+                  "part": "CCTV-NVR-64CH",
+                  "description": "64-Channel Network Video Recorder",
                   "quantity": 1,
                   "unit": "EA",
-                  "unitCost": 3500,
+                  "unitCost": 6000,
                   "manufacturer": "Hikvision",
-                  "partNumber": "DS-7732NI-K4",
-                  "notes": "4K capable, 8TB storage, redundant"
+                  "partNumber": "DS-7664NI-K2"
+                },
+                {
+                  "part": "CCTV-HDD-8TB",
+                  "description": "8TB Surveillance Hard Drive",
+                  "quantity": 8,
+                  "unit": "EA",
+                  "unitCost": 400,
+                  "manufacturer": "Seagate",
+                  "partNumber": "ST8000VE001"
                 }
               ]
             },
@@ -435,44 +816,36 @@
               "category": "Cameras",
               "items": [
                 {
-                  "part": "CCTV-IP-8MP",
-                  "description": "8MP IP Turret Camera",
+                  "part": "CCTV-CAM-4MP",
+                  "description": "4MP IP Turret Camera",
+                  "quantity": 40,
+                  "unit": "EA",
+                  "unitCost": 250,
+                  "manufacturer": "Hikvision",
+                  "partNumber": "DS-2CD2143G0-I"
+                },
+                {
+                  "part": "CCTV-CAM-8MP",
+                  "description": "8MP IP Bullet Camera",
                   "quantity": 20,
                   "unit": "EA",
-                  "unitCost": 600,
-                  "manufacturer": "Hikvision",
-                  "partNumber": "DS-2CD2183G0-I",
-                  "notes": "Motorized lens, PoE powered"
-                }
-              ]
-            },
-            {
-              "category": "Networking",
-              "items": [
-                {
-                  "part": "CCTV-POE-SWITCH-48",
-                  "description": "48-Port PoE Switch",
-                  "quantity": 1,
-                  "unit": "EA",
-                  "unitCost": 1200,
-                  "manufacturer": "Netgear",
-                  "partNumber": "M4300-52G",
-                  "notes": "Managed Gigabit PoE+ switch"
-                }
-              ]
-            },
-            {
-              "category": "Cabling",
-              "items": [
-                {
-                  "part": "CCTV-CAT6A-1000",
-                  "description": "Cat6A Ethernet Cable (1000 ft)",
-                  "quantity": 1,
-                  "unit": "SPOOL",
                   "unitCost": 400,
-                  "manufacturer": "Belden",
-                  "partNumber": "CAT6A",
-                  "notes": "UTP, 10 Gbps capable"
+                  "manufacturer": "Hikvision",
+                  "partNumber": "DS-2CD2083G0-I"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "CCTV-LABOR",
+                  "description": "Professional Installation (150 hours)",
+                  "quantity": 150,
+                  "unit": "HOURS",
+                  "unitCost": 90,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-CCTV"
                 }
               ]
             }
@@ -481,53 +854,77 @@
             {
               "name": "Design & Planning",
               "duration": 7,
-              "tasks": ["Site survey", "Camera placement", "Network design", "Redundancy planning"]
+              "tasks": [
+                "Comprehensive site assessment",
+                "Multi-building coverage design",
+                "Network architecture planning"
+              ]
             },
             {
               "name": "Equipment Procurement",
               "duration": 10,
-              "tasks": ["Order equipment", "Receive shipment", "Quality inspection"]
+              "tasks": [
+                "Order all equipment",
+                "Factory testing",
+                "Staging and inventory"
+              ]
             },
             {
-              "name": "Installation",
-              "duration": 15,
-              "tasks": ["Cable installation", "Camera mounting", "NVR setup", "Network configuration", "Integration"]
+              "name": "Installation Phase 1",
+              "duration": 14,
+              "tasks": [
+                "Camera mounting",
+                "Main cabling runs",
+                "Power distribution"
+              ]
             },
             {
-              "name": "Testing & Training",
+              "name": "Installation Phase 2",
+              "duration": 10,
+              "tasks": [
+                "Recorder setup",
+                "System integration",
+                "Testing"
+              ]
+            },
+            {
+              "name": "Configuration & Training",
               "duration": 5,
-              "tasks": ["System testing", "Failover testing", "Client training", "Documentation"]
+              "tasks": [
+                "Network configuration",
+                "Remote access setup",
+                "User training"
+              ]
             }
           ],
           "requirements": [
             {
-              "category": "Technical",
+              "category": "Network",
               "items": [
-                "Network connectivity (10 Gbps)",
-                "PoE power supply (redundant)",
-                "Adequate storage (redundant)",
-                "Backup power (UPS)",
-                "Remote access capability"
+                "Enterprise network switch",
+                "PoE+ capability",
+                "High bandwidth",
+                "Network security",
+                "Redundancy"
               ]
             },
             {
-              "category": "Legal",
+              "category": "Power",
               "items": [
-                "Privacy compliance",
-                "Recording notice",
-                "Data retention policy",
-                "Access controls",
-                "Audit logging"
+                "Dedicated electrical service",
+                "UPS backup system",
+                "Surge protection",
+                "Generator backup"
               ]
             },
             {
-              "category": "Maintenance",
+              "category": "Documentation",
               "items": [
-                "Regular backups",
-                "Firmware updates",
-                "Lens cleaning",
-                "Storage monitoring",
-                "24/7 support contract"
+                "System manual",
+                "Camera locations map",
+                "Network diagram",
+                "Access credentials",
+                "Maintenance schedule"
               ]
             }
           ]
@@ -542,66 +939,74 @@
       "sizes": [
         {
           "id": "small",
-          "name": "Small (1-4 Doors)",
-          "description": "Single entrance solution",
+          "name": "Small (4-8 Doors)",
+          "description": "Ideal for small offices",
+          "costRange": "$4,000 - $7,000",
+          "timeline": "2-3 weeks",
+          "applications": ["Small offices", "Clinics", "Retail stores", "Restaurants"],
           "materials": [
             {
-              "category": "Control Equipment",
+              "category": "Access Control Panel",
               "items": [
                 {
-                  "part": "AC-CTRL-SINGLE",
-                  "description": "Single Door Access Controller",
+                  "part": "AC-PANEL-4",
+                  "description": "4-Door Access Control Panel",
                   "quantity": 1,
                   "unit": "EA",
-                  "unitCost": 800,
+                  "unitCost": 1500,
                   "manufacturer": "Salto",
-                  "partNumber": "XS2-CTRL",
-                  "notes": "Cloud-based access control"
+                  "partNumber": "XS2-C"
                 }
               ]
             },
             {
-              "category": "Locks",
+              "category": "Door Hardware",
               "items": [
                 {
-                  "part": "AC-LOCK-ELECTRIC",
-                  "description": "Electric Strike Lock",
-                  "quantity": 2,
+                  "part": "AC-LOCK-MAGNET",
+                  "description": "Electromagnetic Door Lock",
+                  "quantity": 6,
                   "unit": "EA",
-                  "unitCost": 400,
+                  "unitCost": 300,
                   "manufacturer": "Salto",
-                  "partNumber": "XS4-LOCK",
-                  "notes": "Fail-safe magnetic lock"
+                  "partNumber": "EM-1200"
                 }
               ]
             },
             {
-              "category": "Credentials",
-              "items": [
-                {
-                  "part": "AC-CARD-MIFARE",
-                  "description": "MIFARE Classic Card (100 pack)",
-                  "quantity": 1,
-                  "unit": "PACK",
-                  "unitCost": 150,
-                  "manufacturer": "NXP",
-                  "partNumber": "MIFARE-100",
-                  "notes": "13.56 MHz RFID cards"
-                }
-              ]
-            },
-            {
-              "category": "Readers",
+              "category": "Readers & Credentials",
               "items": [
                 {
                   "part": "AC-READER-RFID",
                   "description": "RFID Card Reader",
-                  "quantity": 2,
+                  "quantity": 6,
                   "unit": "EA",
-                  "unitCost": 250,
+                  "unitCost": 200,
                   "manufacturer": "Salto",
-                  "partNumber": "XS-READER",
-                  "notes": "Wiegand output, weatherproof"
+                  "partNumber": "RFID-R1"
+                },
+                {
+                  "part": "AC-CARD-RFID",
+                  "description": "RFID Access Card",
+                  "quantity": 50,
+                  "unit": "EA",
+                  "unitCost": 15,
+                  "manufacturer": "Salto",
+                  "partNumber": "CARD-RFID"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "AC-LABOR",
+                  "description": "Professional Installation (25 hours)",
+                  "quantity": 25,
+                  "unit": "HOURS",
+                  "unitCost": 80,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-AC"
                 }
               ]
             }
@@ -610,50 +1015,367 @@
             {
               "name": "Design & Planning",
               "duration": 2,
-              "tasks": ["Access requirements", "System design"]
+              "tasks": [
+                "Access requirements analysis",
+                "Door identification",
+                "System design"
+              ]
             },
             {
               "name": "Equipment Procurement",
               "duration": 3,
-              "tasks": ["Order equipment", "Receive shipment"]
+              "tasks": [
+                "Order equipment",
+                "Quality inspection",
+                "Testing"
+              ]
             },
             {
               "name": "Installation",
-              "duration": 3,
-              "tasks": ["Lock installation", "Reader mounting", "Controller setup", "Credential enrollment"]
+              "duration": 5,
+              "tasks": [
+                "Panel installation",
+                "Lock installation",
+                "Reader installation",
+                "Wiring"
+              ]
             },
             {
-              "name": "Testing & Training",
-              "duration": 1,
-              "tasks": ["System testing", "User training"]
+              "name": "Configuration & Training",
+              "duration": 2,
+              "tasks": [
+                "System programming",
+                "User enrollment",
+                "Training"
+              ]
             }
           ],
           "requirements": [
             {
-              "category": "Technical",
+              "category": "Power",
               "items": [
-                "Power supply (24V DC)",
+                "Dedicated outlet for panel",
+                "UPS backup recommended",
+                "Surge protection"
+              ]
+            },
+            {
+              "category": "Network",
+              "items": [
                 "Network connectivity",
-                "Cloud account",
-                "Backup power"
+                "Internet connection",
+                "Network security"
               ]
             },
             {
-              "category": "Safety",
+              "category": "Documentation",
               "items": [
-                "Emergency override",
-                "Audit logging",
-                "Visitor management",
-                "Alarm integration"
+                "System manual",
+                "Door assignment map",
+                "User credentials list",
+                "Maintenance schedule"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "medium",
+          "name": "Medium (16-32 Doors)",
+          "description": "Mid-size commercial access control",
+          "costRange": "$12,000 - $20,000",
+          "timeline": "3-4 weeks",
+          "applications": ["Office buildings", "Shopping centers", "Hotels", "Warehouses"],
+          "materials": [
+            {
+              "category": "Access Control Panel",
+              "items": [
+                {
+                  "part": "AC-PANEL-16",
+                  "description": "16-Door Access Control Panel",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 3500,
+                  "manufacturer": "Salto",
+                  "partNumber": "XS2-D"
+                }
               ]
             },
             {
-              "category": "Maintenance",
+              "category": "Door Hardware",
               "items": [
-                "Battery replacement",
-                "Credential updates",
-                "Lock lubrication",
-                "System backups"
+                {
+                  "part": "AC-LOCK-MAGNET",
+                  "description": "Electromagnetic Door Lock",
+                  "quantity": 20,
+                  "unit": "EA",
+                  "unitCost": 300,
+                  "manufacturer": "Salto",
+                  "partNumber": "EM-1200"
+                }
+              ]
+            },
+            {
+              "category": "Readers & Credentials",
+              "items": [
+                {
+                  "part": "AC-READER-RFID",
+                  "description": "RFID Card Reader",
+                  "quantity": 20,
+                  "unit": "EA",
+                  "unitCost": 200,
+                  "manufacturer": "Salto",
+                  "partNumber": "RFID-R1"
+                },
+                {
+                  "part": "AC-CARD-RFID",
+                  "description": "RFID Access Card",
+                  "quantity": 150,
+                  "unit": "EA",
+                  "unitCost": 15,
+                  "manufacturer": "Salto",
+                  "partNumber": "CARD-RFID"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "AC-LABOR",
+                  "description": "Professional Installation (60 hours)",
+                  "quantity": 60,
+                  "unit": "HOURS",
+                  "unitCost": 85,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-AC"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 3,
+              "tasks": [
+                "Access requirements analysis",
+                "Multi-zone design",
+                "System architecture"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 5,
+              "tasks": [
+                "Order equipment",
+                "Quality inspection",
+                "Testing and staging"
+              ]
+            },
+            {
+              "name": "Installation Phase 1",
+              "duration": 7,
+              "tasks": [
+                "Panel installation",
+                "Lock installation",
+                "Reader installation"
+              ]
+            },
+            {
+              "name": "Installation Phase 2 & Testing",
+              "duration": 5,
+              "tasks": [
+                "Wiring completion",
+                "System testing",
+                "Integration testing"
+              ]
+            },
+            {
+              "name": "Configuration & Training",
+              "duration": 3,
+              "tasks": [
+                "System programming",
+                "User enrollment",
+                "Training"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Power",
+              "items": [
+                "Dedicated electrical circuit",
+                "UPS backup system",
+                "Surge protection"
+              ]
+            },
+            {
+              "category": "Network",
+              "items": [
+                "Network connectivity",
+                "Internet connection",
+                "Network security",
+                "Redundancy"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "System manual",
+                "Door assignment map",
+                "User credentials database",
+                "Maintenance schedule"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large",
+          "name": "Large (64+ Doors)",
+          "description": "Enterprise access control systems",
+          "costRange": "$30,000 - $80,000+",
+          "timeline": "6-10 weeks",
+          "applications": ["Large office complexes", "Hospitals", "Universities", "Industrial parks"],
+          "materials": [
+            {
+              "category": "Access Control Panel",
+              "items": [
+                {
+                  "part": "AC-PANEL-64",
+                  "description": "64-Door Access Control Panel",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 8000,
+                  "manufacturer": "Salto",
+                  "partNumber": "XS2-E"
+                }
+              ]
+            },
+            {
+              "category": "Door Hardware",
+              "items": [
+                {
+                  "part": "AC-LOCK-MAGNET",
+                  "description": "Electromagnetic Door Lock",
+                  "quantity": 60,
+                  "unit": "EA",
+                  "unitCost": 300,
+                  "manufacturer": "Salto",
+                  "partNumber": "EM-1200"
+                }
+              ]
+            },
+            {
+              "category": "Readers & Credentials",
+              "items": [
+                {
+                  "part": "AC-READER-RFID",
+                  "description": "RFID Card Reader",
+                  "quantity": 60,
+                  "unit": "EA",
+                  "unitCost": 200,
+                  "manufacturer": "Salto",
+                  "partNumber": "RFID-R1"
+                },
+                {
+                  "part": "AC-CARD-RFID",
+                  "description": "RFID Access Card",
+                  "quantity": 500,
+                  "unit": "EA",
+                  "unitCost": 15,
+                  "manufacturer": "Salto",
+                  "partNumber": "CARD-RFID"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "AC-LABOR",
+                  "description": "Professional Installation (180 hours)",
+                  "quantity": 180,
+                  "unit": "HOURS",
+                  "unitCost": 95,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-AC"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 7,
+              "tasks": [
+                "Comprehensive access analysis",
+                "Multi-building design",
+                "System architecture"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 10,
+              "tasks": [
+                "Order equipment",
+                "Factory testing",
+                "Staging and inventory"
+              ]
+            },
+            {
+              "name": "Installation Phase 1",
+              "duration": 14,
+              "tasks": [
+                "Panel installation",
+                "Lock installation",
+                "Reader installation"
+              ]
+            },
+            {
+              "name": "Installation Phase 2",
+              "duration": 10,
+              "tasks": [
+                "Wiring completion",
+                "System integration",
+                "Testing"
+              ]
+            },
+            {
+              "name": "Configuration & Training",
+              "duration": 5,
+              "tasks": [
+                "System programming",
+                "User enrollment",
+                "Training"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Power",
+              "items": [
+                "Dedicated electrical service",
+                "UPS backup system",
+                "Surge protection",
+                "Generator backup"
+              ]
+            },
+            {
+              "category": "Network",
+              "items": [
+                "Enterprise network",
+                "Internet connection",
+                "Network security",
+                "Redundancy",
+                "Backup connectivity"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "System manual",
+                "Door assignment map",
+                "User credentials database",
+                "Maintenance schedule"
               ]
             }
           ]
@@ -664,55 +1386,55 @@
       "id": "structured_cabling",
       "name": "Structured Cabling",
       "description": "Network infrastructure and data cabling",
-      "color": "from-purple-500 to-purple-600",
+      "color": "from-yellow-500 to-yellow-600",
       "sizes": [
         {
           "id": "small",
-          "name": "Small (Up to 10,000 sq ft)",
+          "name": "Small (Up to 5,000 sq ft)",
           "description": "Small office network infrastructure",
+          "costRange": "$3,000 - $5,000",
+          "timeline": "2-3 weeks",
+          "applications": ["Small offices", "Clinics", "Retail stores", "Restaurants"],
           "materials": [
             {
               "category": "Cabling",
               "items": [
                 {
-                  "part": "SC-CAT6A-1000",
-                  "description": "Cat6A Ethernet Cable (1000 ft)",
-                  "quantity": 2,
+                  "part": "SC-CAT6-1000",
+                  "description": "Cat6 Cabling (1000 ft)",
+                  "quantity": 1,
                   "unit": "SPOOL",
                   "unitCost": 400,
                   "manufacturer": "Belden",
-                  "partNumber": "CAT6A",
-                  "notes": "10 Gbps capable"
+                  "partNumber": "CAT6-1000"
                 }
               ]
             },
             {
-              "category": "Patch Panels",
+              "category": "Patch Panel & Termination",
               "items": [
                 {
-                  "part": "SC-PATCH-48",
-                  "description": "48-Port Patch Panel",
+                  "part": "SC-PATCH-24",
+                  "description": "24-Port Patch Panel",
                   "quantity": 1,
                   "unit": "EA",
                   "unitCost": 300,
-                  "manufacturer": "Panduit",
-                  "partNumber": "PATCH-48",
-                  "notes": "Cat6A rated"
+                  "manufacturer": "Leviton",
+                  "partNumber": "PP24-1"
                 }
               ]
             },
             {
-              "category": "Conduit & Racks",
+              "category": "Installation Labor",
               "items": [
                 {
-                  "part": "SC-RACK-42U",
-                  "description": "42U Network Rack",
-                  "quantity": 1,
-                  "unit": "EA",
-                  "unitCost": 800,
-                  "manufacturer": "APC",
-                  "partNumber": "AR3100",
-                  "notes": "19\" standard rack"
+                  "part": "SC-LABOR",
+                  "description": "Professional Installation (30 hours)",
+                  "quantity": 30,
+                  "unit": "HOURS",
+                  "unitCost": 75,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-SC"
                 }
               ]
             }
@@ -720,51 +1442,297 @@
           "phases": [
             {
               "name": "Design & Planning",
-              "duration": 5,
-              "tasks": ["Site survey", "Cable routing", "Capacity planning"]
+              "duration": 2,
+              "tasks": [
+                "Network requirements analysis",
+                "Cable routing planning",
+                "Equipment selection"
+              ]
             },
             {
               "name": "Equipment Procurement",
-              "duration": 7,
-              "tasks": ["Order equipment", "Receive shipment", "Inspection"]
+              "duration": 3,
+              "tasks": [
+                "Order cabling and equipment",
+                "Quality inspection",
+                "Testing"
+              ]
             },
             {
               "name": "Installation",
-              "duration": 10,
-              "tasks": ["Conduit installation", "Cable pulling", "Termination", "Testing"]
+              "duration": 5,
+              "tasks": [
+                "Cable routing",
+                "Conduit installation",
+                "Cable termination",
+                "Testing"
+              ]
             },
             {
-              "name": "Certification & Documentation",
-              "duration": 3,
-              "tasks": ["Cable certification", "Documentation", "Handover"]
+              "name": "Documentation & Handover",
+              "duration": 2,
+              "tasks": [
+                "As-built documentation",
+                "Cable labeling",
+                "Handover"
+              ]
             }
           ],
           "requirements": [
             {
-              "category": "Technical",
+              "category": "Infrastructure",
               "items": [
-                "Proper grounding",
-                "Fire rating compliance",
-                "Future expansion capacity",
-                "Proper ventilation"
+                "Adequate conduit space",
+                "Patch panel location",
+                "Equipment room",
+                "Power availability"
               ]
             },
             {
-              "category": "Standards",
+              "category": "Documentation",
               "items": [
-                "TIA/EIA-568B compliance",
-                "UL certification",
-                "Building codes",
-                "Safety standards"
+                "Cable routing map",
+                "Termination documentation",
+                "Testing results",
+                "Maintenance schedule"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "medium",
+          "name": "Medium (5,000 - 25,000 sq ft)",
+          "description": "Mid-size commercial network infrastructure",
+          "costRange": "$8,000 - $15,000",
+          "timeline": "3-4 weeks",
+          "applications": ["Office buildings", "Shopping centers", "Hotels", "Warehouses"],
+          "materials": [
+            {
+              "category": "Cabling",
+              "items": [
+                {
+                  "part": "SC-CAT6-3000",
+                  "description": "Cat6 Cabling (3000 ft)",
+                  "quantity": 1,
+                  "unit": "SPOOL",
+                  "unitCost": 1000,
+                  "manufacturer": "Belden",
+                  "partNumber": "CAT6-3000"
+                }
               ]
             },
             {
-              "category": "Maintenance",
+              "category": "Patch Panel & Termination",
               "items": [
-                "Cable management",
-                "Documentation updates",
-                "Periodic testing",
-                "Upgrade planning"
+                {
+                  "part": "SC-PATCH-48",
+                  "description": "48-Port Patch Panel",
+                  "quantity": 2,
+                  "unit": "EA",
+                  "unitCost": 500,
+                  "manufacturer": "Leviton",
+                  "partNumber": "PP48-1"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "SC-LABOR",
+                  "description": "Professional Installation (70 hours)",
+                  "quantity": 70,
+                  "unit": "HOURS",
+                  "unitCost": 80,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-SC"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 3,
+              "tasks": [
+                "Network requirements analysis",
+                "Multi-zone cable routing",
+                "Equipment selection"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 5,
+              "tasks": [
+                "Order cabling and equipment",
+                "Quality inspection",
+                "Testing and staging"
+              ]
+            },
+            {
+              "name": "Installation Phase 1",
+              "duration": 7,
+              "tasks": [
+                "Cable routing",
+                "Conduit installation",
+                "Main runs"
+              ]
+            },
+            {
+              "name": "Installation Phase 2 & Testing",
+              "duration": 5,
+              "tasks": [
+                "Cable termination",
+                "System testing",
+                "Verification"
+              ]
+            },
+            {
+              "name": "Documentation & Handover",
+              "duration": 2,
+              "tasks": [
+                "As-built documentation",
+                "Cable labeling",
+                "Handover"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Infrastructure",
+              "items": [
+                "Adequate conduit space",
+                "Multiple patch panel locations",
+                "Equipment rooms",
+                "Power availability"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "Cable routing map",
+                "Termination documentation",
+                "Testing results",
+                "Maintenance schedule"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large",
+          "name": "Large (25,000+ sq ft)",
+          "description": "Enterprise network infrastructure",
+          "costRange": "$20,000 - $50,000+",
+          "timeline": "6-10 weeks",
+          "applications": ["Large office complexes", "Hospitals", "Universities", "Industrial parks"],
+          "materials": [
+            {
+              "category": "Cabling",
+              "items": [
+                {
+                  "part": "SC-CAT6A-5000",
+                  "description": "Cat6A Cabling (5000 ft)",
+                  "quantity": 1,
+                  "unit": "SPOOL",
+                  "unitCost": 2500,
+                  "manufacturer": "Belden",
+                  "partNumber": "CAT6A-5000"
+                }
+              ]
+            },
+            {
+              "category": "Patch Panel & Termination",
+              "items": [
+                {
+                  "part": "SC-PATCH-96",
+                  "description": "96-Port Patch Panel",
+                  "quantity": 4,
+                  "unit": "EA",
+                  "unitCost": 800,
+                  "manufacturer": "Leviton",
+                  "partNumber": "PP96-1"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "SC-LABOR",
+                  "description": "Professional Installation (200 hours)",
+                  "quantity": 200,
+                  "unit": "HOURS",
+                  "unitCost": 90,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-SC"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 7,
+              "tasks": [
+                "Comprehensive network analysis",
+                "Multi-building cable routing",
+                "Equipment selection"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 10,
+              "tasks": [
+                "Order cabling and equipment",
+                "Factory testing",
+                "Staging and inventory"
+              ]
+            },
+            {
+              "name": "Installation Phase 1",
+              "duration": 14,
+              "tasks": [
+                "Cable routing",
+                "Conduit installation",
+                "Main runs"
+              ]
+            },
+            {
+              "name": "Installation Phase 2",
+              "duration": 10,
+              "tasks": [
+                "Cable termination",
+                "System integration",
+                "Testing"
+              ]
+            },
+            {
+              "name": "Documentation & Handover",
+              "duration": 3,
+              "tasks": [
+                "As-built documentation",
+                "Cable labeling",
+                "Handover and training"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Infrastructure",
+              "items": [
+                "Adequate conduit space",
+                "Multiple equipment rooms",
+                "Backup power",
+                "Environmental controls"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "Cable routing map",
+                "Termination documentation",
+                "Testing results",
+                "Maintenance schedule"
               ]
             }
           ]
@@ -775,55 +1743,165 @@
       "id": "av_conference",
       "name": "AV & Conference Systems",
       "description": "Audio/video and meeting room solutions",
-      "color": "from-yellow-500 to-yellow-600",
+      "color": "from-purple-500 to-purple-600",
       "sizes": [
         {
           "id": "small",
           "name": "Small (1-2 Rooms)",
-          "description": "Basic conference room setup",
+          "description": "Basic meeting room AV",
+          "costRange": "$5,000 - $8,000",
+          "timeline": "2-3 weeks",
+          "applications": ["Small offices", "Clinics", "Training rooms", "Boardrooms"],
           "materials": [
             {
-              "category": "Display",
+              "category": "Display Equipment",
               "items": [
                 {
-                  "part": "AV-DISPLAY-65",
-                  "description": "65\" 4K Interactive Display",
-                  "quantity": 1,
+                  "part": "AV-DISPLAY-55",
+                  "description": "55\" 4K Display",
+                  "quantity": 2,
                   "unit": "EA",
-                  "unitCost": 2500,
+                  "unitCost": 1200,
                   "manufacturer": "Samsung",
-                  "partNumber": "QBR65R",
-                  "notes": "Touch-enabled, 4K resolution"
+                  "partNumber": "LH55QMHPLGC"
                 }
               ]
             },
             {
-              "category": "Audio",
+              "category": "Audio Equipment",
               "items": [
                 {
                   "part": "AV-SPEAKER-CEILING",
-                  "description": "Ceiling Speaker (Pair)",
-                  "quantity": 2,
-                  "unit": "PAIR",
-                  "unitCost": 300,
+                  "description": "Ceiling Speaker",
+                  "quantity": 4,
+                  "unit": "EA",
+                  "unitCost": 150,
                   "manufacturer": "Bose",
-                  "partNumber": "FreeSpace",
-                  "notes": "Stereo pair, 100W"
+                  "partNumber": "DS40SE"
                 }
               ]
             },
             {
-              "category": "Control",
+              "category": "Installation Labor",
               "items": [
                 {
-                  "part": "AV-CONTROL-UNIT",
-                  "description": "AV Control Processor",
-                  "quantity": 1,
+                  "part": "AV-LABOR",
+                  "description": "Professional Installation (30 hours)",
+                  "quantity": 30,
+                  "unit": "HOURS",
+                  "unitCost": 85,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-AV"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 2,
+              "tasks": [
+                "Room assessment",
+                "Equipment selection",
+                "Layout design"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 3,
+              "tasks": [
+                "Order equipment",
+                "Quality inspection",
+                "Testing"
+              ]
+            },
+            {
+              "name": "Installation",
+              "duration": 5,
+              "tasks": [
+                "Display mounting",
+                "Speaker installation",
+                "Wiring",
+                "Testing"
+              ]
+            },
+            {
+              "name": "Configuration & Training",
+              "duration": 2,
+              "tasks": [
+                "System configuration",
+                "User training",
+                "Documentation"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Infrastructure",
+              "items": [
+                "Adequate power outlets",
+                "Network connectivity",
+                "Mounting surfaces",
+                "Cable routing"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "System manual",
+                "User guide",
+                "Maintenance schedule"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "medium",
+          "name": "Medium (4-8 Rooms)",
+          "description": "Mid-size AV installation",
+          "costRange": "$15,000 - $25,000",
+          "timeline": "4-6 weeks",
+          "applications": ["Office buildings", "Training centers", "Hotels", "Corporate offices"],
+          "materials": [
+            {
+              "category": "Display Equipment",
+              "items": [
+                {
+                  "part": "AV-DISPLAY-65",
+                  "description": "65\" 4K Display",
+                  "quantity": 6,
                   "unit": "EA",
-                  "unitCost": 1500,
-                  "manufacturer": "Crestron",
-                  "partNumber": "DM-MD64X64",
-                  "notes": "HDMI matrix switcher"
+                  "unitCost": 1800,
+                  "manufacturer": "Samsung",
+                  "partNumber": "LH65QMHPLGC"
+                }
+              ]
+            },
+            {
+              "category": "Audio Equipment",
+              "items": [
+                {
+                  "part": "AV-SPEAKER-CEILING",
+                  "description": "Ceiling Speaker",
+                  "quantity": 20,
+                  "unit": "EA",
+                  "unitCost": 150,
+                  "manufacturer": "Bose",
+                  "partNumber": "DS40SE"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "AV-LABOR",
+                  "description": "Professional Installation (80 hours)",
+                  "quantity": 80,
+                  "unit": "HOURS",
+                  "unitCost": 90,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-AV"
                 }
               ]
             }
@@ -832,50 +1910,183 @@
             {
               "name": "Design & Planning",
               "duration": 3,
-              "tasks": ["Room assessment", "System design", "Cable routing"]
+              "tasks": [
+                "Multi-room assessment",
+                "Equipment selection",
+                "Layout design"
+              ]
             },
             {
               "name": "Equipment Procurement",
               "duration": 5,
-              "tasks": ["Order equipment", "Receive shipment"]
+              "tasks": [
+                "Order equipment",
+                "Quality inspection",
+                "Testing and staging"
+              ]
             },
             {
-              "name": "Installation",
+              "name": "Installation Phase 1",
+              "duration": 7,
+              "tasks": [
+                "Display mounting",
+                "Speaker installation",
+                "Wiring"
+              ]
+            },
+            {
+              "name": "Installation Phase 2 & Testing",
               "duration": 5,
-              "tasks": ["Display mounting", "Audio installation", "Control setup", "Cabling"]
+              "tasks": [
+                "System integration",
+                "Testing",
+                "Verification"
+              ]
             },
             {
-              "name": "Testing & Training",
-              "duration": 2,
-              "tasks": ["System testing", "User training"]
+              "name": "Configuration & Training",
+              "duration": 3,
+              "tasks": [
+                "System configuration",
+                "User training",
+                "Documentation"
+              ]
             }
           ],
           "requirements": [
             {
-              "category": "Technical",
+              "category": "Infrastructure",
               "items": [
-                "Power outlets",
+                "Adequate power distribution",
                 "Network connectivity",
-                "HDMI/USB ports",
-                "Audio line level"
+                "Mounting surfaces",
+                "Cable routing"
               ]
             },
             {
-              "category": "Acoustics",
+              "category": "Documentation",
               "items": [
-                "Proper room acoustics",
-                "Echo cancellation",
-                "Noise isolation",
-                "Speaker placement"
+                "System manual",
+                "User guide",
+                "Maintenance schedule"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large",
+          "name": "Large (16+ Rooms)",
+          "description": "Enterprise AV systems",
+          "costRange": "$40,000 - $100,000+",
+          "timeline": "8-12 weeks",
+          "applications": ["Large office complexes", "Universities", "Hospitals", "Corporate headquarters"],
+          "materials": [
+            {
+              "category": "Display Equipment",
+              "items": [
+                {
+                  "part": "AV-DISPLAY-75",
+                  "description": "75\" 4K Display",
+                  "quantity": 16,
+                  "unit": "EA",
+                  "unitCost": 2500,
+                  "manufacturer": "Samsung",
+                  "partNumber": "LH75QMHPLGC"
+                }
               ]
             },
             {
-              "category": "Maintenance",
+              "category": "Audio Equipment",
               "items": [
-                "Firmware updates",
-                "Cable inspection",
-                "Display cleaning",
-                "Audio level checks"
+                {
+                  "part": "AV-SPEAKER-CEILING",
+                  "description": "Ceiling Speaker",
+                  "quantity": 60,
+                  "unit": "EA",
+                  "unitCost": 150,
+                  "manufacturer": "Bose",
+                  "partNumber": "DS40SE"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "AV-LABOR",
+                  "description": "Professional Installation (250 hours)",
+                  "quantity": 250,
+                  "unit": "HOURS",
+                  "unitCost": 100,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-AV"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 7,
+              "tasks": [
+                "Comprehensive assessment",
+                "Multi-building design",
+                "Equipment selection"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 10,
+              "tasks": [
+                "Order equipment",
+                "Factory testing",
+                "Staging and inventory"
+              ]
+            },
+            {
+              "name": "Installation Phase 1",
+              "duration": 14,
+              "tasks": [
+                "Display mounting",
+                "Speaker installation",
+                "Wiring"
+              ]
+            },
+            {
+              "name": "Installation Phase 2",
+              "duration": 10,
+              "tasks": [
+                "System integration",
+                "Testing",
+                "Verification"
+              ]
+            },
+            {
+              "name": "Configuration & Training",
+              "duration": 5,
+              "tasks": [
+                "System configuration",
+                "User training",
+                "Documentation"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Infrastructure",
+              "items": [
+                "Enterprise power distribution",
+                "Network infrastructure",
+                "Mounting surfaces",
+                "Cable routing"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "System manual",
+                "User guide",
+                "Maintenance schedule"
               ]
             }
           ]
@@ -890,21 +2101,23 @@
       "sizes": [
         {
           "id": "small",
-          "name": "Small (Single Location)",
-          "description": "Basic security package",
+          "name": "Small (Up to 5,000 sq ft)",
+          "description": "Basic security system",
+          "costRange": "$4,000 - $7,000",
+          "timeline": "2-3 weeks",
+          "applications": ["Small offices", "Retail stores", "Clinics", "Restaurants"],
           "materials": [
             {
               "category": "Control Panel",
               "items": [
                 {
-                  "part": "SEC-PANEL-4Z",
+                  "part": "SEC-PANEL-4",
                   "description": "4-Zone Security Panel",
                   "quantity": 1,
                   "unit": "EA",
-                  "unitCost": 600,
+                  "unitCost": 1200,
                   "manufacturer": "Honeywell",
-                  "partNumber": "VISTA-20P",
-                  "notes": "Wireless compatible, battery backup"
+                  "partNumber": "VISTA-20P"
                 }
               ]
             },
@@ -914,47 +2127,34 @@
                 {
                   "part": "SEC-SENSOR-DOOR",
                   "description": "Door/Window Sensor",
-                  "quantity": 6,
+                  "quantity": 8,
                   "unit": "EA",
                   "unitCost": 80,
                   "manufacturer": "Honeywell",
-                  "partNumber": "5816",
-                  "notes": "Wireless, 433 MHz"
+                  "partNumber": "5816"
                 },
                 {
                   "part": "SEC-SENSOR-MOTION",
                   "description": "Motion Detector",
-                  "quantity": 3,
+                  "quantity": 4,
                   "unit": "EA",
-                  "unitCost": 120,
+                  "unitCost": 150,
                   "manufacturer": "Honeywell",
-                  "partNumber": "5800PIR",
-                  "notes": "Wireless, pet immune"
+                  "partNumber": "5883"
                 }
               ]
             },
             {
-              "category": "Keypad & Siren",
+              "category": "Installation Labor",
               "items": [
                 {
-                  "part": "SEC-KEYPAD",
-                  "description": "Wireless Keypad",
-                  "quantity": 1,
-                  "unit": "EA",
-                  "unitCost": 150,
-                  "manufacturer": "Honeywell",
-                  "partNumber": "6160",
-                  "notes": "Backlit, wireless"
-                },
-                {
-                  "part": "SEC-SIREN",
-                  "description": "Wireless Siren",
-                  "quantity": 1,
-                  "unit": "EA",
-                  "unitCost": 200,
-                  "manufacturer": "Honeywell",
-                  "partNumber": "5800SA",
-                  "notes": "110dB, wireless"
+                  "part": "SEC-LABOR",
+                  "description": "Professional Installation (25 hours)",
+                  "quantity": 25,
+                  "unit": "HOURS",
+                  "unitCost": 80,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-SEC"
                 }
               ]
             }
@@ -963,50 +2163,337 @@
             {
               "name": "Design & Planning",
               "duration": 2,
-              "tasks": ["Site assessment", "System design"]
+              "tasks": [
+                "Security assessment",
+                "Sensor placement",
+                "System design"
+              ]
             },
             {
               "name": "Equipment Procurement",
               "duration": 3,
-              "tasks": ["Order equipment", "Receive shipment"]
+              "tasks": [
+                "Order equipment",
+                "Quality inspection",
+                "Testing"
+              ]
             },
             {
               "name": "Installation",
-              "duration": 3,
-              "tasks": ["Panel installation", "Sensor placement", "Programming"]
+              "duration": 5,
+              "tasks": [
+                "Panel installation",
+                "Sensor installation",
+                "Wiring",
+                "Testing"
+              ]
             },
             {
-              "name": "Testing & Training",
-              "duration": 1,
-              "tasks": ["System testing", "User training"]
+              "name": "Configuration & Training",
+              "duration": 2,
+              "tasks": [
+                "System programming",
+                "User training",
+                "Documentation"
+              ]
             }
           ],
           "requirements": [
             {
-              "category": "Technical",
+              "category": "Power",
               "items": [
-                "Power supply (24V DC)",
-                "Phone line (for monitoring)",
-                "Battery backup",
-                "Wireless signal"
+                "Dedicated outlet for panel",
+                "UPS backup recommended",
+                "Surge protection"
               ]
             },
             {
               "category": "Monitoring",
               "items": [
-                "24/7 monitoring service",
-                "Emergency response plan",
-                "User codes",
-                "Alarm logging"
+                "Central station monitoring",
+                "Mobile app access",
+                "Alert notifications"
               ]
             },
             {
-              "category": "Maintenance",
+              "category": "Documentation",
               "items": [
-                "Battery replacement",
-                "Sensor testing",
-                "Panel updates",
-                "Service contract"
+                "System manual",
+                "Sensor locations map",
+                "User credentials",
+                "Maintenance schedule"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "medium",
+          "name": "Medium (5,000 - 25,000 sq ft)",
+          "description": "Mid-size security system",
+          "costRange": "$10,000 - $18,000",
+          "timeline": "3-4 weeks",
+          "applications": ["Office buildings", "Shopping centers", "Hotels", "Warehouses"],
+          "materials": [
+            {
+              "category": "Control Panel",
+              "items": [
+                {
+                  "part": "SEC-PANEL-8",
+                  "description": "8-Zone Security Panel",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 2000,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "VISTA-40P"
+                }
+              ]
+            },
+            {
+              "category": "Sensors",
+              "items": [
+                {
+                  "part": "SEC-SENSOR-DOOR",
+                  "description": "Door/Window Sensor",
+                  "quantity": 20,
+                  "unit": "EA",
+                  "unitCost": 80,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "5816"
+                },
+                {
+                  "part": "SEC-SENSOR-MOTION",
+                  "description": "Motion Detector",
+                  "quantity": 10,
+                  "unit": "EA",
+                  "unitCost": 150,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "5883"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "SEC-LABOR",
+                  "description": "Professional Installation (60 hours)",
+                  "quantity": 60,
+                  "unit": "HOURS",
+                  "unitCost": 85,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-SEC"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 3,
+              "tasks": [
+                "Comprehensive security assessment",
+                "Multi-zone design",
+                "Sensor placement"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 5,
+              "tasks": [
+                "Order equipment",
+                "Quality inspection",
+                "Testing and staging"
+              ]
+            },
+            {
+              "name": "Installation Phase 1",
+              "duration": 7,
+              "tasks": [
+                "Panel installation",
+                "Sensor installation",
+                "Wiring"
+              ]
+            },
+            {
+              "name": "Installation Phase 2 & Testing",
+              "duration": 5,
+              "tasks": [
+                "System integration",
+                "Testing",
+                "Verification"
+              ]
+            },
+            {
+              "name": "Configuration & Training",
+              "duration": 3,
+              "tasks": [
+                "System programming",
+                "User training",
+                "Documentation"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Power",
+              "items": [
+                "Dedicated electrical circuit",
+                "UPS backup system",
+                "Surge protection"
+              ]
+            },
+            {
+              "category": "Monitoring",
+              "items": [
+                "Central station monitoring",
+                "Mobile app access",
+                "Alert notifications"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "System manual",
+                "Sensor locations map",
+                "User credentials",
+                "Maintenance schedule"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large",
+          "name": "Large (25,000+ sq ft)",
+          "description": "Enterprise security system",
+          "costRange": "$25,000 - $60,000+",
+          "timeline": "6-10 weeks",
+          "applications": ["Large office complexes", "Hospitals", "Universities", "Industrial parks"],
+          "materials": [
+            {
+              "category": "Control Panel",
+              "items": [
+                {
+                  "part": "SEC-PANEL-16",
+                  "description": "16-Zone Security Panel",
+                  "quantity": 1,
+                  "unit": "EA",
+                  "unitCost": 4000,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "VISTA-50P"
+                }
+              ]
+            },
+            {
+              "category": "Sensors",
+              "items": [
+                {
+                  "part": "SEC-SENSOR-DOOR",
+                  "description": "Door/Window Sensor",
+                  "quantity": 50,
+                  "unit": "EA",
+                  "unitCost": 80,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "5816"
+                },
+                {
+                  "part": "SEC-SENSOR-MOTION",
+                  "description": "Motion Detector",
+                  "quantity": 25,
+                  "unit": "EA",
+                  "unitCost": 150,
+                  "manufacturer": "Honeywell",
+                  "partNumber": "5883"
+                }
+              ]
+            },
+            {
+              "category": "Installation Labor",
+              "items": [
+                {
+                  "part": "SEC-LABOR",
+                  "description": "Professional Installation (180 hours)",
+                  "quantity": 180,
+                  "unit": "HOURS",
+                  "unitCost": 95,
+                  "manufacturer": "GSIS",
+                  "partNumber": "LABOR-SEC"
+                }
+              ]
+            }
+          ],
+          "phases": [
+            {
+              "name": "Design & Planning",
+              "duration": 7,
+              "tasks": [
+                "Comprehensive security assessment",
+                "Multi-building design",
+                "Sensor placement"
+              ]
+            },
+            {
+              "name": "Equipment Procurement",
+              "duration": 10,
+              "tasks": [
+                "Order equipment",
+                "Factory testing",
+                "Staging and inventory"
+              ]
+            },
+            {
+              "name": "Installation Phase 1",
+              "duration": 14,
+              "tasks": [
+                "Panel installation",
+                "Sensor installation",
+                "Wiring"
+              ]
+            },
+            {
+              "name": "Installation Phase 2",
+              "duration": 10,
+              "tasks": [
+                "System integration",
+                "Testing",
+                "Verification"
+              ]
+            },
+            {
+              "name": "Configuration & Training",
+              "duration": 5,
+              "tasks": [
+                "System programming",
+                "User training",
+                "Documentation"
+              ]
+            }
+          ],
+          "requirements": [
+            {
+              "category": "Power",
+              "items": [
+                "Dedicated electrical service",
+                "UPS backup system",
+                "Surge protection",
+                "Generator backup"
+              ]
+            },
+            {
+              "category": "Monitoring",
+              "items": [
+                "Central station monitoring",
+                "Mobile app access",
+                "Alert notifications",
+                "Backup monitoring"
+              ]
+            },
+            {
+              "category": "Documentation",
+              "items": [
+                "System manual",
+                "Sensor locations map",
+                "User credentials",
+                "Maintenance schedule"
               ]
             }
           ]
