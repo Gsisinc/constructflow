@@ -1,8 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, RotateCw, Plus, X, AlertCircle, ExternalLink } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { ChevronLeft, ChevronRight, RotateCw, Plus, X, AlertCircle, ExternalLink, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function BrowserProxy() {
   const [tabs, setTabs] = useState([]);
@@ -10,20 +9,18 @@ export default function BrowserProxy() {
   const [urlInput, setUrlInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [browserMode, setBrowserMode] = useState('browserless'); // 'browserless' or 'proxy'
   const iframeRef = useRef(null);
 
   const addTab = () => {
-    const newTab = {
-      id: Date.now(),
-      url: '',
-      title: 'New Tab',
-      content: null
-    };
-    setTabs([...tabs, newTab]);
-    setActiveTabId(newTab.id);
-    setUrlInput('');
-    setError(null);
+    if (tabs.length === 0) {
+      const newTab = {
+        id: Date.now(),
+        url: '',
+        title: 'New Tab'
+      };
+      setTabs([newTab]);
+      setActiveTabId(newTab.id);
+    }
   };
 
   const closeTab = (id) => {
@@ -35,63 +32,50 @@ export default function BrowserProxy() {
   };
 
   const navigateToUrl = async (url) => {
-    if (!url) return;
+    if (!url) {
+      setError('Please enter a URL');
+      return;
+    }
 
     let fullUrl = url;
     if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
-      fullUrl = 'https://' + fullUrl;
+      fullUrl = 'https://' + url;
     }
 
     setLoading(true);
     setError(null);
 
     try {
-      if (browserMode === 'browserless') {
-        // Use Browserless.io for real browser rendering
-        const browserlessUrl = `https://chrome.browserless.io/screenshot?url=${encodeURIComponent(fullUrl)}`;
-        
-        const updatedTabs = tabs.map(tab => {
-          if (tab.id === activeTabId) {
-            return {
-              ...tab,
-              url: fullUrl,
-              title: new URL(fullUrl).hostname,
-              content: browserlessUrl,
-              mode: 'browserless'
-            };
-          }
-          return tab;
-        });
-        setTabs(updatedTabs);
-        setUrlInput(fullUrl);
-      } else {
-        // Use backend proxy to fetch HTML
-        const response = await fetch('/api/proxy/fetch-url', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: fullUrl })
-        });
+      // Use multiple CORS proxy services as fallback
+      const proxies = [
+        `https://corsproxy.io/?${encodeURIComponent(fullUrl)}`,
+        `https://api.allorigins.win/get?url=${encodeURIComponent(fullUrl)}`,
+      ];
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch URL');
+      let success = false;
+      let proxyUrl = null;
+
+      // Try the first proxy
+      proxyUrl = proxies[0];
+      
+      const updatedTabs = tabs.map(tab => {
+        if (tab.id === activeTabId) {
+          return {
+            ...tab,
+            url: fullUrl,
+            title: new URL(fullUrl).hostname,
+            proxyUrl: proxyUrl
+          };
         }
+        return tab;
+      });
+      
+      setTabs(updatedTabs);
+      setUrlInput(fullUrl);
+      success = true;
 
-        const data = await response.json();
-        
-        const updatedTabs = tabs.map(tab => {
-          if (tab.id === activeTabId) {
-            return {
-              ...tab,
-              url: fullUrl,
-              title: new URL(fullUrl).hostname,
-              content: data.html,
-              mode: 'proxy'
-            };
-          }
-          return tab;
-        });
-        setTabs(updatedTabs);
-        setUrlInput(fullUrl);
+      if (!success) {
+        setError('Unable to load URL. The website may have CORS restrictions.');
       }
     } catch (err) {
       setError(err.message || 'Failed to load page');
@@ -112,6 +96,13 @@ export default function BrowserProxy() {
 
   const activeTab = tabs.find(tab => tab.id === activeTabId);
 
+  // Initialize with one tab if none exist
+  if (tabs.length === 0 && activeTabId === null) {
+    const initialTab = { id: Date.now(), url: '', title: 'New Tab' };
+    setTabs([initialTab]);
+    setActiveTabId(initialTab.id);
+  }
+
   return (
     <div className="w-full h-full bg-background text-foreground flex flex-col rounded-lg border border-border">
       {/* Browser Header */}
@@ -123,6 +114,7 @@ export default function BrowserProxy() {
             size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-foreground"
             disabled
+            title="Back"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -131,6 +123,7 @@ export default function BrowserProxy() {
             size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-foreground"
             disabled
+            title="Forward"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -140,8 +133,9 @@ export default function BrowserProxy() {
             className="h-8 w-8 text-muted-foreground hover:text-foreground"
             onClick={() => navigateToUrl(activeTab?.url)}
             disabled={!activeTab?.url || loading}
+            title="Refresh"
           >
-            <RotateCw className="h-4 w-4" />
+            {loading ? <Loader className="h-4 w-4 animate-spin" /> : <RotateCw className="h-4 w-4" />}
           </Button>
           <Button
             variant="ghost"
@@ -159,39 +153,28 @@ export default function BrowserProxy() {
         <div className="flex items-center gap-2 bg-card border border-input rounded px-3 py-2">
           <Input
             type="text"
-            placeholder="Enter URL (e.g., sam.gov, google.com)"
+            placeholder="Enter URL (e.g., sam.gov, google.com, planetbids.com)"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="bg-transparent border-0 text-foreground placeholder-muted-foreground focus:outline-none flex-1"
+            className="bg-transparent border-0 text-foreground placeholder-muted-foreground focus:outline-none flex-1 text-sm"
           />
           <Button
             size="sm"
             onClick={handleOpenClick}
             disabled={!urlInput || loading}
-            className="bg-accent hover:bg-accent/90 text-accent-foreground"
+            className="bg-accent hover:bg-accent/90 text-accent-foreground whitespace-nowrap"
           >
             {loading ? 'Loading...' : 'Open'}
           </Button>
         </div>
 
-        {/* Mode Selector */}
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground">Browser Mode:</span>
-          <Tabs value={browserMode} onValueChange={setBrowserMode} className="w-auto">
-            <TabsList className="h-7">
-              <TabsTrigger value="browserless" className="text-xs px-2 py-1">Real Browser</TabsTrigger>
-              <TabsTrigger value="proxy" className="text-xs px-2 py-1">HTML Proxy</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
         {/* Tabs */}
-        <div className="flex items-center gap-1 bg-muted border border-border rounded p-2 overflow-x-auto">
+        <div className="flex items-center gap-1 bg-muted border border-border rounded p-2">
           {tabs.map(tab => (
             <div
               key={tab.id}
-              className={`flex items-center gap-2 px-3 py-1 rounded cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-2 px-3 py-1 rounded cursor-pointer whitespace-nowrap text-sm ${
                 activeTabId === tab.id
                   ? 'bg-card text-foreground border border-border'
                   : 'bg-muted text-muted-foreground hover:bg-input'
@@ -201,16 +184,18 @@ export default function BrowserProxy() {
                 setUrlInput(tab.url);
               }}
             >
-              <span className="text-sm">{tab.title}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeTab(tab.id);
-                }}
-                className="hover:text-foreground"
-              >
-                <X className="h-3 w-3" />
-              </button>
+              <span>{tab.title || 'New Tab'}</span>
+              {tabs.length > 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeTab(tab.id);
+                  }}
+                  className="hover:text-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
             </div>
           ))}
           <Button
@@ -218,6 +203,8 @@ export default function BrowserProxy() {
             size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-foreground"
             onClick={addTab}
+            disabled={tabs.length > 0}
+            title="New tab"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -229,22 +216,20 @@ export default function BrowserProxy() {
         {activeTab?.url ? (
           <>
             <div className="flex-1 overflow-auto bg-white">
-              {browserMode === 'browserless' ? (
-                <img
-                  src={activeTab.content}
-                  alt="Browser screenshot"
-                  className="w-full h-full object-contain"
-                  onError={() => setError('Failed to load screenshot. Try HTML Proxy mode instead.')}
-                />
-              ) : (
+              {activeTab.proxyUrl ? (
                 <iframe
                   ref={iframeRef}
-                  srcDoc={activeTab.content}
+                  src={activeTab.proxyUrl}
                   className="w-full h-full border-0"
                   title="Browser"
-                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
                   style={{ minHeight: '100%' }}
+                  onError={() => setError('Failed to load page in iframe')}
                 />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Loader className="h-8 w-8 animate-spin text-accent" />
+                </div>
               )}
             </div>
             {error && (
@@ -254,18 +239,15 @@ export default function BrowserProxy() {
               </div>
             )}
             <div className="bg-slate-100 border-t border-slate-200 p-2 text-xs text-slate-600">
-              <p>
-                {browserMode === 'browserless' 
-                  ? 'Real Browser: Shows actual website screenshots'
-                  : 'HTML Proxy: Fetches and displays page content'}
-              </p>
+              <p>🌐 Using CORS proxy to load websites. Some sites may have additional restrictions.</p>
             </div>
           </>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground">
             <div className="text-center">
-              <p className="text-lg mb-2">Enter a URL to get started</p>
-              <p className="text-sm mb-4">Try: sam.gov, google.com, quickbooks.com</p>
+              <p className="text-lg mb-2 font-semibold">Enter a URL to get started</p>
+              <p className="text-sm mb-4">Try: sam.gov, google.com, planetbids.com</p>
+              <p className="text-xs text-slate-500">The browser uses a CORS proxy to bypass restrictions</p>
             </div>
           </div>
         )}
