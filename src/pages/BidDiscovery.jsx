@@ -40,6 +40,7 @@ import { searchBidsFromSam } from '@/lib/bidDiscoverySearch';
 import { fetchRealBidOpportunities } from '@/services/realBidDiscoveryService';
 import { callAgent } from '@/services/llmService';
 import { hasSamGovKey, setSamGovKey } from '@/lib/apiKeys';
+import { cn } from '@/lib/utils';
 
 const marketIntelligenceAgent = {
   id: 'market_intelligence',
