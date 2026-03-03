@@ -9,6 +9,7 @@ export default function BrowserProxy() {
   const [urlInput, setUrlInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const iframeRef = useRef(null);
 
   const addTab = () => {
     if (tabs.length === 0) {
@@ -16,7 +17,7 @@ export default function BrowserProxy() {
         id: Date.now(),
         url: '',
         title: 'New Tab',
-        screenshot: null
+        iframeUrl: null
       };
       setTabs([newTab]);
       setActiveTabId(newTab.id);
@@ -46,9 +47,8 @@ export default function BrowserProxy() {
     setError(null);
 
     try {
-      // Use Browserless.io free endpoint to render page
-      // This will show a screenshot of the actual website
-      const browserlessUrl = `https://chrome.browserless.io/screenshot?url=${encodeURIComponent(fullUrl)}&width=1200&height=800`;
+      // Use Cloudflare Workers CORS proxy - most reliable for embedded content
+      const iframeUrl = `https://corsproxy.io/?${encodeURIComponent(fullUrl)}`;
       
       const updatedTabs = tabs.map(tab => {
         if (tab.id === activeTabId) {
@@ -56,7 +56,7 @@ export default function BrowserProxy() {
             ...tab,
             url: fullUrl,
             title: new URL(fullUrl).hostname,
-            screenshot: browserlessUrl
+            iframeUrl: iframeUrl
           };
         }
         return tab;
@@ -85,7 +85,7 @@ export default function BrowserProxy() {
 
   // Initialize with one tab if none exist
   if (tabs.length === 0 && activeTabId === null) {
-    const initialTab = { id: Date.now(), url: '', title: 'New Tab', screenshot: null };
+    const initialTab = { id: Date.now(), url: '', title: 'New Tab', iframeUrl: null };
     setTabs([initialTab]);
     setActiveTabId(initialTab.id);
   }
@@ -118,7 +118,11 @@ export default function BrowserProxy() {
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            onClick={() => navigateToUrl(activeTab?.url)}
+            onClick={() => {
+              if (iframeRef.current) {
+                iframeRef.current.src = iframeRef.current.src;
+              }
+            }}
             disabled={!activeTab?.url || loading}
             title="Refresh"
           >
@@ -199,28 +203,23 @@ export default function BrowserProxy() {
       </div>
 
       {/* Browser Content */}
-      <div className="flex-1 overflow-auto bg-background flex flex-col">
+      <div className="flex-1 overflow-hidden bg-white flex flex-col">
         {activeTab?.url ? (
           <>
-            {loading ? (
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center">
-                  <Loader className="h-8 w-8 animate-spin text-accent mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Loading {activeTab.url}...</p>
-                </div>
-              </div>
-            ) : activeTab.screenshot ? (
-              <div className="w-full h-full flex flex-col">
-                <img
-                  src={activeTab.screenshot}
-                  alt="Website screenshot"
-                  className="w-full h-auto object-contain"
-                  onError={() => setError('Failed to load screenshot')}
-                />
-                <div className="bg-slate-100 border-t border-slate-200 p-2 text-xs text-slate-600">
-                  <p>📸 This is a screenshot of the website rendered by Browserless. Click "Open in new window" to interact with the site.</p>
-                </div>
-              </div>
+            {activeTab.iframeUrl ? (
+              <iframe
+                ref={iframeRef}
+                src={activeTab.iframeUrl}
+                className="w-full h-full border-0 flex-1"
+                title="Browser"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation allow-popups-to-escape-sandbox allow-modals"
+                style={{ minHeight: '100%' }}
+                onLoad={() => setLoading(false)}
+                onError={() => {
+                  setError('Failed to load page');
+                  setLoading(false);
+                }}
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <Loader className="h-8 w-8 animate-spin text-accent" />
@@ -238,7 +237,7 @@ export default function BrowserProxy() {
             <div className="text-center">
               <p className="text-lg mb-2 font-semibold">Enter a URL to get started</p>
               <p className="text-sm mb-4">Try: sam.gov, google.com, planetbids.com</p>
-              <p className="text-xs text-slate-500">The browser will show you a screenshot of the website</p>
+              <p className="text-xs text-slate-500">The browser uses corsproxy.io to load websites</p>
             </div>
           </div>
         )}
