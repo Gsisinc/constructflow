@@ -9,14 +9,14 @@ export default function BrowserProxy() {
   const [urlInput, setUrlInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const iframeRef = useRef(null);
 
   const addTab = () => {
     if (tabs.length === 0) {
       const newTab = {
         id: Date.now(),
         url: '',
-        title: 'New Tab'
+        title: 'New Tab',
+        screenshot: null
       };
       setTabs([newTab]);
       setActiveTabId(newTab.id);
@@ -46,17 +46,9 @@ export default function BrowserProxy() {
     setError(null);
 
     try {
-      // Use multiple CORS proxy services as fallback
-      const proxies = [
-        `https://corsproxy.io/?${encodeURIComponent(fullUrl)}`,
-        `https://api.allorigins.win/get?url=${encodeURIComponent(fullUrl)}`,
-      ];
-
-      let success = false;
-      let proxyUrl = null;
-
-      // Try the first proxy
-      proxyUrl = proxies[0];
+      // Use Browserless.io free endpoint to render page
+      // This will show a screenshot of the actual website
+      const browserlessUrl = `https://chrome.browserless.io/screenshot?url=${encodeURIComponent(fullUrl)}&width=1200&height=800`;
       
       const updatedTabs = tabs.map(tab => {
         if (tab.id === activeTabId) {
@@ -64,7 +56,7 @@ export default function BrowserProxy() {
             ...tab,
             url: fullUrl,
             title: new URL(fullUrl).hostname,
-            proxyUrl: proxyUrl
+            screenshot: browserlessUrl
           };
         }
         return tab;
@@ -72,11 +64,6 @@ export default function BrowserProxy() {
       
       setTabs(updatedTabs);
       setUrlInput(fullUrl);
-      success = true;
-
-      if (!success) {
-        setError('Unable to load URL. The website may have CORS restrictions.');
-      }
     } catch (err) {
       setError(err.message || 'Failed to load page');
     } finally {
@@ -98,7 +85,7 @@ export default function BrowserProxy() {
 
   // Initialize with one tab if none exist
   if (tabs.length === 0 && activeTabId === null) {
-    const initialTab = { id: Date.now(), url: '', title: 'New Tab' };
+    const initialTab = { id: Date.now(), url: '', title: 'New Tab', screenshot: null };
     setTabs([initialTab]);
     setActiveTabId(initialTab.id);
   }
@@ -212,42 +199,46 @@ export default function BrowserProxy() {
       </div>
 
       {/* Browser Content */}
-      <div className="flex-1 overflow-hidden bg-background flex flex-col">
+      <div className="flex-1 overflow-auto bg-background flex flex-col">
         {activeTab?.url ? (
           <>
-            <div className="flex-1 overflow-auto bg-white">
-              {activeTab.proxyUrl ? (
-                <iframe
-                  ref={iframeRef}
-                  src={activeTab.proxyUrl}
-                  className="w-full h-full border-0"
-                  title="Browser"
-                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
-                  style={{ minHeight: '100%' }}
-                  onError={() => setError('Failed to load page in iframe')}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Loader className="h-8 w-8 animate-spin text-accent" />
+            {loading ? (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center">
+                  <Loader className="h-8 w-8 animate-spin text-accent mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Loading {activeTab.url}...</p>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : activeTab.screenshot ? (
+              <div className="w-full h-full flex flex-col">
+                <img
+                  src={activeTab.screenshot}
+                  alt="Website screenshot"
+                  className="w-full h-auto object-contain"
+                  onError={() => setError('Failed to load screenshot')}
+                />
+                <div className="bg-slate-100 border-t border-slate-200 p-2 text-xs text-slate-600">
+                  <p>📸 This is a screenshot of the website rendered by Browserless. Click "Open in new window" to interact with the site.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Loader className="h-8 w-8 animate-spin text-accent" />
+              </div>
+            )}
             {error && (
               <div className="bg-red-50 border-t border-red-200 p-3 flex items-center gap-2 text-sm text-red-700">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 <span>{error}</span>
               </div>
             )}
-            <div className="bg-slate-100 border-t border-slate-200 p-2 text-xs text-slate-600">
-              <p>🌐 Using CORS proxy to load websites. Some sites may have additional restrictions.</p>
-            </div>
           </>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground">
             <div className="text-center">
               <p className="text-lg mb-2 font-semibold">Enter a URL to get started</p>
               <p className="text-sm mb-4">Try: sam.gov, google.com, planetbids.com</p>
-              <p className="text-xs text-slate-500">The browser uses a CORS proxy to bypass restrictions</p>
+              <p className="text-xs text-slate-500">The browser will show you a screenshot of the website</p>
             </div>
           </div>
         )}
