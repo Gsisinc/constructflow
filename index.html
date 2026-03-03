@@ -11,8 +11,20 @@
   </head>
   <body>
     <div id="root">
-      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#102a43;color:#fbbf24;font-family:system-ui,sans-serif;font-size:1.25rem;">Loading MYGSIS…</div>
+      <div id="loading-fallback" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#102a43;color:#fbbf24;font-family:system-ui,sans-serif;font-size:1.25rem;padding:1rem;text-align:center;">
+        <span>Loading MYGSIS…</span>
+        <p id="loading-message" style="margin-top:1rem;font-size:0.875rem;color:#94a3b8;display:none;">Taking a while? <a href="javascript:location.reload()" style="color:#fbbf24;">Refresh</a> or check the console (F12).</p>
+      </div>
     </div>
+    <script>
+      (function(){
+        setTimeout(function(){
+          var root = document.getElementById('root');
+          var msg = document.getElementById('loading-message');
+          if (msg && root && root.querySelector('#loading-fallback')) msg.style.display = 'block';
+        }, 6000);
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

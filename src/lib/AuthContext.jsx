@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
@@ -7,6 +7,8 @@ const AuthContext = createContext();
 
 const basePath = () => (typeof appParams.basePath === 'string' ? appParams.basePath : '');
 
+const LOAD_TIMEOUT_MS = 8000;
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,9 +16,20 @@ export const AuthProvider = ({ children }) => {
   const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
   const [authError, setAuthError] = useState(null);
   const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
+  const loadFinishedRef = useRef(false);
 
   useEffect(() => {
+    loadFinishedRef.current = false;
     checkAppState();
+    // Prevent endless blank loading: after 12s show error so user sees something
+    const t = setTimeout(() => {
+      if (loadFinishedRef.current) return;
+      loadFinishedRef.current = true;
+      setAuthError({ type: 'unknown', message: 'Loading timed out. Check your connection and refresh.' });
+      setIsLoadingPublicSettings(false);
+      setIsLoadingAuth(false);
+    }, LOAD_TIMEOUT_MS);
+    return () => clearTimeout(t);
   }, []);
 
   const checkAppState = async () => {
@@ -43,10 +56,11 @@ export const AuthProvider = ({ children }) => {
           setIsLoadingAuth(false);
           setIsAuthenticated(false);
         }
+        loadFinishedRef.current = true;
         setIsLoadingPublicSettings(false);
       } catch (appError) {
         console.error('App state check failed:', appError);
-
+        loadFinishedRef.current = true;
         if (appError.status === 403 && appError.data?.extra_data?.reason) {
           const reason = appError.data.extra_data.reason;
           if (reason === 'auth_required') {
@@ -76,6 +90,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Unexpected error:', error);
+      loadFinishedRef.current = true;
       setAuthError({
         type: 'unknown',
         message: error.message || 'An unexpected error occurred'

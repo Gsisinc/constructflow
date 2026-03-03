@@ -59,11 +59,11 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
   : <>{children}</>;
 
-const FullPageStatus = ({ title, description, actionLabel, onAction, showSpinner = false }) => (
-  <div className="fixed inset-0 flex items-center justify-center p-4 bg-slate-50">
-    <div className="w-full max-w-md rounded-xl border bg-white p-6 shadow-sm text-center space-y-3">
+const FullPageStatus = ({ title, description, actionLabel, onAction, showSpinner = false, secondaryActions }) => (
+  <div className="fixed inset-0 flex items-center justify-center p-4 bg-slate-200 min-h-screen" role="status" aria-live="polite">
+    <div className="w-full max-w-md rounded-xl border-2 border-slate-300 bg-white p-6 shadow-lg text-center space-y-3">
       {showSpinner && (
-        <div className="mx-auto w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+        <div className="mx-auto w-10 h-10 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" aria-hidden="true" />
       )}
       <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
       {description && <p className="text-sm text-slate-600">{description}</p>}
@@ -76,13 +76,15 @@ const FullPageStatus = ({ title, description, actionLabel, onAction, showSpinner
           {actionLabel}
         </button>
       )}
+      {secondaryActions && <div className="pt-2 flex flex-col sm:flex-row gap-2 justify-center">{secondaryActions}</div>}
     </div>
   </div>
 );
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, checkAppState } = useAuth();
   const [hasStartedLoginRedirect, setHasStartedLoginRedirect] = useState(false);
+  const [showLoadingFallback, setShowLoadingFallback] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -92,8 +94,42 @@ const AuthenticatedApp = () => {
     }
   }, [authError, hasStartedLoginRedirect, navigateToLogin, location.pathname]);
 
+  // If loading takes more than 4s, show Retry / Sign in so user isn't stuck
+  useEffect(() => {
+    if (!(isLoadingPublicSettings || isLoadingAuth)) return;
+    const t = setTimeout(() => setShowLoadingFallback(true), 4000);
+    return () => clearTimeout(t);
+  }, [isLoadingPublicSettings, isLoadingAuth]);
+  useEffect(() => {
+    if (!(isLoadingPublicSettings || isLoadingAuth)) setShowLoadingFallback(false);
+  }, [isLoadingPublicSettings, isLoadingAuth]);
+
   if (isLoadingPublicSettings || isLoadingAuth) {
-    return <FullPageStatus title="Loading your workspace" description="Please wait while we check authentication and project settings." showSpinner />;
+    return (
+      <FullPageStatus
+        title="Loading your workspace"
+        description="Please wait while we check authentication and project settings."
+        showSpinner
+        secondaryActions={showLoadingFallback && (
+          <>
+            <button
+              type="button"
+              onClick={() => { setShowLoadingFallback(false); checkAppState(); }}
+              className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              Retry
+            </button>
+            <button
+              type="button"
+              onClick={navigateToLogin}
+              className="inline-flex items-center justify-center rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+            >
+              Go to sign in
+            </button>
+          </>
+        )}
+      />
+    );
   }
 
   if (authError) {
@@ -160,7 +196,7 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <div className="min-h-screen bg-slate-100" style={{ minHeight: '100vh' }}>
+        <div className="min-h-screen bg-slate-100" style={{ minHeight: '100vh', display: 'block' }}>
           <Router basename={basename}>
             <Routes>
               <Route path="*" element={<RouteGate />} />

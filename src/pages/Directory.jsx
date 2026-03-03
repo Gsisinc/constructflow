@@ -1,204 +1,116 @@
-import { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Search, UserPlus, Users, Star, Trash2, Plus, X } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Search, UserPlus, Users, Building2, Star, Trash2, User, Briefcase } from 'lucide-react';
+
+const GROUP_ALL = 'all';
+const GROUP_EMPLOYEES = 'employees';
+const GROUP_CONTRACTORS = 'contractors';
+const GROUP_USERS = 'users';
 
 export default function Directory() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showCategoryDialog, setShowCategoryDialog] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [newCategoryName, setNewCategoryName] = useState('');
-  
-  // Local state for categories and workers
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Employees' },
-    { id: 2, name: 'Contractors' },
-    { id: 3, name: 'Suppliers' }
-  ]);
-  
-  const [workers, setWorkers] = useState([
-    { id: 1, name: 'John Smith', email: 'john@example.com', phone: '(555) 123-4567', company: 'GSIS', category: 'Employees' },
-    { id: 2, name: 'Jane Doe', email: 'jane@example.com', phone: '(555) 234-5678', company: 'Tech Solutions', category: 'Contractors' }
-  ]);
-  
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', company: '', category: 'Employees' });
+  const [contactGroup, setContactGroup] = useState(GROUP_ALL);
+  const queryClient = useQueryClient();
 
-  // Add visual indicator for selected category
-  const isAllSelected = selectedCategory === 'all';
-
-  // Filter workers
-  const filteredWorkers = workers.filter(w => {
-    const matchesCategory = selectedCategory === 'all' || w.category === selectedCategory;
-    
-    // If no search term, show all contacts in the selected category
-    if (!searchTerm.trim()) {
-      return matchesCategory;
-    }
-    
-    // If search term exists, filter by both category and search
-    const matchesSearch = w.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      w.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      w.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      w.company?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    return matchesSearch && matchesCategory;
+  const { data: workers = [] } = useQuery({
+    queryKey: ['workers'],
+    queryFn: () => base44.entities.Worker.list('-created_date')
   });
 
-  // Get category counts
-  const getCategoryCount = (categoryName) => {
-    return workers.filter(w => w.category === categoryName).length;
-  };
-
-  const handleAddContact = async (e) => {
-    e.preventDefault();
-    if (!formData.name || !formData.email) {
-      alert('Please fill in name and email');
-      return;
-    }
-    
-    const newWorker = {
-      id: Date.now(),
-      ...formData
+  const workersByGroup = useMemo(() => {
+    const byGroup = {
+      [GROUP_ALL]: workers,
+      [GROUP_EMPLOYEES]: workers.filter(w => !w.company),
+      [GROUP_CONTRACTORS]: workers.filter(w => !!w.company),
+      [GROUP_USERS]: workers.filter(w => w.role === 'engineer' || w.role === 'supervisor'),
     };
-    
-    setWorkers([...workers, newWorker]);
-    setShowAddDialog(false);
-    setFormData({ name: '', email: '', phone: '', company: '', category: 'Employees' });
-    alert('Contact added successfully!');
-  };
+    return byGroup;
+  }, [workers]);
+
+  const filteredWorkers = useMemo(() => {
+    const group = workersByGroup[contactGroup] || workers;
+    return group.filter(w =>
+      w.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      w.role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      w.company?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [workersByGroup, contactGroup, searchTerm]);
+
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.Worker.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
+    }
+  });
 
   const handleDeleteContact = async (worker) => {
     if (!window.confirm(`Delete contact ${worker.name || 'this contact'}?`)) return;
-    setWorkers(workers.filter(w => w.id !== worker.id));
-    alert('Contact deleted successfully!');
+    try {
+      await deleteMutation.mutateAsync(worker.id);
+    } catch (error) {
+      console.error(error);
+      alert(error?.message || 'Failed to delete contact');
+    }
   };
 
-  const handleAddCategory = async (e) => {
-    e.preventDefault();
-    if (!newCategoryName.trim()) {
-      alert('Please enter a category name');
-      return;
-    }
-    
-    // Check if category already exists
-    if (categories.some(c => c.name.toLowerCase() === newCategoryName.toLowerCase())) {
-      alert('This category already exists');
-      return;
-    }
-    
-    const newCategory = {
-      id: Date.now(),
-      name: newCategoryName
-    };
-    
-    setCategories([...categories, newCategory]);
-    setNewCategoryName('');
-    setShowCategoryDialog(false);
-    alert('Category created successfully!');
-  };
-
-  const handleDeleteCategory = async (categoryId) => {
-    const category = categories.find(c => c.id === categoryId);
-    if (!window.confirm(`Delete category "${category.name}"?`)) return;
-    
-    // Check if category has workers
-    const hasWorkers = workers.some(w => w.category === category.name);
-    if (hasWorkers) {
-      alert('Cannot delete category with assigned contacts. Please reassign contacts first.');
-      return;
-    }
-    
-    setCategories(categories.filter(c => c.id !== categoryId));
-    alert('Category deleted successfully!');
+  const contactCounts = {
+    users: workers.filter(w => w.role === 'engineer' || w.role === 'supervisor').length,
+    contractors: workers.filter(w => w.company).length,
+    customers: 5,
+    employees: workers.filter(w => !w.company).length,
+    leads: 4,
+    misc: 2,
+    vendors: 4
   };
 
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Directory</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Directory</h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">Manage your team and contacts</p>
         </div>
-        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-          <DialogTrigger asChild>
-            <Button className="bg-amber-600 hover:bg-amber-700 min-h-[44px] text-sm select-none">
-              <UserPlus className="h-4 w-4 mr-1.5 sm:mr-2" />
-              <span className="hidden sm:inline">Add Contact</span>
-              <span className="sm:hidden">Add</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Add New Contact</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleAddContact} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Name *</Label>
-                <Input
-                  placeholder="Contact name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Email *</Label>
-                <Input
-                  type="email"
-                  placeholder="email@example.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Phone</Label>
-                <Input
-                  placeholder="(123) 456-7890"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Company</Label>
-                <Input
-                  placeholder="Company name"
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Category</Label>
-                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(cat => (
-                      <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit" className="w-full sm:w-auto">
-                Add Contact
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <Button className="bg-amber-600 hover:bg-amber-700 min-h-[44px] text-sm select-none">
+          <UserPlus className="h-4 w-4 mr-1.5 sm:mr-2" />
+          <span className="hidden sm:inline">Contact</span>
+          <span className="sm:hidden">Add</span>
+        </Button>
       </div>
+
+      {/* Group contacts by type */}
+        <Tabs value={contactGroup} onValueChange={setContactGroup} className="w-full">
+          <TabsList className="flex flex-wrap h-auto gap-1 p-1 bg-slate-100">
+            <TabsTrigger value={GROUP_ALL} className="gap-1.5 data-[state=active]:bg-white">
+              <Users className="h-3.5 w-3.5" />
+              All ({workers.length})
+            </TabsTrigger>
+            <TabsTrigger value={GROUP_EMPLOYEES} className="gap-1.5 data-[state=active]:bg-white">
+              <User className="h-3.5 w-3.5" />
+              Employees ({workersByGroup[GROUP_EMPLOYEES].length})
+            </TabsTrigger>
+            <TabsTrigger value={GROUP_CONTRACTORS} className="gap-1.5 data-[state=active]:bg-white">
+              <Briefcase className="h-3.5 w-3.5" />
+              Contractors ({workersByGroup[GROUP_CONTRACTORS].length})
+            </TabsTrigger>
+            <TabsTrigger value={GROUP_USERS} className="gap-1.5 data-[state=active]:bg-white">
+              <Users className="h-3.5 w-3.5" />
+              Users ({workersByGroup[GROUP_USERS].length})
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
 
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
-            placeholder="Search..."
+            placeholder="Search contacts..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 text-sm min-h-[44px]"
@@ -211,78 +123,46 @@ export default function Directory() {
         <div className="flex items-center gap-2">
           <Users className="h-4 sm:h-5 w-4 sm:w-5 text-blue-600 flex-shrink-0" />
           <span className="text-xs sm:text-sm text-blue-900">
-            <strong>{workers.length}</strong> Total Contacts | <strong>{categories.length}</strong> Categories
+            <strong>69,999</strong> Licenses | <strong>1</strong> Used | <strong>9,998</strong> Available
           </span>
         </div>
+        <Button size="sm" variant="outline" className="text-xs">Upgrade</Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Contact Categories</CardTitle>
-            <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
-              <DialogTrigger asChild>
-                <Button size="icon" variant="ghost" className="h-6 w-6">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Add New Category</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleAddCategory} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Category Name *</Label>
-                    <Input
-                      placeholder="e.g., Subcontractors, Suppliers, etc."
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full sm:w-auto">
-                    Create Category
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
+          <CardHeader>
+            <CardTitle className="text-base">Contacts by Type</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div 
-              className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-2 rounded cursor-pointer ${
-                isAllSelected ? 'bg-accent text-white' : 'hover:bg-slate-100'
-              }`}
-              onClick={() => setSelectedCategory('all')}
-            >
-              <span className="text-sm font-medium">All Contacts</span>
-              <Badge variant={isAllSelected ? 'default' : 'outline'}>{workers.length}</Badge>
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Users</span>
+              <Badge variant="outline">{contactCounts.users}</Badge>
             </div>
-            {categories.map(cat => (
-              <div 
-                key={cat.id}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-2 rounded hover:bg-slate-100 group"
-              >
-                <div 
-                  className={`flex-1 cursor-pointer p-2 rounded ${
-                    selectedCategory === cat.name ? 'bg-accent text-white' : ''
-                  }`}
-                  onClick={() => setSelectedCategory(cat.name)}
-                >
-                  <span className="text-sm font-medium">{cat.name}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Badge variant="outline" className="text-xs">{getCategoryCount(cat.name)}</Badge>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-5 w-5 text-red-600 opacity-0 group-hover:opacity-100"
-                    onClick={() => handleDeleteCategory(cat.id)}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Contractors</span>
+              <Badge variant="outline">{contactCounts.contractors}</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Customers</span>
+              <Badge variant="outline">{contactCounts.customers}</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Employees</span>
+              <Badge variant="outline">{contactCounts.employees}</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Leads</span>
+              <Badge variant="outline">{contactCounts.leads}</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Misc. Contacts</span>
+              <Badge variant="outline">{contactCounts.misc}</Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Vendors</span>
+              <Badge variant="outline">{contactCounts.vendors}</Badge>
+            </div>
           </CardContent>
         </Card>
 
@@ -313,75 +193,74 @@ export default function Directory() {
         <CardContent className="p-0">
           {/* Mobile View */}
           <div className="sm:hidden space-y-2 p-3">
-            {filteredWorkers.length > 0 ? (
-              filteredWorkers.map((worker) => (
-                <div key={worker.id} className="border-b border-amber-100 pb-2.5 last:border-0">
-                  <div className="flex items-start gap-2 mb-1.5">
-                    <div className="h-7 w-7 rounded-full bg-amber-200 flex items-center justify-center text-xs font-medium flex-shrink-0">
-                      {worker.name?.[0]}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-xs text-slate-900 truncate">{worker.name}</p>
-                      <p className="text-xs text-slate-600 truncate">{worker.company || 'Direct'}</p>
-                      <p className="text-xs text-slate-500">{worker.category}</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button size="icon" variant="ghost" className="h-7 w-7 text-red-600" onClick={() => handleDeleteContact(worker)}>
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
+            {filteredWorkers.map((worker) => (
+              <div key={worker.id} className="border-b border-amber-100 pb-2.5 last:border-0">
+                <div className="flex items-start gap-2 mb-1.5">
+                  <div className="h-7 w-7 rounded-full bg-amber-200 flex items-center justify-center text-xs font-medium flex-shrink-0">
+                    {worker.name?.[0]}
                   </div>
-                  <div className="text-xs text-slate-600 flex gap-2">
-                    <span className="flex-1 truncate">{worker.phone || '-'}</span>
-                    <span className="flex-1 truncate">{worker.email}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-xs text-slate-900 truncate">{worker.name}</p>
+                    <p className="text-xs text-slate-600 truncate">{worker.company || 'Direct'}</p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />}
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-red-600" onClick={() => handleDeleteContact(worker)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-slate-400">
-                <p>No contacts found</p>
+                <div className="text-xs text-slate-600 flex gap-2">
+                  <span className="flex-1 truncate">{worker.phone || '-'}</span>
+                  <Badge variant="outline" className="text-xs flex-shrink-0">{worker.company ? 'Contractor' : 'Employee'}</Badge>
+                </div>
               </div>
-            )}
+            ))}
           </div>
 
           {/* Desktop View */}
           <div className="hidden sm:block overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
+            <table className="w-full">
+              <thead className="bg-amber-50 border-b border-amber-100">
                 <tr>
-                  <th className="px-4 py-3 text-left font-medium text-slate-700">Name</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-700">Email</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-700">Phone</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-700">Company</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-700">Category</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-700">Action</th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Company</th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Name</th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Phone</th>
+                  <th className="text-left py-2.5 px-3 text-xs font-medium text-slate-600">Type</th>
+                  <th className="text-center py-2.5 px-3 text-xs font-medium text-slate-600">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredWorkers.length > 0 ? (
-                  filteredWorkers.map((worker) => (
-                    <tr key={worker.id} className="border-b border-slate-200 hover:bg-slate-50">
-                      <td className="px-4 py-3">{worker.name}</td>
-                      <td className="px-4 py-3">{worker.email}</td>
-                      <td className="px-4 py-3">{worker.phone || '-'}</td>
-                      <td className="px-4 py-3">{worker.company || '-'}</td>
-                      <td className="px-4 py-3">
-                        <Badge variant="secondary">{worker.category}</Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-red-600" onClick={() => handleDeleteContact(worker)}>
-                          <Trash2 className="h-4 w-4" />
+                {filteredWorkers.map((worker) => (
+                  <tr key={worker.id} className="border-b border-amber-100 hover:bg-amber-50">
+                    <td className="py-2.5 px-3">
+                      <div className="flex items-center gap-1.5">
+                        {worker.company && <Building2 className="h-3 w-3 text-slate-400" />}
+                        <span className="font-medium text-xs">{worker.company || '-'}</span>
+                      </div>
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full bg-amber-200 flex items-center justify-center text-xs font-medium">
+                          {worker.name?.[0]}
+                        </div>
+                        <span className="text-xs">{worker.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-2.5 px-3 text-xs text-slate-600">{worker.phone || '-'}</td>
+                    <td className="py-2.5 px-3">
+                      <Badge variant="outline" className="text-xs">{worker.company ? 'Contractor' : 'Employee'}</Badge>
+                    </td>
+                    <td className="py-2.5 px-3 text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        {worker.productivity_score >= 90 && <Star className="h-3.5 w-3.5 text-yellow-500" />}
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-red-600" onClick={() => handleDeleteContact(worker)}>
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="px-4 py-8 text-center text-slate-400">
-                      No contacts found
+                      </div>
                     </td>
                   </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>

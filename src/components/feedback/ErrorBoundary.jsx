@@ -73,7 +73,8 @@ class ErrorBoundary extends React.Component {
   };
 
   handleGoHome = () => {
-    window.location.href = '/';
+    const base = (typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL) ? String(import.meta.env.BASE_URL).replace(/\/$/, '') : '';
+    window.location.href = base ? `${base}/` : '/';
   };
 
   render() {
@@ -99,7 +100,7 @@ class ErrorBoundary extends React.Component {
                   Error Reference ID
                 </p>
                 <code className="text-sm font-mono text-slate-700">
-                  {this.state.errorId}
+                  {this.state.errorId ?? 'unknown'}
                 </code>
               </div>
 
@@ -157,7 +158,7 @@ class ErrorBoundary extends React.Component {
                 >
                   Contact Support
                 </a>{' '}
-                with Error ID: {this.state.errorId}
+                with Error ID: {this.state.errorId ?? 'unknown'}
               </p>
             </CardContent>
           </Card>

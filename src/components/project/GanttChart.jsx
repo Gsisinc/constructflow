@@ -30,36 +30,34 @@ export default function GanttChart({ tasks = [], onTaskAdd, onTaskUpdate, onTask
   // Calculate date range for the chart
   const dates = useMemo(() => {
     if (tasks.length === 0) return [];
-    
-    const allDates = tasks.flatMap(t => [new Date(t.startDate), new Date(t.endDate)]);
+    const allDates = tasks.flatMap(t => [new Date(t.startDate), new Date(t.endDate)]).filter(d => !isNaN(d.getTime()));
+    if (allDates.length === 0) return [];
     const minDate = new Date(Math.min(...allDates));
     const maxDate = new Date(Math.max(...allDates));
-    
-    const daysInRange = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
+    const daysInRange = Math.max(1, Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1);
     const dateArray = [];
-    
     for (let i = 0; i < daysInRange; i++) {
       const date = new Date(minDate);
       date.setDate(date.getDate() + i);
       dateArray.push(new Date(date));
     }
-    
     return dateArray;
   }, [tasks]);
 
   const minDate = dates.length > 0 ? dates[0] : new Date();
   const maxDate = dates.length > 0 ? dates[dates.length - 1] : new Date();
+  const rangeMs = Math.max(maxDate - minDate, 24 * 60 * 60 * 1000); // avoid division by zero
 
   const getTaskPosition = (task) => {
     const taskStart = new Date(task.startDate);
     const taskEnd = new Date(task.endDate);
-    
-    const startPercent = ((taskStart - minDate) / (maxDate - minDate)) * 100;
-    const durationPercent = ((taskEnd - taskStart) / (maxDate - minDate)) * 100;
-    
+    if (isNaN(taskStart.getTime())) taskStart.setTime(minDate.getTime());
+    if (isNaN(taskEnd.getTime())) taskEnd.setTime(maxDate.getTime());
+    const startPercent = ((taskStart - minDate) / rangeMs) * 100;
+    const durationPercent = ((taskEnd - taskStart) / rangeMs) * 100;
     return {
-      left: `${Math.max(0, startPercent)}%`,
-      width: `${Math.max(durationPercent, 2)}%`
+      left: `${Math.max(0, Math.min(100, startPercent))}%`,
+      width: `${Math.max(2, Math.min(100, durationPercent))}%`
     };
   };
 

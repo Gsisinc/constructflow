@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -274,9 +274,9 @@ function StepPhaseReview({ phases, onChange }) {
 }
 
 // ─── Main Wizard ─────────────────────────────────────────────────────────────
-export default function NewProjectWizard({ open, onOpenChange, onCreated, organizationId }) {
+export default function NewProjectWizard({ open, onOpenChange, onCreated, organizationId, initialType }) {
   const [step, setStep] = useState(1);
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedType, setSelectedType] = useState(initialType || '');
   const [formData, setFormData] = useState({
     name: '', client_name: '', status: 'bidding', priority: 'medium',
     address: '', start_date: '', end_date: '', budget: '',
@@ -286,6 +286,11 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
   const [createPhasesFromTemplate, setCreatePhasesFromTemplate] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (open && initialType) setSelectedType(initialType);
+    if (!open) setSelectedType('');
+  }, [open, initialType]);
 
   const handleTypeSelect = (type) => {
     setSelectedType(type);
