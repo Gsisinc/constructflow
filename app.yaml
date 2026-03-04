@@ -1,0 +1,82 @@
+name: constructflow-frontend
+kind: Service
+github:
+  branch: main
+  owner: Gsisinc
+  repo: constructflow
+
+build_command: npm run build
+run_command: npm start
+
+envs:
+  - key: VITE_API_URL
+    scope: RUN_AND_BUILD_TIME
+    value: https://mygsis-${APP_DOMAIN}/api
+
+  - key: VITE_APP_NAME
+    scope: RUN_AND_BUILD_TIME
+    value: MYGSIS
+
+  - key: VITE_APP_TITLE
+    scope: RUN_AND_BUILD_TIME
+    value: MYGSIS - Construction Management Platform
+
+  - key: VITE_ANALYTICS_ENABLED
+    scope: RUN_AND_BUILD_TIME
+    value: "true"
+
+  - key: VITE_DEBUG
+    scope: RUN_AND_BUILD_TIME
+    value: "false"
+
+  - key: NODE_ENV
+    scope: RUN_AND_BUILD_TIME
+    value: production
+
+http_routes:
+  - path: /
+    component_name: constructflow-frontend
+
+cors:
+  allow_origins:
+    - prefix: https://gsistech.com
+    - prefix: https://www.gsistech.com
+    - prefix: https://mygsis-
+  allow_methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - PATCH
+    - OPTIONS
+  allow_headers:
+    - Content-Type
+    - Authorization
+    - X-Requested-With
+  expose_headers:
+    - Content-Type
+    - X-Total-Count
+  max_age: 3600
+  allow_credentials: true
+
+health_check:
+  http_path: /api/health
+
+log_destination:
+  name: constructflow-logs
+
+scaling:
+  min_instance_count: 1
+  max_instance_count: 5
+  instance_size_slug: basic-s
+
+alerts:
+  - rule: CPU_UTILIZATION
+    value: 80
+    window: 5m
+  - rule: MEMORY_UTILIZATION
+    value: 80
+    window: 5m
+  - rule: RESTART_COUNT
+    value: 5
+    window: 1h
