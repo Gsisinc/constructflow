@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { BidListSkeleton } from '@/components/skeleton/SkeletonComponents';
@@ -31,7 +31,9 @@ import {
   ArrowLeft,
   ArrowRight,
   RefreshCw,
-  X
+  X,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -72,16 +74,73 @@ export default function BidDiscovery() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [samKeyInput, setSamKeyInput] = useState('');
   const [samKeySaved, setSamKeySaved] = useState(false);
-  const defaultBrowserUrl = 'https://sam.gov/content/opportunities';
+  const defaultBrowserUrl = 'https://vendorline.com';
+  const [browserFullscreen, setBrowserFullscreen] = useState(true);
+  const savedHeight = typeof window !== 'undefined' && window.localStorage
+    ? parseInt(localStorage.getItem('constructflow.browserHeight'), 10) : NaN;
+  const [browserHeight, setBrowserHeight] = useState(
+    Number.isFinite(savedHeight) && savedHeight >= 320 && savedHeight <= 900 ? savedHeight : 560
+  );
+  const resizeStartY = useRef(0);
+  const resizeStartHeight = useRef(560);
+  const isResizing = useRef(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.localStorage && Number.isFinite(browserHeight)) {
+      localStorage.setItem('constructflow.browserHeight', String(browserHeight));
+    }
+  }, [browserHeight]);
 
   const getTabTitleFromUrl = (url) => {
     try {
       const u = new URL(url);
+      if (u.hostname.includes('vendorline.com')) return 'Vendorline';
       return u.hostname || 'New tab';
     } catch {
       return 'New tab';
     }
   };
+
+  const handleResizeStart = useCallback((e) => {
+    e.preventDefault();
+    isResizing.current = true;
+    resizeStartY.current = e.clientY;
+    resizeStartHeight.current = browserHeight;
+  }, [browserHeight]);
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!isResizing.current) return;
+      document.body.style.cursor = 'ns-resize';
+      document.body.style.userSelect = 'none';
+      const dy = e.clientY - resizeStartY.current;
+      const next = Math.min(900, Math.max(320, resizeStartHeight.current + dy));
+      setBrowserHeight(next);
+    };
+    const onEnd = () => {
+      isResizing.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onEnd);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape' && browserFullscreen) {
+        setBrowserFullscreen(false);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [browserFullscreen]);
 
   const normalizeBrowserInput = (input) => {
     const raw = String(input || '').trim();
@@ -98,28 +157,20 @@ export default function BidDiscovery() {
     return `https://duckduckgo.com/?q=${encodeURIComponent(raw)}`;
   };
 
-  const toReaderUrl = (url) => {
-    const normalized = normalizeBrowserInput(url);
-    // r.jina.ai renders a readable version of a URL (works even when sites block iframes).
-    return `https://r.jina.ai/${normalized}`;
-  };
-
-  const makeTab = ({ id, url, title, mode } = {}) => {
+  const makeTab = ({ id, url, title } = {}) => {
     const normalized = normalizeBrowserInput(url || defaultBrowserUrl);
     return {
       id: id || String(Date.now()),
       url: normalized,
       title: title || getTabTitleFromUrl(normalized),
       key: 0,
-      mode: mode || 'direct', // 'direct' | 'reader'
       history: [normalized],
       historyIndex: 0,
     };
   };
 
   const [browserTabs, setBrowserTabs] = useState([
-    // Default to reader for SAM.gov so users see *something* even if the site blocks embedding.
-    makeTab({ id: '1', url: defaultBrowserUrl, title: 'SAM.gov', mode: 'reader' }),
+    makeTab({ id: '1', url: defaultBrowserUrl, title: getTabTitleFromUrl(defaultBrowserUrl) }),
   ]);
   const [activeBrowserTabId, setActiveBrowserTabId] = useState('1');
   const [browserUrlInput, setBrowserUrlInput] = useState(defaultBrowserUrl);
@@ -197,13 +248,6 @@ export default function BidDiscovery() {
     setBrowserUrlInput(nextUrl);
   };
 
-  const toggleReaderMode = () => {
-    setBrowserTabs((prev) =>
-      prev.map((t) =>
-        t.id === activeBrowserTabId ? { ...t, mode: t.mode === 'reader' ? 'direct' : 'reader', key: t.key + 1 } : t
-      )
-    );
-  };
   const samGovConfigured = hasSamGovKey();
 
   const states = [
@@ -809,12 +853,11 @@ Provide:
     );
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Embedded browser at top (Chrome-like, multiple tabs) */}
-      <Card className="overflow-hidden">
+  const browserCard = (
+    <Card className={cn('overflow-hidden', browserFullscreen ? 'h-full' : '')}>
         <div className="bg-slate-100 border-b flex flex-col">
           <div className="flex items-center gap-1 overflow-x-auto min-h-[40px] px-2 py-1.5 border-b border-slate-200">
+            <div className="px-2 text-sm font-semibold text-slate-700 shrink-0">GSISweb</div>
             {browserTabs.map((tab) => (
               <div
                 key={tab.id}
@@ -851,10 +894,11 @@ Provide:
             <button
               type="button"
               onClick={addBrowserTab}
-              className="p-2 rounded hover:bg-slate-200 text-slate-600 shrink-0"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-slate-200 text-slate-600 shrink-0 text-sm font-medium"
               title="New tab"
             >
               <Plus className="h-4 w-4" />
+              <span>New tab</span>
             </button>
           </div>
           <div className="flex items-center gap-2 p-2 flex-wrap">
@@ -895,14 +939,14 @@ Provide:
             </Button>
             <Button
               type="button"
-              variant={activeBrowserTab?.mode === 'reader' ? 'default' : 'outline'}
+              variant="outline"
               size="sm"
               className="shrink-0 gap-1.5 h-9"
-              onClick={toggleReaderMode}
-              title="Reader mode renders sites that block embedding"
+              onClick={() => setBrowserFullscreen((v) => !v)}
+              title={browserFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
             >
-              <Globe className="h-4 w-4" />
-              {activeBrowserTab?.mode === 'reader' ? 'Reader' : 'Direct'}
+              {browserFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              {browserFullscreen ? 'Exit' : 'Fullscreen'}
             </Button>
             <Button
               type="button"
@@ -917,20 +961,23 @@ Provide:
           </div>
         </div>
         <CardContent className="p-0">
-          <div className="bg-slate-200 rounded-b-lg relative" style={{ minHeight: '320px' }}>
+          <div
+            className="bg-slate-200 rounded-b-lg relative flex flex-col"
+            style={{ minHeight: '320px', height: browserFullscreen ? 'calc(100vh - 140px)' : `${browserHeight}px` }}
+          >
             {browserTabs.map((tab) => (
               <div
                 key={tab.id}
-                className={tab.id === activeBrowserTabId ? 'block' : 'hidden'}
-                style={{ height: '400px' }}
+                className={cn(tab.id === activeBrowserTabId ? 'block flex-1 min-h-0' : 'hidden')}
+                style={{ height: browserFullscreen ? '100%' : `${browserHeight}px` }}
               >
                 {tab.url && (
                   <iframe
                     key={tab.key}
-                    src={tab.mode === 'reader' ? toReaderUrl(tab.url) : normalizeBrowserInput(tab.url)}
+                    src={normalizeBrowserInput(tab.url)}
                     title={tab.title}
                     className="w-full rounded-b-lg border-0 bg-white"
-                    style={{ height: '400px' }}
+                    style={{ height: browserFullscreen ? '100%' : `${browserHeight}px` }}
                     sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-popups-to-escape-sandbox allow-modals allow-downloads allow-top-navigation-by-user-activation"
                     referrerPolicy="no-referrer-when-downgrade"
                     allow="clipboard-read; clipboard-write; fullscreen"
@@ -938,12 +985,35 @@ Provide:
                 )}
               </div>
             ))}
-            <p className="absolute bottom-2 left-2 text-xs text-slate-500 bg-white/90 px-2 py-1 rounded">
-              If a site refuses to embed, switch to Reader or use &quot;Open in new tab&quot;.
+            {!browserFullscreen && (
+              <div
+                role="separator"
+                aria-label="Resize browser height"
+                onMouseDown={handleResizeStart}
+                className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize flex items-center justify-center bg-slate-300/80 hover:bg-slate-400/90 transition-colors rounded-b-lg"
+                title="Drag to resize"
+              >
+                <span className="w-12 h-1 rounded-full bg-slate-500" />
+              </div>
+            )}
+            <p className="absolute bottom-2 left-2 text-xs text-slate-500 bg-white/90 px-2 py-1 rounded z-10">
+              If a site refuses to embed, use &quot;Open in new tab&quot;. {!browserFullscreen && 'Drag the bottom edge to resize.'}
             </p>
           </div>
         </CardContent>
       </Card>
+  );
+
+  return (
+    <>
+      {browserFullscreen ? (
+        <div className="fixed inset-0 z-50 bg-slate-50 p-2 sm:p-3">
+          {browserCard}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* Embedded browser at top (GSISweb) */}
+          {browserCard}
 
       {/* Header */}
       <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-4 sm:p-8 text-white">
@@ -1525,6 +1595,8 @@ Provide:
           </DialogContent>
         </Dialog>
       )}
-    </div>
+        </div>
+      )}
+    </>
   );
 }
