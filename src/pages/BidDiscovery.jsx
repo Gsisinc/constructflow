@@ -74,12 +74,13 @@ export default function BidDiscovery() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [samKeyInput, setSamKeyInput] = useState('');
   const [samKeySaved, setSamKeySaved] = useState(false);
-  const defaultBrowserUrl = 'https://vendorline.com';
-  const [browserFullscreen, setBrowserFullscreen] = useState(true);
+  const defaultBrowserUrl = 'https://vendorline.com/';
+  const [browserFullscreen, setBrowserFullscreen] = useState(false);
+  const getBrowserHeightMax = () => (typeof window !== 'undefined' ? Math.max(320, window.innerHeight - 140) : 900);
   const savedHeight = typeof window !== 'undefined' && window.localStorage
     ? parseInt(localStorage.getItem('constructflow.browserHeight'), 10) : NaN;
   const [browserHeight, setBrowserHeight] = useState(
-    Number.isFinite(savedHeight) && savedHeight >= 320 && savedHeight <= 900 ? savedHeight : 560
+    Number.isFinite(savedHeight) && savedHeight >= 320 && savedHeight <= getBrowserHeightMax() ? savedHeight : 560
   );
   const resizeStartY = useRef(0);
   const resizeStartHeight = useRef(560);
@@ -895,10 +896,10 @@ Provide:
               type="button"
               onClick={addBrowserTab}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded hover:bg-slate-200 text-slate-600 shrink-0 text-sm font-medium"
-              title="New tab"
+              title="New window"
             >
               <Plus className="h-4 w-4" />
-              <span>New tab</span>
+              <span>New window</span>
             </button>
           </div>
           <div className="flex items-center gap-2 p-2 flex-wrap">
