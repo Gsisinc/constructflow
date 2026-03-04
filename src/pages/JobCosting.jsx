@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -22,7 +22,7 @@ export default function JobCosting() {
     queryKey: ['projects', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
+      return constructflowClient.getProjects({ organization_id: user.organization_id }, '-created_date');
     },
     enabled: !!user?.organization_id,
   });

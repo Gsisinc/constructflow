@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -28,7 +28,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
 
   const { data: customPhases = [] } = useQuery({
     queryKey: ['customPhases', projectId],
-    queryFn: () => base44.entities.CustomPhase.filter({ project_id: projectId }, 'order'),
+    queryFn: () => constructflowClient.getCustomPhases({ project_id: projectId }, 'order'),
     enabled: !!projectId
   });
 
@@ -47,14 +47,14 @@ export default function PhaseManager({ projectId, currentPhase }) {
     queryKey: ['customPhase', projectId, selectedPhase],
     queryFn: async () => {
       if (!selectedPhase) return null;
-      const phases = await base44.entities.CustomPhase.filter({ project_id: projectId, phase_name: selectedPhase });
+      const phases = await constructflowClient.getCustomPhases({ project_id: projectId, phase_name: selectedPhase });
       return phases[0];
     },
     enabled: !!projectId && !!selectedPhase
   });
 
   const createPhaseMutation = useMutation({
-    mutationFn: (data) => base44.entities.CustomPhase.create(data),
+    mutationFn: (data) => constructflowClient.createCustomPhase(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases'] });
       setShowCreateDialog(false);
@@ -64,7 +64,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
   });
 
   const deletePhaseMutation = useMutation({
-    mutationFn: (id) => base44.entities.CustomPhase.delete(id),
+    mutationFn: (id) => constructflowClient.deleteCustomPhase(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases'] });
       toast.success('Phase deleted');
@@ -72,7 +72,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
   });
 
   const updatePhaseMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.CustomPhase.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateCustomPhase(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhase'] });
       queryClient.invalidateQueries({ queryKey: ['customPhases'] });
@@ -147,33 +147,33 @@ export default function PhaseManager({ projectId, currentPhase }) {
 
   const { data: requirements = [] } = useQuery({
     queryKey: ['phaseRequirements', projectId, selectedPhase],
-    queryFn: () => base44.entities.PhaseRequirement.filter({ project_id: projectId, phase_name: selectedPhase }),
+    queryFn: () => constructflowClient.getPhaseRequirements({ project_id: projectId, phase_name: selectedPhase }),
     enabled: !!projectId
   });
 
   const { data: files = [] } = useQuery({
     queryKey: ['phaseFiles', projectId, selectedPhase],
-    queryFn: () => base44.entities.PhaseFile.filter({ project_id: projectId, phase_name: selectedPhase }),
+    queryFn: () => constructflowClient.getPhaseFiles({ project_id: projectId, phase_name: selectedPhase }),
     enabled: !!projectId
   });
 
   const { data: notes = [] } = useQuery({
     queryKey: ['phaseNotes', projectId, selectedPhase],
-    queryFn: () => base44.entities.PhaseNote.filter({ project_id: projectId, phase_name: selectedPhase }),
+    queryFn: () => constructflowClient.getPhaseNotes({ project_id: projectId, phase_name: selectedPhase }),
     enabled: !!projectId
   });
 
   const { data: budget } = useQuery({
     queryKey: ['phaseBudget', projectId, selectedPhase],
     queryFn: async () => {
-      const budgets = await base44.entities.PhaseBudget.filter({ project_id: projectId, phase_name: selectedPhase });
+      const budgets = await constructflowClient.getPhaseBudgets({ project_id: projectId, phase_name: selectedPhase });
       return budgets[0];
     },
     enabled: !!projectId
   });
 
   const toggleRequirement = useMutation({
-    mutationFn: ({ id, completed }) => base44.entities.PhaseRequirement.update(id, {
+    mutationFn: ({ id, completed }) => constructflowClient.updatePhaseRequirement(id, {
       status: completed ? 'completed' : 'pending',
       completed_date: completed ? new Date().toISOString().split('T')[0] : null
     }),
@@ -185,7 +185,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
   const toggleBudgetLock = useMutation({
     mutationFn: (isLocked) => {
       if (budget) {
-        return base44.entities.PhaseBudget.update(budget.id, {
+        return constructflowClient.updatePhaseBudget(budget.id, {
           is_locked: isLocked,
           locked_date: isLocked ? new Date().toISOString().split('T')[0] : null
         });
@@ -388,10 +388,10 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
-      const req = await base44.entities.PhaseRequirement.create(data);
+      const req = await constructflowClient.createPhaseRequirement(data);
       // Create a folder only for main requirements (not sub-requirements)
       if (!data.parent_requirement_id) {
-        await base44.entities.PhaseFile.create({
+        await constructflowClient.createPhaseFile({
           project_id: data.project_id,
           phase_name: data.phase_name,
           file_name: `[Folder] ${data.requirement_text}`,
@@ -412,7 +412,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.PhaseRequirement.delete(id),
+    mutationFn: (id) => constructflowClient.deletePhaseRequirement(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
       toast.success('Requirement deleted');
@@ -425,7 +425,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
       if (parent_requirement_id !== undefined) {
         updateData.parent_requirement_id = parent_requirement_id;
       }
-      return base44.entities.PhaseRequirement.update(id, updateData);
+      return constructflowClient.updatePhaseRequirement(id, updateData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
@@ -433,7 +433,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
   });
 
   const updateRequirementMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.PhaseRequirement.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updatePhaseRequirement(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
     }
@@ -700,7 +700,7 @@ function FilesTab({ projectId, phaseName, files }) {
   // Query requirements to create missing folders
   const { data: requirements = [] } = useQuery({
     queryKey: ['phaseRequirements', projectId, phaseName],
-    queryFn: () => base44.entities.PhaseRequirement.filter({ project_id: projectId, phase_name: phaseName }),
+    queryFn: () => constructflowClient.getPhaseRequirements({ project_id: projectId, phase_name: phaseName }),
     enabled: !!projectId && !!phaseName
   });
 
@@ -718,7 +718,7 @@ function FilesTab({ projectId, phaseName, files }) {
         const reqId = folder.file_url.replace('folder://', '').replace('custom_', '');
         // Delete if it's not a main requirement and not a custom folder
         if (!mainReqIds.includes(reqId) && !folder.file_url.includes('custom_')) {
-          await base44.entities.PhaseFile.delete(folder.id);
+          await constructflowClient.deletePhaseFile(folder.id);
           needsRefresh = true;
         }
       }
@@ -728,7 +728,7 @@ function FilesTab({ projectId, phaseName, files }) {
       for (const req of mainRequirements) {
         const folderUrl = `folder://${req.id}`;
         if (!existingFolderUrls.includes(folderUrl)) {
-          await base44.entities.PhaseFile.create({
+          await constructflowClient.createPhaseFile({
             project_id: projectId,
             phase_name: phaseName,
             file_name: `[Folder] ${req.requirement_text}`,
@@ -754,7 +754,7 @@ function FilesTab({ projectId, phaseName, files }) {
   const createFolderMutation = useMutation({
     mutationFn: async (name) => {
       const maxOrder = Math.max(...folders.map(f => f.order || 0), 0);
-      return base44.entities.PhaseFile.create({
+      return constructflowClient.createPhaseFile({
         project_id: projectId,
         phase_name: phaseName,
         file_name: `[Folder] ${name}`,
@@ -777,10 +777,10 @@ function FilesTab({ projectId, phaseName, files }) {
       // Delete all files in the folder first
       const folderFiles = files.filter(f => f.parent_folder_id === folderId);
       for (const file of folderFiles) {
-        await base44.entities.PhaseFile.delete(file.id);
+        await constructflowClient.deletePhaseFile(file.id);
       }
       // Delete the folder
-      await base44.entities.PhaseFile.delete(folderId);
+      await constructflowClient.deletePhaseFile(folderId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
@@ -790,7 +790,7 @@ function FilesTab({ projectId, phaseName, files }) {
   });
 
   const updateFolderOrderMutation = useMutation({
-      mutationFn: ({ id, order }) => base44.entities.PhaseFile.update(id, { order }),
+      mutationFn: ({ id, order }) => constructflowClient.updatePhaseFile(id, { order }),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['phaseFiles'] });
         queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
@@ -816,9 +816,9 @@ function FilesTab({ projectId, phaseName, files }) {
 
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await constructflowClient.post('/documents/upload',{ file });
       
-      await base44.entities.PhaseFile.create({
+      await constructflowClient.createPhaseFile({
         project_id: projectId,
         phase_name: phaseName,
         file_name: file.name,
@@ -1017,7 +1017,7 @@ function NotesTab({ projectId, phaseName, notes }) {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.PhaseNote.create(data),
+    mutationFn: (data) => constructflowClient.createPhaseNote(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseNotes'] });
       setShowForm(false);
@@ -1092,9 +1092,9 @@ function BudgetTab({ projectId, phaseName, budget, onToggleLock }) {
   const saveMutation = useMutation({
     mutationFn: (data) => {
       if (budget) {
-        return base44.entities.PhaseBudget.update(budget.id, data);
+        return constructflowClient.updatePhaseBudget(budget.id, data);
       } else {
-        return base44.entities.PhaseBudget.create({ project_id: projectId, phase_name: phaseName, ...data });
+        return constructflowClient.createPhaseBudget({ project_id: projectId, phase_name: phaseName, ...data });
       }
     },
     onSuccess: () => {

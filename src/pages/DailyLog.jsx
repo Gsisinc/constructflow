@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,7 @@ export default function DailyLog() {
   // Get current user to access organization_id
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   // SECURITY FIX: Filter projects by organization_id
@@ -33,7 +33,7 @@ export default function DailyLog() {
     queryKey: ['projects', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return base44.entities.Project.filter({ 
+      return constructflowClient.getProjects({ 
         organization_id: user.organization_id 
       }, '-created_date');
     },
@@ -42,12 +42,12 @@ export default function DailyLog() {
 
   const { data: logs = [] } = useQuery({
     queryKey: ['dailyLogs', selectedProject],
-    queryFn: () => selectedProject ? base44.entities.DailyLog.filter({ project_id: selectedProject }) : Promise.resolve([]),
+    queryFn: () => selectedProject ? constructflowClient.getDailyLogs({ project_id: selectedProject }) : Promise.resolve([]),
     enabled: !!selectedProject
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.DailyLog.create({
+    mutationFn: (data) => constructflowClient.createDailyLog({
       ...data,
       project_id: selectedProject,
       organization_id: user?.organization_id,
@@ -62,7 +62,7 @@ export default function DailyLog() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.DailyLog.delete(id),
+    mutationFn: (id) => constructflowClient.deleteDailyLog(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dailyLogs'] })
   });
 

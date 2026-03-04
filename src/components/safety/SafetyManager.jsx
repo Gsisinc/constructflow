@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -36,11 +36,11 @@ export default function SafetyManager({ projectId }) {
 
   const { data: incidents = [] } = useQuery({
     queryKey: ['safetyIncidents', projectId],
-    queryFn: () => base44.entities.SafetyIncident.filter({ project_id: projectId }, '-incident_date')
+    queryFn: () => constructflowClient.getSafetyIncidents({ project_id: projectId }, '-incident_date')
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.SafetyIncident.create(data),
+    mutationFn: (data) => constructflowClient.createSafetyIncident(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['safetyIncidents', projectId] });
       setShowForm(false);
@@ -50,7 +50,7 @@ export default function SafetyManager({ projectId }) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.SafetyIncident.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateSafetyIncident(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['safetyIncidents', projectId] });
       toast.success('Incident updated');
@@ -238,7 +238,7 @@ export default function SafetyManager({ projectId }) {
 }
 
 function SafetyIncidentForm({ incident, onSubmit, onCancel }) {
-  const user = base44.auth.me();
+  const user = constructflowClient.getCurrentUser();
   const [formData, setFormData] = useState({
     type: incident?.type || 'near_miss',
     severity: incident?.severity || 'moderate',

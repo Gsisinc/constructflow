@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,15 +26,15 @@ export default function DecisionManager({ projectId }) {
   const [editingDecision, setEditingDecision] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const queryClient = useQueryClient();
-  const user = base44.auth.me();
+  const user = constructflowClient.getCurrentUser();
 
   const { data: decisions = [] } = useQuery({
     queryKey: ['projectDecisions', projectId],
-    queryFn: () => base44.entities.ProjectDecision.filter({ project_id: projectId }, '-created_date')
+    queryFn: () => constructflowClient.getProjectDecisions({ project_id: projectId }, '-created_date')
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ProjectDecision.create(data),
+    mutationFn: (data) => constructflowClient.createProjectDecision(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectDecisions', projectId] });
       setShowForm(false);
@@ -44,7 +44,7 @@ export default function DecisionManager({ projectId }) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.ProjectDecision.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateProjectDecision(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectDecisions', projectId] });
       toast.success('Decision updated');

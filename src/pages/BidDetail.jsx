@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +42,7 @@ export default function BidDetail() {
     setBidId(urlParams.get('id'));
 
     const loadUser = async () => {
-      const userData = await base44.auth.me();
+      const userData = await constructflowClient.getCurrentUser();
       setUser(userData);
     };
     loadUser();
@@ -51,7 +51,7 @@ export default function BidDetail() {
   const { data: bid, refetch: refetchBid } = useQuery({
     queryKey: ['bid', bidId],
     queryFn: async () => {
-      const bids = await base44.entities.BidOpportunity.filter({ id: bidId });
+      const bids = await constructflowClient.getBidOpportunitys({ id: bidId });
       return bids?.[0] || null;
     },
     enabled: !!bidId
@@ -59,18 +59,18 @@ export default function BidDetail() {
 
   const { data: documents = [] } = useQuery({
     queryKey: ['bidDocuments', bidId],
-    queryFn: () => base44.entities.BidDocument.filter({ bid_opportunity_id: bidId }),
+    queryFn: () => constructflowClient.getBidDocuments({ bid_opportunity_id: bidId }),
     enabled: !!bidId
   });
 
   const { data: bidEstimates = [] } = useQuery({
     queryKey: ['bidEstimates', bidId],
-    queryFn: () => base44.entities.BidEstimate.filter({ bid_opportunity_id: bidId }),
+    queryFn: () => constructflowClient.getBidEstimates({ bid_opportunity_id: bidId }),
     enabled: !!bidId
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.BidOpportunity.delete(id),
+    mutationFn: (id) => constructflowClient.deleteBidOpportunity(id),
     onSuccess: () => {
       toast.success('Bid deleted');
       navigate(createPageUrl('Bids'));

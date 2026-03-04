@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -30,12 +30,12 @@ export default function Submittals() {
 
   const { data: submittals = [] } = useQuery({
     queryKey: ['submittals', selectedProject],
-    queryFn: () => selectedProject ? base44.entities.Submittal.filter({ project_id: selectedProject }, '-due_date') : Promise.resolve([]),
+    queryFn: () => selectedProject ? constructflowClient.getSubmittals({ project_id: selectedProject }, '-due_date') : Promise.resolve([]),
     enabled: !!selectedProject
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Submittal.create({
+    mutationFn: (data) => constructflowClient.createSubmittal({
       ...data,
       project_id: selectedProject
     }),
@@ -54,12 +54,12 @@ export default function Submittals() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Submittal.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateSubmittal(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['submittals'] })
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Submittal.delete(id),
+    mutationFn: (id) => constructflowClient.deleteSubmittal(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['submittals'] })
   });
 

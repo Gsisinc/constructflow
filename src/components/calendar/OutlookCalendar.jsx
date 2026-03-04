@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,18 +24,18 @@ export default function OutlookCalendar({ projectId }) {
 
   const { data: calendars = [] } = useQuery({
     queryKey: ['projectCalendars', projectId],
-    queryFn: () => base44.entities.ProjectCalendar.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getProjectCalendars({ project_id: projectId }),
     enabled: !!projectId
   });
 
   const { data: events = [] } = useQuery({
     queryKey: ['calendarEvents', projectId],
-    queryFn: () => base44.entities.CalendarEvent.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getCalendarEvents({ project_id: projectId }),
     enabled: !!projectId
   });
 
   const createCalendarMutation = useMutation({
-    mutationFn: (data) => base44.entities.ProjectCalendar.create(data),
+    mutationFn: (data) => constructflowClient.createProjectCalendar(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectCalendars'] });
       setShowCalendarDialog(false);
@@ -45,7 +45,7 @@ export default function OutlookCalendar({ projectId }) {
   });
 
   const updateCalendarMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.ProjectCalendar.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateProjectCalendar(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectCalendars'] });
       setShowCalendarDialog(false);
@@ -55,7 +55,7 @@ export default function OutlookCalendar({ projectId }) {
   });
 
   const deleteCalendarMutation = useMutation({
-    mutationFn: (id) => base44.entities.ProjectCalendar.delete(id),
+    mutationFn: (id) => constructflowClient.deleteProjectCalendar(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectCalendars'] });
       queryClient.invalidateQueries({ queryKey: ['calendarEvents'] });
@@ -64,14 +64,14 @@ export default function OutlookCalendar({ projectId }) {
   });
 
   const toggleCalendarVisibility = useMutation({
-    mutationFn: ({ id, isVisible }) => base44.entities.ProjectCalendar.update(id, { is_visible: isVisible }),
+    mutationFn: ({ id, isVisible }) => constructflowClient.updateProjectCalendar(id, { is_visible: isVisible }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectCalendars'] });
     }
   });
 
   const createEventMutation = useMutation({
-    mutationFn: (data) => base44.entities.CalendarEvent.create(data),
+    mutationFn: (data) => constructflowClient.createCalendarEvent(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendarEvents'] });
       setShowEventDialog(false);

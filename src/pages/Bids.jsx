@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { BidListSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +43,7 @@ export default function Bids() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await base44.auth.me();
+      const userData = await constructflowClient.getCurrentUser();
       setUser(userData);
     };
     loadUser();
@@ -52,7 +52,7 @@ export default function Bids() {
   const { data: bids = [], isLoading } = useQuery({
     queryKey: ['bids', user?.organization_id],
     queryFn: async () => {
-      const list = await base44.entities.BidOpportunity.filter({ 
+      const list = await constructflowClient.getBidOpportunitys({ 
         organization_id: user.organization_id 
       });
       // Filter out demo bids
@@ -69,7 +69,7 @@ export default function Bids() {
   });
 
   const createBidMutation = useMutation({
-    mutationFn: (data) => base44.entities.BidOpportunity.create({ 
+    mutationFn: (data) => constructflowClient.createBidOpportunity({ 
       ...data, 
       organization_id: user.organization_id 
     }),
@@ -82,7 +82,7 @@ export default function Bids() {
   });
 
   const updateBidMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.BidOpportunity.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateBidOpportunity(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
       setShowDialog(false);
@@ -92,7 +92,7 @@ export default function Bids() {
   });
 
   const deleteBidMutation = useMutation({
-    mutationFn: (id) => base44.entities.BidOpportunity.delete(id),
+    mutationFn: (id) => constructflowClient.deleteBidOpportunity(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
       toast.success('Bid deleted');
@@ -349,12 +349,12 @@ function BidForm({ bid, onSubmit }) {
     try {
       const uploadedList = [];
       for (const file of files) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const { file_url } = await constructflowClient.post('/documents/upload',{ file });
         uploadedList.push({ name: file.name, url: file_url, type: file.type, size: file.size });
       }
       setUploadedFiles((prev) => [...prev, ...uploadedList]);
       toast.info('AI analyzing document...');
-      const llmResponse = await base44.integrations.Core.InvokeLLM({
+      const llmResponse = await constructflowClient.post('/llm/invoke', {
         prompt: `Analyze this bid/RFP document and extract: project title, agency/client name, location, estimated contract value (number), bid due date (YYYY-MM-DD), scope of work description, and project type (commercial/residential/industrial/government/infrastructure). Return JSON only.`,
         file_urls: uploadedList.map((f) => f.url),
         response_json_schema: {

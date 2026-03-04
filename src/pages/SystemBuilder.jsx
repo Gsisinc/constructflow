@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -50,7 +50,7 @@ export default function SystemBuilder() {
   // Get current user and organization
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   const { data: organization } = useQuery({
@@ -64,7 +64,7 @@ export default function SystemBuilder() {
   // Create project mutation
   const createProjectMutation = useMutation({
     mutationFn: async (projectData) => {
-      const newProject = await base44.entities.Project.create(projectData);
+      const newProject = await constructflowClient.createProject(projectData);
       return newProject;
     },
     onSuccess: (newProject) => {
@@ -83,7 +83,7 @@ export default function SystemBuilder() {
     mutationFn: async ({ projectId, materialsData }) => {
       const createdMaterials = [];
       for (const material of materialsData) {
-        const created = await base44.entities.ProjectMaterial.create({
+        const created = await constructflowClient.createProjectMaterial({
           ...material,
           project_id: projectId,
           organization_id: organization?.id,

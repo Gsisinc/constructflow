@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Link } from 'react-router-dom';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { createPageUrl } from '../utils';
@@ -16,7 +16,7 @@ export default function Estimates() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   const { data: bidOpportunities = [] } = useQuery({
@@ -31,7 +31,7 @@ export default function Estimates() {
 
   const deleteEstimateMutation = useMutation({
     mutationFn: async (estimateId) => {
-      await base44.entities.BidEstimate.delete(estimateId);
+      await constructflowClient.deleteBidEstimate(estimateId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidEstimates'] });

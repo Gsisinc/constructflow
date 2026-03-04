@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Plus, Trash2, Download } from 'lucide-react';
@@ -12,7 +12,7 @@ export default function Photos() {
   // Get current user for organization filtering
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
   const [selectedProject, setSelectedProject] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -22,19 +22,19 @@ export default function Photos() {
     queryKey: ['projects', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
+      return constructflowClient.getProjects({ organization_id: user.organization_id }, '-created_date');
     },
     enabled: !!user?.organization_id
   });
 
   const { data: documents = [] } = useQuery({
     queryKey: ['photos', selectedProject],
-    queryFn: () => selectedProject ? base44.entities.Document.filter({ project_id: selectedProject, type: 'photo' }) : Promise.resolve([]),
+    queryFn: () => selectedProject ? constructflowClient.getDocuments({ project_id: selectedProject, type: 'photo' }) : Promise.resolve([]),
     enabled: !!selectedProject
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Document.delete(id),
+    mutationFn: (id) => constructflowClient.deleteDocument(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['photos'] })
   });
 
@@ -44,8 +44,8 @@ export default function Photos() {
 
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      await base44.entities.Document.create({
+      const { file_url } = await constructflowClient.post('/documents/upload',{ file });
+      await constructflowClient.createDocument({
         project_id: selectedProject,
         type: 'photo',
         file_url,

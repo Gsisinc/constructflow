@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,7 @@ import { CheckCircle2, Clock, TrendingUp } from 'lucide-react';
 export default function Phase2Operations() {
   const queryClient = useQueryClient();
 
-  const { data: user } = useQuery({ queryKey: ['currentUser', 'phase2'], queryFn: () => base44.auth.me() });
+  const { data: user } = useQuery({ queryKey: ['currentUser', 'phase2'], queryFn: () => constructflowClient.getCurrentUser() });
 
   const { data: subcontractorBids = [] } = useQuery({
     queryKey: ['subcontractorBids'],
@@ -39,7 +39,7 @@ export default function Phase2Operations() {
 
   const changeOrderAction = useMutation({
     mutationFn: async ({ changeOrder, status }) => {
-      const updated = await base44.entities.ChangeOrder.update(changeOrder.id, {
+      const updated = await constructflowClient.updateChangeOrder(changeOrder.id, {
         ...changeOrder,
         status,
         approved_date: status === 'approved' ? new Date().toISOString().split('T')[0] : changeOrder.approved_date || null

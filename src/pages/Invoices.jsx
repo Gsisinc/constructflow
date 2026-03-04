@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +17,7 @@ export default function Invoices() {
   // Get current user for organization filtering
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
   
   const [selectedProject, setSelectedProject] = useState(null);
@@ -35,19 +35,19 @@ export default function Invoices() {
     queryKey: ['projects', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
+      return constructflowClient.getProjects({ organization_id: user.organization_id }, '-created_date');
     },
     enabled: !!user?.organization_id
   });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['invoices', selectedProject],
-    queryFn: () => selectedProject ? base44.entities.Expense.filter({ project_id: selectedProject }, '-date') : Promise.resolve([]),
+    queryFn: () => selectedProject ? constructflowClient.getExpenses({ project_id: selectedProject }, '-date') : Promise.resolve([]),
     enabled: !!selectedProject
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Expense.create({
+    mutationFn: (data) => constructflowClient.createExpense({
       ...data,
       project_id: selectedProject,
       category: 'other',
@@ -69,7 +69,7 @@ export default function Invoices() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Expense.delete(id),
+    mutationFn: (id) => constructflowClient.deleteExpense(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast.success('Invoice deleted');

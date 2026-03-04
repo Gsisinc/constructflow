@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -39,7 +39,7 @@ export default function TemplateLibrary() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.TemplateLibrary.create(data),
+    mutationFn: (data) => constructflowClient.createTemplateLibrary(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] });
       setShowNewDialog(false);
@@ -48,7 +48,7 @@ export default function TemplateLibrary() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.TemplateLibrary.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateTemplateLibrary(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] });
       setEditingTemplate(null);
@@ -57,7 +57,7 @@ export default function TemplateLibrary() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.TemplateLibrary.delete(id),
+    mutationFn: (id) => constructflowClient.deleteTemplateLibrary(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] });
       toast.success('Template deleted');

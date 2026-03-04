@@ -295,8 +295,8 @@ export default function Dashboard() {
     queryKey: ['currentUser'],
     queryFn: async () => {
       try {
-        const { base44: b44 } = await import('@/api/base44Client');
-        if (b44?.auth?.me) return await b44.auth.me();
+        const constructflowClient = (await import('@/api/constructflowClient')).default;
+        return await constructflowClient.getCurrentUser();
       } catch (_) {}
       return { id: '1', full_name: 'User', email: '', role: 'user', organization_id: 'org-1', avatar: null };
     },
@@ -308,8 +308,8 @@ export default function Dashboard() {
     queryFn: async () => {
       if (!user?.organization_id) return [];
       try {
-        const { base44: b44 } = await import('@/api/base44Client');
-        if (b44?.entities?.Project?.filter) return await b44.entities.Project.filter({ organization_id: user.organization_id });
+        const constructflowClient = (await import('@/api/constructflowClient')).default;
+        return await constructflowClient.getProjects({ organization_id: user.organization_id });
       } catch (_) {}
       return [];
     },
@@ -321,8 +321,8 @@ export default function Dashboard() {
     queryFn: async () => {
       if (!user?.organization_id) return [];
       try {
-        const { base44: b44 } = await import('@/api/base44Client');
-        if (b44?.entities?.BidOpportunity?.filter) return await b44.entities.BidOpportunity.filter({ organization_id: user.organization_id });
+        const constructflowClient = (await import('@/api/constructflowClient')).default;
+        return await constructflowClient.getBids({ organization_id: user.organization_id });
       } catch (_) {}
       return [];
     },

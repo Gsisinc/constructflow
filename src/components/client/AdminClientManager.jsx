@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -20,18 +20,18 @@ export default function AdminClientManager({ projectId }) {
 
   const { data: updates = [] } = useQuery({
     queryKey: ['clientUpdates', projectId],
-    queryFn: () => base44.entities.ClientUpdate.filter({ project_id: projectId }, '-created_date'),
+    queryFn: () => constructflowClient.getClientUpdates({ project_id: projectId }, '-created_date'),
     enabled: !!projectId
   });
 
   const { data: project } = useQuery({
     queryKey: ['project', projectId],
-    queryFn: () => base44.entities.Project.filter({ id: projectId }).then(p => p[0]),
+    queryFn: () => constructflowClient.getProjects({ id: projectId }).then(p => p[0]),
     enabled: !!projectId
   });
 
   const createUpdateMutation = useMutation({
-    mutationFn: (data) => base44.entities.ClientUpdate.create(data),
+    mutationFn: (data) => constructflowClient.createClientUpdate(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clientUpdates'] });
       setShowUpdateDialog(false);
@@ -41,7 +41,7 @@ export default function AdminClientManager({ projectId }) {
   });
 
   const deleteUpdateMutation = useMutation({
-    mutationFn: (id) => base44.entities.ClientUpdate.delete(id),
+    mutationFn: (id) => constructflowClient.deleteClientUpdate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clientUpdates'] });
       toast.success('Update deleted');
@@ -61,7 +61,7 @@ export default function AdminClientManager({ projectId }) {
 
     setUploadingPhoto(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await constructflowClient.post('/documents/upload',{ file });
       setUpdateForm({ ...updateForm, photo_urls: [...updateForm.photo_urls, file_url] });
       toast.success('Photo uploaded');
     } catch (error) {

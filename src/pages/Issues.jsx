@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import EmptyState from '../components/ui/EmptyState';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Button } from '@/components/ui/button';
@@ -69,7 +69,7 @@ export default function Issues() {
   // Get current user for organization filtering
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   const { data: issues = [], isLoading } = useQuery({
@@ -81,13 +81,13 @@ export default function Issues() {
     queryKey: ['projects', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
+      return constructflowClient.getProjects({ organization_id: user.organization_id }, '-created_date');
     },
     enabled: !!user?.organization_id,
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Issue.create(data),
+    mutationFn: (data) => constructflowClient.createIssue(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['issues'] });
       setShowForm(false);
@@ -95,7 +95,7 @@ export default function Issues() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Issue.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateIssue(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['issues'] });
       setShowForm(false);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import ProjectForm from '../components/projects/ProjectForm';
@@ -76,7 +76,7 @@ export default function ProjectDetail() {
   const { data: project, isLoading } = useQuery({
     queryKey: ['project', projectId],
     queryFn: async () => {
-      const projects = await base44.entities.Project.filter({ id: projectId });
+      const projects = await constructflowClient.getProjects({ id: projectId });
       return projects[0];
     },
     enabled: !!projectId,
@@ -84,72 +84,72 @@ export default function ProjectDetail() {
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks', projectId],
-    queryFn: () => base44.entities.Task.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getTasks({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: issues = [] } = useQuery({
     queryKey: ['issues', projectId],
-    queryFn: () => base44.entities.Issue.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getIssues({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['expenses', projectId],
-    queryFn: () => base44.entities.Expense.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getExpenses({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: phaseGates = [] } = useQuery({
     queryKey: ['phaseGates', projectId],
-    queryFn: () => base44.entities.PhaseGate.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getPhaseGates({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: permits = [] } = useQuery({
     queryKey: ['permits', projectId],
-    queryFn: () => base44.entities.Permit.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getPermits({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: calendarEvents = [] } = useQuery({
     queryKey: ['calendarEvents', projectId],
-    queryFn: () => base44.entities.CalendarEvent.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getCalendarEvents({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: clientUpdates = [] } = useQuery({
     queryKey: ['clientUpdates', projectId],
-    queryFn: () => base44.entities.ClientUpdate.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getClientUpdates({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: changeOrders = [] } = useQuery({
     queryKey: ['changeOrders', projectId],
-    queryFn: () => base44.entities.ChangeOrder.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getChangeOrders({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: safetyIncidents = [] } = useQuery({
     queryKey: ['safetyIncidents', projectId],
-    queryFn: () => base44.entities.SafetyIncident.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getSafetyIncidents({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: decisions = [] } = useQuery({
     queryKey: ['decisions', projectId],
-    queryFn: () => base44.entities.ProjectDecision.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getProjectDecisions({ project_id: projectId }),
     enabled: !!projectId,
   });
 
   const { data: customPhases = [] } = useQuery({
     queryKey: ['customPhases', projectId],
-    queryFn: () => base44.entities.CustomPhase.filter({ project_id: projectId }, 'order'),
+    queryFn: () => constructflowClient.getCustomPhases({ project_id: projectId }, 'order'),
     enabled: !!projectId,
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data) => base44.entities.Project.update(projectId, data),
+    mutationFn: (data) => constructflowClient.updateProject(projectId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
       setShowEditForm(false);
@@ -157,14 +157,14 @@ export default function ProjectDetail() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: () => base44.entities.Project.delete(projectId),
+    mutationFn: () => constructflowClient.deleteProject(projectId),
     onSuccess: () => {
       window.location.href = createPageUrl('Projects');
     },
   });
 
   const createGateMutation = useMutation({
-    mutationFn: (data) => base44.entities.PhaseGate.create(data),
+    mutationFn: (data) => constructflowClient.createPhaseGate(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseGates', projectId] });
     },

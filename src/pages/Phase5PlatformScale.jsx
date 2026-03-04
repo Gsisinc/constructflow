@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +39,7 @@ export default function Phase5PlatformScale() {
   const [syncResults, setSyncResults] = useState([]);
   const [conflicts, setConflicts] = useState([]);
 
-  const { data: user } = useQuery({ queryKey: ['currentUser', 'phase5'], queryFn: () => base44.auth.me() });
+  const { data: user } = useQuery({ queryKey: ['currentUser', 'phase5'], queryFn: () => constructflowClient.getCurrentUser() });
   const { data: projects = [] } = useQuery({ queryKey: ['projects', 'phase5'], queryFn: () => base44.entities.Project.list('-created_date') });
   const { data: expenses = [] } = useQuery({ queryKey: ['expenses', 'phase5'], queryFn: () => base44.entities.Expense.list('-created_date') });
   const { data: bids = [] } = useQuery({ queryKey: ['bids', 'phase5'], queryFn: () => base44.entities.BidOpportunity.list('-created_date') });
@@ -49,7 +49,7 @@ export default function Phase5PlatformScale() {
     enabled: !!user?.organization_id,
     queryFn: async () => {
       try {
-        return await base44.entities.UserProfile.filter({ organization_id: user.organization_id });
+        return await constructflowClient.getUserProfiles({ organization_id: user.organization_id });
       } catch (error) {
         console.warn('UserProfile entity unavailable; using current user only.', error);
         return user ? [{ id: user.id, status: 'active' }] : [];
@@ -75,7 +75,7 @@ export default function Phase5PlatformScale() {
     enabled: !!user?.organization_id,
     queryFn: async () => {
       try {
-        const rows = await base44.entities.IntegrationConfig.filter({ organization_id: user.organization_id });
+        const rows = await constructflowClient.getIntegrationConfigs({ organization_id: user.organization_id });
         const mapped = rows.reduce((acc, row) => {
           acc[row.provider] = {
             connected: !!row.connected,
@@ -98,7 +98,7 @@ export default function Phase5PlatformScale() {
     enabled: !!user?.organization_id,
     queryFn: async () => {
       try {
-        const orgRows = await base44.entities.Organization.filter({ id: user.organization_id });
+        const orgRows = await constructflowClient.getOrganizations({ id: user.organization_id });
         const org = orgRows?.[0];
         const policy = org?.tenant_policy || org?.platform_policy || {};
         setTenantPolicy(normalizeTenantPolicy(policy));
@@ -115,11 +115,11 @@ export default function Phase5PlatformScale() {
 
   const saveIntegrations = useMutation({
     mutationFn: async () => {
-      const existing = await base44.entities.IntegrationConfig.filter({ organization_id: user.organization_id });
-      await Promise.all(existing.map((row) => base44.entities.IntegrationConfig.delete(row.id)));
+      const existing = await constructflowClient.getIntegrationConfigs({ organization_id: user.organization_id });
+      await Promise.all(existing.map((row) => constructflowClient.deleteIntegrationConfig(row.id)));
       await Promise.all(
         Object.entries(providerState).map(([provider, cfg]) =>
-          base44.entities.IntegrationConfig.create({
+          constructflowClient.createIntegrationConfig({
             organization_id: user.organization_id,
             provider,
             connected: !!cfg.connected,
@@ -146,10 +146,10 @@ export default function Phase5PlatformScale() {
 
   const saveTenantPolicy = useMutation({
     mutationFn: async () => {
-      const orgRows = await base44.entities.Organization.filter({ id: user.organization_id });
+      const orgRows = await constructflowClient.getOrganizations({ id: user.organization_id });
       const org = orgRows?.[0];
       if (org?.id) {
-        await base44.entities.Organization.update(org.id, {
+        await constructflowClient.updateOrganization(org.id, {
           tenant_policy: tenantPolicy,
           platform_policy: tenantPolicy
         });

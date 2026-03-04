@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +31,7 @@ export default function TextMessages() {
   // Use ClientUpdate entity to simulate SMS threads
   const { data: threads = [] } = useQuery({
     queryKey: ['smsThreads'],
-    queryFn: () => base44.entities.ClientUpdate.filter({ update_type: 'announcement' }, '-created_date'),
+    queryFn: () => constructflowClient.getClientUpdates({ update_type: 'announcement' }, '-created_date'),
   });
 
   // Group by posted_by as "contact"
@@ -49,7 +49,7 @@ export default function TextMessages() {
     : [];
 
   const sendMutation = useMutation({
-    mutationFn: (data) => base44.entities.ClientUpdate.create(data),
+    mutationFn: (data) => constructflowClient.createClientUpdate(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['smsThreads'] });
       setMessageText('');

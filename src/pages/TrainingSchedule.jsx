@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,10 +21,10 @@ export default function TrainingSchedule() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await base44.auth.me();
+      const userData = await constructflowClient.getCurrentUser();
       setUser(userData);
       if (userData?.organization_id) {
-        const orgs = await base44.entities.Organization.filter({ id: userData.organization_id });
+        const orgs = await constructflowClient.getOrganizations({ id: userData.organization_id });
         setOrganization(orgs[0]);
       }
     };
@@ -33,7 +33,7 @@ export default function TrainingSchedule() {
 
   const { data: scheduleItems = [] } = useQuery({
     queryKey: ['schedule', organization?.id],
-    queryFn: () => organization?.id ? base44.entities.TrainingScheduleItem.filter({}) : [],
+    queryFn: () => organization?.id ? constructflowClient.getTrainingScheduleItems({}) : [],
     enabled: !!organization?.id,
   });
 

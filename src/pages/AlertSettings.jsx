@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,7 @@ export default function AlertSettings() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await base44.auth.me();
+      const userData = await constructflowClient.getCurrentUser();
       setUser(userData);
     };
     loadUser();
@@ -22,13 +22,13 @@ export default function AlertSettings() {
 
   const { data: thresholds = [], isLoading } = useQuery({
     queryKey: ['thresholds', user?.organization_id],
-    queryFn: () => base44.entities.AlertThreshold.filter({ organization_id: user.organization_id }),
+    queryFn: () => constructflowClient.getAlertThresholds({ organization_id: user.organization_id }),
     enabled: !!user?.organization_id
   });
 
   const { data: dismissedAlerts = [] } = useQuery({
     queryKey: ['dismissedAlerts', user?.organization_id],
-    queryFn: () => base44.entities.Alert.filter({ 
+    queryFn: () => constructflowClient.getAlerts({ 
       organization_id: user.organization_id,
       dismissed: true
     }, '-dismissed_at', 50),
@@ -36,7 +36,7 @@ export default function AlertSettings() {
   });
 
   const createThresholdMutation = useMutation({
-    mutationFn: (data) => base44.entities.AlertThreshold.create({
+    mutationFn: (data) => constructflowClient.createAlertThreshold({
       ...data,
       organization_id: user.organization_id
     }),
@@ -47,7 +47,7 @@ export default function AlertSettings() {
   });
 
   const updateThresholdMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.AlertThreshold.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateAlertThreshold(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['thresholds'] });
       toast.success('Threshold updated');
@@ -55,7 +55,7 @@ export default function AlertSettings() {
   });
 
   const deleteThresholdMutation = useMutation({
-    mutationFn: (id) => base44.entities.AlertThreshold.delete(id),
+    mutationFn: (id) => constructflowClient.deleteAlertThreshold(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['thresholds'] });
       toast.success('Threshold deleted');
@@ -63,7 +63,7 @@ export default function AlertSettings() {
   });
 
   const restoreAlertMutation = useMutation({
-    mutationFn: (id) => base44.entities.Alert.delete(id),
+    mutationFn: (id) => constructflowClient.deleteAlert(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dismissedAlerts'] });
       toast.success('Alert restored');

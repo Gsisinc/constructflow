@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -77,7 +77,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
   useEffect(() => {
     const loadDocs = async () => {
       try {
-        const docs = await base44.entities.BidDocument.filter({ bid_opportunity_id: bid.id });
+        const docs = await constructflowClient.getBidDocuments({ bid_opportunity_id: bid.id });
         setExistingDocs(docs);
         if (docs.length > 0 && !selectedDocForPreview) {
           setSelectedDocForPreview(docs[0]);
@@ -100,7 +100,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
       const selectedDocs = existingDocs.filter(doc => selectedDocIds.includes(doc.id));
       const fileUrls = selectedDocs.map(doc => doc.file_url);
       
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await constructflowClient.post("/llm/invoke", {
         prompt: buildDrawingAnalysisPrompt({
           bid,
           classification,
@@ -192,7 +192,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
         }
       };
 
-      await base44.entities.BidOpportunity.update(bid.id, {
+      await constructflowClient.updateBidOpportunity(bid.id, {
         ai_analysis: updatedAiAnalysis,
         estimated_value: bid.estimated_value || normalized.estimateInputs.subtotal
       });
@@ -217,8 +217,8 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
       const uploadedDocs = [];
 
       for (const file of files) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        const bidDoc = await base44.entities.BidDocument.create({
+        const { file_url } = await constructflowClient.post('/documents/upload',{ file });
+        const bidDoc = await constructflowClient.createBidDocument({
           bid_opportunity_id: bid.id,
           organization_id: organizationId,
           name: file.name,
@@ -234,7 +234,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
       setUploading(false);
       setAnalyzing(true);
 
-      const result = await base44.integrations.Core.InvokeLLM({
+      const result = await constructflowClient.post("/llm/invoke", {
         prompt: buildDrawingAnalysisPrompt({
           bid,
           classification,
@@ -316,7 +316,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
       await Promise.all(
         uploadedDocs.map(({ bidDoc }) =>
-          base44.entities.BidDocument.update(bidDoc.id, {
+          constructflowClient.updateBidDocument(bidDoc.id, {
             ai_processed: true,
             extracted_data: {
               ...(bidDoc.extracted_data || {}),
@@ -342,7 +342,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
         }
       };
 
-      await base44.entities.BidOpportunity.update(bid.id, {
+      await constructflowClient.updateBidOpportunity(bid.id, {
         ai_analysis: updatedAiAnalysis,
         estimated_value: bid.estimated_value || normalized.estimateInputs.subtotal
       });
@@ -351,7 +351,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
       toast.success(`Drawing analysis complete (${uploadedDocs.length} file${uploadedDocs.length > 1 ? 's' : ''}).`);
       
       // Reload documents list
-      const docs = await base44.entities.BidDocument.filter({ bid_opportunity_id: bid.id });
+      const docs = await constructflowClient.getBidDocuments({ bid_opportunity_id: bid.id });
       setExistingDocs(docs);
       if (docs.length > 0) setSelectedDocForPreview(docs[docs.length - 1]);
       
@@ -394,7 +394,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
     
     setApplyingEstimate(true);
     try {
-      const existingEstimates = await base44.entities.BidEstimate.filter({ bid_opportunity_id: bid.id }).catch(() => []);
+      const existingEstimates = await constructflowClient.getBidEstimates({ bid_opportunity_id: bid.id }).catch(() => []);
       const nextVersion = existingEstimates.length > 0
         ? Math.max(...existingEstimates.map(e => (e.version || 1)), 0) + 1
         : 1;
@@ -413,7 +413,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
         category: mat.csi_division || classification
       }));
 
-      await base44.entities.BidEstimate.create({
+      await constructflowClient.createBidEstimate({
         bid_opportunity_id: bid.id,
         organization_id: organizationId,
         line_items: lineItems,
@@ -431,7 +431,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
         version: nextVersion
       });
 
-      await base44.entities.BidOpportunity.update(bid.id, { 
+      await constructflowClient.updateBidOpportunity(bid.id, { 
         estimated_value: Math.round(totalBidAmount) 
       });
 

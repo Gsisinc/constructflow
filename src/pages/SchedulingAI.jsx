@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +22,7 @@ export default function SchedulingAI() {
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks', selectedProject],
-    queryFn: () => selectedProject ? base44.entities.Task.filter({ project_id: selectedProject }) : Promise.resolve([]),
+    queryFn: () => selectedProject ? constructflowClient.getTasks({ project_id: selectedProject }) : Promise.resolve([]),
     enabled: !!selectedProject,
   });
 
@@ -58,7 +58,7 @@ Respond with a JSON object with this exact structure:
   "estimated_completion": "date or range"
 }`;
 
-      const response = await base44.integrations.Core.InvokeLLM({
+      const response = await constructflowClient.post("/llm/invoke", {
         prompt: aiPrompt,
         response_json_schema: {
           type: 'object',

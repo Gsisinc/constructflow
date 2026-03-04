@@ -110,10 +110,10 @@ export default function BlueprintEstimateResult({ result, imageUrl, onClose }) {
   const [canSaveToEstimates, setCanSaveToEstimates] = useState(false);
 
   useEffect(() => {
-    import('@/api/base44Client')
+    import('@/api/constructflowClient')
       .then((m) => {
-        const b = m?.base44;
-        setCanSaveToEstimates(!!(b?.entities?.BidOpportunity?.create && b?.entities?.BidEstimate?.create));
+        const client = m?.default;
+        setCanSaveToEstimates(!!(client?.createBid && client?.createEstimate));
       })
       .catch(() => setCanSaveToEstimates(false));
   }, []);
@@ -154,8 +154,8 @@ export default function BlueprintEstimateResult({ result, imageUrl, onClose }) {
     }
     setSaving(true);
     try {
-      const { base44: b44 } = await import('@/api/base44Client');
-      if (!b44?.entities?.BidOpportunity?.create || !b44?.entities?.BidEstimate?.create) {
+      const client = (await import('@/api/constructflowClient')).default;
+      if (!client?.createBid || !client?.createEstimate) {
         toast.error('Saving to Estimates is unavailable.');
         return;
       }

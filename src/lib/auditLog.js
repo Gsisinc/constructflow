@@ -1,8 +1,8 @@
-import { rawBase44 } from '@/api/rawBase44Client';
+import constructflowClient from '@/api/constructflowClient';
 
 export async function createAuditLog({ organizationId, userId, action, entityType, entityId, before = null, after = null, metadata = {} }) {
   try {
-    await rawBase44.entities.AuditLog.create({
+    await constructflowClient.post('/audit-logs', {
       organization_id: organizationId || null,
       user_id: userId || null,
       action,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -27,7 +27,7 @@ export default function ProjectMaterials({ projectId, organizationId }) {
   // Get current user
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   // Fetch project materials
@@ -35,7 +35,7 @@ export default function ProjectMaterials({ projectId, organizationId }) {
     queryKey: ['projectMaterials', projectId, organizationId],
     queryFn: () => {
       if (!projectId || !organizationId) return [];
-      return base44.entities.ProjectMaterial.filter({ 
+      return constructflowClient.getProjectMaterials({ 
         project_id: projectId,
         organization_id: organizationId 
       }, '-created_at');
@@ -45,7 +45,7 @@ export default function ProjectMaterials({ projectId, organizationId }) {
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ProjectMaterial.create({
+    mutationFn: (data) => constructflowClient.createProjectMaterial({
       ...data,
       project_id: projectId,
       organization_id: organizationId,
@@ -70,7 +70,7 @@ export default function ProjectMaterials({ projectId, organizationId }) {
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.ProjectMaterial.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateProjectMaterial(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectMaterials'] });
       setEditingMaterial(null);
@@ -91,7 +91,7 @@ export default function ProjectMaterials({ projectId, organizationId }) {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.ProjectMaterial.delete(id),
+    mutationFn: (id) => constructflowClient.deleteProjectMaterial(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectMaterials'] });
       toast.success('Material deleted successfully');

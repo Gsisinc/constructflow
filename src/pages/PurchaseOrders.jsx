@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Input } from '@/components/ui/input';
@@ -43,7 +43,7 @@ export default function PurchaseOrders() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.PurchaseOrder.create(data),
+    mutationFn: (data) => constructflowClient.createPurchaseOrder(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['purchaseOrders'] });
       setShowForm(false);
@@ -52,7 +52,7 @@ export default function PurchaseOrders() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.PurchaseOrder.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updatePurchaseOrder(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['purchaseOrders'] });
       setShowForm(false);
@@ -61,7 +61,7 @@ export default function PurchaseOrders() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.PurchaseOrder.delete(id),
+    mutationFn: (id) => constructflowClient.deletePurchaseOrder(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['purchaseOrders'] });
     },

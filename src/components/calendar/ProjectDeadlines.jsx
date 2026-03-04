@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, AlertCircle, CheckCircle } from 'lucide-react';
@@ -9,13 +9,13 @@ import { differenceInDays, format } from 'date-fns';
 export default function ProjectDeadlines({ projectId }) {
   const { data: project } = useQuery({
     queryKey: ['project', projectId],
-    queryFn: () => base44.entities.Project.filter({ id: projectId }).then(p => p[0]),
+    queryFn: () => constructflowClient.getProjects({ id: projectId }).then(p => p[0]),
     enabled: !!projectId
   });
 
   const { data: customPhases = [] } = useQuery({
     queryKey: ['customPhases', projectId],
-    queryFn: () => base44.entities.CustomPhase.filter({ project_id: projectId, status: 'in_progress' }, 'order'),
+    queryFn: () => constructflowClient.getCustomPhases({ project_id: projectId, status: 'in_progress' }, 'order'),
     enabled: !!projectId
   });
 

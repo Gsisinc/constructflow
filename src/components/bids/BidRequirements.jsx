@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +27,7 @@ export default function BidRequirements({ bidId, organizationId }) {
   });
   const queryClient = useQueryClient();
 
-  const { data: user } = useQuery({ queryKey: ['currentUser', 'bidRequirements'], queryFn: () => base44.auth.me() });
+  const { data: user } = useQuery({ queryKey: ['currentUser', 'bidRequirements'], queryFn: () => constructflowClient.getCurrentUser() });
   const { data: policy } = useQuery({
     queryKey: ['rolePolicy', organizationId, 'bidRequirements'],
     queryFn: () => loadPolicy({ organizationId }),
@@ -36,7 +36,7 @@ export default function BidRequirements({ bidId, organizationId }) {
 
   const { data: requirements = [] } = useQuery({
     queryKey: ['bidRequirements', bidId],
-    queryFn: () => base44.entities.BidRequirement.filter({ 
+    queryFn: () => constructflowClient.getBidRequirements({ 
       bid_opportunity_id: bidId 
     }),
     enabled: !!bidId
@@ -45,7 +45,7 @@ export default function BidRequirements({ bidId, organizationId }) {
   const createMutation = useMutation({
     mutationFn: (data) => {
       requirePermission({ policy, role: user?.role || 'viewer', module: 'bids', action: 'create', message: 'You do not have permission to add bid requirements.' });
-      return base44.entities.BidRequirement.create(data);
+      return constructflowClient.createBidRequirement(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidRequirements'] });
@@ -58,7 +58,7 @@ export default function BidRequirements({ bidId, organizationId }) {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => {
       requirePermission({ policy, role: user?.role || 'viewer', module: 'bids', action: 'edit', message: 'You do not have permission to edit requirements.' });
-      return base44.entities.BidRequirement.update(id, data);
+      return constructflowClient.updateBidRequirement(id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidRequirements'] });
@@ -69,7 +69,7 @@ export default function BidRequirements({ bidId, organizationId }) {
   const deleteMutation = useMutation({
     mutationFn: (id) => {
       requirePermission({ policy, role: user?.role || 'viewer', module: 'bids', action: 'delete', message: 'You do not have permission to delete requirements.' });
-      return base44.entities.BidRequirement.delete(id);
+      return constructflowClient.deleteBidRequirement(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidRequirements'] });

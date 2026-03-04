@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,7 +27,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
   const { data: budget } = useQuery({
     queryKey: ['phaseBudget', projectId, phaseName],
     queryFn: async () => {
-      const budgets = await base44.entities.PhaseBudget.filter({ project_id: projectId, phase_name: phaseName });
+      const budgets = await constructflowClient.getPhaseBudgets({ project_id: projectId, phase_name: phaseName });
       return budgets[0];
     },
     enabled: !!projectId && !!phaseName
@@ -35,34 +35,34 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
 
   const { data: costCodes = [] } = useQuery({
     queryKey: ['costCodes', projectId, phaseName],
-    queryFn: () => base44.entities.CostCode.filter({ project_id: projectId, phase_name: phaseName, is_active: true }),
+    queryFn: () => constructflowClient.getCostCodes({ project_id: projectId, phase_name: phaseName, is_active: true }),
     enabled: !!projectId && !!phaseName
   });
 
   const { data: cashFlowForecasts = [] } = useQuery({
     queryKey: ['cashFlowForecasts', projectId, phaseName],
-    queryFn: () => base44.entities.CashFlowForecast.filter({ project_id: projectId, phase_name: phaseName }, 'forecast_date'),
+    queryFn: () => constructflowClient.getCashFlowForecasts({ project_id: projectId, phase_name: phaseName }, 'forecast_date'),
     enabled: !!projectId && !!phaseName
   });
 
   const { data: changeOrders = [] } = useQuery({
     queryKey: ['phaseChangeOrders', projectId, phaseName],
-    queryFn: () => base44.entities.PhaseChangeOrder.filter({ project_id: projectId, phase_name: phaseName }),
+    queryFn: () => constructflowClient.getPhaseChangeOrders({ project_id: projectId, phase_name: phaseName }),
     enabled: !!projectId && !!phaseName
   });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['phaseExpenses', projectId, phaseName],
-    queryFn: () => base44.entities.Expense.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getExpenses({ project_id: projectId }),
     enabled: !!projectId
   });
 
   const createOrUpdateBudget = useMutation({
     mutationFn: (data) => {
       if (budget) {
-        return base44.entities.PhaseBudget.update(budget.id, data);
+        return constructflowClient.updatePhaseBudget(budget.id, data);
       }
-      return base44.entities.PhaseBudget.create({ project_id: projectId, phase_name: phaseName, ...data });
+      return constructflowClient.createPhaseBudget({ project_id: projectId, phase_name: phaseName, ...data });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseBudget'] });
@@ -71,7 +71,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
   });
 
   const createCostCodeMutation = useMutation({
-    mutationFn: (data) => base44.entities.CostCode.create(data),
+    mutationFn: (data) => constructflowClient.createCostCode(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costCodes'] });
       setShowCostCodeDialog(false);
@@ -81,7 +81,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
   });
 
   const updateCostCodeMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.CostCode.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateCostCode(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costCodes'] });
       setShowCostCodeDialog(false);
@@ -91,7 +91,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
   });
 
   const deleteCostCodeMutation = useMutation({
-    mutationFn: (id) => base44.entities.CostCode.delete(id),
+    mutationFn: (id) => constructflowClient.deleteCostCode(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costCodes'] });
       toast.success('Cost code deleted');
@@ -99,7 +99,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
   });
 
   const createChangeOrderMutation = useMutation({
-    mutationFn: (data) => base44.entities.PhaseChangeOrder.create(data),
+    mutationFn: (data) => constructflowClient.createPhaseChangeOrder(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseChangeOrders'] });
       setShowChangeOrderDialog(false);
@@ -108,7 +108,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
   });
 
   const createExpenseMutation = useMutation({
-    mutationFn: (data) => base44.entities.Expense.create(data),
+    mutationFn: (data) => constructflowClient.createExpense(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseExpenses'] });
       setShowExpenseDialog(false);
@@ -118,7 +118,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
   });
 
   const updateExpenseMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Expense.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateExpense(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseExpenses'] });
       setShowExpenseDialog(false);
@@ -128,7 +128,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
   });
 
   const deleteExpenseMutation = useMutation({
-    mutationFn: (id) => base44.entities.Expense.delete(id),
+    mutationFn: (id) => constructflowClient.deleteExpense(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseExpenses'] });
       toast.success('Expense deleted');

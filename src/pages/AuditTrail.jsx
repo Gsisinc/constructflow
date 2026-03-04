@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,14 +10,14 @@ import { exportAuditAsCsv, exportAuditAsJsonl, buildAuditHashChain, verifyAuditH
 export default function AuditTrail() {
   const { data: user } = useQuery({
     queryKey: ['currentUser', 'auditTrail'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   const { data: logs = [] } = useQuery({
     queryKey: ['auditLogs', user?.organization_id],
     queryFn: async () => {
       if (!user?.organization_id) return [];
-      return base44.entities.AuditLog.filter({ organization_id: user.organization_id }, '-created_date');
+      return constructflowClient.getAuditLogs({ organization_id: user.organization_id }, '-created_date');
     },
     enabled: !!user?.organization_id
   });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { ProjectCardSkeleton } from '@/components/skeleton/SkeletonComponents';
 import ProjectCard from '../components/dashboard/ProjectCard';
 import NewProjectWizard from '../components/projects/NewProjectWizard';
@@ -28,13 +28,13 @@ export default function Projects() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['projects', user?.organization_id],
     queryFn: async () => {
-      const list = await base44.entities.Project.filter({ organization_id: user?.organization_id }, '-created_date');
+      const list = await constructflowClient.getProjects({ organization_id: user?.organization_id }, '-created_date');
       // Filter out demo projects
       return list.filter(p => 
         !p.name?.includes('Downtown Plaza') && 

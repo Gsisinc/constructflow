@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -31,7 +31,7 @@ export default function ProjectTools({ projectId, organizationId }) {
   // Get current user
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   // Fetch project tools
@@ -39,7 +39,7 @@ export default function ProjectTools({ projectId, organizationId }) {
     queryKey: ['projectTools', projectId, organizationId],
     queryFn: () => {
       if (!projectId || !organizationId) return [];
-      return base44.entities.ProjectTool.filter({ 
+      return constructflowClient.getProjectTools({ 
         project_id: projectId,
         organization_id: organizationId 
       }, '-created_at');
@@ -49,7 +49,7 @@ export default function ProjectTools({ projectId, organizationId }) {
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ProjectTool.create({
+    mutationFn: (data) => constructflowClient.createProjectTool({
       ...data,
       project_id: projectId,
       organization_id: organizationId,
@@ -77,7 +77,7 @@ export default function ProjectTools({ projectId, organizationId }) {
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.ProjectTool.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateProjectTool(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectTools'] });
       setEditingTool(null);
@@ -101,7 +101,7 @@ export default function ProjectTools({ projectId, organizationId }) {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.ProjectTool.delete(id),
+    mutationFn: (id) => constructflowClient.deleteProjectTool(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectTools'] });
       toast.success('Tool deleted successfully');

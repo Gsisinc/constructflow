@@ -4,7 +4,7 @@
  * Syncs invoices, expenses, payments, and job costing data
  */
 
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 
 // Configuration for different accounting systems
 const ACCOUNTING_SYSTEMS = {

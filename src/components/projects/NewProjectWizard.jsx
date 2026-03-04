@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight, ChevronLeft, Plus, Trash2, Upload, Loader2, X, Check } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { toast } from 'sonner';
 import { PROJECT_TYPE_CATALOG, getPhaseTemplate } from './projectTemplates';
 
@@ -306,7 +306,7 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
     if (!file) return;
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await constructflowClient.post('/documents/upload',{ file });
       handleChange('image_url', file_url);
       toast.success('Banner uploaded');
     } catch { toast.error('Upload failed'); }
@@ -316,7 +316,7 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
   const handleCreate = async () => {
     setSaving(true);
     try {
-      const project = await base44.entities.Project.create({
+      const project = await constructflowClient.createProject({
         ...formData,
         project_type: selectedType,
         organization_id: organizationId,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,12 +17,12 @@ export default function PhaseRequirementManager({ projectId }) {
 
   const { data: phases = [] } = useQuery({
     queryKey: ['phaseRequirements', projectId],
-    queryFn: () => base44.entities.PhaseRequirement.filter({ project_id: projectId }),
+    queryFn: () => constructflowClient.getPhaseRequirements({ project_id: projectId }),
     enabled: !!projectId
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.PhaseRequirement.create({
+    mutationFn: (data) => constructflowClient.createPhaseRequirement({
       project_id: projectId,
       ...data
     }),
@@ -35,7 +35,7 @@ export default function PhaseRequirementManager({ projectId }) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.PhaseRequirement.delete(id),
+    mutationFn: (id) => constructflowClient.deletePhaseRequirement(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements', projectId] });
       toast.success('Phase deleted');

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -46,7 +46,7 @@ export default function Phase4AIAutomation() {
   const [modelPolicy, setModelPolicy] = useState(DEFAULT_MODEL_POLICY);
   const [automationRules, setAutomationRules] = useState(defaultRules);
 
-  const { data: user } = useQuery({ queryKey: ['currentUser', 'phase4'], queryFn: () => base44.auth.me() });
+  const { data: user } = useQuery({ queryKey: ['currentUser', 'phase4'], queryFn: () => constructflowClient.getCurrentUser() });
   const { data: bids = [] } = useQuery({ queryKey: ['bids', 'phase4'], queryFn: () => base44.entities.BidOpportunity.list('-created_date') });
   const { data: projects = [] } = useQuery({ queryKey: ['projects', 'phase4'], queryFn: () => base44.entities.Project.list('-created_date') });
 
@@ -69,7 +69,7 @@ export default function Phase4AIAutomation() {
     enabled: !!user?.organization_id,
     queryFn: async () => {
       try {
-        const orgRows = await base44.entities.Organization.filter({ id: user.organization_id });
+        const orgRows = await constructflowClient.getOrganizations({ id: user.organization_id });
         const org = orgRows?.[0];
         const settings = org?.ai_governance_settings || {};
         setAiPolicy(normalizeAiPolicy(settings.ai_policy || {}));
@@ -93,10 +93,10 @@ export default function Phase4AIAutomation() {
   const savePoliciesMutation = useMutation({
     mutationFn: async () => {
       try {
-        const orgRows = await base44.entities.Organization.filter({ id: user.organization_id });
+        const orgRows = await constructflowClient.getOrganizations({ id: user.organization_id });
         const org = orgRows?.[0];
         if (org?.id) {
-          await base44.entities.Organization.update(org.id, {
+          await constructflowClient.updateOrganization(org.id, {
             ai_governance_settings: {
               ai_policy: aiPolicy,
               model_policy: modelPolicy
@@ -123,11 +123,11 @@ export default function Phase4AIAutomation() {
   const saveRulesMutation = useMutation({
     mutationFn: async () => {
       try {
-        const existing = await base44.entities.AutomationRule.filter({ organization_id: user.organization_id });
-        await Promise.all(existing.map((row) => base44.entities.AutomationRule.delete(row.id)));
+        const existing = await constructflowClient.getAutomationRules({ organization_id: user.organization_id });
+        await Promise.all(existing.map((row) => constructflowClient.deleteAutomationRule(row.id)));
         await Promise.all(
           automationRules.map((rule) =>
-            base44.entities.AutomationRule.create(attachTenantScope({
+            constructflowClient.createAutomationRule(attachTenantScope({
               ...rule
             }, user))
           )

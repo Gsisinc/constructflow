@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,10 +19,10 @@ export default function TrainingManagement() {
 
   useEffect(() => {
     const loadData = async () => {
-      const userData = await base44.auth.me();
+      const userData = await constructflowClient.getCurrentUser();
       setUser(userData);
       if (userData?.organization_id) {
-        const orgs = await base44.entities.Organization.filter({ id: userData.organization_id });
+        const orgs = await constructflowClient.getOrganizations({ id: userData.organization_id });
         setOrg(orgs[0]);
       }
     };
@@ -31,25 +31,25 @@ export default function TrainingManagement() {
 
   const { data: levels = [] } = useQuery({
     queryKey: ['courseLevels', org?.id],
-    queryFn: () => org?.id ? base44.entities.CourseLevel.filter({ organization_id: org.id }) : [],
+    queryFn: () => org?.id ? constructflowClient.getCourseLevels({ organization_id: org.id }) : [],
     enabled: !!org?.id,
   });
 
   const { data: courses = [] } = useQuery({
     queryKey: ['trainingCourses', org?.id],
-    queryFn: () => org?.id ? base44.entities.TrainingCourse.filter({ organization_id: org.id }) : [],
+    queryFn: () => org?.id ? constructflowClient.getTrainingCourses({ organization_id: org.id }) : [],
     enabled: !!org?.id,
   });
 
   const { data: assignments = [] } = useQuery({
     queryKey: ['assignments', org?.id],
-    queryFn: () => org?.id ? base44.entities.CourseAssignment.filter({ organization_id: org.id }) : [],
+    queryFn: () => org?.id ? constructflowClient.getCourseAssignments({ organization_id: org.id }) : [],
     enabled: !!org?.id,
   });
 
   const { data: technicians = [] } = useQuery({
     queryKey: ['technicians', org?.id],
-    queryFn: () => org?.id ? base44.entities.TechnicianProfile.filter({ organization_id: org.id }) : [],
+    queryFn: () => org?.id ? constructflowClient.getTechnicianProfiles({ organization_id: org.id }) : [],
     enabled: !!org?.id,
   });
 
@@ -131,7 +131,7 @@ function AssignmentsSection({ assignments, technicians, courses, org }) {
   const queryClient = useQueryClient();
 
   const createAssignmentMutation = useMutation({
-    mutationFn: (data) => base44.entities.CourseAssignment.create(data),
+    mutationFn: (data) => constructflowClient.createCourseAssignment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
       setSelectedTech('');

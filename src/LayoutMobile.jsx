@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from './utils';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -125,13 +125,13 @@ export default function Layout({ children, currentPageName }) {
         const urlParams = new URLSearchParams(window.location.search);
         const isCallback = urlParams.has('code') || urlParams.has('state') || window.location.hash.includes('access_token');
         
-        const isAuth = await base44.auth.isAuthenticated();
+        const isAuth = await constructflowClient.getToken() !== null;
         if (!isAuth && !isHomePage && !isCallback) {
           navigate(createPageUrl('Home'));
           return;
         }
         
-        const userData = await base44.auth.me();
+        const userData = await constructflowClient.getCurrentUser();
         setUser(userData);
         
         if (!userData?.organization_id && currentPageName !== 'Onboarding' && !isHomePage) {
@@ -145,7 +145,7 @@ export default function Layout({ children, currentPageName }) {
         }
         
         if (userData?.organization_id) {
-          const org = await base44.entities.Organization.filter({ id: userData.organization_id });
+          const org = await constructflowClient.getOrganizations({ id: userData.organization_id });
           if (org.length > 0) {
             setOrganization(org[0]);
             document.documentElement.style.setProperty('--primary', hexToHSL(org[0].primary_color || '#1e40af'));
@@ -161,7 +161,7 @@ export default function Layout({ children, currentPageName }) {
 
   const handleLogout = async () => {
     try {
-      await base44.auth.logout();
+      await constructflowClient.logout();
       navigate(createPageUrl('Home'));
     } catch (e) {
       console.error('Logout error:', e);

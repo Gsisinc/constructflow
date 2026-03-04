@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +24,7 @@ export default function TaskTracker() {
 
   React.useEffect(() => {
     const loadUser = async () => {
-      const userData = await base44.auth.me();
+      const userData = await constructflowClient.getCurrentUser();
       setUser(userData);
     };
     loadUser();
@@ -32,7 +32,7 @@ export default function TaskTracker() {
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', user?.organization_id],
-    queryFn: () => base44.entities.Project.filter({ organization_id: user.organization_id }),
+    queryFn: () => constructflowClient.getProjects({ organization_id: user.organization_id }),
     enabled: !!user?.organization_id
   });
 
@@ -43,13 +43,13 @@ export default function TaskTracker() {
       if (selectedProject) {
         filter.project_id = selectedProject;
       }
-      return base44.entities.OperationalTask.filter(filter);
+      return constructflowClient.getOperationalTasks(filter);
     },
     enabled: !!user?.organization_id
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.OperationalTask.create({ 
+    mutationFn: (data) => constructflowClient.createOperationalTask({ 
       ...data, 
       organization_id: user.organization_id 
     }),
@@ -61,7 +61,7 @@ export default function TaskTracker() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.OperationalTask.update(id, data),
+    mutationFn: ({ id, data }) => constructflowClient.updateOperationalTask(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['operationalTasks'] });
       toast.success('Task updated');
@@ -69,7 +69,7 @@ export default function TaskTracker() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.OperationalTask.delete(id),
+    mutationFn: (id) => constructflowClient.deleteOperationalTask(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['operationalTasks'] });
       toast.success('Task deleted');

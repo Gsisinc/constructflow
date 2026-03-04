@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,7 @@ export default function FeatureTesting() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   const updateTestResult = (feature, status, message) => {
@@ -76,7 +76,7 @@ export default function FeatureTesting() {
     setTesting(prev => ({ ...prev, agents: true }));
     try {
       // Test by checking agent configuration
-      const agentTest = await base44.integrations.Core.InvokeLLM({
+      const agentTest = await constructflowClient.post("/llm/invoke", {
         prompt: 'Respond with "OK" if you can read this',
         response_json_schema: {
           type: 'object',

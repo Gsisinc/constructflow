@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,14 +18,14 @@ export default function TaskManager({ projectId = null }) {
     queryKey: ['tasks', projectId],
     queryFn: () => {
       if (projectId) {
-        return base44.entities.Task.filter({ project_id: projectId });
+        return constructflowClient.getTasks({ project_id: projectId });
       }
       return base44.entities.Task.list();
     }
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Task.create(data),
+    mutationFn: (data) => constructflowClient.createTask(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       setTaskName('');
@@ -40,7 +40,7 @@ export default function TaskManager({ projectId = null }) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.Task.update(id, { status }),
+    mutationFn: ({ id, status }) => constructflowClient.updateTask(id, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       setOptimisticTasks((prev) => {
@@ -57,7 +57,7 @@ export default function TaskManager({ projectId = null }) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Task.delete(id),
+    mutationFn: (id) => constructflowClient.deleteTask(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast.success('Task deleted');

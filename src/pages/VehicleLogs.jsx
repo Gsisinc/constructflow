@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -36,7 +36,7 @@ export default function VehicleLogs() {
   // Get current user for organization filtering
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryFn: () => constructflowClient.getCurrentUser()
   });
 
   // Fetch vehicle logs with organization filtering
@@ -44,7 +44,7 @@ export default function VehicleLogs() {
     queryKey: ['vehicleLogs', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return base44.entities.VehicleLog.filter({
+      return constructflowClient.getVehicleLogs({
         organization_id: user.organization_id
       }, '-log_date');
     },
@@ -56,7 +56,7 @@ export default function VehicleLogs() {
     queryKey: ['projects', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return base44.entities.Project.filter({
+      return constructflowClient.getProjects({
         organization_id: user.organization_id
       }, '-created_date');
     },
@@ -68,7 +68,7 @@ export default function VehicleLogs() {
     queryKey: ['teamMembers', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return base44.entities.Profile.filter({
+      return constructflowClient.getProfiles({
         organization_id: user.organization_id
       });
     },
@@ -76,7 +76,7 @@ export default function VehicleLogs() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.VehicleLog.create({
+    mutationFn: (data) => constructflowClient.createVehicleLog({
       ...data,
       organization_id: user?.organization_id,
       log_date: format(new Date(), 'yyyy-MM-dd'),
@@ -105,7 +105,7 @@ export default function VehicleLogs() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.VehicleLog.delete(id),
+    mutationFn: (id) => constructflowClient.deleteVehicleLog(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vehicleLogs'] });
       toast.success('Vehicle log deleted');
@@ -118,7 +118,7 @@ export default function VehicleLogs() {
       const log = logs.find(l => l.id === logId);
       const totalCost = (log?.fuel_cost || 0) + (log?.maintenance_cost || 0);
       
-      return base44.entities.Expense.create({
+      return constructflowClient.createExpense({
         project_id: projectId,
         organization_id: user?.organization_id,
         description: `Vehicle Log - ${log?.vehicle_name} (${log?.driver})`,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { BidListSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -287,7 +287,7 @@ export default function BidDiscovery() {
 
   const opportunities = searchResults;
 
-  const { data: currentUser } = useQuery({ queryKey: ['currentUser', 'bidDiscovery'], queryFn: () => base44.auth.me() });
+  const { data: currentUser } = useQuery({ queryKey: ['currentUser', 'bidDiscovery'], queryFn: () => constructflowClient.getCurrentUser() });
 
   const { data: bidsRaw = [] } = useQuery({
     queryKey: ['bids'],
@@ -450,7 +450,7 @@ export default function BidDiscovery() {
   };
 
   const createProjectMutation = useMutation({
-    mutationFn: (data) => base44.entities.Project.create(data),
+    mutationFn: (data) => constructflowClient.createProject(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast.success('Project created successfully!');
@@ -458,7 +458,7 @@ export default function BidDiscovery() {
   });
 
   const createBidMutation = useMutation({
-    mutationFn: (data) => base44.entities.BidOpportunity.create(data),
+    mutationFn: (data) => constructflowClient.createBidOpportunity(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
       toast.success('Bid added to pipeline');
@@ -466,7 +466,7 @@ export default function BidDiscovery() {
   });
 
   const deleteBidMutation = useMutation({
-    mutationFn: (bidId) => base44.entities.BidOpportunity.delete(bidId),
+    mutationFn: (bidId) => constructflowClient.deleteBidOpportunity(bidId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
       toast.success('Bid removed from pipeline');
@@ -474,7 +474,7 @@ export default function BidDiscovery() {
   });
 
   const updateBidMutation = useMutation({
-    mutationFn: ({ bidId, data }) => base44.entities.BidOpportunity.update(bidId, data),
+    mutationFn: ({ bidId, data }) => constructflowClient.updateBidOpportunity(bidId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
     }

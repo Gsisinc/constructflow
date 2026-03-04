@@ -112,7 +112,7 @@ export async function executeTool(name, args, context) {
         const title = (args.title || '').toString().trim();
         const agency = (args.agency || '').toString().trim();
         if (!title || !agency) return JSON.stringify({ error: 'title and agency required' });
-        const record = await base44.entities.BidOpportunity.create({
+        const record = await constructflowClient.createBidOpportunity({
           organization_id: orgId,
           title,
           client_name: agency,
@@ -130,7 +130,7 @@ export async function executeTool(name, args, context) {
         });
       }
       case 'list_projects': {
-        const list = await base44.entities.Project.filter({ organization_id: orgId }, '-created_at');
+        const list = await constructflowClient.getProjects({ organization_id: orgId }, '-created_at');
         const summary = (list || []).map((p) => `${p.name} (id: ${p.id})`).join('\n');
         return JSON.stringify({
           count: (list || []).length,
@@ -142,7 +142,7 @@ export async function executeTool(name, args, context) {
         const project_id = (args.project_id || '').toString().trim();
         const title = (args.title || '').toString().trim();
         if (!project_id || !title) return JSON.stringify({ error: 'project_id and title required' });
-        const task = await base44.entities.Task.create({
+        const task = await constructflowClient.createTask({
           project_id,
           organization_id: orgId,
           title,
@@ -159,7 +159,7 @@ export async function executeTool(name, args, context) {
       case 'create_project': {
         const name = (args.name || '').toString().trim();
         if (!name) return JSON.stringify({ error: 'name required' });
-        const proj = await base44.entities.Project.create({
+        const proj = await constructflowClient.createProject({
           organization_id: orgId,
           name,
           description: (args.description || '').toString() || null,

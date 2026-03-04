@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import constructflowClient from '@/api/constructflowClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,7 @@ export default function ServiceDesk() {
   const [form, setForm] = useState({ subject: '', description: '', priority: 'medium', category: 'service_call', project_id: '' });
   const queryClient = useQueryClient();
 
-  const { data: user } = useQuery({ queryKey: ['currentUser', 'serviceDesk'], queryFn: () => base44.auth.me() });
+  const { data: user } = useQuery({ queryKey: ['currentUser', 'serviceDesk'], queryFn: () => constructflowClient.getCurrentUser() });
   const { data: policy } = useQuery({
     queryKey: ['rolePolicy', user?.organization_id, 'serviceDesk'],
     queryFn: () => loadPolicy({ organizationId: user?.organization_id }),
@@ -54,9 +54,9 @@ export default function ServiceDesk() {
       };
 
       try {
-        await base44.entities.ServiceTicket.create(payload);
+        await constructflowClient.createServiceTicket(payload);
       } catch {
-        await base44.entities.Issue.create({
+        await constructflowClient.createIssue({
           project_id: form.project_id || null,
           organization_id: user?.organization_id || null,
           title: form.subject,
@@ -79,9 +79,9 @@ export default function ServiceDesk() {
     mutationFn: async ({ ticket, nextStatus }) => {
       requirePermission({ policy, role: user?.role || 'viewer', module: 'projects', action: 'edit', message: 'You do not have permission to update ticket status.' });
       if (ticket.subject) {
-        return base44.entities.ServiceTicket.update(ticket.id, { status: nextStatus });
+        return constructflowClient.updateServiceTicket(ticket.id, { status: nextStatus });
       }
-      return base44.entities.Issue.update(ticket.id, { status: nextStatus });
+      return constructflowClient.updateIssue(ticket.id, { status: nextStatus });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['serviceTickets'] }),
     onError: (error) => toast.error(error?.message || 'Failed to update ticket status')
