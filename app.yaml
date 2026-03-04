@@ -33,6 +33,10 @@ envs:
     scope: RUN_AND_BUILD_TIME
     value: production
 
+  - key: PORT
+    scope: RUN_TIME
+    value: "3000"
+
 http_routes:
   - path: /
     component_name: constructflow-frontend
@@ -61,6 +65,11 @@ cors:
 
 health_check:
   http_path: /api/health
+  initial_delay_seconds: 5
+  period_seconds: 10
+  timeout_seconds: 5
+  success_threshold: 1
+  failure_threshold: 3
 
 log_destination:
   name: constructflow-logs
