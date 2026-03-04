@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -535,7 +535,7 @@ export default function AddBid() {
       const uploadedList = [];
       for (const file of files) {
         try {
-          const { file_url } = await constructflowClient.post('/documents/upload',{ file });
+          const { file_url } = await base44.integrations.Core.UploadFile({ file });
           uploadedList.push({ name: file.name, url: file_url, type: file.type, size: file.size });
         } catch (err) {
           toast.error(`Failed to upload ${file.name}: ${err.message}`);
@@ -567,7 +567,7 @@ Extract:
 
 Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
 
-      const llmResponse = await constructflowClient.post("/llm/invoke", {
+      const llmResponse = await base44.integrations.Core.InvokeLLM({
         prompt: quickPrompt,
         file_urls: uploadedList.map((f) => f.url),
         response_json_schema: {
@@ -722,7 +722,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
       let normalized = aiExtractedRaw?.normalized;
 
       if (!normalized && uploadedFiles.length > 0) {
-        const llmResponse = await constructflowClient.post("/llm/invoke", {
+        const llmResponse = await base44.integrations.Core.InvokeLLM({
           prompt: buildBidAnalysisPrompt({ formData, phases, fileCount: uploadedFiles.length }),
           file_urls: uploadedFiles.map((f) => f.url),
           response_json_schema: {
@@ -781,7 +781,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
         description: formData.description || normalized.scopeSummary || ''
       };
 
-      const bid = await constructflowClient.createBidOpportunity({
+      const bid = await base44.entities.BidOpportunity.create({
         organization_id: null,
         title: finalFormData.project_name,
         project_name: finalFormData.project_name,
@@ -801,7 +801,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
 
       if (uploadedFiles.length > 0) {
         await Promise.all(uploadedFiles.map((file) =>
-          constructflowClient.createBidDocument({
+          base44.entities.BidDocument.create({
             bid_opportunity_id: bid.id,
             organization_id: bid.organization_id,
             name: file.name,
@@ -819,7 +819,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
       ];
       if (combinedRequirements.length > 0) {
         await Promise.all(combinedRequirements.map((req) =>
-          constructflowClient.createBidRequirement({
+          base44.entities.BidRequirement.create({
             bid_opportunity_id: bid.id,
             organization_id: bid.organization_id,
             requirement_text: req.text,
@@ -831,7 +831,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
         ));
       }
 
-      await constructflowClient.updateBidOpportunity(bid.id, {
+      await base44.entities.BidOpportunity.update(bid.id, {
         ai_analysis: {
           complexity_score: Math.min(10, Math.max(1, Math.round(((normalized.risks?.length || 1) * 1.5)))),
           risk_factors: (normalized.risks || []).map((r) => r.risk || '').filter(Boolean),
@@ -845,7 +845,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
         }
       });
 
-      const requirements = await constructflowClient.getBidRequirements({ bid_opportunity_id: bid.id });
+      const requirements = await base44.entities.BidRequirement.filter({ bid_opportunity_id: bid.id });
       const project = await convertBidToProjectFromAI({
         base44Client: base44,
         bid: {

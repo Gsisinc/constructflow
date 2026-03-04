@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,11 +35,11 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     let cancelled = false;
     const init = async () => {
       try {
-        const conv = await constructflowClient.post('/agents/conversation',{ agent_name: agent.id });
+        const conv = await base44.agents.createConversation({ agent_name: agent.id });
         if (cancelled) return;
         setConversation(conv);
 
-        unsubscribeRef.current = constructflowClient.get(`/agents/conversation/${conv.id}`).then((updated) => {
+        unsubscribeRef.current = base44.agents.subscribeToConversation(conv.id, (updated) => {
           const agentMessages = (updated?.messages || [])
             .filter(m => m.role === 'assistant' || m.role === 'user')
             .map(m => ({ id: m.id || crypto.randomUUID(), role: m.role, content: m.content }));
@@ -75,7 +75,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     setLoading(true);
 
     try {
-      await constructflowClient.post('/agents/message',conversation, { role: 'user', content: text });
+      await base44.agents.addMessage(conversation, { role: 'user', content: text });
     } catch (err) {
       console.error('Send error:', err);
       toast.error('Failed to send message: ' + err.message);
@@ -88,7 +88,7 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     if (!file) return;
     setUploading(true);
     try {
-      const { file_url } = await constructflowClient.post('/documents/upload',{ file });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
       await sendMessage(`I've uploaded a file: ${file.name}. URL: ${file_url}. Please analyze it.`);
       toast.success('File uploaded');
     } catch (err) {

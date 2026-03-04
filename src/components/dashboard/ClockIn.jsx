@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, LogOut, CheckCircle2 } from 'lucide-react';
@@ -14,7 +14,7 @@ export default function ClockIn() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const user = await constructflowClient.getCurrentUser();
+      const user = await base44.auth.me();
       setUserData(user);
     };
     loadUser();

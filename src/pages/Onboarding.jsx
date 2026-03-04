@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '../utils';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +19,7 @@ export default function Onboarding() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const currentUser = await constructflowClient.getCurrentUser();
+        const currentUser = await base44.auth.me();
         setUser(currentUser);
         // If user already has organization, redirect to dashboard
         if (currentUser?.organization_id) {

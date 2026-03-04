@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,10 +32,10 @@ export default function TrainingMaterials() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await constructflowClient.getCurrentUser();
+      const userData = await base44.auth.me();
       setUser(userData);
       if (userData?.organization_id) {
-        const orgs = await constructflowClient.getOrganizations({ id: userData.organization_id });
+        const orgs = await base44.entities.Organization.filter({ id: userData.organization_id });
         setOrganization(orgs[0]);
       }
     };
@@ -44,19 +44,19 @@ export default function TrainingMaterials() {
 
   const { data: courses = [] } = useQuery({
     queryKey: ['courses', organization?.id],
-    queryFn: () => organization?.id ? constructflowClient.getTrainingCourses({ organization_id: organization.id }) : [],
+    queryFn: () => organization?.id ? base44.entities.TrainingCourse.filter({ organization_id: organization.id }) : [],
     enabled: !!organization?.id,
   });
 
   const { data: materials = [] } = useQuery({
     queryKey: ['materials', organization?.id],
-    queryFn: () => organization?.id ? constructflowClient.getTrainingMaterials({}) : [],
+    queryFn: () => organization?.id ? base44.entities.TrainingMaterial.filter({}) : [],
     enabled: !!organization?.id,
   });
 
   const { data: levels = [] } = useQuery({
     queryKey: ['levels', organization?.id],
-    queryFn: () => organization?.id ? constructflowClient.getCourseLevels({ organization_id: organization.id }).then(r => r.sort((a, b) => a.level_number - b.level_number)) : [],
+    queryFn: () => organization?.id ? base44.entities.CourseLevel.filter({ organization_id: organization.id }).then(r => r.sort((a, b) => a.level_number - b.level_number)) : [],
     enabled: !!organization?.id,
   });
 

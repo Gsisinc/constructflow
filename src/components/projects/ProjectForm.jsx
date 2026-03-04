@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Loader2, Upload, X } from 'lucide-react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 
 const PROJECT_TYPES = [
@@ -78,7 +78,7 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
 
     setUploading(true);
     try {
-      const { file_url } = await constructflowClient.post('/documents/upload',{ file });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setFormData({ ...formData, image_url: file_url });
       toast.success('Banner uploaded');
     } catch (error) {

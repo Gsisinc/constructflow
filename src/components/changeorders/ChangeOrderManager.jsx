@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,15 +26,15 @@ export default function ChangeOrderManager({ projectId }) {
   const [editingOrder, setEditingOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const queryClient = useQueryClient();
-  const user = constructflowClient.getCurrentUser();
+  const user = base44.auth.me();
 
   const { data: changeOrders = [] } = useQuery({
     queryKey: ['changeOrders', projectId],
-    queryFn: () => constructflowClient.getChangeOrders({ project_id: projectId }, '-created_date')
+    queryFn: () => base44.entities.ChangeOrder.filter({ project_id: projectId }, '-created_date')
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createChangeOrder(data),
+    mutationFn: (data) => base44.entities.ChangeOrder.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['changeOrders', projectId] });
       setShowForm(false);
@@ -44,7 +44,7 @@ export default function ChangeOrderManager({ projectId }) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateChangeOrder(id, data),
+    mutationFn: ({ id, data }) => base44.entities.ChangeOrder.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['changeOrders', projectId] });
       toast.success('Change order updated successfully');

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import SkillsCloud from '../components/team/SkillsCloud';
 import EmptyState from '../components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
@@ -83,7 +83,7 @@ export default function Team() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createWorker(data),
+    mutationFn: (data) => base44.entities.Worker.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workers'] });
       setShowForm(false);
@@ -91,7 +91,7 @@ export default function Team() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateWorker(id, data),
+    mutationFn: ({ id, data }) => base44.entities.Worker.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workers'] });
       setShowForm(false);
@@ -100,7 +100,7 @@ export default function Team() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => constructflowClient.deleteWorker(id),
+    mutationFn: (id) => base44.entities.Worker.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workers'] });
     },

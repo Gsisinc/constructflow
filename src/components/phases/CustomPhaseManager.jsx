@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,12 +17,12 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
 
   const { data: phases = [] } = useQuery({
     queryKey: ['customPhases', projectId],
-    queryFn: () => constructflowClient.getCustomPhases({ project_id: projectId }, 'order'),
+    queryFn: () => base44.entities.CustomPhase.filter({ project_id: projectId }, 'order'),
     enabled: !!projectId
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createCustomPhase(data),
+    mutationFn: (data) => base44.entities.CustomPhase.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases'] });
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
@@ -33,7 +33,7 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => constructflowClient.deleteCustomPhase(id),
+    mutationFn: (id) => base44.entities.CustomPhase.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases'] });
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
@@ -42,7 +42,7 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateCustomPhase(id, data),
+    mutationFn: ({ id, data }) => base44.entities.CustomPhase.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases'] });
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
@@ -54,7 +54,7 @@ export default function CustomPhaseManager({ projectId, onSelectPhase }) {
     mutationFn: ({ phases }) => {
       // Update order for each phase
       return Promise.all(phases.map(p => 
-        constructflowClient.updateCustomPhase(p.id, { order: p.order })
+        base44.entities.CustomPhase.update(p.id, { order: p.order })
       ));
     },
     onSuccess: () => {

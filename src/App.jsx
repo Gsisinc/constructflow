@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate, useLocation, useNavig
 import PageNotFound from './lib/PageNotFound';
 // SAFEGUARD: Dashboard is always the improved version. Do not remove — Base44 auto-gen often overwrites pages.config and breaks the Dashboard route.
 import DashboardPage from './pages/Dashboard.ImprovedVersion';
-import { AuthProvider, useAuth } from '@/lib/AuthContextNew';
+import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { useEffect, useState } from 'react';

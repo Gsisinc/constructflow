@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +15,7 @@ import { hasPermission, loadPolicy } from '@/lib/permissions';
 
 async function safeCreateDocumentVersion(payload) {
   try {
-    return await constructflowClient.createDocumentVersion(payload);
+    return await base44.entities.DocumentVersion.create(payload);
   } catch (error) {
     console.warn('DocumentVersion entity unavailable. Skipping version record.', error);
     return null;
@@ -24,7 +24,7 @@ async function safeCreateDocumentVersion(payload) {
 
 async function safeListDocumentVersions(documentId) {
   try {
-    return await constructflowClient.getDocumentVersions({ document_id: documentId }, '-version_number');
+    return await base44.entities.DocumentVersion.filter({ document_id: documentId }, '-version_number');
   } catch (error) {
     console.warn('DocumentVersion entity unavailable. Returning empty list.', error);
     return [];
@@ -50,7 +50,7 @@ export default function Documents() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser', 'documents-page'],
-    queryFn: () => constructflowClient.getCurrentUser()
+    queryFn: () => base44.auth.me()
   });
 
   const { data: policy } = useQuery({
@@ -70,7 +70,7 @@ export default function Documents() {
 
   const { data: documents = [] } = useQuery({
     queryKey: ['documents', selectedProject],
-    queryFn: () => (selectedProject ? constructflowClient.getDocuments({ project_id: selectedProject }, '-created_date') : Promise.resolve([])),
+    queryFn: () => (selectedProject ? base44.entities.Document.filter({ project_id: selectedProject }, '-created_date') : Promise.resolve([])),
     enabled: !!selectedProject
   });
 
@@ -90,7 +90,7 @@ export default function Documents() {
     mutationFn: async () => {
       let fileMeta = null;
       if (selectedFile) {
-        const { file_url } = await constructflowClient.post('/documents/upload',{ file: selectedFile });
+        const { file_url } = await base44.integrations.Core.UploadFile({ file: selectedFile });
         fileMeta = {
           file_url,
           file_name: selectedFile.name,
@@ -99,7 +99,7 @@ export default function Documents() {
         };
       }
 
-      const document = await constructflowClient.createDocument({
+      const document = await base44.entities.Document.create({
         ...formData,
         ...fileMeta,
         project_id: selectedProject,
@@ -143,7 +143,7 @@ export default function Documents() {
 
   const deleteMutation = useMutation({
     mutationFn: async (doc) => {
-      await constructflowClient.deleteDocument(doc.id);
+      await base44.entities.Document.delete(doc.id);
       await createAuditLog({
         organizationId: user?.organization_id,
         userId: user?.id,
@@ -165,10 +165,10 @@ export default function Documents() {
       const doc = documents.find((item) => item.id === newVersionDoc);
       if (!doc || !newVersionFile) return;
 
-      const { file_url } = await constructflowClient.post('/documents/upload',{ file: newVersionFile });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: newVersionFile });
       const nextVersion = Number(doc.version || 1) + 1;
 
-      const updatedDoc = await constructflowClient.updateDocument(doc.id, {
+      const updatedDoc = await base44.entities.Document.update(doc.id, {
         file_url,
         file_name: newVersionFile.name,
         file_type: newVersionFile.type,

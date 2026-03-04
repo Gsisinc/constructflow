@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,10 +14,10 @@ export default function FieldHoursApproval() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await constructflowClient.getCurrentUser();
+      const userData = await base44.auth.me();
       setUser(userData);
       if (userData?.organization_id) {
-        const orgs = await constructflowClient.getOrganizations({ id: userData.organization_id });
+        const orgs = await base44.entities.Organization.filter({ id: userData.organization_id });
         setOrganization(orgs[0]);
       }
     };
@@ -26,17 +26,17 @@ export default function FieldHoursApproval() {
 
   const { data: fieldHours = [] } = useQuery({
     queryKey: ['fieldHoursForApproval', organization?.id],
-    queryFn: () => organization?.id ? constructflowClient.getFieldHoursLogs({}) : [],
+    queryFn: () => organization?.id ? base44.entities.FieldHoursLog.filter({}) : [],
     enabled: !!organization?.id,
   });
 
   const approveMutation = useMutation({
-    mutationFn: (id) => constructflowClient.updateFieldHoursLog(id, { approved: true }),
+    mutationFn: (id) => base44.entities.FieldHoursLog.update(id, { approved: true }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['fieldHoursForApproval'] }),
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (id) => constructflowClient.updateFieldHoursLog(id, { approved: false }),
+    mutationFn: (id) => base44.entities.FieldHoursLog.update(id, { approved: false }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['fieldHoursForApproval'] }),
   });
 

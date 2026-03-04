@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,12 +13,12 @@ export default function EstimateEditor({ bidId, organizationId }) {
 
   const { data: estimates = [], isLoading } = useQuery({
     queryKey: ['bidEstimates', bidId],
-    queryFn: () => constructflowClient.getBidEstimates({ bid_opportunity_id: bidId }),
+    queryFn: () => base44.entities.BidEstimate.filter({ bid_opportunity_id: bidId }),
     enabled: !!bidId
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createBidEstimate({
+    mutationFn: (data) => base44.entities.BidEstimate.create({
       ...data,
       bid_opportunity_id: bidId,
       organization_id: organizationId
@@ -31,7 +31,7 @@ export default function EstimateEditor({ bidId, organizationId }) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateBidEstimate(id, data),
+    mutationFn: ({ id, data }) => base44.entities.BidEstimate.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidEstimates', bidId] });
       toast.success('Estimate saved');
@@ -40,7 +40,7 @@ export default function EstimateEditor({ bidId, organizationId }) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => constructflowClient.deleteBidEstimate(id),
+    mutationFn: (id) => base44.entities.BidEstimate.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidEstimates', bidId] });
       toast.success('Estimate deleted');

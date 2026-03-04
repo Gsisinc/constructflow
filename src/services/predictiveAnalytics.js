@@ -4,7 +4,7 @@
  * Provides advanced insights for decision-making
  */
 
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { callOpenAI } from '@/services/llmService';
 
 /**

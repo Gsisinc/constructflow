@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,9 +15,9 @@ export default function UserApprovals() {
   const { data: pendingUsers = [], isLoading } = useQuery({
     queryKey: ['pendingUsers'],
     queryFn: async () => {
-      const userData = await constructflowClient.getCurrentUser();
+      const userData = await base44.auth.me();
       if (userData?.role === 'admin') {
-        return constructflowClient.getPendingUsers({ status: 'pending' }, '-created_date');
+        return base44.entities.PendingUser.filter({ status: 'pending' }, '-created_date');
       }
       return [];
     }
@@ -25,7 +25,7 @@ export default function UserApprovals() {
 
   React.useEffect(() => {
     const loadUser = async () => {
-      const userData = await constructflowClient.getCurrentUser();
+      const userData = await base44.auth.me();
       setUser(userData);
     };
     loadUser();
@@ -36,7 +36,7 @@ export default function UserApprovals() {
       // Map requested role to system role (admin or user)
       const systemRole = pendingUser.requested_role === 'project_manager' ? 'admin' : 'user';
       await base44.users.inviteUser(pendingUser.email, systemRole);
-      await constructflowClient.updatePendingUser(pendingUser.id, {
+      await base44.entities.PendingUser.update(pendingUser.id, {
         status: 'approved',
         reviewed_by: user?.email,
         reviewed_date: new Date().toISOString().split('T')[0]
@@ -53,7 +53,7 @@ export default function UserApprovals() {
 
   const rejectMutation = useMutation({
     mutationFn: async (pendingUser) => {
-      await constructflowClient.updatePendingUser(pendingUser.id, {
+      await base44.entities.PendingUser.update(pendingUser.id, {
         status: 'rejected',
         reviewed_by: user?.email,
         reviewed_date: new Date().toISOString().split('T')[0]

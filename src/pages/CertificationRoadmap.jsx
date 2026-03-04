@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,10 +22,10 @@ export default function CertificationRoadmap() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await constructflowClient.getCurrentUser();
+      const userData = await base44.auth.me();
       setUser(userData);
       if (userData?.organization_id) {
-        const orgs = await constructflowClient.getOrganizations({ id: userData.organization_id });
+        const orgs = await base44.entities.Organization.filter({ id: userData.organization_id });
         setOrganization(orgs[0]);
       }
     };
@@ -34,19 +34,19 @@ export default function CertificationRoadmap() {
 
   const { data: certifications = [] } = useQuery({
     queryKey: ['allCertifications', organization?.id],
-    queryFn: () => organization?.id ? constructflowClient.getIndustryCertifications({ organization_id: organization.id }) : [],
+    queryFn: () => organization?.id ? base44.entities.IndustryCertification.filter({ organization_id: organization.id }) : [],
     enabled: !!organization?.id,
   });
 
   const { data: techCertifications = [] } = useQuery({
     queryKey: ['techCertifications', organization?.id],
-    queryFn: () => organization?.id ? constructflowClient.getTechnicianCertifications({}) : [],
+    queryFn: () => organization?.id ? base44.entities.TechnicianCertification.filter({}) : [],
     enabled: !!organization?.id,
   });
 
   const { data: technicians = [] } = useQuery({
     queryKey: ['technicians', organization?.id],
-    queryFn: () => organization?.id ? constructflowClient.getTechnicianProfiles({ organization_id: organization.id }) : [],
+    queryFn: () => organization?.id ? base44.entities.TechnicianProfile.filter({ organization_id: organization.id }) : [],
     enabled: !!organization?.id,
   });
 

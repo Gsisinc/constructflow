@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +30,7 @@ export default function ESignatures() {
   // Get current user for organization filtering
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => constructflowClient.getCurrentUser()
+    queryFn: () => base44.auth.me()
   });
   const [showForm, setShowForm] = useState(false);
   const [tab, setTab] = useState('all');
@@ -42,7 +42,7 @@ export default function ESignatures() {
     queryKey: ['projects', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return constructflowClient.getProjects({ organization_id: user.organization_id }, '-created_date');
+      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
     },
     enabled: !!user?.organization_id,
   });
@@ -50,11 +50,11 @@ export default function ESignatures() {
   // Use Document entity to track e-signature requests
   const { data: docs = [] } = useQuery({
     queryKey: ['esignDocs'],
-    queryFn: () => constructflowClient.getDocuments({ type: 'contract' }, '-created_date'),
+    queryFn: () => base44.entities.Document.filter({ type: 'contract' }, '-created_date'),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createDocument({
+    mutationFn: (data) => base44.entities.Document.create({
       name: data.name,
       type: 'contract',
       status: 'pending_review',
@@ -70,7 +70,7 @@ export default function ESignatures() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, status }) => constructflowClient.updateDocument(id, { status }),
+    mutationFn: ({ id, status }) => base44.entities.Document.update(id, { status }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['esignDocs'] }),
   });
 

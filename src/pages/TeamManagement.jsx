@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,7 +31,7 @@ export default function TeamManagement() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await constructflowClient.getCurrentUser();
+      const userData = await base44.auth.me();
       setUser(userData);
     };
     loadUser();
@@ -39,19 +39,19 @@ export default function TeamManagement() {
 
   const { data: workers = [], isLoading } = useQuery({
     queryKey: ['workers', user?.organization_id],
-    queryFn: () => constructflowClient.getWorkers({ organization_id: user.organization_id }),
+    queryFn: () => base44.entities.Worker.filter({ organization_id: user.organization_id }),
     enabled: !!user?.organization_id
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', user?.organization_id],
-    queryFn: () => constructflowClient.getProjects({ organization_id: user.organization_id }),
+    queryFn: () => base44.entities.Project.filter({ organization_id: user.organization_id }),
     enabled: !!user?.organization_id
   });
 
   const { data: assignments = [] } = useQuery({
     queryKey: ['assignments', user?.organization_id],
-    queryFn: () => constructflowClient.getWorkerAssignments({ 
+    queryFn: () => base44.entities.WorkerAssignment.filter({ 
       organization_id: user.organization_id,
       status: 'active'
     }),
@@ -59,7 +59,7 @@ export default function TeamManagement() {
   });
 
   const createWorkerMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createWorker({
+    mutationFn: (data) => base44.entities.Worker.create({
       ...data,
       organization_id: user.organization_id
     }),
@@ -72,7 +72,7 @@ export default function TeamManagement() {
   });
 
   const updateWorkerMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateWorker(id, data),
+    mutationFn: ({ id, data }) => base44.entities.Worker.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workers'] });
       setShowWorkerDialog(false);
@@ -82,7 +82,7 @@ export default function TeamManagement() {
   });
 
   const deleteWorkerMutation = useMutation({
-    mutationFn: (id) => constructflowClient.deleteWorker(id),
+    mutationFn: (id) => base44.entities.Worker.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workers'] });
       toast.success('Team member removed');
@@ -480,14 +480,14 @@ function AssignmentDialog({ open, onOpenChange, worker, projects, organizationId
 
   const createAssignmentMutation = useMutation({
     mutationFn: async (data) => {
-      const assignment = await constructflowClient.createWorkerAssignment({
+      const assignment = await base44.entities.WorkerAssignment.create({
         ...data,
         organization_id: organizationId,
         worker_id: worker.id
       });
       
       // Update worker status
-      await constructflowClient.updateWorker(worker.id, {
+      await base44.entities.Worker.update(worker.id, {
         status: 'assigned',
         current_project_id: data.project_id
       });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import EmptyState from '../components/ui/EmptyState';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Button } from '@/components/ui/button';
@@ -77,7 +77,7 @@ export default function Materials() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createMaterial(data),
+    mutationFn: (data) => base44.entities.Material.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['materials'] });
       setShowForm(false);
@@ -85,7 +85,7 @@ export default function Materials() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateMaterial(id, data),
+    mutationFn: ({ id, data }) => base44.entities.Material.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['materials'] });
       setShowForm(false);

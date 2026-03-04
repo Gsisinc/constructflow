@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,9 +28,9 @@ export default function PermitUploader({ projectId, phaseName }) {
 
     setUploading(true);
     try {
-      const { file_url } = await constructflowClient.post('/documents/upload',{ file: selectedFile });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: selectedFile });
       
-      await constructflowClient.createPermit({
+      await base44.entities.Permit.create({
         project_id: projectId,
         permit_type: formData.permit_type,
         description: formData.description,

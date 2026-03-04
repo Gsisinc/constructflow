@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,7 @@ export default function CostPlusInvoicing() {
   // Get current user for organization filtering
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => constructflowClient.getCurrentUser()
+    queryFn: () => base44.auth.me()
   });
   const [showForm, setShowForm] = useState(false);
   const [selectedProject, setSelectedProject] = useState('');
@@ -32,14 +32,14 @@ export default function CostPlusInvoicing() {
     queryKey: ['projects', user?.organization_id],
     queryFn: () => {
       if (!user?.organization_id) return [];
-      return constructflowClient.getProjects({ organization_id: user.organization_id }, '-created_date');
+      return base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date');
     },
     enabled: !!user?.organization_id,
   });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['expenses', 'pending'],
-    queryFn: () => constructflowClient.getExpenses({ status: 'approved' }, '-date'),
+    queryFn: () => base44.entities.Expense.filter({ status: 'approved' }, '-date'),
     enabled: !!selectedProject,
   });
 
@@ -50,7 +50,7 @@ export default function CostPlusInvoicing() {
 
   const { data: invoices = [] } = useQuery({
     queryKey: ['costPlusInvoices'],
-    queryFn: () => constructflowClient.getDocuments({ type: 'invoice' }, '-created_date'),
+    queryFn: () => base44.entities.Document.filter({ type: 'invoice' }, '-created_date'),
   });
 
   const projectExpenses = expenses.filter(e => e.project_id === selectedProject);
@@ -67,7 +67,7 @@ export default function CostPlusInvoicing() {
   };
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createDocument({
+    mutationFn: (data) => base44.entities.Document.create({
       project_id: selectedProject,
       name: data.title,
       type: 'invoice',

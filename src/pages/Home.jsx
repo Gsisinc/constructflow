@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '../utils';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -25,7 +25,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    const isAuth = await constructflowClient.getToken() !== null;
+    const isAuth = await base44.auth.isAuthenticated();
     if (isAuth) {
       navigate(createPageUrl('Bids'));
     } else {
@@ -34,7 +34,7 @@ export default function Home() {
   };
 
   const handleGetStarted = async () => {
-    const isAuth = await constructflowClient.getToken() !== null;
+    const isAuth = await base44.auth.isAuthenticated();
     if (isAuth) {
       navigate(createPageUrl('Bids'));
     } else {

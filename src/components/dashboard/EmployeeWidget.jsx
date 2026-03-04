@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,12 +11,12 @@ import { createPageUrl } from '@/utils';
 export default function EmployeeWidget() {
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => constructflowClient.getCurrentUser()
+    queryFn: () => base44.auth.me()
   });
 
   const { data: workers = [] } = useQuery({
     queryKey: ['workers', user?.organization_id],
-    queryFn: () => constructflowClient.getWorkers({ organization_id: user.organization_id }, '-created_date', 10),
+    queryFn: () => base44.entities.Worker.filter({ organization_id: user.organization_id }, '-created_date', 10),
     enabled: !!user?.organization_id
   });
 

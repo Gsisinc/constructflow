@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import ProjectCalendar from '../components/calendar/ProjectCalendar';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import ProjectDeadlines from '../components/calendar/ProjectDeadlines';
@@ -66,7 +66,7 @@ export default function Calendar() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createCalendarEvent(data),
+    mutationFn: (data) => base44.entities.CalendarEvent.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendarEvents'] });
       setShowForm(false);
@@ -75,7 +75,7 @@ export default function Calendar() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateCalendarEvent(id, data),
+    mutationFn: ({ id, data }) => base44.entities.CalendarEvent.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendarEvents'] });
       setShowForm(false);

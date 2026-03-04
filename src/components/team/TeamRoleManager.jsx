@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,7 +23,7 @@ export default function TeamRoleManager({ projectId }) {
 
   const { data: teamMembers = [] } = useQuery({
     queryKey: ['projectTeam', projectId],
-    queryFn: () => constructflowClient.getProjectTeams({ project_id: projectId })
+    queryFn: () => base44.entities.ProjectTeam.filter({ project_id: projectId })
   });
 
   const { data: roles = [] } = useQuery({
@@ -32,7 +32,7 @@ export default function TeamRoleManager({ projectId }) {
   });
 
   const createTeamMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createProjectTeam(data),
+    mutationFn: (data) => base44.entities.ProjectTeam.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectTeam', projectId] });
       setShowTeamForm(false);
@@ -42,7 +42,7 @@ export default function TeamRoleManager({ projectId }) {
   });
 
   const updateTeamMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateProjectTeam(id, data),
+    mutationFn: ({ id, data }) => base44.entities.ProjectTeam.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectTeam', projectId] });
       toast.success('Team member updated');
@@ -50,7 +50,7 @@ export default function TeamRoleManager({ projectId }) {
   });
 
   const createRoleMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createProjectRole(data),
+    mutationFn: (data) => base44.entities.ProjectRole.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectRoles'] });
       setShowRoleForm(false);
@@ -60,7 +60,7 @@ export default function TeamRoleManager({ projectId }) {
   });
 
   const updateRoleMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateProjectRole(id, data),
+    mutationFn: ({ id, data }) => base44.entities.ProjectRole.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectRoles'] });
       toast.success('Role updated');

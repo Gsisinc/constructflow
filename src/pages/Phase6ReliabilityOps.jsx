@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ export default function Phase6ReliabilityOps() {
   const [autoEscalationEnabled, setAutoEscalationEnabled] = useState(true);
   const runbooks = defaultPhase6Runbooks();
 
-  const { data: user } = useQuery({ queryKey: ['currentUser', 'phase6'], queryFn: () => constructflowClient.getCurrentUser() });
+  const { data: user } = useQuery({ queryKey: ['currentUser', 'phase6'], queryFn: () => base44.auth.me() });
 
   const { data: incidents = [] } = useQuery({
     queryKey: ['incidents', 'phase6'],
@@ -91,10 +91,10 @@ export default function Phase6ReliabilityOps() {
   const saveOpsPolicy = useMutation({
     mutationFn: async () => {
       try {
-        const orgRows = await constructflowClient.getOrganizations({ id: user.organization_id });
+        const orgRows = await base44.entities.Organization.filter({ id: user.organization_id });
         const org = orgRows?.[0];
         if (org?.id) {
-          await constructflowClient.updateOrganization(org.id, {
+          await base44.entities.Organization.update(org.id, {
             reliability_policy: {
               auto_escalation_enabled: autoEscalationEnabled,
               runbook_count: runbooks.length

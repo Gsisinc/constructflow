@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,15 +22,15 @@ export default function Settings() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => constructflowClient.getCurrentUser()
+    queryFn: () => base44.auth.me()
   });
 
   const { data: organization } = useQuery({
     queryKey: ['organization', user?.email],
     queryFn: async () => {
-      const orgs = await constructflowClient.getOrganizations({ owner_email: user.email });
+      const orgs = await base44.entities.Organization.filter({ owner_email: user.email });
       if (orgs.length === 0) {
-        const newOrg = await constructflowClient.createOrganization({
+        const newOrg = await base44.entities.Organization.create({
           name: 'My Company',
           owner_email: user.email
         });
@@ -42,7 +42,7 @@ export default function Settings() {
   });
 
   const updateOrgMutation = useMutation({
-    mutationFn: (data) => constructflowClient.updateOrganization(organization.id, data),
+    mutationFn: (data) => base44.entities.Organization.update(organization.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organization'] });
       toast.success('Settings saved');
@@ -64,7 +64,7 @@ export default function Settings() {
 
     setUploadingLogo(true);
     try {
-      const { file_url } = await constructflowClient.post('/documents/upload',{ file });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setOrgForm({ ...orgForm, logo_url: file_url });
       toast.success('Logo uploaded');
     } catch (error) {

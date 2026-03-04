@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,24 +15,24 @@ export default function AlertsWidget() {
   
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => constructflowClient.getCurrentUser()
+    queryFn: () => base44.auth.me()
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', user?.organization_id],
-    queryFn: () => constructflowClient.getProjects({ organization_id: user.organization_id }, '-created_date', 20),
+    queryFn: () => base44.entities.Project.filter({ organization_id: user.organization_id }, '-created_date', 20),
     enabled: !!user?.organization_id
   });
 
   const { data: issues = [] } = useQuery({
     queryKey: ['issues', user?.organization_id],
-    queryFn: () => constructflowClient.getIssues({ organization_id: user.organization_id }, '-created_date', 10),
+    queryFn: () => base44.entities.Issue.filter({ organization_id: user.organization_id }, '-created_date', 10),
     enabled: !!user?.organization_id
   });
 
   const { data: thresholds = [] } = useQuery({
     queryKey: ['thresholds', user?.organization_id],
-    queryFn: () => constructflowClient.getAlertThresholds({ 
+    queryFn: () => base44.entities.AlertThreshold.filter({ 
       organization_id: user.organization_id,
       enabled: true
     }),
@@ -41,7 +41,7 @@ export default function AlertsWidget() {
 
   const { data: dismissedAlerts = [] } = useQuery({
     queryKey: ['dismissedAlerts', user?.organization_id],
-    queryFn: () => constructflowClient.getAlerts({ 
+    queryFn: () => base44.entities.Alert.filter({ 
       organization_id: user.organization_id,
       dismissed: true
     }),
@@ -51,7 +51,7 @@ export default function AlertsWidget() {
   const dismissAlertMutation = useMutation({
     mutationFn: async (alert) => {
       // Create dismissed alert record
-      await constructflowClient.createAlert({
+      await base44.entities.Alert.create({
         organization_id: user.organization_id,
         type: alert.type,
         severity: alert.severity,

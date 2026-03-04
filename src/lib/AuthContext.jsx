@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 
@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
   const checkUserAuth = async () => {
     try {
       setIsLoadingAuth(true);
-      const currentUser = await constructflowClient.getCurrentUser();
+      const currentUser = await base44.auth.me();
       if (!currentUser) {
         setIsLoadingAuth(false);
         setIsAuthenticated(false);
@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }) => {
       const appRoot = `${window.location.origin}${basePath()}/`;
       base44.auth.logout(appRoot);
     } else {
-      constructflowClient.logout();
+      base44.auth.logout();
     }
   };
 

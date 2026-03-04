@@ -4,7 +4,7 @@
  * Integrates with DocuSign for e-signature workflows
  */
 
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 
 /**
  * Parse incoming email and extract actionable items

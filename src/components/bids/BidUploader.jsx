@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,7 +47,7 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
 
   const { data: user } = useQuery({
     queryKey: ['currentUser', 'bidUploader'],
-    queryFn: () => constructflowClient.getCurrentUser()
+    queryFn: () => base44.auth.me()
   });
   const { data: policy } = useQuery({
     queryKey: ['rolePolicy', organizationId, 'bidUploader'],
@@ -92,10 +92,10 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
       const newFiles = [];
 
       for (const file of files) {
-        const { file_url } = await constructflowClient.post('/documents/upload',{ file });
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
         newFiles.push({ name: file.name, url: file_url, type: file.type, size: file.size });
 
-        const doc = await constructflowClient.createBidDocument({
+        const doc = await base44.entities.BidDocument.create({
           bid_opportunity_id: bidId,
           organization_id: organizationId,
           name: file.name,
@@ -109,7 +109,7 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
         setProcessing(true);
 
         try {
-          const aiRaw = await constructflowClient.post("/llm/invoke", {
+          const aiRaw = await base44.integrations.Core.InvokeLLM({
             prompt: `You are a construction bid analyst. Analyze this bid/RFP/ITB document thoroughly and extract ALL of the following information:
 
 1. project_name: The official project or solicitation title
@@ -180,7 +180,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
           const aiResult = normalizeAnalysisPayload(aiRaw);
 
           // Update the document record with all extracted data
-          await constructflowClient.updateBidDocument(doc.id, {
+          await base44.entities.BidDocument.update(doc.id, {
             ai_processed: true,
             extracted_data: {
               project_name: aiResult.project_name,
@@ -202,7 +202,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
               aiResult.requirements
                 .filter((req) => req?.text)
                 .map((req) =>
-                  constructflowClient.createBidRequirement({
+                  base44.entities.BidRequirement.create({
                     bid_opportunity_id: bidId,
                     organization_id: organizationId,
                     requirement_text: req.text,
@@ -242,7 +242,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
       setUploadedFiles((prev) => [...prev, ...newFiles]);
 
       // Fetch existing bid to avoid overwriting good data
-      const existingBidRows = await constructflowClient.getBidOpportunitys({ id: bidId });
+      const existingBidRows = await base44.entities.BidOpportunity.filter({ id: bidId });
       const existing = existingBidRows?.[0] || {};
       const existingAi = existing.ai_analysis || {};
 
@@ -282,7 +282,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
       if (aggregate.description && !existing.description) { bidUpdate.description = aggregate.description; fieldsUpdated.push('description'); }
       if (aggregate.description && !existing.scope_of_work) { bidUpdate.scope_of_work = aggregate.description; fieldsUpdated.push('scope_of_work'); }
 
-      await constructflowClient.updateBidOpportunity(bidId, bidUpdate);
+      await base44.entities.BidOpportunity.update(bidId, bidUpdate);
 
       // Store result for display
       setAnalysisResult({

@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -96,7 +96,7 @@ export default function DrawingDesignerTab({ bid, onDesignerSaved }) {
 
   const handleBackgroundUpload = async (file) => {
     try {
-      const { file_url } = await constructflowClient.post('/documents/upload',{ file });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setBackground({
         file_url,
         file_type: getFileType(file),
@@ -212,7 +212,7 @@ export default function DrawingDesignerTab({ bid, onDesignerSaved }) {
         }
       };
 
-      await constructflowClient.updateBidOpportunity(bid.id, {
+      await base44.entities.BidOpportunity.update(bid.id, {
         ai_analysis: nextAiAnalysis
       });
 

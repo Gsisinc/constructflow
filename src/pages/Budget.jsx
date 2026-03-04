@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import LiveBudgetTracker from '../components/budget/LiveBudgetTracker';
 import { DashboardSkeleton } from '@/components/skeleton/SkeletonComponents';
 import CashFlowForecast from '../components/budget/CashFlowForecast';
@@ -85,7 +85,7 @@ export default function Budget() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createExpense(data),
+    mutationFn: (data) => base44.entities.Expense.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
@@ -95,7 +95,7 @@ export default function Budget() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updateExpense(id, data),
+    mutationFn: ({ id, data }) => base44.entities.Expense.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       setShowForm(false);

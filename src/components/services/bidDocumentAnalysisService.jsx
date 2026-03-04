@@ -1,4 +1,4 @@
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 
 export const BLUEPRINT_ANALYZER_CAPABILITIES = [
   'Identifies drawing type, trade, and scale',

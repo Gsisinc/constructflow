@@ -4,7 +4,7 @@
  * Provides webhook support and API marketplace
  */
 
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 
 /**
  * Get Zapier integration configuration

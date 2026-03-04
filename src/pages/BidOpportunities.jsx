@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { BidListSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { createPageUrl } from '../utils';
@@ -30,17 +30,17 @@ export default function BidOpportunities() {
   
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => constructflowClient.getCurrentUser()
+    queryFn: () => base44.auth.me()
   });
 
   const { data: bids = [], isLoading } = useQuery({
     queryKey: ['bidOpportunities', user?.organization_id],
-    queryFn: () => constructflowClient.getBidOpportunitys({ organization_id: user.organization_id }, '-created_date'),
+    queryFn: () => base44.entities.BidOpportunity.filter({ organization_id: user.organization_id }, '-created_date'),
     enabled: !!user?.organization_id
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createBidOpportunity({
+    mutationFn: (data) => base44.entities.BidOpportunity.create({
       ...data,
       organization_id: user.organization_id
     }),
@@ -53,7 +53,7 @@ export default function BidOpportunities() {
 
   const analyzeWithAI = async (bid) => {
     try {
-      const analysis = await constructflowClient.post("/llm/invoke", {
+      const analysis = await base44.integrations.Core.InvokeLLM({
         prompt: `Analyze this bid opportunity and provide recommendations:
         
 Project: ${bid.title}
@@ -80,7 +80,7 @@ Return as JSON.`,
         }
       });
 
-      await constructflowClient.updateBidOpportunity(bid.id, {
+      await base44.entities.BidOpportunity.update(bid.id, {
         status: 'analyzing',
         ai_analysis: analysis
       });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,12 +28,12 @@ export default function Safety() {
 
   const { data: incidents = [] } = useQuery({
     queryKey: ['safetyIncidents', selectedProject],
-    queryFn: () => selectedProject ? constructflowClient.getSafetyIncidents({ project_id: selectedProject }, '-created_date') : Promise.resolve([]),
+    queryFn: () => selectedProject ? base44.entities.SafetyIncident.filter({ project_id: selectedProject }, '-created_date') : Promise.resolve([]),
     enabled: !!selectedProject
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createSafetyIncident({
+    mutationFn: (data) => base44.entities.SafetyIncident.create({
       ...data,
       project_id: selectedProject,
       type: data.incident_type,
@@ -48,7 +48,7 @@ export default function Safety() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => constructflowClient.deleteSafetyIncident(id),
+    mutationFn: (id) => base44.entities.SafetyIncident.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['safetyIncidents'] })
   });
 

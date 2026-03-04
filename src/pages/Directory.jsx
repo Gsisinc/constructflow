@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,7 +44,7 @@ export default function Directory() {
 
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => constructflowClient.deleteWorker(id),
+    mutationFn: (id) => base44.entities.Worker.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workers'] });
     }

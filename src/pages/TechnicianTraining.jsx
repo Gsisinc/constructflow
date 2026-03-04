@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +15,7 @@ export default function TechnicianTraining() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await constructflowClient.getCurrentUser();
+      const userData = await base44.auth.me();
       setUser(userData);
     };
     loadUser();
@@ -23,13 +23,13 @@ export default function TechnicianTraining() {
 
   const { data: assignments = [] } = useQuery({
     queryKey: ['courseAssignments', user?.email],
-    queryFn: () => user?.email ? constructflowClient.getCourseAssignments({ technician_email: user.email }) : [],
+    queryFn: () => user?.email ? base44.entities.CourseAssignment.filter({ technician_email: user.email }) : [],
     enabled: !!user?.email,
   });
 
   const { data: technicianProfile } = useQuery({
     queryKey: ['technicianProfile', user?.email],
-    queryFn: () => user?.email ? constructflowClient.getTechnicianProfiles({ email: user.email }) : [],
+    queryFn: () => user?.email ? base44.entities.TechnicianProfile.filter({ email: user.email }) : [],
     enabled: !!user?.email,
   });
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,30 +26,30 @@ export default function ClientPortal() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => constructflowClient.getCurrentUser()
+    queryFn: () => base44.auth.me()
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['clientProjects', user?.email],
-    queryFn: () => constructflowClient.getProjects({ client_email: user?.email }),
+    queryFn: () => base44.entities.Project.filter({ client_email: user?.email }),
     enabled: !!user?.email
   });
 
   const { data: updates = [] } = useQuery({
     queryKey: ['clientUpdates', selectedProject?.id],
-    queryFn: () => constructflowClient.getClientUpdates({ project_id: selectedProject?.id }, '-created_date'),
+    queryFn: () => base44.entities.ClientUpdate.filter({ project_id: selectedProject?.id }, '-created_date'),
     enabled: !!selectedProject?.id
   });
 
   const { data: changeOrders = [] } = useQuery({
     queryKey: ['clientChangeOrders', selectedProject?.id],
-    queryFn: () => constructflowClient.getPhaseChangeOrders({ project_id: selectedProject?.id }),
+    queryFn: () => base44.entities.PhaseChangeOrder.filter({ project_id: selectedProject?.id }),
     enabled: !!selectedProject?.id
   });
 
   const { data: calendarEvents = [] } = useQuery({
     queryKey: ['clientCalendarEvents', selectedProject?.id],
-    queryFn: () => constructflowClient.getCalendarEvents({ project_id: selectedProject?.id }),
+    queryFn: () => base44.entities.CalendarEvent.filter({ project_id: selectedProject?.id }),
     enabled: !!selectedProject?.id
   });
 
@@ -57,17 +57,17 @@ export default function ClientPortal() {
     queryKey: ['clientServiceTickets', selectedProject?.id],
     queryFn: async () => {
       try {
-        return await constructflowClient.getServiceTickets({ project_id: selectedProject?.id }, '-created_date');
+        return await base44.entities.ServiceTicket.filter({ project_id: selectedProject?.id }, '-created_date');
       } catch (error) {
         console.warn('ServiceTicket entity unavailable, using Issue fallback.', error);
-        return constructflowClient.getIssues({ project_id: selectedProject?.id }, '-created_date');
+        return base44.entities.Issue.filter({ project_id: selectedProject?.id }, '-created_date');
       }
     },
     enabled: !!selectedProject?.id
   });
 
   const createCommentMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createClientUpdate(data),
+    mutationFn: (data) => base44.entities.ClientUpdate.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clientUpdates'] });
       setShowCommentDialog(false);
@@ -76,7 +76,7 @@ export default function ClientPortal() {
   });
 
   const createChangeOrderMutation = useMutation({
-    mutationFn: (data) => constructflowClient.createPhaseChangeOrder(data),
+    mutationFn: (data) => base44.entities.PhaseChangeOrder.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clientChangeOrders'] });
       setShowChangeOrderDialog(false);
@@ -87,10 +87,10 @@ export default function ClientPortal() {
   const createServiceTicketMutation = useMutation({
     mutationFn: async (data) => {
       try {
-        return await constructflowClient.createServiceTicket(data);
+        return await base44.entities.ServiceTicket.create(data);
       } catch (error) {
         console.warn('ServiceTicket entity unavailable, storing as Issue.', error);
-        return constructflowClient.createIssue({
+        return base44.entities.Issue.create({
           project_id: data.project_id,
           title: data.subject,
           description: data.description,

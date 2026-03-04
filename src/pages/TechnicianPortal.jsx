@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,7 @@ export default function TechnicianPortal() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const userData = await constructflowClient.getCurrentUser();
+      const userData = await base44.auth.me();
       setUser(userData);
     };
     loadUser();
@@ -23,32 +23,32 @@ export default function TechnicianPortal() {
   const { data: profile = {} } = useQuery({
     queryKey: ['techProfile', user?.email],
     queryFn: () => user?.email ? 
-      constructflowClient.getTechnicianProfiles({ email: user.email }).then(r => r[0] || {}) : 
+      base44.entities.TechnicianProfile.filter({ email: user.email }).then(r => r[0] || {}) : 
       Promise.resolve({}),
     enabled: !!user?.email,
   });
 
   const { data: certifications = [] } = useQuery({
     queryKey: ['techCerts', user?.email],
-    queryFn: () => user?.email ? constructflowClient.getTechnicianCertifications({ technician_email: user.email }) : [],
+    queryFn: () => user?.email ? base44.entities.TechnicianCertification.filter({ technician_email: user.email }) : [],
     enabled: !!user?.email,
   });
 
   const { data: fieldHours = [] } = useQuery({
     queryKey: ['fieldHours', user?.email],
-    queryFn: () => user?.email ? constructflowClient.getFieldHoursLogs({ technician_email: user.email }) : [],
+    queryFn: () => user?.email ? base44.entities.FieldHoursLog.filter({ technician_email: user.email }) : [],
     enabled: !!user?.email,
   });
 
   const { data: skills = [] } = useQuery({
     queryKey: ['skills', user?.email],
-    queryFn: () => user?.email ? constructflowClient.getSkillsMatrixs({ technician_email: user.email }) : [],
+    queryFn: () => user?.email ? base44.entities.SkillsMatrix.filter({ technician_email: user.email }) : [],
     enabled: !!user?.email,
   });
 
   const { data: assignments = [] } = useQuery({
     queryKey: ['assignments', user?.email],
-    queryFn: () => user?.email ? constructflowClient.getCourseAssignments({ technician_email: user.email }) : [],
+    queryFn: () => user?.email ? base44.entities.CourseAssignment.filter({ technician_email: user.email }) : [],
     enabled: !!user?.email,
   });
 

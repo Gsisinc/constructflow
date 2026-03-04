@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -17,7 +17,7 @@ export default function BidToProject({ bid, organizationId }) {
   const handleConvert = async () => {
     setConverting(true);
     try {
-      const requirements = await constructflowClient.getBidRequirements({
+      const requirements = await base44.entities.BidRequirement.filter({
         bid_opportunity_id: bid.id
       });
 

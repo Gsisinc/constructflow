@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Lock, Unlock, ChevronRight, AlertTriangle, MoreVertical, Trash2, Plus, Target, FileText } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import constructflowClient from '@/api/constructflowClient';
+import { base44 } from '@/api/base44Client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,7 +46,7 @@ export default function PhaseNavigator({
   
   const { data: allRequirements = [] } = useQuery({
     queryKey: ['phaseRequirements', projectId],
-    queryFn: () => constructflowClient.getPhaseRequirements({ project_id: projectId }),
+    queryFn: () => base44.entities.PhaseRequirement.filter({ project_id: projectId }),
     enabled: !!projectId,
   });
   
@@ -62,7 +62,7 @@ export default function PhaseNavigator({
   const currentPhaseIndex = PHASES.findIndex(p => p.id === currentPhase);
 
   const deleteCustomPhaseMutation = useMutation({
-    mutationFn: (customPhaseId) => constructflowClient.deleteCustomPhase(customPhaseId),
+    mutationFn: (customPhaseId) => base44.entities.CustomPhase.delete(customPhaseId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
       toast.success('Phase deleted');
@@ -76,7 +76,7 @@ export default function PhaseNavigator({
   const [newPhaseIcon, setNewPhaseIcon] = useState('📌');
 
   const createPhaseMutation = useMutation({
-    mutationFn: (phaseData) => constructflowClient.createCustomPhase(phaseData),
+    mutationFn: (phaseData) => base44.entities.CustomPhase.create(phaseData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
       setShowNewPhaseDialog(false);
@@ -87,7 +87,7 @@ export default function PhaseNavigator({
   });
 
   const updatePhaseMutation = useMutation({
-    mutationFn: ({ phaseId, data }) => constructflowClient.updateCustomPhase(phaseId, data),
+    mutationFn: ({ phaseId, data }) => base44.entities.CustomPhase.update(phaseId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customPhases', projectId] });
       toast.success('Phase updated');
@@ -97,7 +97,7 @@ export default function PhaseNavigator({
   const addRequirementsMutation = useMutation({
     mutationFn: async (dataArray) => {
       // Create all requirements in parallel
-      const promises = dataArray.map(data => constructflowClient.createPhaseRequirement(data));
+      const promises = dataArray.map(data => base44.entities.PhaseRequirement.create(data));
       return await Promise.all(promises);
     },
     onSuccess: () => {
@@ -109,7 +109,7 @@ export default function PhaseNavigator({
   });
 
   const updateRequirementMutation = useMutation({
-    mutationFn: ({ id, data }) => constructflowClient.updatePhaseRequirement(id, data),
+    mutationFn: ({ id, data }) => base44.entities.PhaseRequirement.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements', projectId] });
     }

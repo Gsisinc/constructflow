@@ -1,4 +1,4 @@
-import constructflowClient from '../api/constructflowClient';
+import { base44 } from '../api/base44Client';
 import { CONNECTOR_REGISTRY, detectReconciliationConflicts, listConnectorCapabilities } from './integrationCore';
 
 export { listConnectorCapabilities, detectReconciliationConflicts };
@@ -20,7 +20,7 @@ export async function queueIntegrationSync({ organizationId, userId, provider, d
   };
 
   try {
-    return await constructflowClient.createIntegrationSyncJob(job);
+    return await base44.entities.IntegrationSyncJob.create(job);
   } catch (error) {
     console.warn('IntegrationSyncJob entity unavailable; returning in-memory queued job.', error);
     return { id: `mem-${Date.now()}`, ...job };
@@ -42,7 +42,7 @@ export async function runSyncJob(job) {
   try {
     if (job?.id && String(job.id).startsWith('mem-')) return result;
     if (job?.id) {
-      await constructflowClient.updateIntegrationSyncJob(job.id, result);
+      await base44.entities.IntegrationSyncJob.update(job.id, result);
     }
   } catch (error) {
     console.warn('Unable to persist integration sync job run result.', error);
@@ -62,7 +62,7 @@ export async function saveReconciliationDecision({ organizationId, provider, ext
   };
 
   try {
-    return await constructflowClient.createIntegrationReconciliation(row);
+    return await base44.entities.IntegrationReconciliation.create(row);
   } catch (error) {
     console.warn('IntegrationReconciliation entity unavailable; returning in-memory decision.', error);
     return { id: `mem-rec-${Date.now()}`, ...row };
