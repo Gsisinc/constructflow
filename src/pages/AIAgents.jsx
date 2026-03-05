@@ -312,7 +312,7 @@ export default function AIAgents() {
               </CardContent>
             </Card>
 
-                {/* AI Agent Visualization */}
+            {/* AI Agent Visualization */}
             <Card className="overflow-hidden border border-[var(--cf-border)]">
               <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 min-h-[200px] sm:min-h-[360px]" style={{ minHeight: 'min(480px, 50vh)' }}>
                 <img
@@ -320,7 +320,7 @@ export default function AIAgents() {
                   alt={`${currentAgent.name} visualization`}
                   className="w-full sm:w-auto h-full object-cover"
                 />
-              </div>
+            </div>
             </Card>
 
             <div>
