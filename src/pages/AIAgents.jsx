@@ -5,7 +5,7 @@ import AgentChat from '@/components/agents/AgentChat';
 import LocalAgentChat from '@/components/agents/LocalAgentChat';
 import MinibrowserLauncher, { openMinibrowser } from '@/components/MinibrowserLauncher';
 import { AGENT_WORKFLOWS } from '@/config/agentWorkflows';
-import { AGENCY_DIVISIONS, filterSpecialAgents } from '@/config/specialAgents';
+import { AGENCY_DIVISIONS, SPECIAL_AGENTS, filterSpecialAgents } from '@/config/specialAgents';
 import { Maximize2, Bot, Sparkles, Search, ExternalLink } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
@@ -46,7 +46,10 @@ export default function AIAgents() {
   const [agencyDivision, setAgencyDivision] = useState('');
 
   const filteredAgencyAgents = filterSpecialAgents(agencySearch, agencyDivision || undefined);
-  const divisionLabel = (id) => AGENCY_DIVISIONS.find((d) => d.id === id)?.label || id;
+  const divisionLabel = (id) => {
+    const div = AGENCY_DIVISIONS.find((d) => d.id === id);
+    return div ? div.label : id;
+  };
 
   const agents = {
     deepseek: { 
@@ -221,7 +224,7 @@ export default function AIAgents() {
                         {agent.name}
                       </CardTitle>
                       <span className="text-xs bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full font-medium shrink-0">
-                        {divisionLabel(agent.division)}
+                        {agent.division}
                       </span>
                     </div>
                     <p className="text-sm text-[var(--cf-muted)] mt-1">{agent.description}</p>
