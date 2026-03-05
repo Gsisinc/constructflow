@@ -2,16 +2,37 @@
 
 /**
  * Comprehensive Test Suite for All AI Agents
- * Tests each of the 10 agents with their typical prompts
+ * Tests each of the 10 workflow agents with their typical prompts.
+ * Uses OPENAI_API_KEY or VITE_OPENAI_API_KEY (from .env) so existing app keys work.
  */
 
+import { readFileSync, existsSync } from 'fs';
+import { resolve } from 'path';
 import { AGENT_WORKFLOWS, buildAgentSystemPrompt } from '../src/config/agentWorkflows.js';
 import { OpenAI } from 'openai';
 
+// Load .env if present (VITE_* keys used by the app)
+function loadEnv() {
+  const path = resolve(process.cwd(), '.env');
+  if (!existsSync(path)) return;
+  try {
+    const content = readFileSync(path, 'utf8');
+    for (const line of content.split('\n')) {
+      const m = line.match(/^\s*([^#=]+)=(.*)$/);
+      if (m) process.env[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, '');
+    }
+  } catch (_) {}
+}
+loadEnv();
+
+const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
+if (!apiKey || apiKey === 'your_openai_api_key_here') {
+  console.error('No OpenAI API key. Set OPENAI_API_KEY or VITE_OPENAI_API_KEY in .env to run agent tests.');
+  process.exit(1);
+}
+
 // Initialize OpenAI client
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const client = new OpenAI({ apiKey });
 
 // Test cases for each agent
 const testCases = {
@@ -80,7 +101,7 @@ async function testAgent(agentId, testCase) {
     console.log(`Prompt: ${testCase.prompt.substring(0, 100)}...`);
     
     const response = await client.chat.completions.create({
-      model: 'gpt-4.1-mini',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',

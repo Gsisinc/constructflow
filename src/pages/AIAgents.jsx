@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import AgentChat from '@/components/agents/AgentChat';
+import LocalAgentChat from '@/components/agents/LocalAgentChat';
 import MinibrowserLauncher, { openMinibrowser } from '@/components/MinibrowserLauncher';
 import { AGENT_WORKFLOWS } from '@/config/agentWorkflows';
+import { SPECIAL_AGENTS } from '@/config/specialAgents';
 import { Maximize2, Bot, Sparkles } from 'lucide-react';
 
 const WORKFLOW_ICONS = {
@@ -38,6 +40,7 @@ export default function AIAgents() {
   const [activeTab, setActiveTab] = useState('deepseek');
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [chatAgent, setChatAgent] = useState(null);
+  const [specialChatAgent, setSpecialChatAgent] = useState(null);
 
   const agents = {
     deepseek: { 
@@ -150,9 +153,34 @@ export default function AIAgents() {
           <section>
             <div className="mb-6 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white p-6 shadow-xl">
               <h2 className="text-xl font-bold flex items-center gap-2">Custom Agents</h2>
-              <p className="text-white/90 text-sm mt-1">Specialized AI agents for construction workflows.</p>
+              <p className="text-white/90 text-sm mt-1">Specialized AI agents. All use Claude or OpenAI (your API keys in Settings). Vision and PDF: use the analyzer in each chat to extract data from images or PDFs.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--cf-muted)] uppercase tracking-wider mb-3">Special Agents (The Agency)</h3>
+              <p className="text-xs text-[var(--cf-muted)] mb-4">From <a href="https://github.com/msitarzewski/agency-agents" target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:underline">agency-agents</a>. Claude/OpenAI via existing API keys. In chat: attach images or PDFs with the analyzer to get vision and PDF extraction.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                {SPECIAL_AGENTS.map((agent) => (
+                  <Card key={agent.id} className="hover:shadow-xl transition-all border-[var(--cf-border)] bg-[var(--cf-surface)]">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <span className="text-2xl">{agent.icon}</span>
+                        {agent.name}
+                        <span className="ml-auto text-xs bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full font-semibold">Claude</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-sm text-[var(--cf-muted)]">{agent.description}</p>
+                      <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white" onClick={() => setSpecialChatAgent(agent)}>
+                        {specialChatAgent?.id === agent.id ? 'Chat open' : 'Use agent'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--cf-muted)] uppercase tracking-wider mb-3">Construction Workflow Agents</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {customAgents.map((agent) => (
                 <Card
                   key={agent.id}
@@ -268,6 +296,13 @@ export default function AIAgents() {
           <AgentChat
             agent={chatAgent}
             onClose={() => setChatAgent(null)}
+          />
+        )}
+
+        {specialChatAgent && (
+          <LocalAgentChat
+            agent={specialChatAgent}
+            onClose={() => setSpecialChatAgent(null)}
           />
         )}
       </div>
