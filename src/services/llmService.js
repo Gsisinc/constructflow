@@ -89,58 +89,33 @@ async function callOpenAIAPI(systemPrompt, userMessage, temperature = 0.7, maxTo
 }
 
 /**
- * Call backend LLM endpoint. Falls back to direct API if backend unavailable.
+ * Call Claude or OpenAI directly (skip backend for now).
+ * Try Claude first, then OpenAI.
  */
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
-  const token = getAuthToken();
-  
-  // Try backend endpoint first
-  if (token) {
-    try {
-      const res = await fetch(BACKEND_LLM_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          systemPrompt,
-          userMessage,
-          temperature,
-          maxTokens,
-        }),
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        if (data.response) return data.response;
-      }
-      
-      if (res.status === 503) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'LLM service not configured');
-      }
-    } catch (backendErr) {
-      console.warn('Backend LLM failed, trying direct API:', backendErr);
-    }
-  }
-  
-  // Fallback to direct API if backend fails
   let lastError = null;
+  
+  // Try Claude first
   try {
     const out = await callClaude(systemPrompt, userMessage, temperature, maxTokens);
     if (out) return out;
   } catch (e) {
     lastError = e;
+    console.warn('Claude failed:', e);
   }
+  
+  // Try OpenAI
   try {
     const out = await callOpenAIAPI(systemPrompt, userMessage, temperature, maxTokens);
     if (out) return out;
   } catch (e) {
     lastError = e;
+    console.warn('OpenAI failed:', e);
   }
+  
+  // Both failed
   if (!getClaudeKey() && !getOpenAIKey()) {
-    throw new Error(NO_LLM_ERROR);
+    throw new Error('No API keys found. Add Claude or OpenAI API key in Settings → API status.');
   }
   throw new Error(lastError?.message || 'LLM request failed. Check your API keys and try again.');
 }
