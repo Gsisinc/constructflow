@@ -161,6 +161,8 @@ export default function Directory() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [certFilter, setCertFilter] = useState('all');
   const [detailTab, setDetailTab] = useState('info');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newContact, setNewContact] = useState({ name: '', trade: 'electrician', company: '', phone: '', category: 'worker' });
 
   useEffect(() => {
     if (projectIdFromUrl) setProjectId(projectIdFromUrl);
@@ -265,6 +267,29 @@ export default function Directory() {
     });
   };
 
+  const handleAddContact = async () => {
+    if (!newContact.name.trim()) {
+      toast.error('Name is required');
+      return;
+    }
+    try {
+      const contact = {
+        name: newContact.name,
+        trade: newContact.trade,
+        employer: newContact.company,
+        phone: newContact.phone,
+        category: newContact.category,
+      };
+      await base44.entities.Worker.create(contact);
+      toast.success(`${newContact.name} added to directory`);
+      setNewContact({ name: '', trade: 'electrician', company: '', phone: '', category: 'worker' });
+      setShowAddForm(false);
+      queryClient.invalidateQueries({ queryKey: ['workers', 'directory'] });
+    } catch (err) {
+      toast.error(err?.message || 'Failed to add contact');
+    }
+  };
+
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-8rem)] bg-slate-100">
       {/* A. Persistent Header - Industrial Toolbar */}
@@ -350,7 +375,7 @@ export default function Directory() {
             <AlertOctagon className="h-4 w-4" />
             Emergency
           </Button>
-          <Button size="sm" className="h-9 bg-amber-500 hover:bg-amber-600 text-slate-900">
+          <Button size="sm" className="h-9 bg-amber-500 hover:bg-amber-600 text-slate-900" onClick={() => setShowAddForm(true)}>
             <UserPlus className="h-4 w-4 mr-1" /> Add
           </Button>
         </div>
@@ -651,6 +676,81 @@ export default function Directory() {
               </SheetFooter>
             </>
           )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Add Contact Form */}
+      <Sheet open={showAddForm} onOpenChange={setShowAddForm}>
+        <SheetContent side="right" className="w-full sm:max-w-[400px] overflow-y-auto">
+          <SheetHeader className="border-b pb-4">
+            <SheetTitle>Add Contact</SheetTitle>
+            <SheetDescription>Add a new person to the site directory</SheetDescription>
+          </SheetHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="name" className="text-sm font-medium">Name *</Label>
+              <Input
+                id="name"
+                placeholder="Full name"
+                value={newContact.name}
+                onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="trade" className="text-sm font-medium">Trade</Label>
+              <Select value={newContact.trade} onValueChange={(v) => setNewContact({ ...newContact, trade: v })}>
+                <SelectTrigger id="trade" className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TRADES.map(t => (
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="company" className="text-sm font-medium">Company</Label>
+              <Input
+                id="company"
+                placeholder="Company name"
+                value={newContact.company}
+                onChange={(e) => setNewContact({ ...newContact, company: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone" className="text-sm font-medium">Phone</Label>
+              <Input
+                id="phone"
+                placeholder="(555) 123-4567"
+                value={newContact.phone}
+                onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="category" className="text-sm font-medium">Category</Label>
+              <Select value={newContact.category} onValueChange={(v) => setNewContact({ ...newContact, category: v })}>
+                <SelectTrigger id="category" className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="worker">Worker</SelectItem>
+                  <SelectItem value="supervisor">Supervisor</SelectItem>
+                  <SelectItem value="vendor">Vendor</SelectItem>
+                  <SelectItem value="inspector">Inspector</SelectItem>
+                  <SelectItem value="client">Client</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <SheetFooter className="border-t pt-4">
+            <Button variant="outline" onClick={() => setShowAddForm(false)}>Cancel</Button>
+            <Button onClick={handleAddContact} className="bg-amber-500 hover:bg-amber-600 text-slate-900">Add Contact</Button>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
     </div>
