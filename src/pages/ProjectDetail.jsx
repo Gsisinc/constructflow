@@ -277,7 +277,13 @@ export default function ProjectDetail() {
                 </div>
               )}
             </div>
-            <div className="flex gap-2 w-full sm:w-auto">
+            <div className="flex gap-2 w-full sm:w-auto flex-wrap">
+              <Link to={createPageUrl('Directory') + '?projectId=' + encodeURIComponent(projectId)}>
+                <Button variant="outline" className="flex-1 sm:flex-none text-sm">
+                  <Users className="h-4 w-4 mr-1 sm:mr-2" />
+                  Site Roster
+                </Button>
+              </Link>
               <Button variant="outline" onClick={() => setShowEditForm(true)} className="flex-1 sm:flex-none text-sm">
                 <Edit className="h-4 w-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Edit</span>
