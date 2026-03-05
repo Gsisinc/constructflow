@@ -276,6 +276,7 @@ export default function AIAgents() {
                   </CardContent>
                 </Card>
               ))}
+              </div>
             </div>
           </section>
         ) : (
