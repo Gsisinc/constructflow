@@ -5,8 +5,9 @@ import AgentChat from '@/components/agents/AgentChat';
 import LocalAgentChat from '@/components/agents/LocalAgentChat';
 import MinibrowserLauncher, { openMinibrowser } from '@/components/MinibrowserLauncher';
 import { AGENT_WORKFLOWS } from '@/config/agentWorkflows';
-import { SPECIAL_AGENTS } from '@/config/specialAgents';
-import { Maximize2, Bot, Sparkles } from 'lucide-react';
+import { AGENCY_DIVISIONS, filterSpecialAgents } from '@/config/specialAgents';
+import { Maximize2, Bot, Sparkles, Search, ExternalLink } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 const WORKFLOW_ICONS = {
   central_orchestrator: '👔',
@@ -41,6 +42,11 @@ export default function AIAgents() {
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [chatAgent, setChatAgent] = useState(null);
   const [specialChatAgent, setSpecialChatAgent] = useState(null);
+  const [agencySearch, setAgencySearch] = useState('');
+  const [agencyDivision, setAgencyDivision] = useState('');
+
+  const filteredAgencyAgents = filterSpecialAgents(agencySearch, agencyDivision || undefined);
+  const divisionLabel = (id) => AGENCY_DIVISIONS.find((d) => d.id === id)?.label || id;
 
   const agents = {
     deepseek: { 
@@ -151,36 +157,94 @@ export default function AIAgents() {
 
         {activeTab === 'custom' ? (
           <section>
-            <div className="mb-6 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white p-6 shadow-xl">
-              <h2 className="text-xl font-bold flex items-center gap-2">Custom Agents</h2>
-              <p className="text-white/90 text-sm mt-1">Specialized AI agents. All use Claude or OpenAI (your API keys in Settings). Vision and PDF: use the analyzer in each chat to extract data from images or PDFs.</p>
+            {/* The Agency — hero */}
+            <div className="mb-8 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-900 via-violet-900/40 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-violet-500/20">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold flex items-center gap-2">
+                    <span className="text-3xl">🎭</span>
+                    The Agency
+                  </h2>
+                  <p className="text-white/90 text-sm mt-1 max-w-xl">
+                    Specialized AI agents from{' '}
+                    <a href="https://github.com/msitarzewski/agency-agents" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:underline inline-flex items-center gap-1">
+                      agency-agents <ExternalLink className="h-3 w-3" />
+                    </a>
+                    . All use Claude or OpenAI (your API keys in Settings). In chat, use the analyzer to attach images or PDFs for vision and extraction.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-white/80 text-sm">
+                  <span className="rounded-full bg-white/10 px-3 py-1">{filteredAgencyAgents.length} agents</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--cf-muted)] uppercase tracking-wider mb-3">Special Agents (The Agency)</h3>
-              <p className="text-xs text-[var(--cf-muted)] mb-4">From <a href="https://github.com/msitarzewski/agency-agents" target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:underline">agency-agents</a>. Claude/OpenAI via existing API keys. In chat: attach images or PDFs with the analyzer to get vision and PDF extraction.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                {SPECIAL_AGENTS.map((agent) => (
-                  <Card key={agent.id} className="hover:shadow-xl transition-all border-[var(--cf-border)] bg-[var(--cf-surface)]">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <span className="text-2xl">{agent.icon}</span>
-                        {agent.name}
-                        <span className="ml-auto text-xs bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full font-semibold">Claude</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <p className="text-sm text-[var(--cf-muted)]">{agent.description}</p>
-                      <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white" onClick={() => setSpecialChatAgent(agent)}>
-                        {specialChatAgent?.id === agent.id ? 'Chat open' : 'Use agent'}
-                      </Button>
-                    </CardContent>
-                  </Card>
+
+            {/* Search + division filter */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--cf-muted)]" />
+                <Input
+                  placeholder="Search agents by name or description..."
+                  value={agencySearch}
+                  onChange={(e) => setAgencySearch(e.target.value)}
+                  className="pl-9 bg-[var(--cf-surface)] border-[var(--cf-border)]"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setAgencyDivision('')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${!agencyDivision ? 'bg-violet-600 text-white' : 'bg-[var(--cf-surface)] text-[var(--cf-muted)] hover:bg-[var(--cf-border)]'}`}
+                >
+                  All
+                </button>
+                {AGENCY_DIVISIONS.map((div) => (
+                  <button
+                    key={div.id}
+                    onClick={() => setAgencyDivision(agencyDivision === div.id ? '' : div.id)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${agencyDivision === div.id ? 'bg-violet-600 text-white' : 'bg-[var(--cf-surface)] text-[var(--cf-muted)] hover:bg-[var(--cf-border)]'}`}
+                  >
+                    <span>{div.icon}</span>
+                    {div.label}
+                  </button>
                 ))}
               </div>
             </div>
+
+            {/* Agency agent grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+              {filteredAgencyAgents.map((agent) => (
+                <Card key={agent.id} className="hover:shadow-xl transition-all border-[var(--cf-border)] bg-[var(--cf-surface)]">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <span className="text-2xl">{agent.icon}</span>
+                        {agent.name}
+                      </CardTitle>
+                      <span className="text-xs bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full font-medium shrink-0">
+                        {divisionLabel(agent.division)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-[var(--cf-muted)] mt-1">{agent.description}</p>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <Button
+                      className={`w-full bg-gradient-to-r ${agent.color || 'from-cyan-500 to-cyan-600'} text-white hover:opacity-90`}
+                      onClick={() => setSpecialChatAgent(agent)}
+                    >
+                      {specialChatAgent?.id === agent.id ? 'Chat open' : 'Use agent'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {filteredAgencyAgents.length === 0 && (
+              <p className="text-center text-[var(--cf-muted)] py-8">No agents match your search. Try a different term or clear the division filter.</p>
+            )}
+
             <div>
               <h3 className="text-sm font-semibold text-[var(--cf-muted)] uppercase tracking-wider mb-3">Construction Workflow Agents</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {customAgents.map((agent) => (
                 <Card
                   key={agent.id}
