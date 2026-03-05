@@ -1,32 +1,22 @@
 /**
- * LLM Service - Real AI only (Claude / OpenAI). No fallback templates.
- * Agent purpose is enforced via the system prompt passed from agentWorkflows.
- * Uses backend /api/llm/call endpoint for secure API key handling.
+ * LLM Service - Claude ONLY with strict agent constraints
+ * No fallbacks. Agents operate within their defined system prompts.
+ * Real AI functionality enforced through system prompt constraints.
  */
 
-import { getClaudeKey, getOpenAIKey } from '@/lib/apiKeys';
+import { getClaudeKey } from '@/lib/apiKeys';
 
-const NO_LLM_ERROR = 'AI service is currently unavailable. Please try again or contact support.';
-const BACKEND_LLM_URL = '/api/llm/call';
+const CLAUDE_ERROR = 'Claude API is required. Add your Claude API key in Settings → API status.';
 
-/** Get auth token from localStorage */
-function getAuthToken() {
-  try {
-    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token') || '';
-  } catch {
-    return '';
-  }
-}
-
-/** Call Anthropic Claude API */
-async function callClaude(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
+/**
+ * Call Claude API with strict agent system prompt
+ * No fallbacks - if Claude fails, the agent fails.
+ * This ensures real AI functionality within agent constraints.
+ */
+async function callClaudeAPI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
   const key = getClaudeKey();
-  if (!key) return null;
-
-  // If using a proxy (like Manus), we should use the OpenAI-compatible endpoint
-  const apiBase = import.meta.env.VITE_OPENAI_API_BASE;
-  if (apiBase && apiBase.includes('manus.im')) {
-    return callOpenAIAPI(systemPrompt, userMessage, temperature, maxTokens);
+  if (!key) {
+    throw new Error(CLAUDE_ERROR);
   }
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -44,91 +34,127 @@ async function callClaude(systemPrompt, userMessage, temperature = 0.7, maxToken
       messages: [{ role: 'user', content: userMessage }],
     }),
   });
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `Claude ${res.status}`);
+    throw new Error(err.error?.message || `Claude API error: ${res.status}`);
   }
+
   const data = await res.json();
   const text = data.content?.[0]?.text;
-  if (!text) throw new Error('Empty Claude response');
-  return text;
-}
-
-/** Call OpenAI Chat Completions API */
-async function callOpenAIAPI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
-  const key = getOpenAIKey();
-  if (!key) return null;
+  if (!text) throw new Error('Empty response from Claude');
   
-  const apiBase = import.meta.env.VITE_OPENAI_API_BASE || 'https://api.openai.com/v1';
-  const url = `${apiBase.replace(/\/$/, '')}/chat/completions`;
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${key}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      max_tokens: maxTokens,
-      temperature,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
-      ],
-    }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `OpenAI ${res.status}`);
-  }
-  const data = await res.json();
-  const text = data.choices?.[0]?.message?.content;
-  if (!text) throw new Error('Empty OpenAI response');
   return text;
 }
 
 /**
- * Call Claude or OpenAI directly (skip backend for now).
- * Try Claude first, then OpenAI.
+ * Call agent with system prompt - Claude ONLY
+ * The system prompt defines the agent's constraints and behavior.
+ * No fallbacks, no compromises.
  */
-export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
-  let lastError = null;
-  
-  // Try Claude first
-  try {
-    const out = await callClaude(systemPrompt, userMessage, temperature, maxTokens);
-    if (out) return out;
-  } catch (e) {
-    lastError = e;
-    console.warn('Claude failed:', e);
+export async function callAgent(agentSystemPrompt, userMessage, options = {}) {
+  const response = await callClaudeAPI(agentSystemPrompt, userMessage, 0.7, 2000);
+  return parseLLMResponse(response);
+}
+
+/**
+ * Call agent with tools - Claude ONLY with tool use
+ * Agents can execute tools within their defined scope.
+ */
+export async function callAgentWithTools(agentSystemPrompt, userMessage, toolDefs, toolContext) {
+  const { executeTool, context } = toolContext;
+  const actionsTaken = [];
+  const maxRounds = 4;
+
+  const claudeTools = (toolDefs || []).map((t) => ({
+    name: t.name,
+    description: t.description,
+    input_schema: t.input_schema || { type: 'object', properties: {} },
+  }));
+
+  const key = getClaudeKey();
+  if (!key) {
+    throw new Error(CLAUDE_ERROR);
   }
-  
-  // Try OpenAI
-  try {
-    const out = await callOpenAIAPI(systemPrompt, userMessage, temperature, maxTokens);
-    if (out) return out;
-  } catch (e) {
-    lastError = e;
-    console.warn('OpenAI failed:', e);
+
+  const messages = [
+    { role: 'user', content: userMessage },
+  ];
+
+  for (let round = 0; round < maxRounds; round++) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 2000,
+        temperature: 0.7,
+        system: agentSystemPrompt,
+        messages: messages,
+        tools: claudeTools.length > 0 ? claudeTools : undefined,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Claude API error: ${res.status}`);
+    }
+
+    const data = await res.json();
+    const contentBlocks = data.content || [];
+    const textBlock = contentBlocks.find((b) => b.type === 'text');
+    const toolUseBlocks = contentBlocks.filter((b) => b.type === 'tool_use');
+
+    if (toolUseBlocks.length > 0) {
+      const assistantContent = contentBlocks.map((b) => {
+        if (b.type === 'text') return { type: 'text', text: b.text };
+        return { type: 'tool_use', id: b.id, name: b.name, input: b.input };
+      });
+      messages.push({ role: 'assistant', content: assistantContent });
+
+      for (const tu of toolUseBlocks) {
+        const result = await executeTool(tu.name, tu.input || {}, context);
+        actionsTaken.push({ name: tu.name, result });
+        messages.push({
+          role: 'user',
+          content: [{ type: 'tool_result', tool_use_id: tu.id, content: result }],
+        });
+      }
+      continue;
+    }
+
+    return {
+      content: (textBlock?.text || '').trim() || 'Done.',
+      actionsTaken,
+    };
   }
-  
-  // Both failed
-  if (!getClaudeKey() && !getOpenAIKey()) {
-    throw new Error('No API keys found. Add Claude or OpenAI API key in Settings → API status.');
-  }
-  throw new Error(lastError?.message || 'LLM request failed. Check your API keys and try again.');
+
+  const response = await callClaudeAPI(agentSystemPrompt, userMessage, 0.7, 2000);
+  return {
+    content: parseLLMResponse(response),
+    actionsTaken,
+  };
+}
+
+/**
+ * Stream agent response - Claude ONLY
+ */
+export async function streamAgent(agentSystemPrompt, userMessage, onChunk) {
+  const fullResponse = await callClaudeAPI(agentSystemPrompt, userMessage, 0.7, 2000);
+  if (onChunk && fullResponse) onChunk(fullResponse);
+  return parseLLMResponse(fullResponse);
 }
 
 /**
  * Parse LLM response to extract structured data
- * @param {string} response - The raw response from LLM
- * @returns {string} Parsed and cleaned response
  */
 export function parseLLMResponse(response) {
   if (!response) return '';
 
-  // Try to parse as JSON first
   try {
     const parsed = JSON.parse(response);
     if (typeof parsed === 'string') return parsed;
@@ -145,191 +171,16 @@ export function parseLLMResponse(response) {
 }
 
 /**
- * Call agent with system prompt (no tools).
- * Uses backend endpoint if available, falls back to direct API.
+ * Legacy callOpenAI - now calls Claude only
  */
-export async function callAgent(agentSystemPrompt, userMessage, options = {}) {
-  const response = await callOpenAI(agentSystemPrompt, userMessage, 0.7, 2000);
-  return parseLLMResponse(response);
-}
-
-/**
- * Call agent with tools so it can complete tasks (create tasks, run discovery, add opportunities, etc.).
- * Uses OpenAI or Claude with tool use; executes tools and loops until the model returns only text.
- * @param {string} agentSystemPrompt
- * @param {string} userMessage
- * @param {Array<{ name: string, description: string, input_schema: object }>} toolDefs
- * @param {{ executeTool: (name, args, ctx) => Promise<string>, context: object }} toolContext
- * @returns {Promise<{ content: string, actionsTaken: Array<{ name: string, result: string }> }>}
- */
-export async function callAgentWithTools(agentSystemPrompt, userMessage, toolDefs, toolContext) {
-  const { executeTool, context } = toolContext;
-  const actionsTaken = [];
-  const maxRounds = 4;
-
-  const openAITools = (toolDefs || []).map((t) => ({
-    type: 'function',
-    function: {
-      name: t.name,
-      description: t.description,
-      parameters: t.input_schema || { type: 'object', properties: {} },
-    },
-  }));
-
-  const keyOpenAI = import.meta.env.VITE_OPENAI_API_KEY ?? import.meta.env.REACT_APP_OPENAI_API_KEY;
-  const keyClaude = import.meta.env.VITE_CLAUDE_API_KEY ?? import.meta.env.REACT_APP_CLAUDE_API_KEY;
-
-  const messages = [
-    { role: 'system', content: agentSystemPrompt + '\n\nWhen the user asks you to do something (find bids, create a task, add to pipeline, create a project), use the provided tools to actually perform the action. After using tools, summarize what you did in a short reply.' },
-    { role: 'user', content: userMessage },
-  ];
-
-  for (let round = 0; round < maxRounds; round++) {
-    if (keyOpenAI && openAITools.length > 0) {
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${keyOpenAI}` },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          max_tokens: 2000,
-          temperature: 0.7,
-          messages,
-          tools: openAITools,
-          tool_choice: 'auto',
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || `OpenAI ${res.status}`);
-      }
-      const data = await res.json();
-      const msg = data.choices?.[0]?.message;
-      if (!msg) throw new Error('Empty OpenAI response');
-
-      const content = msg.content?.trim();
-      const toolCalls = msg.tool_calls;
-
-      if (toolCalls && toolCalls.length > 0) {
-        messages.push(msg);
-        for (const tc of toolCalls) {
-          const name = tc.function?.name;
-          const args = (() => { try { return JSON.parse(tc.function?.arguments || '{}'); } catch (_) { return {}; } })();
-          const result = await executeTool(name, args, context);
-          actionsTaken.push({ name, result });
-          messages.push({
-            role: 'tool',
-            tool_call_id: tc.id,
-            content: result,
-          });
-        }
-        continue;
-      }
-
-      return {
-        content: content || 'Done.',
-        actionsTaken,
-      };
-    }
-
-    if (keyClaude && openAITools.length > 0) {
-      const claudeMessages = messages.map((m) => {
-        if (m.role === 'system') return null;
-        if (m.role === 'user') return { role: 'user', content: m.content };
-        if (m.role === 'assistant' && m.content) return { role: 'assistant', content: m.content };
-        if (m.role === 'assistant' && m.tool_calls) {
-          const content = m.tool_calls.map((tc) => ({
-            type: 'tool_use',
-            id: tc.id,
-            name: tc.function?.name,
-            input: (() => { try { return JSON.parse(tc.function?.arguments || '{}'); } catch (_) { return {}; } })(),
-          }));
-          return { role: 'assistant', content };
-        }
-        if (m.role === 'tool') {
-          return { role: 'user', content: [{ type: 'tool_result', tool_use_id: m.tool_call_id, content: m.content }] };
-        }
-        return null;
-      }).filter(Boolean);
-
-      const system = messages.find((m) => m.role === 'system')?.content || agentSystemPrompt;
-      const claudeTools = (toolDefs || []).map((t) => ({
-        name: t.name,
-        description: t.description,
-        input_schema: t.input_schema || { type: 'object', properties: {} },
-      }));
-
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': keyClaude,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20241022',
-          max_tokens: 2000,
-          temperature: 0.7,
-          system: system,
-          messages: claudeMessages,
-          tools: claudeTools,
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || `Claude ${res.status}`);
-      }
-      const data = await res.json();
-      const contentBlocks = data.content || [];
-      const textBlock = contentBlocks.find((b) => b.type === 'text');
-      const toolUseBlocks = contentBlocks.filter((b) => b.type === 'tool_use');
-
-      if (toolUseBlocks.length > 0) {
-        const assistantContent = contentBlocks.map((b) => {
-          if (b.type === 'text') return { type: 'text', text: b.text };
-          return { type: 'tool_use', id: b.id, name: b.name, input: b.input };
-        });
-        messages.push({ role: 'assistant', content: assistantContent });
-        for (const tu of toolUseBlocks) {
-          const result = await executeTool(tu.name, tu.input || {}, context);
-          actionsTaken.push({ name: tu.name, result });
-          messages.push({
-            role: 'tool',
-            tool_call_id: tu.id,
-            content: result,
-          });
-        }
-        continue;
-      }
-
-      return {
-        content: (textBlock?.text || '').trim() || 'Done.',
-        actionsTaken,
-      };
-    }
-
-    break;
-  }
-
-  const response = await callOpenAI(agentSystemPrompt, userMessage, 0.7, 2000);
-  return {
-    content: parseLLMResponse(response),
-    actionsTaken,
-  };
-}
-
-/**
- * Stream agent response (real API only; no fallback).
- */
-export async function streamAgent(agentSystemPrompt, userMessage, onChunk) {
-  const fullResponse = await callOpenAI(agentSystemPrompt, userMessage, 0.7, 2000);
-  if (onChunk && fullResponse) onChunk(fullResponse);
-  return parseLLMResponse(fullResponse);
+export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
+  return callClaudeAPI(systemPrompt, userMessage, temperature, maxTokens);
 }
 
 export default {
-  callOpenAI,
   callAgent,
   callAgentWithTools,
   streamAgent,
-  parseLLMResponse
+  parseLLMResponse,
+  callOpenAI,
 };
