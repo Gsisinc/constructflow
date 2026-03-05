@@ -1,12 +1,22 @@
 /**
  * LLM Service - Real AI only (Claude / OpenAI). No fallback templates.
  * Agent purpose is enforced via the system prompt passed from agentWorkflows.
- * Keys: env vars first, then localStorage (set in Settings or AI Agents → OpenAI/Claude).
+ * Uses backend /api/llm/call endpoint for secure API key handling.
  */
 
 import { getClaudeKey, getOpenAIKey } from '@/lib/apiKeys';
 
-const NO_LLM_ERROR = 'AI service is currently unavailable. Add an API key in Settings → API status or AI Agents (OpenAI/Claude) and try again.';
+const NO_LLM_ERROR = 'AI service is currently unavailable. Please try again or contact support.';
+const BACKEND_LLM_URL = '/api/llm/call';
+
+/** Get auth token from localStorage */
+function getAuthToken() {
+  try {
+    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token') || '';
+  } catch {
+    return '';
+  }
+}
 
 /** Call Anthropic Claude API */
 async function callClaude(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
@@ -79,9 +89,43 @@ async function callOpenAIAPI(systemPrompt, userMessage, temperature = 0.7, maxTo
 }
 
 /**
- * Try Claude, then OpenAI. No fallback — real responses only; throws if both fail or no keys.
+ * Call backend LLM endpoint. Falls back to direct API if backend unavailable.
  */
 export async function callOpenAI(systemPrompt, userMessage, temperature = 0.7, maxTokens = 2000) {
+  const token = getAuthToken();
+  
+  // Try backend endpoint first
+  if (token) {
+    try {
+      const res = await fetch(BACKEND_LLM_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          systemPrompt,
+          userMessage,
+          temperature,
+          maxTokens,
+        }),
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.response) return data.response;
+      }
+      
+      if (res.status === 503) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'LLM service not configured');
+      }
+    } catch (backendErr) {
+      console.warn('Backend LLM failed, trying direct API:', backendErr);
+    }
+  }
+  
+  // Fallback to direct API if backend fails
   let lastError = null;
   try {
     const out = await callClaude(systemPrompt, userMessage, temperature, maxTokens);
@@ -127,6 +171,7 @@ export function parseLLMResponse(response) {
 
 /**
  * Call agent with system prompt (no tools).
+ * Uses backend endpoint if available, falls back to direct API.
  */
 export async function callAgent(agentSystemPrompt, userMessage, options = {}) {
   const response = await callOpenAI(agentSystemPrompt, userMessage, 0.7, 2000);
