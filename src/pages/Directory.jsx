@@ -64,6 +64,7 @@ import {
   Lock,
   MoreHorizontal,
   Menu,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -174,7 +175,14 @@ export default function Directory() {
   const [detailTab, setDetailTab] = useState('info');
   const [showAddForm, setShowAddForm] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [newContact, setNewContact] = useState({ name: '', trade: 'electrician', company: '', phone: '', category: 'worker' });
+  const [newContact, setNewContact] = useState({
+    name: '',
+    role: 'electrician',
+    company: '',
+    phone: '',
+    email: '',
+    category: 'worker',
+  });
 
   useEffect(() => {
     if (projectIdFromUrl) setProjectId(projectIdFromUrl);
@@ -209,6 +217,36 @@ export default function Directory() {
     queryKey: ['tasks', projectId],
     queryFn: () => (projectId ? base44.entities.Task.filter({ project_id: projectId }) : Promise.resolve([])),
     enabled: !!projectId,
+  });
+
+  const createWorkerMutation = useMutation({
+    mutationFn: async (data) => {
+      const payload = { ...data };
+      if (user?.organization_id && !payload.organization_id) {
+        payload.organization_id = user.organization_id;
+      }
+      return base44.entities.Worker.create(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workers', 'directory'] });
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      toast.success('Contact added');
+      setShowAddForm(false);
+      setNewContact({
+        name: '',
+        company: '',
+        role: 'electrician',
+        phone: '',
+        email: '',
+        category: 'worker',
+      });
+    },
+    onError: (err) => {
+      const message =
+        (typeof err === 'object' && err && 'message' in err && err.message) ||
+        'Failed to add contact';
+      toast.error(message);
+    },
   });
 
   const people = useMemo(
@@ -268,27 +306,25 @@ export default function Directory() {
     });
   };
 
-  const handleAddContact = async () => {
+  const handleAddContact = () => {
     if (!newContact.name.trim()) {
       toast.error('Name is required');
       return;
     }
-    try {
-      const contact = {
-        name: newContact.name,
-        trade: newContact.trade,
-        employer: newContact.company,
-        phone: newContact.phone,
-        category: newContact.category,
-      };
-      await base44.entities.Worker.create(contact);
-      toast.success(`${newContact.name} added to directory`);
-      setNewContact({ name: '', trade: 'electrician', company: '', phone: '', category: 'worker' });
-      setShowAddForm(false);
-      queryClient.invalidateQueries({ queryKey: ['workers', 'directory'] });
-    } catch (err) {
-      toast.error(err?.message || 'Failed to add contact');
-    }
+
+    createWorkerMutation.mutate({
+      name: newContact.name.trim(),
+      role: newContact.role,
+      trade: newContact.role,
+      company: newContact.company?.trim() || '',
+      employer: newContact.company?.trim() || '',
+      phone: newContact.phone?.trim() || '',
+      email: newContact.email?.trim() || '',
+      category: newContact.category,
+      status: 'assigned',
+      site_status: 'assigned',
+      current_project_id: projectId || '',
+    });
   };
 
   return (
@@ -317,7 +353,11 @@ export default function Directory() {
           <Button size="sm" variant="ghost" className="h-8 w-8 p-0 md:hidden" onClick={() => setShowFilters(true)}>
             <Menu className="h-4 w-4" />
           </Button>
-          <Button size="sm" className="h-8 bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs md:text-sm px-2" onClick={() => setShowAddForm(true)}>
+          <Button
+            size="sm"
+            className="h-8 bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs md:text-sm px-2"
+            onClick={() => setShowAddForm(true)}
+          >
             <UserPlus className="h-3 w-3 md:h-4 md:w-4 mr-1" /> Add
           </Button>
         </div>
@@ -563,7 +603,7 @@ export default function Directory() {
             </div>
             <div>
               <Label htmlFor="trade" className="text-sm font-medium">Trade</Label>
-              <Select value={newContact.trade} onValueChange={(v) => setNewContact({ ...newContact, trade: v })}>
+              <Select value={newContact.role} onValueChange={(v) => setNewContact({ ...newContact, role: v })}>
                 <SelectTrigger id="trade" className="mt-1 text-sm">
                   <SelectValue />
                 </SelectTrigger>
@@ -595,6 +635,17 @@ export default function Directory() {
               />
             </div>
             <div>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@company.com"
+                value={newContact.email}
+                onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
+                className="mt-1 text-sm"
+              />
+            </div>
+            <div>
               <Label htmlFor="category" className="text-sm font-medium">Category</Label>
               <Select value={newContact.category} onValueChange={(v) => setNewContact({ ...newContact, category: v })}>
                 <SelectTrigger id="category" className="mt-1 text-sm">
@@ -610,7 +661,14 @@ export default function Directory() {
           </div>
           <SheetFooter className="border-t pt-4 mt-4 flex gap-2">
             <Button variant="outline" onClick={() => setShowAddForm(false)}>Cancel</Button>
-            <Button onClick={handleAddContact} className="bg-amber-500 hover:bg-amber-600 text-slate-900">Add</Button>
+            <Button
+              onClick={handleAddContact}
+              disabled={createWorkerMutation.isPending}
+              className="bg-amber-500 hover:bg-amber-600 text-slate-900"
+            >
+              {createWorkerMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Add
+            </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
