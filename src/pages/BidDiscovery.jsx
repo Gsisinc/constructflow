@@ -1395,10 +1395,10 @@ Provide:
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge>{bid.status}</Badge>
-                        {bid.documents && bid.documents.length > 0 && (
+                        {bid.requirements && bid.requirements.length > 0 && (
                           <Badge variant="outline" className="gap-1">
                             <ListChecks className="h-3 w-3" />
-                            {bid.documents.filter(d => d.startsWith('☑')).length}/{bid.documents.length}
+                            {bid.requirements.filter(d => d.startsWith('☑')).length}/{bid.requirements.length}
                           </Badge>
                         )}
                       </div>

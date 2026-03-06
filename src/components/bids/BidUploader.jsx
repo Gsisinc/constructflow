@@ -55,22 +55,34 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
     enabled: !!organizationId
   });
 
+  const effectiveRole =
+    user?.role ||
+    user?.user_role ||
+    user?.permission_role ||
+    null;
+
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
     e.target.value = '';
     setUploading(true);
+    setProcessing(false);
     setAnalysisResult(null);
     setShowResult(false);
 
     try {
-      requirePermission({
-        policy,
-        role: user?.role || 'viewer',
-        module: 'documents',
-        action: 'create',
-        message: 'You do not have permission to upload bid documents.'
-      });
+      // Don't hard-block uploads when role/policy isn't available yet.
+      // Many Base44 auth payloads don't include a role, and defaulting to "viewer"
+      // prevents all uploads even for legitimate users.
+      if (effectiveRole) {
+        requirePermission({
+          policy,
+          role: effectiveRole,
+          module: 'documents',
+          action: 'create',
+          message: 'You do not have permission to upload bid documents.'
+        });
+      }
 
       const aggregate = {
         project_name: '',
@@ -90,7 +102,9 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
       };
 
       const newFiles = [];
+      const docsToProcess = [];
 
+      // 1) Upload + create document records first (fast + consistent UI state)
       for (const file of files) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
         newFiles.push({ name: file.name, url: file_url, type: file.type, size: file.size });
@@ -105,9 +119,16 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
           ai_processed: false
         });
 
-        setUploading(false);
-        setProcessing(true);
+        docsToProcess.push({ file, file_url, doc });
+      }
 
+      setUploadedFiles((prev) => [...prev, ...newFiles]);
+      setUploading(false);
+      setProcessing(true);
+
+      // 2) AI processing pass
+      for (const item of docsToProcess) {
+        const { file, file_url, doc } = item;
         try {
           const aiRaw = await base44.integrations.Core.InvokeLLM({
             prompt: `You are a construction bid analyst. Analyze this bid/RFP/ITB document thoroughly and extract ALL of the following information:
@@ -238,8 +259,6 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
           toast.error(`AI analysis failed for ${file.name}`);
         }
       }
-
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
 
       // Fetch existing bid to avoid overwriting good data
       const existingBidRows = await base44.entities.BidOpportunity.filter({ id: bidId });

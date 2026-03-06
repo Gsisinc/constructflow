@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -481,6 +481,11 @@ export default function AddBid() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  const { data: user } = useQuery({
+    queryKey: ['currentUser', 'addBid'],
+    queryFn: () => base44.auth.me(),
+  });
+
   const [formData, setFormData] = useState({ ...EMPTY_FORM });
   const [phases, setPhases] = useState(DEFAULT_PHASES);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -781,8 +786,10 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
         description: formData.description || normalized.scopeSummary || ''
       };
 
+      const organizationId = user?.organization_id || null;
+
       const bid = await base44.entities.BidOpportunity.create({
-        organization_id: null,
+        organization_id: organizationId,
         title: finalFormData.project_name,
         project_name: finalFormData.project_name,
         agency: finalFormData.agency,
@@ -803,7 +810,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
         await Promise.all(uploadedFiles.map((file) =>
           base44.entities.BidDocument.create({
             bid_opportunity_id: bid.id,
-            organization_id: bid.organization_id,
+            organization_id: organizationId,
             name: file.name,
             file_url: file.url,
             file_type: file.type,
@@ -821,7 +828,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
         await Promise.all(combinedRequirements.map((req) =>
           base44.entities.BidRequirement.create({
             bid_opportunity_id: bid.id,
-            organization_id: bid.organization_id,
+            organization_id: organizationId,
             requirement_text: req.text,
             category: req.category || 'other',
             priority: req.priority || 'medium',
