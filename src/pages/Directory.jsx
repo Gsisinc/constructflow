@@ -249,6 +249,37 @@ export default function Directory() {
     },
   });
 
+  const clockStatusMutation = useMutation({
+    mutationFn: async ({ workerId, action }) => {
+      const nowIso = new Date().toISOString();
+      if (!workerId) throw new Error('Missing worker id');
+      if (action === 'in') {
+        return base44.entities.Worker.update(workerId, { site_status: 'on_site', last_seen: nowIso });
+      }
+      return base44.entities.Worker.update(workerId, { site_status: 'assigned', last_seen: null });
+    },
+    onSuccess: (_updated, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['workers', 'directory'] });
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      setSelectedPerson((prev) => {
+        if (!prev || prev.id !== vars.workerId) return prev;
+        const nowIso = new Date().toISOString();
+        return {
+          ...prev,
+          site_status: vars.action === 'in' ? 'on_site' : 'assigned',
+          last_seen: vars.action === 'in' ? nowIso : null,
+        };
+      });
+      toast.success(vars.action === 'in' ? 'Clocked in (On Site)' : 'Clocked out');
+    },
+    onError: (err) => {
+      const message =
+        (typeof err === 'object' && err && 'message' in err && err.message) ||
+        'Clock action failed';
+      toast.error(message);
+    },
+  });
+
   const people = useMemo(
     () => workersRaw.map((w, i) => enrichPerson(w, i)),
     [workersRaw]
@@ -574,7 +605,22 @@ export default function Directory() {
                   </ul>
                 )}
               </div>
-              <SheetFooter className="border-t pt-4 mt-4 flex gap-2">
+              <SheetFooter className="border-t pt-4 mt-4 flex flex-wrap gap-2">
+                <Button
+                  variant={selectedPerson.site_status === 'on_site' ? 'default' : 'outline'}
+                  size="sm"
+                  disabled={clockStatusMutation.isPending || !selectedPerson.id}
+                  onClick={() => clockStatusMutation.mutate({ workerId: selectedPerson.id, action: selectedPerson.site_status === 'on_site' ? 'out' : 'in' })}
+                  className={cn(
+                    selectedPerson.site_status === 'on_site'
+                      ? 'bg-green-600 hover:bg-green-700 text-white'
+                      : 'border-green-300 text-green-700 hover:bg-green-50'
+                  )}
+                  title={selectedPerson.site_status === 'on_site' ? 'Clock out / mark off site' : 'Clock in / mark on site'}
+                >
+                  {clockStatusMutation.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : (selectedPerson.site_status === 'on_site' ? <X className="h-4 w-4 mr-1" /> : <Check className="h-4 w-4 mr-1" />)}
+                  {selectedPerson.site_status === 'on_site' ? 'Clock Out' : 'Clock In'}
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => handlePing(selectedPerson)}><Radio className="h-4 w-4 mr-1" /> Ping</Button>
                 <Button variant="outline" size="sm" onClick={() => handleSendRFI(selectedPerson)}><Send className="h-4 w-4 mr-1" /> RFI</Button>
               </SheetFooter>

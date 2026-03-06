@@ -26,10 +26,26 @@ export default function ClockIn() {
   const clockMutation = useMutation({
     mutationFn: async (action) => {
       if (!userData) throw new Error('Not authenticated');
+      const nowIso = new Date().toISOString();
       await base44.auth.updateMe({
         last_clock_action: action,
-        last_clock_time: new Date().toISOString()
+        last_clock_time: nowIso
       });
+      // Best-effort: keep the Directory roster in sync by updating the matching Worker row (if any).
+      try {
+        if (userData.email) {
+          const matches = await base44.entities.Worker.filter({ email: userData.email });
+          const worker = matches?.[0];
+          if (worker?.id) {
+            await base44.entities.Worker.update(worker.id, {
+              site_status: action === 'in' ? 'on_site' : 'assigned',
+              last_seen: action === 'in' ? nowIso : null,
+            });
+          }
+        }
+      } catch (_) {
+        // Ignore roster sync failures (clock-in for auth user still succeeded).
+      }
       return action;
     },
     onSuccess: (action) => {
@@ -39,6 +55,8 @@ export default function ClockIn() {
         last_clock_time: new Date().toISOString()
       }));
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      queryClient.invalidateQueries({ queryKey: ['workers', 'directory'] });
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
       toast.success(action === 'in' ? 'Clocked in successfully' : 'Clocked out successfully');
     }
   });
