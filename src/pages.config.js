@@ -108,8 +108,6 @@ import Projects from './pages/Projects';
 import PurchaseOrders from './pages/PurchaseOrders';
 import QuickBooksSync from './pages/QuickBooksSync';
 import RolePermissions from './pages/RolePermissions';
-import PayStub from './pages/PayStub';
-import RequestTimeOff from './pages/RequestTimeOff';
 import Safety from './pages/Safety';
 import SchedulingAI from './pages/SchedulingAI';
 import ServiceDesk from './pages/ServiceDesk';
