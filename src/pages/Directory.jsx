@@ -70,6 +70,7 @@ import {
   Mail,
   FilterX,
   ArrowUpDown,
+  ImagePlus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -221,7 +222,10 @@ export default function Directory() {
     email: '',
     category: 'worker',
     group: '',
+    avatar_url: '',
   });
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const photoInputRef = React.useRef(null);
 
   useEffect(() => {
     if (projectIdFromUrl) setProjectId(projectIdFromUrl);
@@ -279,6 +283,7 @@ export default function Directory() {
         email: '',
         category: 'worker',
         group: '',
+        avatar_url: '',
       });
     },
     onError: (err) => {
@@ -480,6 +485,25 @@ export default function Directory() {
     }
   };
 
+  const handlePhotoChange = async (e) => {
+    const file = e.target?.files?.[0];
+    if (!file || !file.type.startsWith('image/')) {
+      toast.error('Please choose an image file (JPG, PNG, etc.)');
+      return;
+    }
+    setUploadingPhoto(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setNewContact((prev) => ({ ...prev, avatar_url: file_url || '' }));
+      toast.success('Photo added');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to upload photo');
+    } finally {
+      setUploadingPhoto(false);
+      if (photoInputRef.current) photoInputRef.current.value = '';
+    }
+  };
+
   const handleSaveContact = () => {
     if (!newContact.name.trim()) {
       toast.error('Name is required');
@@ -495,6 +519,7 @@ export default function Directory() {
       email: newContact.email?.trim() || '',
       category: newContact.category,
       ...(newContact.group && { phase: newContact.group, group: newContact.group }),
+      avatar_url: newContact.avatar_url || undefined,
     };
     if (editingContact?.id) {
       updateWorkerMutation.mutate({ id: editingContact.id, data: payload });
@@ -537,7 +562,7 @@ export default function Directory() {
           <Button
             size="sm"
             className="h-8 bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs md:text-sm px-2"
-            onClick={() => { setEditingContact(null); setNewContact({ name: '', role: 'electrician', company: '', phone: '', email: '', category: 'worker', group: '' }); setShowAddForm(true); }}
+            onClick={() => { setEditingContact(null); setNewContact({ name: '', role: 'electrician', company: '', phone: '', email: '', category: 'worker', group: '', avatar_url: '' }); setShowAddForm(true); }}
           >
             <UserPlus className="h-3 w-3 md:h-4 md:w-4 mr-1" /> Add
           </Button>
@@ -816,8 +841,16 @@ export default function Directory() {
           {selectedPerson && (
             <>
               <SheetHeader className="border-b pb-4 mb-4">
-                <SheetTitle>{selectedPerson.name}</SheetTitle>
-                <SheetDescription>{TRADES.find(t=>t.value===selectedPerson.trade)?.label} · {selectedPerson.employer}</SheetDescription>
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16 rounded-full border-2 border-slate-200 flex-shrink-0">
+                    <AvatarImage src={selectedPerson.avatar_url} className="object-cover" />
+                    <AvatarFallback className="bg-slate-500 text-white text-xl">{selectedPerson.name?.[0]?.toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <SheetTitle className="truncate">{selectedPerson.name}</SheetTitle>
+                    <SheetDescription>{TRADES.find(t=>t.value===selectedPerson.trade)?.label} · {selectedPerson.employer}</SheetDescription>
+                  </div>
+                </div>
               </SheetHeader>
               <div className="space-y-4">
                 <div className="flex gap-2">
@@ -866,7 +899,7 @@ export default function Directory() {
                 )}
               </div>
               <SheetFooter className="border-t pt-4 mt-4 flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => { setNewContact({ name: selectedPerson.name || '', role: selectedPerson.role || selectedPerson.trade || 'electrician', company: selectedPerson.employer || selectedPerson.company || '', phone: selectedPerson.phone || '', email: selectedPerson.email || '', category: selectedPerson.category || 'worker', group: selectedPerson.group || selectedPerson.phase || selectedPerson.site_zone || '' }); setEditingContact(selectedPerson); setShowAddForm(true); setSelectedPerson(null); }}>
+                <Button variant="outline" size="sm" onClick={() => { setNewContact({ name: selectedPerson.name || '', role: selectedPerson.role || selectedPerson.trade || 'electrician', company: selectedPerson.employer || selectedPerson.company || '', phone: selectedPerson.phone || '', email: selectedPerson.email || '', category: selectedPerson.category || 'worker', group: selectedPerson.group || selectedPerson.phase || selectedPerson.site_zone || '', avatar_url: selectedPerson.avatar_url || '' }); setEditingContact(selectedPerson); setShowAddForm(true); setSelectedPerson(null); }}>
                   <Pencil className="h-4 w-4 mr-1" /> Edit
                 </Button>
                 <Button
@@ -915,6 +948,40 @@ export default function Directory() {
             <SheetDescription>{editingContact ? 'Update this contact\'s details' : 'Add a new person to the directory'}</SheetDescription>
           </SheetHeader>
           <div className="space-y-4">
+            <div className="flex flex-col items-center gap-3">
+              <Label className="text-sm font-medium">Photo</Label>
+              <div className="relative">
+                <Avatar className="h-24 w-24 rounded-full border-2 border-slate-200">
+                  <AvatarImage src={newContact.avatar_url} className="object-cover" />
+                  <AvatarFallback className="bg-slate-400 text-white text-2xl">
+                    {newContact.name?.trim()?.[0]?.toUpperCase() || '?'}
+                  </AvatarFallback>
+                </Avatar>
+                {uploadingPhoto && (
+                  <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+                    <Loader2 className="h-8 w-8 text-white animate-spin" />
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handlePhotoChange}
+                  disabled={uploadingPhoto}
+                />
+                <Button type="button" variant="outline" size="sm" disabled={uploadingPhoto} onClick={() => photoInputRef.current?.click()}>
+                  <ImagePlus className="h-4 w-4 mr-1" /> {newContact.avatar_url ? 'Change' : 'Add'} photo
+                </Button>
+                {newContact.avatar_url && (
+                  <Button type="button" variant="ghost" size="sm" className="text-red-600" disabled={uploadingPhoto} onClick={() => setNewContact((prev) => ({ ...prev, avatar_url: '' }))}>
+                    Remove
+                  </Button>
+                )}
+              </div>
+            </div>
             <div>
               <Label htmlFor="name" className="text-sm font-medium">Name *</Label>
               <Input
