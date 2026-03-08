@@ -155,13 +155,13 @@ export const AuthProvider = ({ children }) => {
       }
     }
 
-    // 4) In org but not a Worker → client/stakeholder (backend assigns org on join as client)
+    // 4) In org but not in Worker: default to technician (so techs see Tech Portal). Only client when they chose "Join as Client" (sessionStorage already set in step 1).
     if (!role && currentUser?.organization_id) {
-      role = 'client';
-      try { sessionStorage.setItem(PORTAL_ROLE_KEY, 'client'); } catch (_) {}
+      role = 'technician';
+      try { sessionStorage.setItem(PORTAL_ROLE_KEY, 'technician'); } catch (_) {}
     }
 
-    // 5) Fallback: not in Worker and no org_id — use sessionStorage or default technician
+    // 5) Fallback: default technician
     if (!role) {
       role = 'technician';
       try { sessionStorage.setItem(PORTAL_ROLE_KEY, 'technician'); } catch (_) {}

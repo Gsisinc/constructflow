@@ -74,9 +74,9 @@ const adminNavItems = [
   { name: 'User Approvals', icon: User, page: 'UserApprovals' },
 ];
 
-// Technician portal: only what techs need (calendar, modules, directory, AI help, tools, time cards, tasks, pay, time off)
+// Technician portal: dashboard + calendar, tasks, time cards, modules, directory, etc.
 const technicianPrimaryNav = [
-  { name: 'Tech Home', icon: Wrench, page: 'TechnicianPortal' },
+  { name: 'Dashboard', icon: LayoutDashboard, page: 'TechnicianPortal' },
   { name: 'Calendar', icon: Calendar, page: 'Calendar' },
   { name: 'Tasks', icon: FileStack, page: 'TaskTracker' },
   { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
@@ -388,7 +388,7 @@ export default function Layout({ children, currentPageName }) {
       </header>
 
       {/* Mega Menu */}
-      <MegaMenu isOpen={megaMenuOpen} onClose={() => setMegaMenuOpen(false)} />
+      <MegaMenu isOpen={megaMenuOpen} onClose={() => setMegaMenuOpen(false)} userRole={user?.role} />
 
       {/* Sidebar Overlay */}
       {sidebarOpen && (

@@ -30,12 +30,12 @@ import {
   X
 } from 'lucide-react';
 
-// Quick access for technicians only
+// Quick access for technicians only (tech portal dashboard + tools)
 const technicianMenuSections = [
   {
     title: 'My Work',
     items: [
-      { icon: LayoutDashboard, label: 'Tech Home', page: 'TechnicianPortal' },
+      { icon: LayoutDashboard, label: 'Dashboard', page: 'TechnicianPortal' },
       { icon: Calendar, label: 'Calendar', page: 'Calendar' },
       { icon: FileStack, label: 'Tasks', page: 'TaskTracker' },
       { icon: Clock, label: 'Time Cards', page: 'TimeCards' },
@@ -216,8 +216,9 @@ export default function MegaMenu({ isOpen, onClose, userRole }) {
 
   if (!isOpen) return null;
 
-  const sections = userRole === 'technician' ? technicianMenuSections : userRole === 'client' ? clientMenuSections : menuSections;
-  const subtitle = userRole === 'technician' ? 'Your tools, schedule, and support' : userRole === 'client' ? 'Projects and support' : 'Navigate to any feature across the platform';
+  // Base44 only has user/admin: we map to technician | client | admin. Default to tech menu when role not yet loaded.
+  const sections = userRole === 'admin' ? menuSections : userRole === 'client' ? clientMenuSections : technicianMenuSections;
+  const subtitle = userRole === 'admin' ? 'Navigate to any feature across the platform' : userRole === 'client' ? 'Projects and support' : 'Your tools, schedule, and support';
 
   return (
     <>
