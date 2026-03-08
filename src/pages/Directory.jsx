@@ -89,7 +89,7 @@ const TRADES = [
   { value: 'other', label: 'Other', color: 'bg-slate-400 text-white', icon: HardHat },
 ];
 
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   { id: 'worker', label: 'Worker', color: 'bg-blue-500' },
   { id: 'supervisor', label: 'Supervisor', color: 'bg-purple-500' },
   { id: 'vendor', label: 'Vendor', color: 'bg-green-500' },
@@ -97,6 +97,25 @@ const CATEGORIES = [
   { id: 'client', label: 'Client', color: 'bg-red-500' },
   { id: 'other', label: 'Other', color: 'bg-slate-500' },
 ];
+
+const DIRECTORY_CUSTOM_CATEGORIES_KEY = 'constructflow.directoryCustomCategories';
+
+function loadCustomCategories() {
+  try {
+    const raw = typeof window !== 'undefined' && window.localStorage.getItem(DIRECTORY_CUSTOM_CATEGORIES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomCategories(list) {
+  try {
+    if (typeof window !== 'undefined') window.localStorage.setItem(DIRECTORY_CUSTOM_CATEGORIES_KEY, JSON.stringify(list));
+  } catch (_) {}
+}
 
 const SITE_STATUS = {
   on_site: { label: 'On Site', ribbon: 'bg-green-500', icon: Check },
@@ -154,6 +173,7 @@ function enrichPerson(worker, index) {
     has_first_aid: certs.some(c => c.id === 'first_aid'),
     last_seen: worker.last_seen || (status === 'on_site' ? new Date(Date.now() - 10 * 60 * 1000).toISOString() : null),
     category: worker.category || 'worker',
+    group: worker.group || worker.phase || worker.site_zone || worker.employer || '',
   };
 }
 
@@ -172,6 +192,10 @@ export default function Directory() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [certFilter, setCertFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [groupFilter, setGroupFilter] = useState('all');
+  const [customCategories, setCustomCategories] = useState(() => loadCustomCategories());
+  const [showManageCategories, setShowManageCategories] = useState(false);
+  const [newCategoryLabel, setNewCategoryLabel] = useState('');
   const [detailTab, setDetailTab] = useState('info');
   const [showAddForm, setShowAddForm] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -182,6 +206,7 @@ export default function Directory() {
     phone: '',
     email: '',
     category: 'worker',
+    group: '',
   });
 
   useEffect(() => {
@@ -239,6 +264,7 @@ export default function Directory() {
         phone: '',
         email: '',
         category: 'worker',
+        group: '',
       });
     },
     onError: (err) => {
@@ -285,6 +311,20 @@ export default function Directory() {
     [workersRaw]
   );
 
+  const categoriesList = useMemo(
+    () => [...DEFAULT_CATEGORIES, ...customCategories],
+    [customCategories]
+  );
+
+  const uniqueGroups = useMemo(() => {
+    const set = new Set();
+    people.forEach(p => {
+      const g = (p.group || '').toString().trim();
+      if (g) set.add(g);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [people]);
+
   const peopleForProject = useMemo(() => {
     if (!projectId) return people;
     return people.filter(p => p.current_project_id === projectId || p.project_id === projectId);
@@ -302,10 +342,11 @@ export default function Directory() {
     if (statusFilter !== 'all') list = list.filter(p => p.site_status === statusFilter);
     if (certFilter !== 'all') list = list.filter(p => (p.certifications || []).some(c => c.id === certFilter));
     if (categoryFilter !== 'all') list = list.filter(p => p.category === categoryFilter);
+    if (groupFilter !== 'all') list = list.filter(p => (p.group || '') === groupFilter);
     if (emergencyMode) list = list.filter(p => p.site_status === 'on_site');
     if (emergencyMode) list = list.filter(p => p.has_first_aid);
     return list;
-  }, [peopleForProject, searchTerm, statusFilter, certFilter, categoryFilter, emergencyMode]);
+  }, [peopleForProject, searchTerm, statusFilter, certFilter, categoryFilter, groupFilter, emergencyMode]);
 
   const onSiteCount = useMemo(() => peopleForProject.filter((p) => p.site_status === 'on_site').length, [peopleForProject]);
   const selectedProject = useMemo(() => projects.find(p => p.id === projectId), [projects, projectId]);
@@ -337,6 +378,33 @@ export default function Directory() {
     });
   };
 
+  const handleAddCustomCategory = () => {
+    const label = (newCategoryLabel || '').trim();
+    if (!label) {
+      toast.error('Enter a category name');
+      return;
+    }
+    const id = label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') || 'custom';
+    const exists = [...DEFAULT_CATEGORIES, ...customCategories].some(c => c.id === id);
+    if (exists) {
+      toast.error('A category with that name already exists');
+      return;
+    }
+    const next = [...customCategories, { id, label, color: 'bg-teal-500' }];
+    setCustomCategories(next);
+    saveCustomCategories(next);
+    setNewCategoryLabel('');
+    toast.success(`Category "${label}" added`);
+  };
+
+  const handleRemoveCustomCategory = (id) => {
+    const next = customCategories.filter(c => c.id !== id);
+    setCustomCategories(next);
+    saveCustomCategories(next);
+    if (categoryFilter === id) setCategoryFilter('all');
+    toast.success('Category removed');
+  };
+
   const handleAddContact = () => {
     if (!newContact.name.trim()) {
       toast.error('Name is required');
@@ -352,6 +420,7 @@ export default function Directory() {
       phone: newContact.phone?.trim() || '',
       email: newContact.email?.trim() || '',
       category: newContact.category,
+      ...(newContact.group && { phase: newContact.group, group: newContact.group }),
       status: 'assigned',
       site_status: 'assigned',
       current_project_id: projectId || '',
@@ -446,9 +515,23 @@ export default function Directory() {
                 </div>
               </div>
               <div>
+                <Label className="text-sm font-semibold mb-2 block">Group</Label>
+                <Select value={groupFilter} onValueChange={(v) => { setGroupFilter(v); setShowFilters(false); }}>
+                  <SelectTrigger className="text-sm">
+                    <SelectValue placeholder="All groups" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All groups</SelectItem>
+                    {uniqueGroups.map(g => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <Label className="text-sm font-semibold mb-2 block">Category</Label>
                 <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map(cat => (
+                  {categoriesList.map(cat => (
                     <button
                       key={cat.id}
                       type="button"
@@ -463,6 +546,9 @@ export default function Directory() {
                     </button>
                   ))}
                 </div>
+                <Button type="button" variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => { setShowFilters(false); setShowManageCategories(true); }}>
+                  + Add category
+                </Button>
               </div>
             </div>
           </SheetContent>
@@ -509,9 +595,23 @@ export default function Directory() {
               </div>
             </div>
             <div>
+              <Label className="text-xs font-semibold mb-2 block">Group</Label>
+              <Select value={groupFilter} onValueChange={setGroupFilter}>
+                <SelectTrigger className="text-sm">
+                  <SelectValue placeholder="All groups" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All groups</SelectItem>
+                  {uniqueGroups.map(g => (
+                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <Label className="text-xs font-semibold mb-2 block">Category</Label>
               <div className="flex flex-wrap gap-2">
-                {CATEGORIES.map(cat => (
+                {categoriesList.map(cat => (
                   <button
                     key={cat.id}
                     type="button"
@@ -526,6 +626,9 @@ export default function Directory() {
                   </button>
                 ))}
               </div>
+              <Button type="button" variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => setShowManageCategories(true)}>
+                + Add category
+              </Button>
             </div>
           </div>
         </aside>
@@ -585,7 +688,7 @@ export default function Directory() {
                     <div><span className="text-slate-500">Trade</span><p className="font-medium">{TRADES.find(t=>t.value===selectedPerson.trade)?.label}</p></div>
                     <div><span className="text-slate-500">Company</span><p className="font-medium">{selectedPerson.employer}</p></div>
                     <div><span className="text-slate-500">Status</span><p className="font-medium">{SITE_STATUS[selectedPerson.site_status]?.label}</p></div>
-                    <div><span className="text-slate-500">Category</span><p className="font-medium">{CATEGORIES.find(c=>c.id===selectedPerson.category)?.label}</p></div>
+                    <div><span className="text-slate-500">Category</span><p className="font-medium">{categoriesList.find(c=>c.id===selectedPerson.category)?.label || selectedPerson.category}</p></div>
                   </div>
                 )}
                 {detailTab === 'certs' && (
@@ -698,11 +801,25 @@ export default function Directory() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map(cat => (
+                  {categoriesList.map(cat => (
                     <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label htmlFor="group" className="text-sm font-medium">Group (optional)</Label>
+              <Input
+                id="group"
+                placeholder="e.g. Crew A, Foundation Phase"
+                value={newContact.group}
+                onChange={(e) => setNewContact({ ...newContact, group: e.target.value })}
+                className="mt-1 text-sm"
+                list="directory-groups"
+              />
+              <datalist id="directory-groups">
+                {uniqueGroups.map(g => <option key={g} value={g} />)}
+              </datalist>
             </div>
           </div>
           <SheetFooter className="border-t pt-4 mt-4 flex gap-2">
@@ -716,6 +833,43 @@ export default function Directory() {
               Add
             </Button>
           </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
+      {/* Manage categories */}
+      <Sheet open={showManageCategories} onOpenChange={setShowManageCategories}>
+        <SheetContent side="right" className="w-full sm:max-w-[360px] overflow-y-auto p-4">
+          <SheetHeader className="border-b pb-4 mb-4">
+            <SheetTitle>Manage categories</SheetTitle>
+            <SheetDescription>Add custom categories for filtering and when adding contacts.</SheetDescription>
+          </SheetHeader>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input
+                placeholder="New category name"
+                value={newCategoryLabel}
+                onChange={(e) => setNewCategoryLabel(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddCustomCategory()}
+                className="flex-1"
+              />
+              <Button type="button" size="sm" onClick={handleAddCustomCategory}>Add</Button>
+            </div>
+            {customCategories.length > 0 && (
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Your categories</Label>
+                <ul className="space-y-2">
+                  {customCategories.map(cat => (
+                    <li key={cat.id} className="flex items-center justify-between rounded border px-3 py-2 bg-slate-50">
+                      <span className={cn('px-2 py-0.5 rounded text-xs text-white', cat.color)}>{cat.label}</span>
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-red-600" onClick={() => handleRemoveCustomCategory(cat.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </SheetContent>
       </Sheet>
     </div>
