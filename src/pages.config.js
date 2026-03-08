@@ -55,6 +55,17 @@ import AIAgentsMultiPlatform from './pages/AIAgentsMultiPlatform';
 import AddBid from './pages/AddBid';
 import AlertSettings from './pages/AlertSettings';
 import AuditTrail from './pages/AuditTrail';
+import Accounts from './pages/Accounts';
+import Companies from './pages/Companies';
+import FinancialDashboard from './pages/FinancialDashboard';
+import FinancialSettings from './pages/FinancialSettings';
+import Inventory from './pages/Inventory';
+import Ledger from './pages/Ledger';
+import PurchaseInvoices from './pages/PurchaseInvoices';
+import Reports from './pages/Reports';
+import SalesInvoices from './pages/SalesInvoices';
+import Transactions from './pages/Transactions';
+import Warehouses from './pages/Warehouses';
 import BidDetail from './pages/BidDetail';
 import biddiscoveryMobile from './pages/BidDiscovery-Mobile';
 import BidDiscovery from './pages/BidDiscovery';
@@ -153,6 +164,17 @@ export const PAGES = {
     "Bids": Bids,
     "BillApprovals": BillApprovals,
     "Budget": Budget,
+    "Accounts": Accounts,
+    "Companies": Companies,
+    "FinancialDashboard": FinancialDashboard,
+    "FinancialSettings": FinancialSettings,
+    "Inventory": Inventory,
+    "Ledger": Ledger,
+    "PurchaseInvoices": PurchaseInvoices,
+    "Reports": Reports,
+    "SalesInvoices": SalesInvoices,
+    "Transactions": Transactions,
+    "Warehouses": Warehouses,
     "Calendar": Calendar,
     "CertificationRoadmap": CertificationRoadmap,
     "ClientPortal": ClientPortal,
