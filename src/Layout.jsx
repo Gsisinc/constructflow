@@ -178,26 +178,44 @@ export default function Layout({ children, currentPageName }) {
         }
         
         const userData = await base44.auth.me();
-        setUser(userData);
-        
+        // If profile.role wasn't set by backend, treat as technician when they have a Worker record (e.g. Sky Robotic assigned to org)
+        let role = userData?.role ?? null;
+        if (!role && userData?.organization_id && userData?.email) {
+          try {
+            const workers = await base44.entities.Worker.filter({ email: userData.email });
+            if (workers?.length > 0) role = 'technician';
+          } catch (_) {}
+        }
+        const effectiveRole = role ?? userData?.role;
+        setUser({ ...userData, role: effectiveRole });
+
         if (!userData?.organization_id && currentPageName !== 'Onboarding' && !isHomePage && !isLandingPage) {
           navigate(createPageUrl('Onboarding'));
           return;
         }
 
         if (isHomePage && isAuth) {
-            const role = userData?.role;
-            if (role === 'technician') {
+            if (effectiveRole === 'technician') {
               navigate(createPageUrl('TechnicianPortal'));
               return;
             }
-            if (role === 'client') {
+            if (effectiveRole === 'client') {
               navigate(createPageUrl('ClientPortal'));
               return;
             }
             navigate(createPageUrl('Bids'));
             return;
           }
+
+        // Technicians should land on Tech Portal even when opening app on a direct link (e.g. /Dashboard)
+        if (effectiveRole === 'technician' && currentPageName && !['TechnicianPortal', 'Calendar', 'TaskTracker', 'TimeCards', 'TechnicianTraining', 'Directory', 'AIAgents', 'PayStub', 'RequestTimeOff', 'Settings', 'AlertSettings'].includes(currentPageName)) {
+          navigate(createPageUrl('TechnicianPortal'));
+          return;
+        }
+        if (effectiveRole === 'client' && currentPageName && !['ClientPortal', 'Projects', 'Documents', 'ServiceDesk', 'Settings'].includes(currentPageName)) {
+          navigate(createPageUrl('ClientPortal'));
+          return;
+        }
         
         if (userData?.organization_id) {
           const org = await base44.entities.Organization.filter({ id: userData.organization_id });
@@ -431,15 +449,15 @@ export default function Layout({ children, currentPageName }) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - on mobile leave room for bottom nav (4rem) so nothing is cut off */}
       <aside className={cn(
         "fixed top-14 sm:top-16 left-0 bg-white border-r border-gray-200 shadow-sm z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
-        "h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)]",
+        "h-[calc(100vh-3.5rem-4rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)]",
         sidebarCollapsed ? "lg:w-20" : "lg:w-64",
         sidebarOpen ? "translate-x-0" : "-translate-x-full",
         "lg:translate-x-0"
       )}>
-        <nav className="p-3 sm:p-4 space-y-1">
+        <nav className="p-3 sm:p-4 pb-6 sm:pb-4 space-y-1">
           {user?.role === 'technician' ? (
             <>
               {technicianPrimaryNav.map((item) => (
