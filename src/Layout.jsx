@@ -67,8 +67,20 @@ const secondaryNavItems = [
   { name: 'PM Guide', icon: FileText, page: 'PMSetupGuide' },
 ];
 
+// Financial module navigation items
+const financialNavItems = [
+  { name: 'Financial Dashboard', icon: DollarSign, page: 'FinancialDashboard' },
+  { name: 'Sales Invoices', icon: FileText, page: 'SalesInvoices' },
+  { name: 'Purchase Invoices', icon: FileText, page: 'PurchaseInvoices' },
+  { name: 'Transactions', icon: Banknote, page: 'Transactions' },
+  { name: 'Chart of Accounts', icon: DollarSign, page: 'Accounts' },
+  { name: 'Reports', icon: FileStack, page: 'Reports' },
+  { name: 'Inventory', icon: Grid3x3, page: 'Inventory' },
+  { name: 'Warehouses', icon: Wrench, page: 'Warehouses' },
+];
+
 // All navigation items for backward compatibility
-const navItems = [...primaryNavItems, ...secondaryNavItems, { name: 'Settings', icon: Settings, page: 'Settings' }, { name: 'Role Permissions', icon: Settings, page: 'RolePermissions' }, { name: 'Audit Trail', icon: FileStack, page: 'AuditTrail' }, { name: 'Service Desk', icon: Wrench, page: 'ServiceDesk' }];
+const navItems = [...primaryNavItems, ...secondaryNavItems, ...financialNavItems, { name: 'Settings', icon: Settings, page: 'Settings' }, { name: 'Role Permissions', icon: Settings, page: 'RolePermissions' }, { name: 'Audit Trail', icon: FileStack, page: 'AuditTrail' }, { name: 'Service Desk', icon: Wrench, page: 'ServiceDesk' }];
 
 const adminNavItems = [
   { name: 'User Approvals', icon: User, page: 'UserApprovals' },

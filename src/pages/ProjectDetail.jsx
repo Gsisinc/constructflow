@@ -416,6 +416,7 @@ export default function ProjectDetail() {
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="permits">Permits</TabsTrigger>
           <TabsTrigger value="materials">Materials</TabsTrigger>
+          <TabsTrigger value="financials">Financials</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
         </TabsList>
 
@@ -473,6 +474,48 @@ export default function ProjectDetail() {
 
         <TabsContent value="materials" className="mt-6">
           <ProjectMaterials projectId={projectId} organizationId={project.organization_id} />
+        </TabsContent>
+
+        <TabsContent value="financials" className="mt-6">
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">Project Financials</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <p className="text-sm text-slate-600 mb-1">Budget</p>
+                  <p className="text-2xl font-bold text-slate-900">${project.budget?.toLocaleString() || '0'}</p>
+                </div>
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <p className="text-sm text-slate-600 mb-1">Spent</p>
+                  <p className="text-2xl font-bold text-slate-900">${totalExpenses?.toLocaleString() || '0'}</p>
+                </div>
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <p className="text-sm text-slate-600 mb-1">Remaining</p>
+                  <p className="text-2xl font-bold text-slate-900">${((project.budget || 0) - totalExpenses)?.toLocaleString() || '0'}</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <Link to={createPageUrl('FinancialDashboard') + '?projectId=' + encodeURIComponent(projectId)}>
+                  <Button className="w-full" variant="outline">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    View Financial Dashboard
+                  </Button>
+                </Link>
+                <Link to={createPageUrl('SalesInvoices') + '?projectId=' + encodeURIComponent(projectId)}>
+                  <Button className="w-full" variant="outline">
+                    <FileText className="h-4 w-4 mr-2" />
+                    View Sales Invoices
+                  </Button>
+                </Link>
+                <Link to={createPageUrl('Transactions') + '?projectId=' + encodeURIComponent(projectId)}>
+                  <Button className="w-full" variant="outline">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    View Transactions
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="client" className="mt-6">
