@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
     if (!role && typeof sessionStorage !== 'undefined') {
       try {
         const stored = sessionStorage.getItem(PORTAL_ROLE_KEY);
-        if (stored === 'technician' || stored === 'client') role = stored;
+        if (stored === 'technician' || stored === 'client' || stored === 'admin') role = stored;
       } catch (_) {}
     }
 
@@ -144,6 +144,14 @@ export const AuthProvider = ({ children }) => {
 
     if (role === 'technician' || role === 'client') {
       try { if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(PORTAL_ROLE_KEY, role); } catch (_) {}
+    }
+    if (!role && currentUser?.organization_id) {
+      role = 'technician';
+      try { sessionStorage.setItem(PORTAL_ROLE_KEY, 'technician'); } catch (_) {}
+    }
+    if (!role) {
+      role = 'technician';
+      try { sessionStorage.setItem(PORTAL_ROLE_KEY, 'technician'); } catch (_) {}
     }
     return role ?? currentUser?.role ?? null;
   };

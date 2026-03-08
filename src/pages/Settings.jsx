@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Upload, Palette, Building2, Save, Loader2, AlertTriangle, Wrench } from 'lucide-react';
+import { Upload, Palette, Building2, Save, Loader2, AlertTriangle, Wrench, LayoutDashboard } from 'lucide-react';
 import ApiStatusCard from '@/components/settings/ApiStatusCard';
 import { toast } from 'sonner';
 import { createPageUrl } from '../utils';
@@ -126,6 +126,30 @@ export default function Settings() {
           >
             <Wrench className="h-4 w-4 mr-2" />
             Use Tech Portal
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border-slate-200 bg-slate-50/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <LayoutDashboard className="h-4 w-4 text-slate-600" />
+            Office / admin?
+          </CardTitle>
+          <p className="text-sm text-slate-600">If you need the full workspace (bids, projects, system builder, etc.), switch to admin view. You can switch back to Tech Portal anytime from here.</p>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="outline"
+            className="border-slate-300 text-slate-800 hover:bg-slate-100"
+            onClick={() => {
+              try { sessionStorage.setItem('mygsis_portal_role', 'admin'); } catch (_) {}
+              navigate(createPageUrl('Dashboard'));
+              window.location.reload();
+            }}
+          >
+            <LayoutDashboard className="h-4 w-4 mr-2" />
+            Use full admin workspace
           </Button>
         </CardContent>
       </Card>
