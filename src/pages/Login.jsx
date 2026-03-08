@@ -45,6 +45,10 @@ export default function Login() {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       if (error) throw error;
       toast.success('Signed in');
+      try {
+        if (portalType === 'tech') sessionStorage.setItem('mygsis_portal_role', 'technician');
+        else if (portalType === 'client') sessionStorage.setItem('mygsis_portal_role', 'client');
+      } catch (_) {}
       let target = redirectParam && redirectParam.startsWith('/') ? redirectParam : redirectParam ? `/${redirectParam}` : null;
       if (!target) {
         if (portalType === 'tech') target = createPageUrl('TechnicianPortal');

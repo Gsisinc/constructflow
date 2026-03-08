@@ -83,10 +83,24 @@ const FullPageStatus = ({ title, description, actionLabel, onAction, showSpinner
 );
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, checkAppState } = useAuth();
+  const { user, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, checkAppState } = useAuth();
   const [hasStartedLoginRedirect, setHasStartedLoginRedirect] = useState(false);
   const [showLoadingFallback, setShowLoadingFallback] = useState(false);
   const location = useLocation();
+
+  // Backup: force technicians to Tech Portal, clients to Client Portal (in case auth redirect ran before route rendered)
+  useEffect(() => {
+    if (!user || isLoadingAuth) return;
+    if (user.role !== 'technician' && user.role !== 'client') return;
+    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || '';
+    const path = (location.pathname || '').replace(new RegExp('^' + (base || '')), '') || '/';
+    const segment = path.replace(/^\/+/, '').split('/')[0] || 'Home';
+    const target = user.role === 'technician' ? 'TechnicianPortal' : 'ClientPortal';
+    if (segment !== target) {
+      const origin = window.location.origin || '';
+      window.location.replace(`${origin}${base}/${target}`);
+    }
+  }, [user, user?.role, isLoadingAuth, location.pathname]);
 
   useEffect(() => {
     if (authError?.type === 'auth_required' && !hasStartedLoginRedirect && location.pathname !== '/Login') {

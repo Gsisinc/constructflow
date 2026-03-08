@@ -101,6 +101,7 @@ export default function Onboarding() {
       });
       if (response?.data?.success !== false && !response?.data?.error) {
         toast.success('Organization created. You’re the admin.');
+        try { sessionStorage.setItem('mygsis_portal_role', 'admin'); } catch (_) {}
         setPendingRedirect('Dashboard');
         setStep('profile');
         setProfileFullName(user?.full_name || '');
