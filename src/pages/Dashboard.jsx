@@ -48,6 +48,7 @@ import {
 } from 'lucide-react';
 
 import { format, formatDistanceToNow, isToday, isTomorrow, isPast } from 'date-fns';
+import FinancialSummaryWidget from '@/components/dashboard/FinancialSummaryWidget';
 
 // Animation variants
 const containerVariants = {
@@ -570,6 +571,11 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
+        </motion.div>
+
+        {/* Financial Summary Widget */}
+        <motion.div variants={itemVariants}>
+          <FinancialSummaryWidget />
         </motion.div>
 
         {/* Main Grid */}
