@@ -178,13 +178,26 @@ export default function Layout({ children, currentPageName }) {
         }
         
         const userData = await base44.auth.me();
-        // If profile.role wasn't set by backend, treat as technician when they have a Worker record (e.g. Sky Robotic assigned to org)
+        const email = (userData?.email || userData?.user?.email || '').trim() || null;
+        // If profile.role wasn't set by backend, treat as technician when they have a Worker or TechnicianProfile record
         let role = userData?.role ?? null;
-        if (!role && userData?.organization_id && userData?.email) {
+        if (!role && userData?.organization_id && email) {
           try {
-            const workers = await base44.entities.Worker.filter({ email: userData.email });
-            if (workers?.length > 0) role = 'technician';
+            const workersWithOrg = await base44.entities.Worker.filter({ email, organization_id: userData.organization_id }).catch(() => []);
+            if (Array.isArray(workersWithOrg) && workersWithOrg.length > 0) role = 'technician';
           } catch (_) {}
+          if (!role) {
+            try {
+              const workersAny = await base44.entities.Worker.filter({ email }).catch(() => []);
+              if (Array.isArray(workersAny) && workersAny.length > 0) role = 'technician';
+            } catch (_) {}
+          }
+          if (!role && base44.entities.TechnicianProfile && typeof base44.entities.TechnicianProfile.filter === 'function') {
+            try {
+              const profiles = await base44.entities.TechnicianProfile.filter({ email }).then((r) => (Array.isArray(r) ? r : [])).catch(() => []);
+              if (profiles.length > 0) role = 'technician';
+            } catch (_) {}
+          }
         }
         const effectiveRole = role ?? userData?.role;
         setUser({ ...userData, role: effectiveRole });
@@ -232,20 +245,20 @@ export default function Layout({ children, currentPageName }) {
     loadUser();
   }, [currentPageName]);
 
-  // Redirect technicians and clients away from admin-only pages
+  // Redirect technicians and clients away from admin-only pages (runs when user loads so techs never see admin UI)
   const technicianAllowedPages = new Set(['TechnicianPortal', 'Calendar', 'TaskTracker', 'TimeCards', 'TechnicianTraining', 'Directory', 'AIAgents', 'PayStub', 'RequestTimeOff', 'Settings', 'AlertSettings']);
   const clientAllowedPages = new Set(['ClientPortal', 'Projects', 'Documents', 'ServiceDesk', 'Settings']);
   useEffect(() => {
-    if (!user?.role) return;
+    if (!user) return;
     if (user.role === 'technician' && currentPageName && !technicianAllowedPages.has(currentPageName)) {
-      navigate(createPageUrl('TechnicianPortal'));
+      navigate(createPageUrl('TechnicianPortal'), { replace: true });
       return;
     }
     if (user.role === 'client' && currentPageName && !clientAllowedPages.has(currentPageName)) {
-      navigate(createPageUrl('ClientPortal'));
+      navigate(createPageUrl('ClientPortal'), { replace: true });
       return;
     }
-  }, [user?.role, currentPageName, navigate]);
+  }, [user, currentPageName, navigate]);
 
   // Track page changes for back navigation
   useEffect(() => {
