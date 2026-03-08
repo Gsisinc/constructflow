@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
+import { appClient as supabaseAppClient } from '@/api/appClient';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 
@@ -103,14 +104,25 @@ export const AuthProvider = ({ children }) => {
   const PORTAL_ROLE_KEY = 'mygsis_portal_role';
 
   const resolveRole = async (currentUser) => {
+    const email = (currentUser?.email || currentUser?.user?.email || '').trim().toLowerCase() || null;
     let role = currentUser?.role ?? null;
-    if (!role) {
+
+    if (!role && typeof sessionStorage !== 'undefined') {
       try {
-        const stored = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(PORTAL_ROLE_KEY) : null;
+        const stored = sessionStorage.getItem(PORTAL_ROLE_KEY);
         if (stored === 'technician' || stored === 'client') role = stored;
       } catch (_) {}
     }
-    const email = (currentUser?.email || currentUser?.user?.email || '').trim() || null;
+
+    if (!role && email) {
+      try {
+        const list = await base44.entities.Worker.list().catch(() => []);
+        const arr = Array.isArray(list) ? list : [];
+        const match = arr.find((w) => (w.email || '').toLowerCase() === email);
+        if (match) role = 'technician';
+      } catch (_) {}
+    }
+
     if (!role && currentUser?.organization_id && email) {
       try {
         const workersWithOrg = await base44.entities.Worker.filter({ email, organization_id: currentUser.organization_id }).catch(() => []);
@@ -129,6 +141,7 @@ export const AuthProvider = ({ children }) => {
         } catch (_) {}
       }
     }
+
     if (role === 'technician' || role === 'client') {
       try { if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(PORTAL_ROLE_KEY, role); } catch (_) {}
     }
@@ -138,16 +151,40 @@ export const AuthProvider = ({ children }) => {
   const checkUserAuth = async () => {
     try {
       setIsLoadingAuth(true);
-      const currentUser = await base44.auth.me();
+      let currentUser = null;
+      if (supabaseAppClient.enabled && typeof supabaseAppClient.auth?.me === 'function') {
+        try {
+          currentUser = await supabaseAppClient.auth.me();
+        } catch (_) {}
+      }
+      if (!currentUser) currentUser = await base44.auth.me();
       if (!currentUser) {
         setIsLoadingAuth(false);
         setIsAuthenticated(false);
         return;
       }
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const portal = params.get('portal');
+        if (portal === 'technician' || portal === 'client') {
+          try { sessionStorage.setItem(PORTAL_ROLE_KEY, portal); } catch (_) {}
+        }
+      }
       const role = await resolveRole(currentUser);
-      setUser({ ...currentUser, role });
+      const userWithRole = { ...currentUser, role };
+      setUser(userWithRole);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
+      if (role === 'technician') {
+        try {
+          const base = (typeof appParams.basePath === 'string' ? appParams.basePath : '').replace(/\/$/, '') || '';
+          const path = (typeof window !== 'undefined' && window.location.pathname).replace(new RegExp('^' + (base || '')), '') || '/';
+          const segment = path.replace(/^\/+/, '').split('/')[0] || 'Home';
+          if (segment !== 'TechnicianPortal') {
+            window.location.replace(`${window.location.origin}${base}/TechnicianPortal`);
+          }
+        } catch (_) {}
+      }
     } catch (error) {
       console.error('User auth check failed:', error);
       setIsLoadingAuth(false);
