@@ -65,6 +65,11 @@ import {
   MoreHorizontal,
   Menu,
   Loader2,
+  Pencil,
+  Trash2,
+  Mail,
+  FilterX,
+  ArrowUpDown,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -205,7 +210,9 @@ export default function Directory() {
   const [newCategoryLabel, setNewCategoryLabel] = useState('');
   const [detailTab, setDetailTab] = useState('info');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingContact, setEditingContact] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState('name');
   const [newContact, setNewContact] = useState({
     name: '',
     role: 'electrician',
@@ -313,6 +320,36 @@ export default function Directory() {
     },
   });
 
+  const updateWorkerMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Worker.update(id, data),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ['workers', 'directory'] });
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      toast.success('Contact updated');
+      setShowAddForm(false);
+      setEditingContact(null);
+      setSelectedPerson((prev) => (prev && prev.id === updated?.id ? { ...prev, ...updated } : prev));
+      setNewContact({ name: '', role: 'electrician', company: '', phone: '', email: '', category: 'worker', group: '' });
+    },
+    onError: (err) => {
+      toast.error(typeof err === 'object' && err && 'message' in err ? err.message : 'Failed to update contact');
+    },
+  });
+
+  const deleteWorkerMutation = useMutation({
+    mutationFn: (id) => base44.entities.Worker.delete(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ['workers', 'directory'] });
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      setSelectedPerson((prev) => (prev && prev.id === id ? null : prev));
+      setEditingContact((prev) => (prev && prev.id === id ? null : prev));
+      toast.success('Contact removed');
+    },
+    onError: (err) => {
+      toast.error(typeof err === 'object' && err && 'message' in err ? err.message : 'Failed to remove contact');
+    },
+  });
+
   const people = useMemo(
     () => workersRaw.map((w, i) => enrichPerson(w, i)),
     [workersRaw]
@@ -354,6 +391,26 @@ export default function Directory() {
     if (emergencyMode) list = list.filter(p => p.has_first_aid);
     return list;
   }, [peopleForProject, searchTerm, statusFilter, certFilter, categoryFilter, groupFilter, emergencyMode]);
+
+  const sortedFilteredPeople = useMemo(() => {
+    const list = [...filteredPeople];
+    if (sortBy === 'name') list.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+    else if (sortBy === 'company') list.sort((a, b) => (a.employer || a.company || '').localeCompare(b.employer || b.company || '', undefined, { sensitivity: 'base' }));
+    else if (sortBy === 'status') list.sort((a, b) => (a.site_status || '').localeCompare(b.site_status || ''));
+    else if (sortBy === 'category') list.sort((a, b) => (a.category || '').localeCompare(b.category || ''));
+    return list;
+  }, [filteredPeople, sortBy]);
+
+  const hasActiveFilters = projectId || statusFilter !== 'all' || certFilter !== 'all' || categoryFilter !== 'all' || groupFilter !== 'all' || (searchTerm || '').trim();
+
+  const clearFilters = () => {
+    setProjectId('');
+    setStatusFilter('all');
+    setCertFilter('all');
+    setCategoryFilter('all');
+    setGroupFilter('all');
+    setSearchTerm('');
+  };
 
   const onSiteCount = useMemo(() => peopleForProject.filter((p) => p.site_status === 'on_site').length, [peopleForProject]);
   const selectedProject = useMemo(() => projects.find(p => p.id === projectId), [projects, projectId]);
@@ -423,13 +480,12 @@ export default function Directory() {
     }
   };
 
-  const handleAddContact = () => {
+  const handleSaveContact = () => {
     if (!newContact.name.trim()) {
       toast.error('Name is required');
       return;
     }
-
-    createWorkerMutation.mutate({
+    const payload = {
       name: newContact.name.trim(),
       role: newContact.role,
       trade: newContact.role,
@@ -439,10 +495,17 @@ export default function Directory() {
       email: newContact.email?.trim() || '',
       category: newContact.category,
       ...(newContact.group && { phase: newContact.group, group: newContact.group }),
-      status: 'assigned',
-      site_status: 'assigned',
-      current_project_id: projectId || '',
-    });
+    };
+    if (editingContact?.id) {
+      updateWorkerMutation.mutate({ id: editingContact.id, data: payload });
+    } else {
+      createWorkerMutation.mutate({
+        ...payload,
+        status: 'assigned',
+        site_status: 'assigned',
+        current_project_id: projectId || '',
+      });
+    }
   };
 
   return (
@@ -474,7 +537,7 @@ export default function Directory() {
           <Button
             size="sm"
             className="h-8 bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs md:text-sm px-2"
-            onClick={() => setShowAddForm(true)}
+            onClick={() => { setEditingContact(null); setNewContact({ name: '', role: 'electrician', company: '', phone: '', email: '', category: 'worker', group: '' }); setShowAddForm(true); }}
           >
             <UserPlus className="h-3 w-3 md:h-4 md:w-4 mr-1" /> Add
           </Button>
@@ -568,6 +631,39 @@ export default function Directory() {
                   + Add category
                 </Button>
               </div>
+              <div>
+                <Label className="text-sm font-semibold mb-2 block">Certification</Label>
+                <Select value={certFilter} onValueChange={(v) => { setCertFilter(v); setShowFilters(false); }}>
+                  <SelectTrigger className="text-sm">
+                    <SelectValue placeholder="Any" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Any</SelectItem>
+                    {CERT_TYPES.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-sm font-semibold mb-2 block">Sort by</Label>
+                <Select value={sortBy} onValueChange={(v) => { setSortBy(v); setShowFilters(false); }}>
+                  <SelectTrigger className="text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">Name</SelectItem>
+                    <SelectItem value="company">Company</SelectItem>
+                    <SelectItem value="status">Status</SelectItem>
+                    <SelectItem value="category">Category</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {hasActiveFilters && (
+                <Button type="button" variant="outline" size="sm" className="w-full" onClick={() => { clearFilters(); setShowFilters(false); }}>
+                  <FilterX className="h-4 w-4 mr-2" /> Clear all filters
+                </Button>
+              )}
             </div>
           </SheetContent>
         </Sheet>
@@ -648,18 +744,56 @@ export default function Directory() {
                 + Add category
               </Button>
             </div>
+            <div>
+              <Label className="text-xs font-semibold mb-2 block">Certification</Label>
+              <Select value={certFilter} onValueChange={setCertFilter}>
+                <SelectTrigger className="text-sm">
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any</SelectItem>
+                  {CERT_TYPES.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs font-semibold mb-2 block">Sort by</Label>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name">Name</SelectItem>
+                  <SelectItem value="company">Company</SelectItem>
+                  <SelectItem value="status">Status</SelectItem>
+                  <SelectItem value="category">Category</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {hasActiveFilters && (
+              <Button type="button" variant="outline" size="sm" className="w-full" onClick={clearFilters}>
+                <FilterX className="h-4 w-4 mr-2" /> Clear all filters
+              </Button>
+            )}
           </div>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 min-w-0 overflow-auto">
-          {filteredPeople.length === 0 ? (
-            <div className="flex items-center justify-center py-12 text-slate-500 text-sm">
-              No personnel match filters
+          {sortedFilteredPeople.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-500 text-sm gap-2">
+              <p>{hasActiveFilters ? 'No personnel match filters' : 'No contacts yet'}</p>
+              {hasActiveFilters && (
+                <Button variant="outline" size="sm" onClick={clearFilters}>
+                  <FilterX className="h-4 w-4 mr-2" /> Clear filters
+                </Button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
-              {filteredPeople.map((p) => (
+              {sortedFilteredPeople.map((p) => (
                 <SiteRosterCard
                   key={p.id}
                   person={p}
@@ -707,6 +841,11 @@ export default function Directory() {
                     <div><span className="text-slate-500">Company</span><p className="font-medium">{selectedPerson.employer}</p></div>
                     <div><span className="text-slate-500">Status</span><p className="font-medium">{SITE_STATUS[selectedPerson.site_status]?.label}</p></div>
                     <div><span className="text-slate-500">Category</span><p className="font-medium">{categoriesList.find(c=>c.id===selectedPerson.category)?.label || selectedPerson.category}</p></div>
+                    {(selectedPerson.group || selectedPerson.phase || selectedPerson.site_zone) && (
+                      <div><span className="text-slate-500">Group / Phase</span><p className="font-medium">{selectedPerson.group || selectedPerson.phase || selectedPerson.site_zone}</p></div>
+                    )}
+                    {selectedPerson.phone && <div><span className="text-slate-500">Phone</span><p className="font-medium">{selectedPerson.phone}</p></div>}
+                    {selectedPerson.email && <div><span className="text-slate-500">Email</span><p className="font-medium">{selectedPerson.email}</p></div>}
                   </div>
                 )}
                 {detailTab === 'certs' && (
@@ -727,6 +866,9 @@ export default function Directory() {
                 )}
               </div>
               <SheetFooter className="border-t pt-4 mt-4 flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => { setNewContact({ name: selectedPerson.name || '', role: selectedPerson.role || selectedPerson.trade || 'electrician', company: selectedPerson.employer || selectedPerson.company || '', phone: selectedPerson.phone || '', email: selectedPerson.email || '', category: selectedPerson.category || 'worker', group: selectedPerson.group || selectedPerson.phase || selectedPerson.site_zone || '' }); setEditingContact(selectedPerson); setShowAddForm(true); setSelectedPerson(null); }}>
+                  <Pencil className="h-4 w-4 mr-1" /> Edit
+                </Button>
                 <Button
                   variant={selectedPerson.site_status === 'on_site' ? 'default' : 'outline'}
                   size="sm"
@@ -744,6 +886,21 @@ export default function Directory() {
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => handlePing(selectedPerson)}><Radio className="h-4 w-4 mr-1" /> Ping</Button>
                 <Button variant="outline" size="sm" onClick={() => handleSendRFI(selectedPerson)}><Send className="h-4 w-4 mr-1" /> RFI</Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 border-red-200 hover:bg-red-50"
+                  disabled={deleteWorkerMutation.isPending || !selectedPerson.id}
+                  onClick={() => {
+                    if (confirm(`Remove ${selectedPerson.name || 'this contact'} from the directory? This cannot be undone.`)) {
+                      deleteWorkerMutation.mutate(selectedPerson.id);
+                      setSelectedPerson(null);
+                    }
+                  }}
+                >
+                  {deleteWorkerMutation.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Trash2 className="h-4 w-4 mr-1" />}
+                  Remove
+                </Button>
               </SheetFooter>
             </>
           )}
@@ -751,11 +908,11 @@ export default function Directory() {
       </Sheet>
 
       {/* Add Contact Form */}
-      <Sheet open={showAddForm} onOpenChange={setShowAddForm}>
+      <Sheet open={showAddForm} onOpenChange={(open) => { if (!open) setEditingContact(null); setShowAddForm(open); }}>
         <SheetContent side="right" className="w-full sm:max-w-[400px] overflow-y-auto p-4">
           <SheetHeader className="border-b pb-4 mb-4">
-            <SheetTitle>Add Contact</SheetTitle>
-            <SheetDescription>Add a new person to the directory</SheetDescription>
+            <SheetTitle>{editingContact ? 'Edit Contact' : 'Add Contact'}</SheetTitle>
+            <SheetDescription>{editingContact ? 'Update this contact\'s details' : 'Add a new person to the directory'}</SheetDescription>
           </SheetHeader>
           <div className="space-y-4">
             <div>
@@ -841,14 +998,14 @@ export default function Directory() {
             </div>
           </div>
           <SheetFooter className="border-t pt-4 mt-4 flex gap-2">
-            <Button variant="outline" onClick={() => setShowAddForm(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => { setShowAddForm(false); setEditingContact(null); }}>Cancel</Button>
             <Button
-              onClick={handleAddContact}
-              disabled={createWorkerMutation.isPending}
+              onClick={handleSaveContact}
+              disabled={createWorkerMutation.isPending || updateWorkerMutation.isPending}
               className="bg-amber-500 hover:bg-amber-600 text-slate-900"
             >
-              {createWorkerMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Add
+              {(createWorkerMutation.isPending || updateWorkerMutation.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {editingContact ? 'Save' : 'Add'}
             </Button>
           </SheetFooter>
         </SheetContent>
