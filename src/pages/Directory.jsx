@@ -105,7 +105,14 @@ function loadCustomCategories() {
     const raw = typeof window !== 'undefined' && window.localStorage.getItem(DIRECTORY_CUSTOM_CATEGORIES_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (item) =>
+        item != null &&
+        typeof item === 'object' &&
+        typeof item.id === 'string' &&
+        typeof item.label === 'string'
+    );
   } catch {
     return [];
   }
@@ -311,10 +318,10 @@ export default function Directory() {
     [workersRaw]
   );
 
-  const categoriesList = useMemo(
-    () => [...DEFAULT_CATEGORIES, ...customCategories],
-    [customCategories]
-  );
+  const categoriesList = useMemo(() => {
+    const custom = Array.isArray(customCategories) ? customCategories : [];
+    return [...DEFAULT_CATEGORIES, ...custom.filter((c) => c && typeof c.id === 'string' && typeof c.label === 'string')];
+  }, [customCategories]);
 
   const uniqueGroups = useMemo(() => {
     const set = new Set();
@@ -379,30 +386,41 @@ export default function Directory() {
   };
 
   const handleAddCustomCategory = () => {
-    const label = (newCategoryLabel || '').trim();
-    if (!label) {
-      toast.error('Enter a category name');
-      return;
+    try {
+      const label = (newCategoryLabel || '').trim();
+      if (!label) {
+        toast.error('Enter a category name');
+        return;
+      }
+      const id = label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') || 'custom';
+      const exists = [...DEFAULT_CATEGORIES, ...(customCategories || [])].some((c) => c && c.id === id);
+      if (exists) {
+        toast.error('A category with that name already exists');
+        return;
+      }
+      const next = [...(Array.isArray(customCategories) ? customCategories : []), { id, label, color: 'bg-teal-500' }];
+      setCustomCategories(next);
+      saveCustomCategories(next);
+      setNewCategoryLabel('');
+      toast.success(`Category "${label}" added`);
+    } catch (err) {
+      console.error('Add category error:', err);
+      toast.error(err?.message || 'Failed to add category. Try again.');
     }
-    const id = label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') || 'custom';
-    const exists = [...DEFAULT_CATEGORIES, ...customCategories].some(c => c.id === id);
-    if (exists) {
-      toast.error('A category with that name already exists');
-      return;
-    }
-    const next = [...customCategories, { id, label, color: 'bg-teal-500' }];
-    setCustomCategories(next);
-    saveCustomCategories(next);
-    setNewCategoryLabel('');
-    toast.success(`Category "${label}" added`);
   };
 
   const handleRemoveCustomCategory = (id) => {
-    const next = customCategories.filter(c => c.id !== id);
-    setCustomCategories(next);
-    saveCustomCategories(next);
-    if (categoryFilter === id) setCategoryFilter('all');
-    toast.success('Category removed');
+    try {
+      const list = Array.isArray(customCategories) ? customCategories : [];
+      const next = list.filter((c) => c && c.id !== id);
+      setCustomCategories(next);
+      saveCustomCategories(next);
+      if (categoryFilter === id) setCategoryFilter('all');
+      toast.success('Category removed');
+    } catch (err) {
+      console.error('Remove category error:', err);
+      toast.error('Failed to remove category. Try again.');
+    }
   };
 
   const handleAddContact = () => {
@@ -854,18 +872,20 @@ export default function Directory() {
               />
               <Button type="button" size="sm" onClick={handleAddCustomCategory}>Add</Button>
             </div>
-            {customCategories.length > 0 && (
+            {Array.isArray(customCategories) && customCategories.length > 0 && (
               <div>
                 <Label className="text-sm font-medium mb-2 block">Your categories</Label>
                 <ul className="space-y-2">
-                  {customCategories.map(cat => (
-                    <li key={cat.id} className="flex items-center justify-between rounded border px-3 py-2 bg-slate-50">
-                      <span className={cn('px-2 py-0.5 rounded text-xs text-white', cat.color)}>{cat.label}</span>
-                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-red-600" onClick={() => handleRemoveCustomCategory(cat.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </li>
-                  ))}
+                  {customCategories
+                    .filter((cat) => cat && typeof cat.id === 'string' && typeof cat.label === 'string')
+                    .map((cat) => (
+                      <li key={cat.id} className="flex items-center justify-between rounded border px-3 py-2 bg-slate-50">
+                        <span className={cn('px-2 py-0.5 rounded text-xs text-white', cat.color || 'bg-teal-500')}>{cat.label}</span>
+                        <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-red-600" onClick={() => handleRemoveCustomCategory(cat.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    ))}
                 </ul>
               </div>
             )}
