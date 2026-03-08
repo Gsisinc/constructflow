@@ -156,8 +156,8 @@ export default function ClientPortal() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Welcome, {user.full_name}</h1>
-            <p className="text-slate-500 mt-1">Track your project progress and stay updated</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Client Portal</h1>
+            <p className="text-slate-500 mt-1">View progress reports, updates, and project communications</p>
           </div>
           {projects.length > 1 && (
             <Select value={selectedProject?.id} onValueChange={(id) => setSelectedProject(projects.find(p => p.id === id))}>
@@ -175,9 +175,46 @@ export default function ClientPortal() {
 
         {selectedProject && (
           <>
+            {/* Progress reports - primary module for clients */}
+            <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+              <CardHeader>
+                <CardTitle className="text-xl">Progress report — {selectedProject.name}</CardTitle>
+                <p className="text-sm text-slate-500">Current status and recent updates</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-slate-600">Overall progress</span>
+                    <span className="font-semibold">{selectedProject.progress ?? 0}%</span>
+                  </div>
+                  <Progress value={selectedProject.progress ?? 0} className="h-3" />
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-slate-500">Start</p>
+                    <p className="font-medium">{selectedProject.start_date ? format(new Date(selectedProject.start_date), 'MMM d, yyyy') : '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Target completion</p>
+                    <p className="font-medium">{selectedProject.end_date ? format(new Date(selectedProject.end_date), 'MMM d, yyyy') : '—'}</p>
+                  </div>
+                </div>
+                {updates.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-slate-700 mb-2">Recent updates</p>
+                    <ul className="space-y-1 max-h-32 overflow-y-auto text-sm text-slate-600">
+                      {updates.slice(0, 5).map((u) => (
+                        <li key={u.id}>• {u.message || u.update_type} — {u.created_date ? format(new Date(u.created_date), 'MMM d') : ''}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Project Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              <Card className="md:col-span-2 border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+              <Card className="md:col-span-2 border-2 border-slate-200 bg-white">
                 <CardHeader>
                   <CardTitle className="text-2xl">{selectedProject.name}</CardTitle>
                   <div className="flex gap-2 mt-2">

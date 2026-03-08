@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { createPageUrl } from '@/utils';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { motion } from 'framer-motion';
-import { BookOpen, Award, Clock, TrendingUp, AlertTriangle, CheckCircle2, Zap } from 'lucide-react';
+import { BookOpen, Award, Clock, TrendingUp, AlertTriangle, CheckCircle2, Zap, Wrench, FolderOpen, ListChecks, Package } from 'lucide-react';
+import ClockIn from '@/components/dashboard/ClockIn';
 
 export default function TechnicianPortal() {
   const [user, setUser] = useState(null);
@@ -19,6 +22,56 @@ export default function TechnicianPortal() {
     };
     loadUser();
   }, []);
+
+  const { data: worker } = useQuery({
+    queryKey: ['techWorker', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const list = await base44.entities.Worker.filter({ email: user.email });
+      return list?.[0] || null;
+    },
+    enabled: !!user?.email,
+  });
+
+  const assignedProjectIds = [worker?.current_project_id, worker?.project_id].filter(Boolean);
+  const { data: assignedProjects = [] } = useQuery({
+    queryKey: ['techProjects', assignedProjectIds],
+    queryFn: async () => {
+      if (assignedProjectIds.length === 0) return [];
+      const out = [];
+      for (const id of assignedProjectIds) {
+        try {
+          const p = await base44.entities.Project.filter({ id }).then(r => r?.[0]);
+          if (p) out.push(p);
+        } catch (_) {}
+      }
+      return out;
+    },
+    enabled: assignedProjectIds.length > 0,
+  });
+
+  const { data: myTasks = [] } = useQuery({
+    queryKey: ['techTasks', worker?.id, assignedProjectIds],
+    queryFn: async () => {
+      if (!worker?.id || assignedProjectIds.length === 0) return [];
+      const all = [];
+      for (const pid of assignedProjectIds) {
+        try {
+          const tasks = await base44.entities.Task.filter({ project_id: pid });
+          all.push(...tasks.filter(t => t.assigned_to === worker.id || t.assignee_id === worker.id));
+        } catch (_) {}
+      }
+      return all;
+    },
+    enabled: !!worker?.id && assignedProjectIds.length > 0,
+  });
+
+  const firstProjectId = assignedProjects[0]?.id;
+  const { data: projectMaterials = [] } = useQuery({
+    queryKey: ['techProjectMaterials', firstProjectId],
+    queryFn: () => firstProjectId ? base44.entities.ProjectMaterial.filter({ project_id: firstProjectId }, '-created_at') : [],
+    enabled: !!firstProjectId,
+  });
 
   const { data: profile = {} } = useQuery({
     queryKey: ['techProfile', user?.email],
@@ -64,8 +117,13 @@ export default function TechnicianPortal() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">Your Training Portal</h1>
-          <p className="text-slate-600">Track your progress, certifications, and skills</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">Tech Portal</h1>
+          <p className="text-slate-600">Clock in/out, your projects, requirements, materials & training</p>
+        </motion.div>
+
+        {/* Clock In/Out - always visible */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6">
+          <ClockIn />
         </motion.div>
 
         {/* Alerts */}
@@ -125,13 +183,117 @@ export default function TechnicianPortal() {
           </motion.div>
         </div>
 
-        <Tabs defaultValue="overview" className="w-full sm:w-auto">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 mb-6">
+        <Tabs defaultValue="work" className="w-full sm:w-auto">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-2 md:grid-cols-6 mb-6 flex-wrap">
+            <TabsTrigger value="work" className="flex items-center gap-1">
+              <Wrench className="h-4 w-4" /> Work
+            </TabsTrigger>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="certifications">Certifications</TabsTrigger>
             <TabsTrigger value="skills">Skills</TabsTrigger>
             <TabsTrigger value="fieldHours">Field Hours</TabsTrigger>
           </TabsList>
+
+          {/* Work Tab - Projects, Requirements, Materials */}
+          <TabsContent value="work" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FolderOpen className="h-5 w-5" />
+                  Projects assigned to you
+                </CardTitle>
+                <CardDescription>Your current project assignments</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {assignedProjects.length > 0 ? (
+                  <ul className="space-y-2">
+                    {assignedProjects.map((p) => (
+                      <li key={p.id}>
+                        <Link to={createPageUrl('ProjectDetail') + '?id=' + p.id} className="text-amber-600 hover:underline font-medium">
+                          {p.name || p.title || 'Unnamed project'}
+                        </Link>
+                        {p.status && <Badge variant="outline" className="ml-2">{p.status}</Badge>}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-slate-500">No projects assigned yet. Contact your supervisor.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ListChecks className="h-5 w-5" />
+                  Your tasks
+                </CardTitle>
+                <CardDescription>Tasks assigned to you on your projects</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {myTasks.length > 0 ? (
+                  <ul className="space-y-2 max-h-64 overflow-y-auto">
+                    {myTasks.map((t) => (
+                      <li key={t.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                        <span className="font-medium">{t.title || t.name || 'Task'}</span>
+                        <Badge variant={t.status === 'completed' ? 'default' : 'secondary'}>{t.status || 'pending'}</Badge>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-slate-500">No tasks assigned yet.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ListChecks className="h-5 w-5" />
+                  Requirements
+                </CardTitle>
+                <CardDescription>View project requirements and scope</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {assignedProjects.length > 0 ? (
+                  <p className="text-slate-600 text-sm">
+                    View full requirements and scope in each project. Open a project above to see requirements, documents, and specs.
+                  </p>
+                ) : (
+                  <p className="text-slate-500">No projects assigned yet.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Materials
+                </CardTitle>
+                <CardDescription>Materials for your assigned project{assignedProjects.length !== 1 ? 's' : ''}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {firstProjectId ? (
+                  projectMaterials.length > 0 ? (
+                    <ul className="space-y-2 max-h-64 overflow-y-auto">
+                      {projectMaterials.slice(0, 20).map((m) => (
+                        <li key={m.id} className="flex justify-between py-2 border-b border-slate-100 last:border-0">
+                          <span>{m.name || m.description || 'Material'}</span>
+                          <span className="text-slate-600">{m.quantity} {m.unit || 'units'}</span>
+                        </li>
+                      ))}
+                      {projectMaterials.length > 20 && <p className="text-xs text-slate-500 pt-2">+ {projectMaterials.length - 20} more</p>}
+                    </ul>
+                  ) : (
+                    <p className="text-slate-500">No materials listed for this project yet.</p>
+                  )
+                ) : (
+                  <p className="text-slate-500">Assign to a project to see materials.</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">

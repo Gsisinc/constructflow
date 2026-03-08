@@ -566,7 +566,7 @@ export default function Directory() {
         emergencyMode ? 'bg-red-700 text-white border-red-800' : 'bg-slate-800 text-white border-slate-700'
       )}>
         <div className="font-bold text-sm md:text-lg tracking-tight shrink-0">
-          {emergencyMode ? 'EMERGENCY' : 'ROSTER'}
+          {emergencyMode ? 'EMERGENCY' : 'DIRECTORY'}
         </div>
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
