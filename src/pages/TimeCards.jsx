@@ -6,22 +6,35 @@ import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
+import ClockIn from '@/components/dashboard/ClockIn';
 
 export default function TimeCards() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
+    queryKey: ['currentUser', 'timecards'],
+    queryFn: () => base44.auth.me(),
   });
+
+  const { data: fieldHours = [] } = useQuery({
+    queryKey: ['fieldHoursLog', user?.email],
+    queryFn: () => (user?.email ? base44.entities.FieldHoursLog.filter({ technician_email: user.email }, '-date').catch(() => []) : []),
+    enabled: !!user?.email,
+  });
+
+  const hoursThisWeek = Array.isArray(fieldHours)
+    ? fieldHours
+        .filter((e) => e.date) // optional: filter to current week
+        .reduce((sum, e) => sum + (parseFloat(e.hours) || 0), 0)
+    : 0;
 
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Time Cards</h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Track and manage crew time</p>
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Track and manage your time</p>
         </div>
         <div className="flex gap-1.5 sm:gap-2 flex-wrap">
           <Button variant="outline" size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Time Card</Button>
@@ -30,6 +43,8 @@ export default function TimeCards() {
           <Button size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Weekly Sheet</Button>
         </div>
       </div>
+
+      <ClockIn />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {/* Calendar */}
@@ -80,8 +95,8 @@ export default function TimeCards() {
                 <div>
                   <p className="text-xs sm:text-sm text-slate-600 mb-2">Last Week vs This Week</p>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-xl sm:text-lg sm:text-xl md:text-2xl font-bold">0:00</span>
-                    <span className="text-xs sm:text-sm text-slate-600">Me</span>
+                    <span className="text-xl sm:text-lg sm:text-xl md:text-2xl font-bold">{hoursThisWeek.toFixed(1)}</span>
+                    <span className="text-xs sm:text-sm text-slate-600">Me (hrs)</span>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-xl sm:text-lg sm:text-xl md:text-2xl font-bold">0:00</span>

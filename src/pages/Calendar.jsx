@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import ProjectCalendar from '../components/calendar/ProjectCalendar';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import ProjectDeadlines from '../components/calendar/ProjectDeadlines';
@@ -48,6 +49,7 @@ const STATUSES = [
 ];
 
 export default function Calendar() {
+  const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -55,14 +57,23 @@ export default function Calendar() {
   const [viewMode, setViewMode] = useState('month');
   const queryClient = useQueryClient();
 
-  const { data: events = [], isLoading } = useQuery({
-    queryKey: ['calendarEvents'],
-    queryFn: () => base44.entities.CalendarEvent.list('-start_date'),
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects', user?.organization_id],
+    queryFn: () => user?.organization_id
+      ? base44.entities.Project.filter({ organization_id: user.organization_id })
+      : base44.entities.Project.list(),
+    enabled: !!user,
   });
 
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+  const projectIds = projects.map((p) => p.id);
+  const { data: events = [], isLoading } = useQuery({
+    queryKey: ['calendarEvents', projectIds.length],
+    queryFn: async () => {
+      const list = await base44.entities.CalendarEvent.list('-start_date').catch(() => []);
+      if (!projectIds.length) return Array.isArray(list) ? list : [];
+      return (Array.isArray(list) ? list : []).filter((e) => !e.project_id || projectIds.includes(e.project_id));
+    },
+    enabled: !!user,
   });
 
   const createMutation = useMutation({

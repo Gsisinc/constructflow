@@ -187,6 +187,41 @@ export const AGENT_WORKFLOWS = {
       'Suggested three substitution options with cost/impact tradeoff, including recycled-content conduit and high-efficiency fixtures. Mapped likely LEED contribution and payback range.',
     guardrails: ['State uncertainty when data is missing.', 'Do not claim scraped supplier data unless provided.', 'Do not claim external scraping capabilities.']
   },
+  technician_field_guide: {
+    id: 'technician_field_guide',
+    name: 'Technician Field Guide',
+    purpose: 'Guide field technicians through job requirements, task steps, and best practices — like a step-by-step checklist and onsite assistant.',
+    supportsLiveBidDiscovery: false,
+    showBidOpportunitiesPanel: false,
+    inputs: [
+      'Job or project type (e.g. fire alarm, CCTV, access control, cabling)',
+      'Current phase or task',
+      'Requirements or specs (if provided)',
+      'Blockers or questions'
+    ],
+    workflow: [
+      'Clarify the job type and scope so the technician is on the right track.',
+      'Break down the work into ordered steps (pre-work, installation, testing, closeout).',
+      'For each step: list requirements, tools/materials, and acceptance criteria.',
+      'Highlight safety and compliance checkpoints (PPE, lockout, permits).',
+      'Suggest common pitfalls and how to avoid them.',
+      'If the technician is stuck, ask what they see and suggest next actions or escalation.'
+    ],
+    outputs: [
+      'Step-by-step task checklist',
+      'Requirements and acceptance criteria',
+      'Safety/compliance reminders',
+      'Suggested next action or escalation'
+    ],
+    typicalPrompt: 'I’m on site for a fire alarm panel install. Walk me through what I need to do and what to check before power-up.',
+    sampleOutput:
+      'Step 1: Confirm power is off and permit/panel location per plans. Step 2: Mount panel and pull conductors per schedule. Step 3: Terminate per manufacturer spec; document any deviation. Step 4: Pre-energization check (continuity, no shorts). Step 5: Power up and verify NAC/sounder circuits. Safety: lockout/tagout and PPE. If anything doesn’t match plans, note it and confirm with PM before closing out.',
+    guardrails: [
+      'Do not replace manufacturer instructions or code — reference them and suggest the technician confirm on site.',
+      'If the technician describes a safety concern, recommend stopping and escalating.',
+      'Do not invent project-specific details (e.g. panel model) unless the user provides them.'
+    ]
+  },
   stakeholder_communication: {
     id: 'stakeholder_communication',
     name: 'Stakeholder Communication',

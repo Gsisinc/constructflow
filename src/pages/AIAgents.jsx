@@ -6,7 +6,8 @@ import LocalAgentChat from '@/components/agents/LocalAgentChat';
 import MinibrowserLauncher, { openMinibrowser } from '@/components/MinibrowserLauncher';
 import { AGENT_WORKFLOWS } from '@/config/agentWorkflows';
 import { AGENCY_DIVISIONS, SPECIAL_AGENTS, filterSpecialAgents } from '@/config/specialAgents';
-import { Maximize2, Bot, Sparkles, Search, ExternalLink } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
+import { Maximize2, Bot, Sparkles, Search, ExternalLink, Wrench } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const WORKFLOW_ICONS = {
@@ -21,6 +22,7 @@ const WORKFLOW_ICONS = {
   sustainability_optimization: '🌱',
   stakeholder_communication: '💬',
   blueprint_analyzer: '📐',
+  technician_field_guide: '🔧',
 };
 
 const WORKFLOW_COLORS = {
@@ -35,9 +37,12 @@ const WORKFLOW_COLORS = {
   sustainability_optimization: 'from-teal-500 to-teal-600',
   stakeholder_communication: 'from-indigo-500 to-indigo-600',
   blueprint_analyzer: 'from-blue-600 to-violet-600',
+  technician_field_guide: 'from-amber-500 to-orange-600',
 };
 
 export default function AIAgents() {
+  const { user } = useAuth();
+  const isTechnician = user?.role === 'technician';
   const [activeTab, setActiveTab] = useState('deepseek');
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [chatAgent, setChatAgent] = useState(null);
@@ -129,6 +134,29 @@ export default function AIAgents() {
             Custom construction agents (real AI) and quick access to external AI in minibrowsers
           </p>
         </header>
+
+        {/* Technician: highlight Field Guide */}
+        {isTechnician && (
+          <Card className="mb-6 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 dark:border-amber-800">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Wrench className="h-5 w-5 text-amber-600" />
+                Technician Field Guide
+              </CardTitle>
+              <p className="text-sm text-[var(--cf-muted)]">
+                Get step-by-step help with job requirements, task checklists, and onsite best practices. Click &quot;Custom agents&quot; then open &quot;Technician Field Guide&quot; to chat.
+              </p>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Button
+                className="bg-amber-600 hover:bg-amber-700 text-white"
+                onClick={() => { setActiveTab('custom'); setSelectedAgent('technician_field_guide'); setChatAgent({ id: 'technician_field_guide', name: 'Technician Field Guide', description: AGENT_WORKFLOWS.technician_field_guide?.purpose, color: 'from-amber-500 to-orange-600' }); }}
+              >
+                <Bot className="h-4 w-4 mr-2" /> Open Field Guide
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Tab pills */}
         <div className="flex flex-wrap gap-2 mb-6">

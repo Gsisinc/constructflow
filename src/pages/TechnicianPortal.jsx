@@ -1,47 +1,106 @@
-import React, { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
-import { createPageUrl } from '@/utils';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { motion } from 'framer-motion';
-import { BookOpen, Award, Clock, TrendingUp, AlertTriangle, CheckCircle2, Zap, Wrench, FolderOpen, ListChecks, Package } from 'lucide-react';
-import ClockIn from '@/components/dashboard/ClockIn';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
+import { createPageUrl } from "@/utils";
+import {
+  CalendarDays,
+  CheckCircle2,
+  ClipboardList,
+  Clock3,
+  FileText,
+  HardHat,
+  Image as ImageIcon,
+  Layers3,
+  MapPin,
+  MessageSquare,
+  Package,
+  Settings,
+  ShieldCheck,
+  Siren,
+  AlertTriangle,
+  UserCheck,
+  Wifi,
+  Camera,
+  ArrowUpRight,
+  Building2,
+  Sparkles,
+} from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import ClockIn from "@/components/dashboard/ClockIn";
+
+function SectionTitle({ eyebrow, title, right }) {
+  return (
+    <div className="flex items-end justify-between gap-4">
+      <div>
+        <p className="text-xs uppercase tracking-[0.28em] text-[#CBAE63]/80">{eyebrow}</p>
+        <h2 className="mt-2 text-2xl font-semibold text-white">{title}</h2>
+      </div>
+      {right}
+    </div>
+  );
+}
+
+function GlassCard({ children, className = "" }) {
+  return (
+    <Card className={`border border-white/10 bg-white/[0.04] shadow-2xl shadow-black/20 backdrop-blur-xl ${className}`}>
+      {children}
+    </Card>
+  );
+}
+
+const technicianTools = [
+  { label: "Site Contacts", icon: UserCheck, page: "Directory" },
+  { label: "Photos", icon: ImageIcon, page: "Photos" },
+  { label: "Documents", icon: FileText, page: "Documents" },
+  { label: "Materials", icon: Package, page: "Materials" },
+  { label: "Safety", icon: HardHat, page: "Safety" },
+  { label: "Incidents", icon: Siren, page: "Issues" },
+  { label: "Support", icon: MessageSquare, page: "ServiceDesk" },
+  { label: "Settings", icon: Settings, page: "Settings" },
+];
+
+const technicianModules = [
+  { title: "My Work Orders", desc: "Assigned tasks, priorities, SLAs.", icon: ClipboardList, page: "TaskTracker" },
+  { title: "Daily Schedule", desc: "Day view, week view, calendar sync.", icon: CalendarDays, page: "Calendar" },
+  { title: "Project Access", desc: "Project details, site contacts, scope.", icon: Layers3, page: "Projects" },
+  { title: "Time Tracking", desc: "Clock in/out, timesheets, overtime.", icon: Clock3, page: "TimeCards" },
+  { title: "Plans & Documents", desc: "Drawings, RFIs, submittals, manuals.", icon: FileText, page: "Documents" },
+  { title: "Photos & Media", desc: "Before/after, punch images, uploads.", icon: Camera, page: "Photos" },
+  { title: "Materials & Tools", desc: "Parts requests, inventory, shortages.", icon: Package, page: "Materials" },
+  { title: "Field Forms", desc: "Service reports, inspections, sign-offs.", icon: CheckCircle2, page: "TaskTracker" },
+  { title: "Safety & Compliance", desc: "JHAs, incident reports, PPE checks.", icon: ShieldCheck, page: "Safety" },
+  { title: "Support & Escalation", desc: "Remote support, issue escalation.", icon: MessageSquare, page: "ServiceDesk" },
+];
 
 export default function TechnicianPortal() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      const userData = await base44.auth.me();
-      setUser(userData);
-    };
-    loadUser();
-  }, []);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { data: worker } = useQuery({
-    queryKey: ['techWorker', user?.email],
+    queryKey: ["techWorker", user?.email],
     queryFn: async () => {
       if (!user?.email) return null;
-      const list = await base44.entities.Worker.filter({ email: user.email });
-      return list?.[0] || null;
+      const list = await base44.entities.Worker.filter({ email: user.email }).catch(() => []);
+      return Array.isArray(list) && list.length ? list[0] : null;
     },
     enabled: !!user?.email,
   });
 
   const assignedProjectIds = [worker?.current_project_id, worker?.project_id].filter(Boolean);
   const { data: assignedProjects = [] } = useQuery({
-    queryKey: ['techProjects', assignedProjectIds],
+    queryKey: ["techProjects", assignedProjectIds],
     queryFn: async () => {
       if (assignedProjectIds.length === 0) return [];
       const out = [];
       for (const id of assignedProjectIds) {
         try {
-          const p = await base44.entities.Project.filter({ id }).then(r => r?.[0]);
+          const p = await base44.entities.Project.filter({ id }).then((r) => r?.[0]);
           if (p) out.push(p);
         } catch (_) {}
       }
@@ -50,462 +109,300 @@ export default function TechnicianPortal() {
     enabled: assignedProjectIds.length > 0,
   });
 
-  const { data: myTasks = [] } = useQuery({
-    queryKey: ['techTasks', worker?.id, assignedProjectIds],
+  const { data: myTasksRaw = [] } = useQuery({
+    queryKey: ["techTasks", worker?.id, user?.organization_id, assignedProjectIds],
     queryFn: async () => {
-      if (!worker?.id || assignedProjectIds.length === 0) return [];
+      try {
+        if (user?.organization_id) {
+          const list = await base44.entities.OperationalTask.filter({ organization_id: user.organization_id }).catch(() => []);
+          const arr = Array.isArray(list) ? list : [];
+          if (arr.length > 0) {
+            if (worker?.id) return arr.filter((t) => t.assigned_to === worker.id || t.assignee_id === worker.id || !t.assigned_to);
+            return arr;
+          }
+        }
+      } catch (_) {}
       const all = [];
       for (const pid of assignedProjectIds) {
         try {
-          const tasks = await base44.entities.Task.filter({ project_id: pid });
-          all.push(...tasks.filter(t => t.assigned_to === worker.id || t.assignee_id === worker.id));
+          const tasks = await base44.entities.Task.filter({ project_id: pid }).catch(() => []);
+          const list = Array.isArray(tasks) ? tasks : [];
+          all.push(...list.filter((t) => !worker?.id || t.assigned_to === worker.id || t.assignee_id === worker.id));
         } catch (_) {}
       }
       return all;
     },
-    enabled: !!worker?.id && assignedProjectIds.length > 0,
+    enabled: !!user?.organization_id || assignedProjectIds.length > 0,
   });
 
-  const firstProjectId = assignedProjects[0]?.id;
-  const { data: projectMaterials = [] } = useQuery({
-    queryKey: ['techProjectMaterials', firstProjectId],
-    queryFn: () => firstProjectId ? base44.entities.ProjectMaterial.filter({ project_id: firstProjectId }, '-created_at') : [],
-    enabled: !!firstProjectId,
-  });
-
-  const { data: profile = {} } = useQuery({
-    queryKey: ['techProfile', user?.email],
-    queryFn: () => user?.email ? 
-      base44.entities.TechnicianProfile.filter({ email: user.email }).then(r => r[0] || {}) : 
-      Promise.resolve({}),
-    enabled: !!user?.email,
-  });
-
-  const { data: certifications = [] } = useQuery({
-    queryKey: ['techCerts', user?.email],
-    queryFn: () => user?.email ? base44.entities.TechnicianCertification.filter({ technician_email: user.email }) : [],
-    enabled: !!user?.email,
-  });
+  const myTasks = Array.isArray(myTasksRaw) ? myTasksRaw : [];
 
   const { data: fieldHours = [] } = useQuery({
-    queryKey: ['fieldHours', user?.email],
-    queryFn: () => user?.email ? base44.entities.FieldHoursLog.filter({ technician_email: user.email }) : [],
+    queryKey: ["fieldHours", user?.email],
+    queryFn: () => (user?.email ? base44.entities.FieldHoursLog.filter({ technician_email: user.email }).catch(() => []) : []),
     enabled: !!user?.email,
   });
 
-  const { data: skills = [] } = useQuery({
-    queryKey: ['skills', user?.email],
-    queryFn: () => user?.email ? base44.entities.SkillsMatrix.filter({ technician_email: user.email }) : [],
-    enabled: !!user?.email,
+  const { data: openIssues = [] } = useQuery({
+    queryKey: ["techIssues", assignedProjectIds],
+    queryFn: async () => {
+      const all = [];
+      for (const pid of assignedProjectIds) {
+        try {
+          const list = await base44.entities.Issue.filter({ project_id: pid }).catch(() => []);
+          all.push(...(Array.isArray(list) ? list.filter((i) => i.status !== "closed" && i.status !== "resolved") : []));
+        } catch (_) {}
+      }
+      return all;
+    },
+    enabled: assignedProjectIds.length > 0,
   });
 
-  const { data: assignments = [] } = useQuery({
-    queryKey: ['assignments', user?.email],
-    queryFn: () => user?.email ? base44.entities.CourseAssignment.filter({ technician_email: user.email }) : [],
-    enabled: !!user?.email,
-  });
+  const totalHours = Array.isArray(fieldHours) ? fieldHours.reduce((s, e) => s + (parseFloat(e.hours) || 0), 0) : 0;
+  const todayTasks = Array.isArray(myTasks) ? myTasks.filter((t) => {
+    const d = t.due_date || t.due || t.scheduled_date;
+    if (!d) return true;
+    const today = new Date().toISOString().slice(0, 10);
+    return String(d).slice(0, 10) === today;
+  }) : [];
+  const inProgressTasks = Array.isArray(myTasks) ? myTasks.filter((t) => (t.status || "").toLowerCase() === "in_progress" || (t.status || "").toLowerCase() === "in progress") : [];
 
-  if (!user) return <div className="p-6">Loading...</div>;
+  const quickStats = [
+    { label: "Assigned Today", value: String(todayTasks.length), icon: ClipboardList },
+    { label: "Active Sites", value: String(assignedProjects.length || 0), icon: Building2 },
+    { label: "Hours Logged", value: String(totalHours.toFixed(1)), icon: Clock3 },
+    { label: "Open Issues", value: String(openIssues.length), icon: AlertTriangle },
+  ];
 
-  const totalFieldHours = fieldHours.reduce((sum, log) => sum + (log.hours || 0), 0);
-  const validCerts = certifications.filter(c => c.status === 'valid').length;
-  const expiringCerts = certifications.filter(c => c.status === 'expiring_soon');
-  const activeCourses = assignments.filter(a => a.status === 'in_progress');
+  const highPriorityTasks = (Array.isArray(myTasks) ? myTasks.slice(0, 5) : []).map((t) => ({
+    id: t.id,
+    title: t.title || t.name || "Task",
+    type: t.type || t.priority || "Task",
+    site: assignedProjects.find((p) => p.id === t.project_id)?.name || "—",
+    eta: t.due_date ? new Date(t.due_date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—",
+    status: t.status || "Pending",
+    progress: t.percent_complete ?? (t.status === "completed" ? 100 : t.status === "in_progress" ? 50 : 0),
+  }));
+
+  const goTo = (page) => {
+    if (page === "TechnicianPortal") return;
+    navigate(createPageUrl(page));
+  };
+
+  if (!user) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center text-slate-400">
+        <span>Loading...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 break-words">Tech Portal</h1>
-          <p className="text-slate-600">Clock in/out, your projects, requirements, materials & training</p>
-        </motion.div>
-
-        {/* Clock In/Out - always visible */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6">
-          <ClockIn />
-        </motion.div>
-
-        {/* Alerts */}
-        {expiringCerts.length > 0 && (
-          <Alert className="mb-6 bg-amber-50 border-amber-200">
-            <AlertTriangle className="h-4 w-4 text-amber-600" />
-            <AlertDescription className="text-amber-800">
-              {expiringCerts.length} certification(s) expiring soon. Schedule renewal!
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600">Current Level</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{profile.current_level || 0}/6</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600">Certifications</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600">{validCerts}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600">Field Hours</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-purple-600">{totalFieldHours}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600">Active Courses</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-orange-600">{activeCourses.length}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        <Tabs defaultValue="work" className="w-full sm:w-auto">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-2 md:grid-cols-6 mb-6 flex-wrap">
-            <TabsTrigger value="work" className="flex items-center gap-1">
-              <Wrench className="h-4 w-4" /> Work
-            </TabsTrigger>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="certifications">Certifications</TabsTrigger>
-            <TabsTrigger value="skills">Skills</TabsTrigger>
-            <TabsTrigger value="fieldHours">Field Hours</TabsTrigger>
-          </TabsList>
-
-          {/* Work Tab - Projects, Requirements, Materials */}
-          <TabsContent value="work" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FolderOpen className="h-5 w-5" />
-                  Projects assigned to you
-                </CardTitle>
-                <CardDescription>Your current project assignments</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {assignedProjects.length > 0 ? (
-                  <ul className="space-y-2">
-                    {assignedProjects.map((p) => (
-                      <li key={p.id}>
-                        <Link to={createPageUrl('ProjectDetail') + '?id=' + p.id} className="text-amber-600 hover:underline font-medium">
-                          {p.name || p.title || 'Unnamed project'}
-                        </Link>
-                        {p.status && <Badge variant="outline" className="ml-2">{p.status}</Badge>}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-slate-500">No projects assigned yet. Contact your supervisor.</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ListChecks className="h-5 w-5" />
-                  Your tasks
-                </CardTitle>
-                <CardDescription>Tasks assigned to you on your projects</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {myTasks.length > 0 ? (
-                  <ul className="space-y-2 max-h-64 overflow-y-auto">
-                    {myTasks.map((t) => (
-                      <li key={t.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-                        <span className="font-medium">{t.title || t.name || 'Task'}</span>
-                        <Badge variant={t.status === 'completed' ? 'default' : 'secondary'}>{t.status || 'pending'}</Badge>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-slate-500">No tasks assigned yet.</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ListChecks className="h-5 w-5" />
-                  Requirements
-                </CardTitle>
-                <CardDescription>View project requirements and scope</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {assignedProjects.length > 0 ? (
-                  <p className="text-slate-600 text-sm">
-                    View full requirements and scope in each project. Open a project above to see requirements, documents, and specs.
-                  </p>
-                ) : (
-                  <p className="text-slate-500">No projects assigned yet.</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  Materials
-                </CardTitle>
-                <CardDescription>Materials for your assigned project{assignedProjects.length !== 1 ? 's' : ''}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {firstProjectId ? (
-                  projectMaterials.length > 0 ? (
-                    <ul className="space-y-2 max-h-64 overflow-y-auto">
-                      {projectMaterials.slice(0, 20).map((m) => (
-                        <li key={m.id} className="flex justify-between py-2 border-b border-slate-100 last:border-0">
-                          <span>{m.name || m.description || 'Material'}</span>
-                          <span className="text-slate-600">{m.quantity} {m.unit || 'units'}</span>
-                        </li>
-                      ))}
-                      {projectMaterials.length > 20 && <p className="text-xs text-slate-500 pt-2">+ {projectMaterials.length - 20} more</p>}
-                    </ul>
-                  ) : (
-                    <p className="text-slate-500">No materials listed for this project yet.</p>
-                  )
-                ) : (
-                  <p className="text-slate-500">Assign to a project to see materials.</p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Level Progress</CardTitle>
-                <CardDescription>Your journey to Level {(profile.current_level || 0) + 1}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <p className="text-sm font-medium">Level {profile.current_level || 0} Completion</p>
-                      <p className="text-xs text-slate-500">{Math.round((activeCourses.length / 6) * 100)}%</p>
+    <div className="min-h-screen bg-[#06152B] text-slate-100">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(203,174,99,0.16),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(37,99,235,0.18),transparent_24%),linear-gradient(180deg,#071224_0%,#081A34_50%,#06152B_100%)]" />
+      <div className="relative mx-auto max-w-[1600px] px-6 py-6 lg:px-8">
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+          <main className="space-y-6">
+              <GlassCard className="rounded-[30px]">
+                <CardContent className="p-6 lg:p-7">
+                  <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+                    <div>
+                      <Badge className="border-0 bg-[#CBAE63]/15 px-3 py-1 text-[#E8D39B] hover:bg-[#CBAE63]/15">Premium Technician Workspace</Badge>
+                      <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white lg:text-5xl">
+                        Field control for technicians.
+                      </h1>
+                      <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 lg:text-lg">
+                        Your dashboard: tasks, schedule, time tracking, documents, and support — all in one place.
+                      </p>
                     </div>
-                    <Progress value={(activeCourses.length / 6) * 100} className="h-3" />
-                  </div>
-                  <p className="text-sm text-slate-600">
-                    {activeCourses.length} of 6 modules completed for this level
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  Active Courses
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {activeCourses.length > 0 ? (
-                  <div className="space-y-3">
-                    {activeCourses.map(course => (
-                      <div key={course.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-slate-900 break-words">{course.course_title}</p>
-                          <p className="text-xs text-slate-600">Due: {new Date(course.due_date).toLocaleDateString()}</p>
-                        </div>
-                        <Badge className="bg-blue-100 text-blue-800">In Progress</Badge>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-slate-500 text-center py-6">No active courses</p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Certifications Tab */}
-          <TabsContent value="certifications" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="w-5 h-5" />
-                  Your Certifications
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {certifications.length > 0 ? (
-                  <div className="space-y-3">
-                    {certifications.map(cert => (
-                      <motion.div
-                        key={cert.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className={`p-4 rounded-lg border-2 ${
-                          cert.status === 'valid'
-                            ? 'bg-green-50 border-green-200'
-                            : cert.status === 'expiring_soon'
-                            ? 'bg-amber-50 border-amber-200'
-                            : 'bg-slate-50 border-slate-200'
-                        }`}
+                    <div className="flex flex-wrap gap-3">
+                      <Button
+                        className="h-12 rounded-2xl bg-gradient-to-r from-[#D7B86A] to-[#A57B2D] px-5 text-[#08111F] hover:opacity-95"
+                        onClick={() => goTo("TaskTracker")}
                       >
+                        Open My Tasks
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-12 rounded-2xl border-white/15 bg-white/5 px-5 text-white hover:bg-white/10"
+                        onClick={() => goTo("TimeCards")}
+                      >
+                        Time Cards & Check-In
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </GlassCard>
+
+              <ClockIn />
+
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {quickStats.map((stat) => {
+                  const Icon = stat.icon;
+                  return (
+                    <GlassCard key={stat.label} className="rounded-[24px]">
+                      <CardContent className="p-5">
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="font-semibold text-slate-900 break-words">{cert.cert_name}</p>
-                            <p className="text-sm text-slate-600">{cert.issuing_body}</p>
-                            <p className="text-xs text-slate-500 mt-1">
-                              Earned: {new Date(cert.date_earned).toLocaleDateString()}
-                            </p>
-                            {cert.expiration_date && (
-                              <p className="text-xs text-slate-500">
-                                Expires: {new Date(cert.expiration_date).toLocaleDateString()}
-                              </p>
-                            )}
+                            <p className="text-sm text-slate-400">{stat.label}</p>
+                            <p className="mt-2 text-4xl font-semibold text-white">{stat.value}</p>
                           </div>
-                          <Badge
-                            className={
-                              cert.status === 'valid'
-                                ? 'bg-green-100 text-green-800'
-                                : cert.status === 'expiring_soon'
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-slate-100 text-slate-800'
-                            }
-                          >
-                            {cert.status}
-                          </Badge>
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#CBAE63]/25 bg-[#CBAE63]/10 text-[#E1C67D]">
+                            <Icon className="h-6 w-6" />
+                          </div>
                         </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-slate-500 text-center py-6">No certifications yet. Start your training!</p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                      </CardContent>
+                    </GlassCard>
+                  );
+                })}
+              </div>
 
-          {/* Skills Tab */}
-          <TabsContent value="skills" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
-                  Skills Assessment
-                </CardTitle>
-                <CardDescription>1 = Beginner, 5 = Expert</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {skills.length > 0 ? (
-                  <div className="space-y-6">
-                    {['cabling', 'access_control', 'cctv', 'fire_alarm', 'isp'].map(category => {
-                      const categorySkills = skills.filter(s => s.skill_category === category);
-                      if (categorySkills.length === 0) return null;
-                      return (
-                        <div key={category}>
-                          <h3 className="font-semibold text-slate-900 mb-3 capitalize">
-                            {category.replace('_', ' ')}
-                          </h3>
-                          <div className="space-y-3">
-                            {categorySkills.map(skill => (
-                              <div key={skill.id}>
-                                <div className="flex items-center justify-between mb-1">
-                                  <p className="text-sm font-medium text-slate-700 break-words">{skill.skill_name}</p>
-                                  <div className="flex gap-2">
-                                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                      You: {skill.self_rating}/5
-                                    </span>
-                                    {skill.supervisor_rating && (
-                                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                                        Supervisor: {skill.supervisor_rating}/5
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="flex gap-2">
-                                  <div className="flex-1">
-                                    <Progress value={(skill.self_rating / 5) * 100} className="h-2" />
-                                  </div>
-                                  {skill.gap_notes && (
-                                    <div className="text-xs text-amber-600">⚠ Gap</div>
-                                  )}
-                                </div>
+              <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+                <GlassCard className="rounded-[28px]">
+                  <CardHeader className="pb-2">
+                    <SectionTitle
+                      eyebrow="Work Queue"
+                      title="High-priority assignments"
+                      right={
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-2xl border-white/15 bg-white/5 text-white hover:bg-white/10"
+                          onClick={() => goTo("TaskTracker")}
+                        >
+                          View all
+                        </Button>
+                      }
+                    />
+                  </CardHeader>
+                  <CardContent className="space-y-4 pt-2">
+                    {highPriorityTasks.length === 0 ? (
+                      <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-slate-400">No tasks assigned yet. Open My Tasks or ask your supervisor.</p>
+                    ) : (
+                      highPriorityTasks.map((task, i) => (
+                        <motion.div
+                          key={task.id || i}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.08 }}
+                          className="rounded-[24px] border border-white/10 bg-gradient-to-r from-white/[0.05] to-white/[0.02] p-5"
+                        >
+                          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                            <div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Badge className="border-0 bg-[#CBAE63]/15 text-[#E8D39B] hover:bg-[#CBAE63]/15">{task.type}</Badge>
+                                <Badge className="border-0 bg-[#295FC6]/20 text-blue-200 hover:bg-[#295FC6]/20">{task.status}</Badge>
                               </div>
-                            ))}
+                              <h3 className="mt-3 text-xl font-semibold text-white">{task.title}</h3>
+                              <div className="mt-2 flex flex-wrap gap-4 text-sm text-slate-400">
+                                <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4" /> {task.site}</span>
+                                <span className="inline-flex items-center gap-2"><Clock3 className="h-4 w-4" /> {task.eta}</span>
+                              </div>
+                            </div>
+                            <div className="min-w-[220px] xl:max-w-[260px] xl:text-right">
+                              <div className="mb-2 flex items-center justify-between text-sm text-slate-400 xl:justify-end xl:gap-3">
+                                <span>Progress</span>
+                                <span className="font-medium text-white">{task.progress}%</span>
+                              </div>
+                              <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
+                                <div className="h-full rounded-full bg-gradient-to-r from-[#D7B86A] to-[#2D63C7]" style={{ width: `${task.progress}%` }} />
+                              </div>
+                            </div>
                           </div>
+                        </motion.div>
+                      ))
+                    )}
+                  </CardContent>
+                </GlassCard>
+
+                <div className="space-y-6">
+                  <GlassCard className="rounded-[28px]">
+                    <CardHeader>
+                      <SectionTitle eyebrow="Quick Access" title="Technician tools" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-3">
+                        {technicianTools.map((tool) => {
+                          const Icon = tool.icon;
+                          return (
+                            <button
+                              key={tool.label}
+                              type="button"
+                              onClick={() => goTo(tool.page)}
+                              className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left transition hover:bg-white/[0.08]"
+                            >
+                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#CBAE63]/12 text-[#E1C67D]">
+                                <Icon className="h-5 w-5" />
+                              </div>
+                              <span className="text-sm font-medium text-slate-100">{tool.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  </GlassCard>
+
+                  <GlassCard className="rounded-[28px]">
+                    <CardHeader>
+                      <SectionTitle eyebrow="Snapshot" title="Your context" />
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                        <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1C417D]/25 text-[#E1C67D] ring-1 ring-[#CBAE63]/20">
+                          <Building2 className="h-5 w-5" />
                         </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-slate-400">Active projects</p>
+                          <p className="mt-1 text-xl font-semibold text-white">{assignedProjects.length}</p>
+                          <p className="mt-1 text-sm text-slate-400">Assigned to you</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                        <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1C417D]/25 text-[#E1C67D] ring-1 ring-[#CBAE63]/20">
+                          <Clock3 className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-slate-400">Hours logged</p>
+                          <p className="mt-1 text-xl font-semibold text-white">{totalHours.toFixed(1)}</p>
+                          <p className="mt-1 text-sm text-slate-400">Total field hours</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </GlassCard>
+                </div>
+              </div>
+
+              <GlassCard className="rounded-[30px]">
+                <CardHeader>
+                  <SectionTitle eyebrow="Modules" title="Portal features" />
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {technicianModules.map((module) => {
+                      const Icon = module.icon;
+                      return (
+                        <button
+                          key={module.title}
+                          type="button"
+                          onClick={() => goTo(module.page)}
+                          className="rounded-[24px] border border-white/10 bg-white/[0.04] p-5 text-left transition hover:-translate-y-0.5 hover:bg-white/[0.06]"
+                        >
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D7B86A]/20 to-[#214C94]/25 text-[#E3C978] ring-1 ring-white/10">
+                            <Icon className="h-6 w-6" />
+                          </div>
+                          <h3 className="mt-4 text-xl font-semibold text-white">{module.title}</h3>
+                          <p className="mt-2 text-sm leading-6 text-slate-300">{module.desc}</p>
+                          <span className="mt-2 inline-flex items-center gap-1 text-xs text-[#CBAE63]">
+                            Open <ArrowUpRight className="h-3 w-3" />
+                          </span>
+                        </button>
                       );
                     })}
                   </div>
-                ) : (
-                  <p className="text-slate-500 text-center py-6">No skills assessed yet</p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Field Hours Tab */}
-          <TabsContent value="fieldHours" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  Field Hours Log
-                </CardTitle>
-                <CardDescription>Total: {totalFieldHours} hours logged</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {fieldHours.length > 0 ? (
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {fieldHours.map(log => (
-                      <motion.div
-                        key={log.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex items-center justify-between p-3 border rounded-lg"
-                      >
-                        <div>
-                          <p className="font-medium text-slate-900 break-words">{log.project_name}</p>
-                          <p className="text-xs text-slate-600">
-                            {new Date(log.date).toLocaleDateString()} • {log.task_type}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-blue-600">{log.hours}h</p>
-                          {log.approved && (
-                            <Badge className="bg-green-100 text-green-800 text-xs mt-1">Approved</Badge>
-                          )}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-slate-500 text-center py-6">No field hours logged yet</p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                </CardContent>
+              </GlassCard>
+            </main>
+        </motion.div>
       </div>
     </div>
   );

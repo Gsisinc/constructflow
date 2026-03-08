@@ -254,8 +254,12 @@ export default function Directory() {
   });
 
   const { data: workersRaw = [] } = useQuery({
-    queryKey: ['workers', 'directory'],
-    queryFn: () => base44.entities.Worker.list('-created_date'),
+    queryKey: ['workers', 'directory', user?.organization_id],
+    queryFn: () =>
+      user?.organization_id
+        ? base44.entities.Worker.filter({ organization_id: user.organization_id }, '-created_date')
+        : base44.entities.Worker.list('-created_date'),
+    enabled: !!user,
   });
 
   const { data: projectTasks = [] } = useQuery({

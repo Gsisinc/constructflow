@@ -36,16 +36,35 @@ export default function TaskTracker() {
     enabled: !!user?.organization_id
   });
 
-  const { data: tasks = [] } = useQuery({
-    queryKey: ['operationalTasks', selectedProject, user?.organization_id],
-    queryFn: () => {
-      const filter = { organization_id: user.organization_id };
-      if (selectedProject) {
-        filter.project_id = selectedProject;
-      }
-      return base44.entities.OperationalTask.filter(filter);
+  const { data: worker } = useQuery({
+    queryKey: ['techWorker', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return null;
+      const list = await base44.entities.Worker.filter({ email: user.email }).catch(() => []);
+      return Array.isArray(list) && list.length ? list[0] : null;
     },
-    enabled: !!user?.organization_id
+    enabled: !!user?.email,
+  });
+
+  const { data: tasks = [] } = useQuery({
+    queryKey: ['operationalTasks', selectedProject, user?.organization_id, worker?.id],
+    queryFn: async () => {
+      const filter = { organization_id: user.organization_id };
+      if (selectedProject) filter.project_id = selectedProject;
+      try {
+        const list = await base44.entities.OperationalTask.filter(filter);
+        const arr = Array.isArray(list) ? list : [];
+        if (worker?.id) return arr.filter((t) => t.assigned_to === worker.id || t.assignee_id === worker.id || !t.assigned_to);
+        return arr;
+      } catch {
+        const taskFilter = selectedProject ? { project_id: selectedProject } : {};
+        const list = await base44.entities.Task.filter(taskFilter).catch(() => []);
+        const arr = Array.isArray(list) ? list : [];
+        if (worker?.id) return arr.filter((t) => t.assigned_to === worker.id || t.assignee_id === worker.id || !t.assigned_to);
+        return arr;
+      }
+    },
+    enabled: !!user?.organization_id,
   });
 
   const createMutation = useMutation({
