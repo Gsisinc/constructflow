@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Account } from "@/entities/Account";
-import { Company } from "@/entities/Company";
+import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,8 +14,8 @@ import SetupChartOfAccounts from "../components/accounts/SetupChartOfAccounts";
 
 export default function Accounts() {
     const [accounts, setAccounts] = useState([]);
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [editingAccount, setEditingAccount] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -26,19 +26,19 @@ export default function Accounts() {
     }, []);
 
     useEffect(() => {
-        if (selectedCompany) {
+        if (selectedProject) {
             loadAccounts();
         }
-    }, [selectedCompany]);
+    }, [selectedProject]);
 
     const loadData = async () => {
         setLoading(true);
         try {
             const user = await User.me();
-            const companiesData = await Company.filter({ created_by: user.email });
-            setCompanies(companiesData);
+            const projectsData = await Company.filter({ created_by: user.email });
+            setProjects(companiesData);
             if (companiesData.length > 0) {
-                setSelectedCompany(companiesData[0]);
+                setSelectedProject(companiesData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -47,9 +47,9 @@ export default function Accounts() {
     };
 
     const loadAccounts = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Account.filter({ company_id: selectedCompany.id });
+            const data = await Account.filter({ project_id: selectedProject.id });
             setAccounts(data);
         } catch (error) {
             console.error("Error loading accounts:", error);
@@ -58,7 +58,7 @@ export default function Accounts() {
 
     const handleSave = async (accountData) => {
         try {
-            const dataWithCompany = { ...accountData, company_id: selectedCompany.id };
+            const dataWithCompany = { ...accountData, project_id: selectedProject.id };
             if (editingAccount) {
                 await Account.update(editingAccount.id, dataWithCompany);
             } else {
@@ -106,27 +106,27 @@ export default function Accounts() {
                 <div>
                     <h1 className="text-3xl font-bold text-gradient">Chart of Accounts</h1>
                     <p className="text-gray-600 mt-1">
-                        {selectedCompany?.name} • {accounts.length} accounts
+                        {selectedProject?.name} • {accounts.length} accounts
                     </p>
                 </div>
                 <Button
                     onClick={() => setShowForm(true)}
                     className="bg-gradient-to-r from-emerald-500 to-emerald-600"
-                    disabled={!selectedCompany}
+                    disabled={!selectedProject}
                 >
                     <Plus className="w-4 h-4 mr-2" />
                     New Account
                 </Button>
             </div>
 
-            {!selectedCompany ? (
+            {!selectedProject ? (
                 <div className="text-center py-16">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Selected</h2>
                     <p className="text-gray-500">Please select a company to manage accounts</p>
                 </div>
             ) : accounts.length === 0 ? (
-                <SetupChartOfAccounts companyId={selectedCompany.id} onSetupComplete={loadAccounts} />
+                <SetupChartOfAccounts companyId={selectedProject.id} onSetupComplete={loadAccounts} />
             ) : (
                 <>
                     {/* Stats Cards */}

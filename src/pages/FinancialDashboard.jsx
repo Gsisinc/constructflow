@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Company } from "@/entities/Company";
+import { Project } from "@/entities/Project";
 import { Account } from "@/entities/Account";
 import { Transaction } from "@/entities/Transaction";
 import { User } from "@/entities/User";
@@ -11,7 +11,8 @@ import {
     DollarSign,
     FileText,
     Calendar,
-    Banknote
+    Banknote,
+    MapPin
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -21,10 +22,19 @@ import StatsCard from "../components/financial-dashboard/StatsCard";
 import RecentTransactions from "../components/financial-dashboard/RecentTransactions";
 import FinancialChart from "../components/financial-dashboard/FinancialChart";
 import CompanyOverview from "../components/financial-dashboard/CompanyOverview";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
-export default function Dashboard() {
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+export default function FinancialDashboard() {
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [selectedPhase, setSelectedPhase] = useState(null);
+    const [phases, setPhases] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [accounts, setAccounts] = useState([]);
     const [financialData, setFinancialData] = useState({
@@ -32,7 +42,8 @@ export default function Dashboard() {
         totalExpenses: 0,
         netProfit: 0,
         totalAssets: 0,
-        cashFlow: 0
+        cashFlow: 0,
+        budgetUtilization: 0
     });
     const [loading, setLoading] = useState(true);
 
@@ -40,28 +51,31 @@ export default function Dashboard() {
         loadDashboardData();
     }, []);
 
+    useEffect(() => {
+        if (selectedProject) {
+            loadProjectFinancials();
+        }
+    }, [selectedProject, selectedPhase]);
+
     const loadDashboardData = async () => {
         setLoading(true);
         try {
             const user = await User.me();
-            const companiesData = await Company.filter({ created_by: user.email });
-            setCompanies(companiesData);
+            // Load projects instead of companies
+            const projectsData = await Project.filter({ created_by: user.email });
+            setProjects(projectsData);
 
-            if (companiesData.length > 0) {
-                const company = companiesData[0]; // Use first company for demo
-                setSelectedCompany(company);
+            if (projectsData.length > 0) {
+                const project = projectsData[0];
+                setSelectedProject(project);
                 
-                // Load company-specific data
-                const [transactionsData, accountsData] = await Promise.all([
-                    Transaction.filter({ company_id: company.id, status: "Posted" }, "-date", 10),
-                    Account.filter({ company_id: company.id, is_active: true })
-                ]);
-
-                setTransactions(transactionsData);
-                setAccounts(accountsData);
-                
-                // Calculate financial metrics
-                calculateFinancialMetrics(transactionsData, accountsData);
+                // Load project phases if available
+                if (project.phases && Array.isArray(project.phases)) {
+                    setPhases(project.phases);
+                    if (project.phases.length > 0) {
+                        setSelectedPhase(project.phases[0].id);
+                    }
+                }
             }
         } catch (error) {
             console.error("Error loading dashboard:", error);
@@ -69,10 +83,40 @@ export default function Dashboard() {
         setLoading(false);
     };
 
-    const calculateFinancialMetrics = (transactions, accounts) => {
+    const loadProjectFinancials = async () => {
+        try {
+            if (!selectedProject) return;
+
+            const filters = { 
+                project_id: selectedProject.id,
+                status: "Posted"
+            };
+
+            // Add phase filter if selected
+            if (selectedPhase) {
+                filters.phase_id = selectedPhase;
+            }
+
+            const [transactionsData, accountsData] = await Promise.all([
+                Transaction.filter(filters, "-date", 10),
+                Account.filter({ project_id: selectedProject.id, is_active: true })
+            ]);
+
+            setTransactions(transactionsData);
+            setAccounts(accountsData);
+            
+            // Calculate financial metrics for project
+            calculateFinancialMetrics(transactionsData, accountsData, selectedProject);
+        } catch (error) {
+            console.error("Error loading project financials:", error);
+        }
+    };
+
+    const calculateFinancialMetrics = (transactions, accounts, project) => {
         let totalRevenue = 0;
         let totalExpenses = 0;
         let totalAssets = 0;
+        let budgetUtilization = 0;
 
         // Calculate from accounts
         accounts.forEach(account => {
@@ -89,6 +133,11 @@ export default function Dashboard() {
             }
         });
 
+        // Calculate budget utilization for construction project
+        if (project.budget) {
+            budgetUtilization = (totalExpenses / project.budget) * 100;
+        }
+
         const netProfit = totalRevenue - totalExpenses;
         const cashFlow = transactions
             .filter(t => t.type === 'Receipt' || t.type === 'Payment')
@@ -99,123 +148,134 @@ export default function Dashboard() {
             totalExpenses,
             netProfit,
             totalAssets,
-            cashFlow
+            cashFlow,
+            budgetUtilization
         });
     };
 
     if (loading) {
-        return (
-            <div className="p-8">
-                <div className="animate-pulse space-y-6">
-                    <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[...Array(4)].map((_, i) => (
-                            <div key={i} className="h-32 bg-gray-200 rounded-xl"></div>
-                        ))}
-                    </div>
-                    <div className="grid lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2 h-96 bg-gray-200 rounded-xl"></div>
-                        <div className="h-96 bg-gray-200 rounded-xl"></div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (companies.length === 0) {
-        return (
-            <div className="p-8">
-                <div className="text-center py-16">
-                    <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to AccountingPro</h2>
-                    <p className="text-gray-500 mb-6">Get started by creating your first company</p>
-                    <Link to={createPageUrl("Companies")}>
-                        <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700">
-                            <Building2 className="w-4 h-4 mr-2" />
-                            Create Company
-                        </Button>
-                    </Link>
-                </div>
-            </div>
-        );
+        return <div className="p-8">Loading financial dashboard...</div>;
     }
 
     return (
-        <div className="p-4 lg:p-8 space-y-8">
-            {/* Header */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gradient">Financial Dashboard</h1>
-                    <p className="text-gray-600 mt-1">
-                        {selectedCompany?.name} • {format(new Date(), 'MMMM yyyy')}
-                    </p>
-                </div>
-                <div className="flex gap-3">
-                    <Button variant="outline" className="glass-card border-white/20">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        This Month
-                    </Button>
-                    <Link to={createPageUrl("Reports")}>
-                        <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600">
-                            <FileText className="w-4 h-4 mr-2" />
-                            View Reports
-                        </Button>
+        <div className="space-y-8 p-8">
+            {/* Header with Project Selection */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-3xl font-bold">Project Financial Dashboard</h1>
+                    <Link to={createPageUrl("Projects")}>
+                        <Button variant="outline">View All Projects</Button>
                     </Link>
+                </div>
+
+                {/* Project and Phase Selection */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="text-sm font-medium">Select Project</label>
+                        <Select value={selectedProject?.id || ""} onValueChange={(id) => {
+                            const project = projects.find(p => p.id === id);
+                            setSelectedProject(project);
+                        }}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Choose a project" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {projects.map(project => (
+                                    <SelectItem key={project.id} value={project.id}>
+                                        <div className="flex items-center gap-2">
+                                            <MapPin className="w-4 h-4" />
+                                            {project.name}
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {phases.length > 0 && (
+                        <div>
+                            <label className="text-sm font-medium">Select Phase (Optional)</label>
+                            <Select value={selectedPhase || ""} onValueChange={setSelectedPhase}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="All phases" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">All Phases</SelectItem>
+                                    {phases.map(phase => (
+                                        <SelectItem key={phase.id} value={phase.id}>
+                                            {phase.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Financial Metrics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <StatsCard
                     title="Total Revenue"
-                    value={`$${Math.abs(financialData.totalRevenue).toLocaleString()}`}
-                    change="+12.5%"
-                    trend="up"
-                    icon={TrendingUp}
-                    gradient="from-emerald-500 to-emerald-600"
+                    value={`$${financialData.totalRevenue.toLocaleString()}`}
+                    icon={<TrendingUp className="w-5 h-5" />}
+                    trend="+12%"
                 />
                 <StatsCard
                     title="Total Expenses"
                     value={`$${financialData.totalExpenses.toLocaleString()}`}
-                    change="+8.2%"
-                    trend="up"
-                    icon={TrendingDown}
-                    gradient="from-rose-500 to-rose-600"
+                    icon={<TrendingDown className="w-5 h-5" />}
+                    trend="+8%"
                 />
                 <StatsCard
                     title="Net Profit"
                     value={`$${financialData.netProfit.toLocaleString()}`}
-                    change="+15.3%"
-                    trend="up"
-                    icon={DollarSign}
-                    gradient="from-blue-500 to-blue-600"
+                    icon={<DollarSign className="w-5 h-5" />}
+                    trend={financialData.netProfit > 0 ? "+5%" : "-3%"}
                 />
                 <StatsCard
-                    title="Total Assets"
-                    value={`$${financialData.totalAssets.toLocaleString()}`}
-                    change="+5.7%"
-                    trend="up"
-                    icon={Banknote}
-                    gradient="from-purple-500 to-purple-600"
+                    title="Cash Flow"
+                    value={`$${financialData.cashFlow.toLocaleString()}`}
+                    icon={<Banknote className="w-5 h-5" />}
+                    trend="+2%"
+                />
+                <StatsCard
+                    title="Budget Utilization"
+                    value={`${financialData.budgetUtilization.toFixed(1)}%`}
+                    icon={<FileText className="w-5 h-5" />}
+                    trend={financialData.budgetUtilization > 100 ? "Over budget" : "On track"}
                 />
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid lg:grid-cols-3 gap-6">
-                {/* Left Column - Charts and Analytics */}
-                <div className="lg:col-span-2 space-y-6">
-                    <FinancialChart selectedCompany={selectedCompany} />
+            {/* Charts and Details */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <FinancialChart transactions={transactions} />
                 </div>
+                <div>
+                    <CompanyOverview project={selectedProject} financialData={financialData} />
+                </div>
+            </div>
 
-                {/* Right Column - Overview and Transactions */}
-                <div className="space-y-6">
-                    <CompanyOverview 
-                        company={selectedCompany}
-                        accountsCount={accounts.length}
-                        transactionsCount={transactions.length}
-                    />
-                    <RecentTransactions transactions={transactions} />
-                </div>
+            {/* Recent Transactions */}
+            <div>
+                <RecentTransactions transactions={transactions} />
+            </div>
+
+            {/* Quick Links */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Link to={createPageUrl("SalesInvoices")}>
+                    <Button variant="outline" className="w-full">View Invoices</Button>
+                </Link>
+                <Link to={createPageUrl("Transactions")}>
+                    <Button variant="outline" className="w-full">View Transactions</Button>
+                </Link>
+                <Link to={createPageUrl("Reports")}>
+                    <Button variant="outline" className="w-full">View Reports</Button>
+                </Link>
+                <Link to={createPageUrl("Budget")}>
+                    <Button variant="outline" className="w-full">Budget Tracking</Button>
+                </Link>
             </div>
         </div>
     );

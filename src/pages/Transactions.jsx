@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Transaction } from "@/entities/Transaction";
 import { Account } from "@/entities/Account";
-import { Company } from "@/entities/Company";
+import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
 import { Button } from "@/components/ui/button";
 import { Plus, Receipt, Building } from "lucide-react";
@@ -15,8 +15,8 @@ import GenerateSampleTransactions from "../components/transactions/GenerateSampl
 export default function Transactions() {
     const [transactions, setTransactions] = useState([]);
     const [accounts, setAccounts] = useState([]);
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [editingTransaction, setEditingTransaction] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -27,20 +27,20 @@ export default function Transactions() {
     }, []);
 
     useEffect(() => {
-        if (selectedCompany) {
+        if (selectedProject) {
             loadTransactions();
             loadAccounts();
         }
-    }, [selectedCompany]);
+    }, [selectedProject]);
 
     const loadData = async () => {
         setLoading(true);
         try {
             const user = await User.me();
-            const companiesData = await Company.filter({ created_by: user.email });
-            setCompanies(companiesData);
+            const projectsData = await Company.filter({ created_by: user.email });
+            setProjects(companiesData);
             if (companiesData.length > 0) {
-                setSelectedCompany(companiesData[0]);
+                setSelectedProject(companiesData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -49,9 +49,9 @@ export default function Transactions() {
     };
 
     const loadTransactions = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Transaction.filter({ company_id: selectedCompany.id }, "-date");
+            const data = await Transaction.filter({ project_id: selectedProject.id }, "-date");
             setTransactions(data);
         } catch (error) {
             console.error("Error loading transactions:", error);
@@ -59,9 +59,9 @@ export default function Transactions() {
     };
 
     const loadAccounts = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Account.filter({ company_id: selectedCompany.id, is_active: true });
+            const data = await Account.filter({ project_id: selectedProject.id, is_active: true });
             setAccounts(data);
         } catch (error) {
             console.error("Error loading accounts:", error);
@@ -76,7 +76,7 @@ export default function Transactions() {
         try {
             const dataWithCompany = {
                 ...transactionData,
-                company_id: selectedCompany.id,
+                project_id: selectedProject.id,
                 transaction_number: transactionData.transaction_number || generateTransactionNumber()
             };
 
@@ -121,20 +121,20 @@ export default function Transactions() {
                 <div>
                     <h1 className="text-3xl font-bold text-gradient">Transactions</h1>
                     <p className="text-gray-600 mt-1">
-                        {selectedCompany?.name} • {transactions.length} transactions
+                        {selectedProject?.name} • {transactions.length} transactions
                     </p>
                 </div>
                 <Button
                     onClick={() => setShowForm(true)}
                     className="bg-gradient-to-r from-emerald-500 to-emerald-600"
-                    disabled={!selectedCompany || accounts.length === 0}
+                    disabled={!selectedProject || accounts.length === 0}
                 >
                     <Plus className="w-4 h-4 mr-2" />
                     New Transaction
                 </Button>
             </div>
 
-            {!selectedCompany ? (
+            {!selectedProject ? (
                 <div className="text-center py-16">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Selected</h2>
@@ -148,7 +148,7 @@ export default function Transactions() {
                 </div>
             ) : transactions.length === 0 ? (
                 <GenerateSampleTransactions 
-                    companyId={selectedCompany.id} 
+                    companyId={selectedProject.id} 
                     accounts={accounts} 
                     onGenerationComplete={loadTransactions} 
                 />

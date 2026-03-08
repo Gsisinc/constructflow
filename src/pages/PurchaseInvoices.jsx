@@ -7,7 +7,7 @@ import { InventoryStock } from "@/entities/InventoryStock";
 import { Warehouse } from "@/entities/Warehouse";
 import { Batch } from "@/entities/Batch";
 import { BatchStock } from "@/entities/BatchStock";
-import { Company } from "@/entities/Company";
+import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
 import { Button } from "@/components/ui/button";
 import { Plus, Building } from "lucide-react";
@@ -21,8 +21,8 @@ export default function PurchaseInvoices() {
     const [products, setProducts] = useState([]);
     const [warehouses, setWarehouses] = useState([]);
     const [accounts, setAccounts] = useState([]);
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [editingInvoice, setEditingInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -32,23 +32,23 @@ export default function PurchaseInvoices() {
     }, []);
 
     useEffect(() => {
-        if (selectedCompany) {
+        if (selectedProject) {
             loadInvoices();
             loadProducts();
             loadWarehouses();
             loadAccounts();
         }
-    }, [selectedCompany]);
+    }, [selectedProject]);
 
     const loadData = async () => {
         setLoading(true);
         try {
             const user = await User.me();
-            const companiesData = await Company.filter({ created_by: user.email });
-            setCompanies(companiesData);
+            const projectsData = await Company.filter({ created_by: user.email });
+            setProjects(companiesData);
             if (companiesData.length > 0) {
-                const companyId = localStorage.getItem('selectedCompanyId') || companiesData[0].id;
-                setSelectedCompany(companiesData.find(c => c.id === companyId) || companiesData[0]);
+                const companyId = localStorage.getItem('selectedProjectId') || companiesData[0].id;
+                setSelectedProject(companiesData.find(c => c.id === companyId) || companiesData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -57,9 +57,9 @@ export default function PurchaseInvoices() {
     };
 
     const loadInvoices = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await PurchaseInvoice.filter({ company_id: selectedCompany.id }, "-invoice_date");
+            const data = await PurchaseInvoice.filter({ project_id: selectedProject.id }, "-invoice_date");
             setInvoices(data);
         } catch (error) {
             console.error("Error loading invoices:", error);
@@ -67,9 +67,9 @@ export default function PurchaseInvoices() {
     };
 
     const loadProducts = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Product.filter({ company_id: selectedCompany.id });
+            const data = await Product.filter({ project_id: selectedProject.id });
             setProducts(data);
         } catch (error) {
             console.error("Error loading products:", error);
@@ -77,9 +77,9 @@ export default function PurchaseInvoices() {
     };
 
     const loadWarehouses = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Warehouse.filter({ company_id: selectedCompany.id, is_active: true });
+            const data = await Warehouse.filter({ project_id: selectedProject.id, is_active: true });
             setWarehouses(data);
         } catch (error) {
             console.error("Error loading warehouses:", error);
@@ -87,9 +87,9 @@ export default function PurchaseInvoices() {
     };
 
     const loadAccounts = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Account.filter({ company_id: selectedCompany.id });
+            const data = await Account.filter({ project_id: selectedProject.id });
             setAccounts(data);
         } catch (error) {
             console.error("Error loading accounts:", error);
@@ -98,7 +98,7 @@ export default function PurchaseInvoices() {
 
     const handleSave = async (invoiceData) => {
         try {
-            const dataWithCompany = { ...invoiceData, company_id: selectedCompany.id };
+            const dataWithCompany = { ...invoiceData, project_id: selectedProject.id };
             
             if (!dataWithCompany.warehouse_id) {
                 alert("Please select a warehouse");
@@ -229,7 +229,7 @@ export default function PurchaseInvoices() {
         }
 
         const transaction = await Transaction.create({
-            company_id: selectedCompany.id,
+            project_id: selectedProject.id,
             transaction_number: `PI-${invoice.invoice_number}`,
             type: 'Purchase Bill',
             date: invoice.invoice_date,
@@ -271,15 +271,15 @@ export default function PurchaseInvoices() {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-gradient">Purchase Invoices</h1>
-                    <p className="text-gray-600 mt-1">{selectedCompany?.name} • {invoices.length} invoices</p>
+                    <p className="text-gray-600 mt-1">{selectedProject?.name} • {invoices.length} invoices</p>
                 </div>
-                <Button onClick={() => { setEditingInvoice(null); setShowForm(true); }} className="bg-gradient-to-r from-emerald-500 to-emerald-600" disabled={!selectedCompany}>
+                <Button onClick={() => { setEditingInvoice(null); setShowForm(true); }} className="bg-gradient-to-r from-emerald-500 to-emerald-600" disabled={!selectedProject}>
                     <Plus className="w-4 h-4 mr-2" />
                     New Purchase
                 </Button>
             </div>
 
-            {!selectedCompany ? (
+            {!selectedProject ? (
                 <div className="text-center py-16">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Selected</h2>
@@ -296,7 +296,7 @@ export default function PurchaseInvoices() {
                                     invoice={editingInvoice}
                                     products={products}
                                     warehouses={warehouses}
-                                    company={selectedCompany}
+                                    company={selectedProject}
                                     onSave={handleSave}
                                     onCancel={() => { setShowForm(false); setEditingInvoice(null); }}
                                 />

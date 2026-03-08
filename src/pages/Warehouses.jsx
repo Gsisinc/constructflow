@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Warehouse } from "@/entities/Warehouse";
-import { Company } from "@/entities/Company";
+import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
 import { Button } from "@/components/ui/button";
 import { Plus, Building } from "lucide-react";
@@ -10,8 +10,8 @@ import WarehouseList from "../components/warehouses/WarehouseList";
 
 export default function Warehouses() {
     const [warehouses, setWarehouses] = useState([]);
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [editingWarehouse, setEditingWarehouse] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -21,20 +21,20 @@ export default function Warehouses() {
     }, []);
 
     useEffect(() => {
-        if (selectedCompany) {
+        if (selectedProject) {
             loadWarehouses();
         }
-    }, [selectedCompany]);
+    }, [selectedProject]);
 
     const loadData = async () => {
         setLoading(true);
         try {
             const user = await User.me();
-            const companiesData = await Company.filter({ created_by: user.email });
-            setCompanies(companiesData);
+            const projectsData = await Company.filter({ created_by: user.email });
+            setProjects(companiesData);
             if (companiesData.length > 0) {
-                const companyId = localStorage.getItem('selectedCompanyId') || companiesData[0].id;
-                setSelectedCompany(companiesData.find(c => c.id === companyId) || companiesData[0]);
+                const companyId = localStorage.getItem('selectedProjectId') || companiesData[0].id;
+                setSelectedProject(companiesData.find(c => c.id === companyId) || companiesData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -43,9 +43,9 @@ export default function Warehouses() {
     };
 
     const loadWarehouses = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Warehouse.filter({ company_id: selectedCompany.id });
+            const data = await Warehouse.filter({ project_id: selectedProject.id });
             setWarehouses(data);
         } catch (error) {
             console.error("Error loading warehouses:", error);
@@ -54,7 +54,7 @@ export default function Warehouses() {
 
     const handleSave = async (warehouseData) => {
         try {
-            const dataWithCompany = { ...warehouseData, company_id: selectedCompany.id };
+            const dataWithCompany = { ...warehouseData, project_id: selectedProject.id };
             if (editingWarehouse) {
                 await Warehouse.update(editingWarehouse.id, dataWithCompany);
             } else {
@@ -82,9 +82,9 @@ export default function Warehouses() {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-gradient">Warehouses</h1>
-                    <p className="text-gray-600 mt-1">{selectedCompany?.name} • {warehouses.length} warehouses</p>
+                    <p className="text-gray-600 mt-1">{selectedProject?.name} • {warehouses.length} warehouses</p>
                 </div>
-                <Button onClick={() => { setEditingWarehouse(null); setShowForm(true); }} className="bg-gradient-to-r from-emerald-500 to-emerald-600" disabled={!selectedCompany}>
+                <Button onClick={() => { setEditingWarehouse(null); setShowForm(true); }} className="bg-gradient-to-r from-emerald-500 to-emerald-600" disabled={!selectedProject}>
                     <Plus className="w-4 h-4 mr-2" />
                     New Warehouse
                 </Button>
@@ -102,7 +102,7 @@ export default function Warehouses() {
                 </div>
             )}
 
-            {!selectedCompany ? (
+            {!selectedProject ? (
                 <div className="text-center py-16">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Selected</h2>

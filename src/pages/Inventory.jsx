@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Product } from "@/entities/Product";
-import { Company } from "@/entities/Company";
+import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
 import { InventoryStock } from "@/entities/InventoryStock";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,8 @@ import InventoryStats from "../components/inventory/InventoryStats";
 export default function Inventory() {
     const [products, setProducts] = useState([]);
     const [inventoryStocks, setInventoryStocks] = useState([]);
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -28,31 +28,31 @@ export default function Inventory() {
     }, []);
 
     useEffect(() => {
-        if (selectedCompany) {
+        if (selectedProject) {
             loadProducts();
         }
-    }, [selectedCompany]);
+    }, [selectedProject]);
 
     useEffect(() => {
         // Refresh products when page becomes visible
         const handleVisibilityChange = () => {
-            if (!document.hidden && selectedCompany) {
+            if (!document.hidden && selectedProject) {
                 loadProducts();
             }
         };
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [selectedCompany]);
+    }, [selectedProject]);
 
     const loadData = async () => {
         setLoading(true);
         try {
             const user = await User.me();
-            const companiesData = await Company.filter({ created_by: user.email });
-            setCompanies(companiesData);
+            const projectsData = await Company.filter({ created_by: user.email });
+            setProjects(companiesData);
             if (companiesData.length > 0) {
-                const companyId = localStorage.getItem('selectedCompanyId') || companiesData[0].id;
-                setSelectedCompany(companiesData.find(c => c.id === companyId) || companiesData[0]);
+                const companyId = localStorage.getItem('selectedProjectId') || companiesData[0].id;
+                setSelectedProject(companiesData.find(c => c.id === companyId) || companiesData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -61,10 +61,10 @@ export default function Inventory() {
     };
 
     const loadProducts = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
             const [productData, stockData] = await Promise.all([
-                Product.filter({ company_id: selectedCompany.id }),
+                Product.filter({ project_id: selectedProject.id }),
                 InventoryStock.list() // Note: This fetches all stock. Needs filtering if secured by company
             ]);
             
@@ -83,7 +83,7 @@ export default function Inventory() {
 
     const handleSave = async (productData) => {
         try {
-            const dataWithCompany = { ...productData, company_id: selectedCompany.id };
+            const dataWithCompany = { ...productData, project_id: selectedProject.id };
             if (editingProduct) {
                 await Product.update(editingProduct.id, dataWithCompany);
             } else {
@@ -116,20 +116,20 @@ export default function Inventory() {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-gradient">Inventory Management</h1>
-                    <p className="text-gray-600 mt-1">{selectedCompany?.name} • {products.length} products</p>
+                    <p className="text-gray-600 mt-1">{selectedProject?.name} • {products.length} products</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button onClick={loadProducts} variant="outline" disabled={!selectedCompany}>
+                    <Button onClick={loadProducts} variant="outline" disabled={!selectedProject}>
                         Refresh
                     </Button>
-                    <Button onClick={() => { setEditingProduct(null); setShowForm(true); }} className="bg-gradient-to-r from-emerald-500 to-emerald-600" disabled={!selectedCompany}>
+                    <Button onClick={() => { setEditingProduct(null); setShowForm(true); }} className="bg-gradient-to-r from-emerald-500 to-emerald-600" disabled={!selectedProject}>
                         <Plus className="w-4 h-4 mr-2" />
                         New Product
                     </Button>
                 </div>
             </div>
 
-            {!selectedCompany ? (
+            {!selectedProject ? (
                 <div className="text-center py-16">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Selected</h2>

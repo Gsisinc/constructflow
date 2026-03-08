@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Account } from "@/entities/Account";
 import { Transaction } from "@/entities/Transaction";
-import { Company } from "@/entities/Company";
+import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,8 +15,8 @@ import { format } from "date-fns";
 export default function Ledger() {
     const [accounts, setAccounts] = useState([]);
     const [transactions, setTransactions] = useState([]);
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [selectedAccount, setSelectedAccount] = useState(null);
     const [dateFrom, setDateFrom] = useState(format(new Date(new Date().getFullYear(), 0, 1), 'yyyy-MM-dd'));
     const [dateTo, setDateTo] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -28,11 +28,11 @@ export default function Ledger() {
     }, []);
 
     useEffect(() => {
-        if (selectedCompany) {
+        if (selectedProject) {
             loadAccounts();
             loadTransactions();
         }
-    }, [selectedCompany]);
+    }, [selectedProject]);
 
     useEffect(() => {
         if (selectedAccount) {
@@ -44,11 +44,11 @@ export default function Ledger() {
         setLoading(true);
         try {
             const user = await User.me();
-            const companiesData = await Company.filter({ created_by: user.email });
-            setCompanies(companiesData);
+            const projectsData = await Company.filter({ created_by: user.email });
+            setProjects(companiesData);
             if (companiesData.length > 0) {
-                const companyId = localStorage.getItem('selectedCompanyId') || companiesData[0].id;
-                setSelectedCompany(companiesData.find(c => c.id === companyId) || companiesData[0]);
+                const companyId = localStorage.getItem('selectedProjectId') || companiesData[0].id;
+                setSelectedProject(companiesData.find(c => c.id === companyId) || companiesData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -57,9 +57,9 @@ export default function Ledger() {
     };
 
     const loadAccounts = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Account.filter({ company_id: selectedCompany.id });
+            const data = await Account.filter({ project_id: selectedProject.id });
             setAccounts(data);
         } catch (error) {
             console.error("Error loading accounts:", error);
@@ -67,9 +67,9 @@ export default function Ledger() {
     };
 
     const loadTransactions = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Transaction.filter({ company_id: selectedCompany.id, status: 'Posted' }, '-date');
+            const data = await Transaction.filter({ project_id: selectedProject.id, status: 'Posted' }, '-date');
             setTransactions(data);
         } catch (error) {
             console.error("Error loading transactions:", error);
@@ -122,11 +122,11 @@ export default function Ledger() {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-gradient">Account Ledger</h1>
-                    <p className="text-gray-600 mt-1">{selectedCompany?.name}</p>
+                    <p className="text-gray-600 mt-1">{selectedProject?.name}</p>
                 </div>
             </div>
 
-            {!selectedCompany ? (
+            {!selectedProject ? (
                 <div className="text-center py-16">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Selected</h2>

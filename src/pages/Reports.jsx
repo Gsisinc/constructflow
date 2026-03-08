@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Transaction } from "@/entities/Transaction";
 import { Account } from "@/entities/Account";
-import { Company } from "@/entities/Company";
+import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,8 @@ import TrialBalance from "../components/reports/TrialBalance";
 import ReportFilters from "../components/reports/ReportFilters";
 
 export default function Reports() {
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [accounts, setAccounts] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [activeReport, setActiveReport] = useState("balance-sheet");
@@ -36,19 +36,19 @@ export default function Reports() {
     }, []);
 
     useEffect(() => {
-        if (selectedCompany) {
+        if (selectedProject) {
             loadCompanyData();
         }
-    }, [selectedCompany, dateRange]);
+    }, [selectedProject, dateRange]);
 
     const loadData = async () => {
         setLoading(true);
         try {
             const user = await User.me();
-            const companiesData = await Company.filter({ created_by: user.email });
-            setCompanies(companiesData);
+            const projectsData = await Company.filter({ created_by: user.email });
+            setProjects(companiesData);
             if (companiesData.length > 0) {
-                setSelectedCompany(companiesData[0]);
+                setSelectedProject(companiesData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -57,12 +57,12 @@ export default function Reports() {
     };
 
     const loadCompanyData = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
             const [accountsData, transactionsData] = await Promise.all([
-                Account.filter({ company_id: selectedCompany.id }),
+                Account.filter({ project_id: selectedProject.id }),
                 Transaction.filter({ 
-                    company_id: selectedCompany.id,
+                    project_id: selectedProject.id,
                     status: "Posted"
                 })
             ]);
@@ -139,7 +139,7 @@ export default function Reports() {
                 <div>
                     <h1 className="text-3xl font-bold text-gradient">Financial Reports</h1>
                     <p className="text-gray-600 mt-1">
-                        {selectedCompany?.name} • {accounts.length} accounts
+                        {selectedProject?.name} • {accounts.length} accounts
                     </p>
                 </div>
                 <div className="flex gap-3">
@@ -154,7 +154,7 @@ export default function Reports() {
                 </div>
             </div>
 
-            {!selectedCompany ? (
+            {!selectedProject ? (
                 <div className="text-center py-16">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Selected</h2>
@@ -203,7 +203,7 @@ export default function Reports() {
                     <ReportFilters
                         dateRange={dateRange}
                         onDateRangeChange={setDateRange}
-                        company={selectedCompany}
+                        company={selectedProject}
                     />
 
                     {/* Report Content */}

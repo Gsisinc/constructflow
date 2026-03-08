@@ -6,7 +6,7 @@ import { Transaction } from "@/entities/Transaction";
 import { InventoryStock } from "@/entities/InventoryStock";
 import { BatchStock } from "@/entities/BatchStock";
 import { Batch } from "@/entities/Batch";
-import { Company } from "@/entities/Company";
+import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText, Building } from "lucide-react";
@@ -19,8 +19,10 @@ export default function SalesInvoices() {
     const [invoices, setInvoices] = useState([]);
     const [products, setProducts] = useState([]);
     const [accounts, setAccounts] = useState([]);
-    const [companies, setCompanies] = useState([]);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [selectedPhase, setSelectedPhase] = useState(null);
+    const [phases, setPhases] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [editingInvoice, setEditingInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -30,22 +32,26 @@ export default function SalesInvoices() {
     }, []);
 
     useEffect(() => {
-        if (selectedCompany) {
+        if (selectedProject) {
             loadInvoices();
             loadProducts();
             loadAccounts();
+            // Load phases if available
+            if (selectedProject.phases && Array.isArray(selectedProject.phases)) {
+                setPhases(selectedProject.phases);
+            }
         }
-    }, [selectedCompany]);
+    }, [selectedProject, selectedPhase]);
 
     const loadData = async () => {
         setLoading(true);
         try {
             const user = await User.me();
-            const companiesData = await Company.filter({ created_by: user.email });
-            setCompanies(companiesData);
-            if (companiesData.length > 0) {
-                const companyId = localStorage.getItem('selectedCompanyId') || companiesData[0].id;
-                setSelectedCompany(companiesData.find(c => c.id === companyId) || companiesData[0]);
+            const projectsData = await Project.filter({ created_by: user.email });
+            setProjects(projectsData);
+            if (projectsData.length > 0) {
+                const projectId = localStorage.getItem('selectedProjectId') || projectsData[0].id;
+                setSelectedProject(projectsData.find(p => p.id === projectId) || projectsData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -54,9 +60,13 @@ export default function SalesInvoices() {
     };
 
     const loadInvoices = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await SalesInvoice.filter({ company_id: selectedCompany.id }, "-invoice_date");
+            const filters = { project_id: selectedProject.id };
+            if (selectedPhase) {
+                filters.phase_id = selectedPhase;
+            }
+            const data = await SalesInvoice.filter(filters, "-invoice_date");
             setInvoices(data);
         } catch (error) {
             console.error("Error loading invoices:", error);
@@ -64,9 +74,9 @@ export default function SalesInvoices() {
     };
 
     const loadProducts = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Product.filter({ company_id: selectedCompany.id });
+            const data = await Product.filter({ project_id: selectedProject.id });
             setProducts(data);
         } catch (error) {
             console.error("Error loading products:", error);
@@ -74,9 +84,9 @@ export default function SalesInvoices() {
     };
 
     const loadAccounts = async () => {
-        if (!selectedCompany) return;
+        if (!selectedProject) return;
         try {
-            const data = await Account.filter({ company_id: selectedCompany.id });
+            const data = await Account.filter({ project_id: selectedProject.id });
             setAccounts(data);
         } catch (error) {
             console.error("Error loading accounts:", error);
@@ -85,18 +95,18 @@ export default function SalesInvoices() {
 
     const handleSave = async (invoiceData) => {
         try {
-            const dataWithCompany = { ...invoiceData, company_id: selectedCompany.id };
+            const dataWithProject = { ...invoiceData, project_id: selectedProject.id, phase_id: selectedPhase || null };
             
             let savedInvoice;
             if (editingInvoice) {
-                await SalesInvoice.update(editingInvoice.id, dataWithCompany);
-                savedInvoice = { id: editingInvoice.id, ...dataWithCompany };
+                await SalesInvoice.update(editingInvoice.id, dataWithProject);
+                savedInvoice = { id: editingInvoice.id, ...dataWithProject };
             } else {
-                savedInvoice = await SalesInvoice.create(dataWithCompany);
+                savedInvoice = await SalesInvoice.create(dataWithProject);
             }
 
             // Update inventory and create accounting transaction when status changes to Sent or Paid
-            if ((dataWithCompany.status === 'Paid' || dataWithCompany.status === 'Sent') && 
+            if ((dataWithProject.status === 'Paid' || dataWithProject.status === 'Sent') && 
                 (!editingInvoice || editingInvoice.status === 'Draft')) {
                 await updateInventoryStock(savedInvoice);
                 await createAccountingTransaction(savedInvoice);
@@ -178,7 +188,7 @@ export default function SalesInvoices() {
         }
 
         const transaction = await Transaction.create({
-            company_id: selectedCompany.id,
+            project_id: selectedProject.id,
             transaction_number: `SI-${invoice.invoice_number}`,
             type: 'Sales Invoice',
             date: invoice.invoice_date,
@@ -220,22 +230,38 @@ export default function SalesInvoices() {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-gradient">Sales Invoices</h1>
-                    <p className="text-gray-600 mt-1">{selectedCompany?.name} • {invoices.length} invoices</p>
+                    <p className="text-gray-600 mt-1">{selectedProject?.name} • {invoices.length} invoices</p>
                 </div>
-                <Button onClick={() => { setEditingInvoice(null); setShowForm(true); }} className="bg-gradient-to-r from-emerald-500 to-emerald-600" disabled={!selectedCompany}>
+                <Button onClick={() => { setEditingInvoice(null); setShowForm(true); }} className="bg-gradient-to-r from-emerald-500 to-emerald-600" disabled={!selectedProject}>
                     <Plus className="w-4 h-4 mr-2" />
                     New Invoice
                 </Button>
             </div>
 
-            {!selectedCompany ? (
+            !selectedProject ? (
                 <div className="text-center py-16">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Selected</h2>
-                    <p className="text-gray-500">Please select a company to manage invoices.</p>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2">No Project Selected</h2>
+                    <p className="text-gray-500">Please select a project to manage invoices.</p>
                 </div>
             ) : (
                 <>
+                    {/* Phase Filter */}
+                    {phases.length > 0 && (
+                        <div className="bg-slate-50 p-4 rounded-lg">
+                            <label className="text-sm font-medium">Filter by Phase (Optional)</label>
+                            <select 
+                                value={selectedPhase || ""} 
+                                onChange={(e) => setSelectedPhase(e.target.value || null)}
+                                className="mt-2 w-full p-2 border rounded"
+                            >
+                                <option value="">All Phases</option>
+                                {phases.map(phase => (
+                                    <option key={phase.id} value={phase.id}>{phase.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                     <InvoiceStats invoices={invoices} />
                     
                     {showForm && (
@@ -244,7 +270,7 @@ export default function SalesInvoices() {
                                 <InvoiceForm
                                     invoice={editingInvoice}
                                     products={products}
-                                    company={selectedCompany}
+                                    company={selectedProject}
                                     onSave={handleSave}
                                     onCancel={() => { setShowForm(false); setEditingInvoice(null); }}
                                 />
@@ -252,7 +278,7 @@ export default function SalesInvoices() {
                         </div>
                     )}
                     <InvoiceList invoices={invoices} onEdit={handleEdit} />
-                </>
+                </>>
             )}
         </div>
     );
