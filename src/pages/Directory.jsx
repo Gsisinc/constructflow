@@ -225,7 +225,9 @@ export default function Directory() {
     avatar_url: '',
   });
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [uploadingDetailPhoto, setUploadingDetailPhoto] = useState(false);
   const photoInputRef = React.useRef(null);
+  const detailPhotoInputRef = React.useRef(null);
 
   useEffect(() => {
     if (projectIdFromUrl) setProjectId(projectIdFromUrl);
@@ -361,6 +363,19 @@ export default function Directory() {
     },
     onError: (err) => {
       toast.error(typeof err === 'object' && err && 'message' in err ? err.message : 'Failed to remove contact');
+    },
+  });
+
+  const updateWorkerAvatarMutation = useMutation({
+    mutationFn: ({ workerId, avatar_url: url }) => base44.entities.Worker.update(workerId, { avatar_url: url }),
+    onSuccess: (_data, { workerId, avatar_url: url }) => {
+      queryClient.invalidateQueries({ queryKey: ['workers', 'directory'] });
+      queryClient.invalidateQueries({ queryKey: ['workers'] });
+      setSelectedPerson((prev) => (prev && prev.id === workerId ? { ...prev, avatar_url: url } : prev));
+      toast.success('Photo updated');
+    },
+    onError: (err) => {
+      toast.error(typeof err === 'object' && err && 'message' in err ? err.message : 'Failed to update photo');
     },
   });
 
@@ -526,6 +541,25 @@ export default function Directory() {
     } finally {
       setUploadingPhoto(false);
       if (photoInputRef.current) photoInputRef.current.value = '';
+    }
+  };
+
+  const handleDetailPhotoChange = async (e) => {
+    const file = e.target?.files?.[0];
+    if (!file || !file.type.startsWith('image/')) {
+      toast.error('Please choose an image file (JPG, PNG, etc.)');
+      return;
+    }
+    if (!selectedPerson?.id) return;
+    setUploadingDetailPhoto(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (file_url) updateWorkerAvatarMutation.mutate({ workerId: selectedPerson.id, avatar_url: file_url });
+    } catch (err) {
+      toast.error(err?.message || 'Failed to upload photo');
+    } finally {
+      setUploadingDetailPhoto(false);
+      if (detailPhotoInputRef.current) detailPhotoInputRef.current.value = '';
     }
   };
 
@@ -867,13 +901,40 @@ export default function Directory() {
             <>
               <SheetHeader className="border-b pb-4 mb-4">
                 <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16 rounded-full border-2 border-slate-200 flex-shrink-0">
-                    <AvatarImage src={selectedPerson.avatar_url} className="object-cover" />
-                    <AvatarFallback className="bg-slate-500 text-white text-xl">{selectedPerson.name?.[0]?.toUpperCase()}</AvatarFallback>
-                  </Avatar>
+                  <div className="relative group">
+                    <Avatar className="h-16 w-16 rounded-full border-2 border-slate-200 flex-shrink-0">
+                      <AvatarImage src={selectedPerson.avatar_url} className="object-cover" />
+                      <AvatarFallback className="bg-slate-500 text-white text-xl">{selectedPerson.name?.[0]?.toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    {(uploadingDetailPhoto || updateWorkerAvatarMutation.isPending) && (
+                      <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+                        <Loader2 className="h-6 w-6 text-white animate-spin" />
+                      </div>
+                    )}
+                    <input
+                      ref={detailPhotoInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleDetailPhotoChange}
+                      disabled={uploadingDetailPhoto || updateWorkerAvatarMutation.isPending}
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      className="absolute bottom-0 right-0 h-7 w-7 rounded-full p-0 shadow"
+                      disabled={uploadingDetailPhoto || updateWorkerAvatarMutation.isPending}
+                      onClick={() => detailPhotoInputRef.current?.click()}
+                      title="Add or change photo"
+                    >
+                      <ImagePlus className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <div className="min-w-0">
                     <SheetTitle className="truncate">{selectedPerson.name}</SheetTitle>
                     <SheetDescription>{TRADES.find(t=>t.value===selectedPerson.trade)?.label} · {selectedPerson.employer}</SheetDescription>
+                    <p className="text-xs text-slate-500 mt-1">Click the + on the photo to add or change</p>
                   </div>
                 </div>
               </SheetHeader>
