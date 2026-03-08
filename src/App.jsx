@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import './styles/mobile-optimization.css';
 import './styles/design-system.css';
 import ErrorBoundary from '@/components/feedback/ErrorBoundary';
+import RoleGuard from '@/components/RoleGuard';
 
 /** When static host serves 404.html we redirect to app root and store URL here; restore the intended path. */
 function SPARedirectHandler() {
@@ -161,9 +162,11 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={
-        <LayoutWrapper currentPageName={mainPageKey}>
-          {MainPage ? <MainPage /> : <PageNotFound />}
-        </LayoutWrapper>
+        <RoleGuard pageName={mainPageKey}>
+          <LayoutWrapper currentPageName={mainPageKey}>
+            {MainPage ? <MainPage /> : <PageNotFound />}
+          </LayoutWrapper>
+        </RoleGuard>
       } />
       {Object.entries(Pages).map(([path, Page]) => {
         // SAFEGUARD: Always use the real Dashboard so Base44 overwriting pages.config cannot break it
@@ -174,9 +177,11 @@ const AuthenticatedApp = () => {
             key={path}
             path={`/${path}`}
             element={
-              <LayoutWrapper currentPageName={path}>
-                {isValid ? <Component /> : <PageNotFound />}
-              </LayoutWrapper>
+              <RoleGuard pageName={path}>
+                <LayoutWrapper currentPageName={path}>
+                  {isValid ? <Component /> : <PageNotFound />}
+                </LayoutWrapper>
+              </RoleGuard>
             }
           />
         );

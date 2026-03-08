@@ -100,6 +100,41 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const PORTAL_ROLE_KEY = 'mygsis_portal_role';
+
+  const resolveRole = async (currentUser) => {
+    let role = currentUser?.role ?? null;
+    if (!role) {
+      try {
+        const stored = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(PORTAL_ROLE_KEY) : null;
+        if (stored === 'technician' || stored === 'client') role = stored;
+      } catch (_) {}
+    }
+    const email = (currentUser?.email || currentUser?.user?.email || '').trim() || null;
+    if (!role && currentUser?.organization_id && email) {
+      try {
+        const workersWithOrg = await base44.entities.Worker.filter({ email, organization_id: currentUser.organization_id }).catch(() => []);
+        if (Array.isArray(workersWithOrg) && workersWithOrg.length > 0) role = 'technician';
+      } catch (_) {}
+      if (!role) {
+        try {
+          const workersAny = await base44.entities.Worker.filter({ email }).catch(() => []);
+          if (Array.isArray(workersAny) && workersAny.length > 0) role = 'technician';
+        } catch (_) {}
+      }
+      if (!role && base44.entities.TechnicianProfile && typeof base44.entities.TechnicianProfile.filter === 'function') {
+        try {
+          const profiles = await base44.entities.TechnicianProfile.filter({ email }).then((r) => (Array.isArray(r) ? r : [])).catch(() => []);
+          if (profiles.length > 0) role = 'technician';
+        } catch (_) {}
+      }
+    }
+    if (role === 'technician' || role === 'client') {
+      try { if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(PORTAL_ROLE_KEY, role); } catch (_) {}
+    }
+    return role ?? currentUser?.role ?? null;
+  };
+
   const checkUserAuth = async () => {
     try {
       setIsLoadingAuth(true);
@@ -109,7 +144,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
         return;
       }
-      setUser(currentUser);
+      const role = await resolveRole(currentUser);
+      setUser({ ...currentUser, role });
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
     } catch (error) {
@@ -128,6 +164,7 @@ export const AuthProvider = ({ children }) => {
   const logout = (shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);
+    try { if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem(PORTAL_ROLE_KEY); } catch (_) {}
 
     if (shouldRedirect) {
       const appRoot = `${window.location.origin}${basePath()}/`;

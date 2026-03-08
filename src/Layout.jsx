@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from './utils';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { cn } from '@/lib/utils';
 import CommandPalette from '@/components/layout/CommandPalette';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
@@ -151,10 +152,10 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
 }
 
 export default function Layout({ children, currentPageName }) {
+  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [organization, setOrganization] = useState(null);
   const [previousPage, setPreviousPage] = useState(null);
   const location = useLocation();
@@ -165,111 +166,34 @@ export default function Layout({ children, currentPageName }) {
   const isLandingPage = currentPageName === 'Landing';
   const isRootPage = location.pathname === '/';
 
-  const PORTAL_ROLE_KEY = 'mygsis_portal_role';
-
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const isCallback = urlParams.has('code') || urlParams.has('state') || window.location.hash.includes('access_token');
-        
-        const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth && !isHomePage && !isLandingPage && !isCallback) {
-          try { sessionStorage.removeItem(PORTAL_ROLE_KEY); } catch (_) {}
-          navigate(createPageUrl('Home'));
-          return;
-        }
-        
-        const userData = await base44.auth.me();
-        const email = (userData?.email || userData?.user?.email || '').trim() || null;
-        let role = userData?.role ?? null;
-        if (!role) {
-          try {
-            const stored = sessionStorage.getItem(PORTAL_ROLE_KEY);
-            if (stored === 'technician' || stored === 'client') role = stored;
-          } catch (_) {}
-        }
-        if (!role && userData?.organization_id && email) {
-          try {
-            const workersWithOrg = await base44.entities.Worker.filter({ email, organization_id: userData.organization_id }).catch(() => []);
-            if (Array.isArray(workersWithOrg) && workersWithOrg.length > 0) role = 'technician';
-          } catch (_) {}
-          if (!role) {
-            try {
-              const workersAny = await base44.entities.Worker.filter({ email }).catch(() => []);
-              if (Array.isArray(workersAny) && workersAny.length > 0) role = 'technician';
-            } catch (_) {}
-          }
-          if (!role && base44.entities.TechnicianProfile && typeof base44.entities.TechnicianProfile.filter === 'function') {
-            try {
-              const profiles = await base44.entities.TechnicianProfile.filter({ email }).then((r) => (Array.isArray(r) ? r : [])).catch(() => []);
-              if (profiles.length > 0) role = 'technician';
-            } catch (_) {}
-          }
-        }
-        const effectiveRole = role ?? userData?.role;
-        if (effectiveRole === 'technician' || effectiveRole === 'client') {
-          try { sessionStorage.setItem(PORTAL_ROLE_KEY, effectiveRole); } catch (_) {}
-        }
-        setUser({ ...userData, role: effectiveRole });
-
-        if (!userData?.organization_id && currentPageName !== 'Onboarding' && !isHomePage && !isLandingPage) {
-          navigate(createPageUrl('Onboarding'));
-          return;
-        }
-
-        if (isHomePage && isAuth) {
-            if (effectiveRole === 'technician') {
-              navigate(createPageUrl('TechnicianPortal'));
-              return;
-            }
-            if (effectiveRole === 'client') {
-              navigate(createPageUrl('ClientPortal'));
-              return;
-            }
-            navigate(createPageUrl('Bids'));
-            return;
-          }
-
-        // Technicians should land on Tech Portal even when opening app on a direct link (e.g. /Dashboard)
-        if (effectiveRole === 'technician' && currentPageName && !['TechnicianPortal', 'Calendar', 'TaskTracker', 'TimeCards', 'TechnicianTraining', 'Directory', 'AIAgents', 'PayStub', 'RequestTimeOff', 'Settings', 'AlertSettings'].includes(currentPageName)) {
-          navigate(createPageUrl('TechnicianPortal'));
-          return;
-        }
-        if (effectiveRole === 'client' && currentPageName && !['ClientPortal', 'Projects', 'Documents', 'ServiceDesk', 'Settings'].includes(currentPageName)) {
-          navigate(createPageUrl('ClientPortal'));
-          return;
-        }
-        
-        if (userData?.organization_id) {
-          const org = await base44.entities.Organization.filter({ id: userData.organization_id });
-          if (org.length > 0) {
-            setOrganization(org[0]);
-            document.documentElement.style.setProperty('--primary', hexToHSL(org[0].primary_color || '#2563eb'));
-            document.documentElement.style.setProperty('--secondary', hexToHSL(org[0].secondary_color || '#3b82f6'));
-          }
-        }
-      } catch (e) {
-        console.log('User not logged in');
-      }
-    };
-    loadUser();
-  }, [currentPageName]);
-
-  // Redirect technicians and clients away from admin-only pages (runs when user loads so techs never see admin UI)
-  const technicianAllowedPages = new Set(['TechnicianPortal', 'Calendar', 'TaskTracker', 'TimeCards', 'TechnicianTraining', 'Directory', 'AIAgents', 'PayStub', 'RequestTimeOff', 'Settings', 'AlertSettings']);
-  const clientAllowedPages = new Set(['ClientPortal', 'Projects', 'Documents', 'ServiceDesk', 'Settings']);
+  // Auth guard: no org -> onboarding (handled once auth is ready)
   useEffect(() => {
     if (!user) return;
-    if (user.role === 'technician' && currentPageName && !technicianAllowedPages.has(currentPageName)) {
-      navigate(createPageUrl('TechnicianPortal'), { replace: true });
-      return;
+    if (!user.organization_id && currentPageName !== 'Onboarding' && !isHomePage && !isLandingPage) {
+      navigate(createPageUrl('Onboarding'));
     }
-    if (user.role === 'client' && currentPageName && !clientAllowedPages.has(currentPageName)) {
-      navigate(createPageUrl('ClientPortal'), { replace: true });
-      return;
-    }
-  }, [user, currentPageName, navigate]);
+  }, [user, user?.organization_id, currentPageName, isHomePage, isLandingPage, navigate]);
+
+  // Admin default: from Home go to Bids (technicians/clients are redirected by RoleGuard before we mount)
+  useEffect(() => {
+    if (!user || !isHomePage) return;
+    if (user.role === 'technician') navigate(createPageUrl('TechnicianPortal'));
+    else if (user.role === 'client') navigate(createPageUrl('ClientPortal'));
+    else navigate(createPageUrl('Bids'));
+  }, [user, user?.role, isHomePage, navigate]);
+
+  // Load organization for logo/theme
+  useEffect(() => {
+    if (!user?.organization_id) return;
+    let cancelled = false;
+    base44.entities.Organization.filter({ id: user.organization_id }).then((orgs) => {
+      if (cancelled || !orgs?.length) return;
+      setOrganization(orgs[0]);
+      document.documentElement.style.setProperty('--primary', hexToHSL(orgs[0].primary_color || '#2563eb'));
+      document.documentElement.style.setProperty('--secondary', hexToHSL(orgs[0].secondary_color || '#3b82f6'));
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [user?.organization_id]);
 
   // Track page changes for back navigation
   useEffect(() => {
