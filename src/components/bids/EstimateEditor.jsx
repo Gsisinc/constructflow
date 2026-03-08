@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { jsPDF } from 'jspdf';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, Save, Calculator, Edit } from 'lucide-react';
+import { Plus, Trash2, Save, Calculator, Edit, Download, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function EstimateEditor({ bidId, organizationId }) {
+export default function EstimateEditor({ bidId, organizationId, bidTitle }) {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -71,6 +72,7 @@ export default function EstimateEditor({ bidId, organizationId }) {
   return (
     <EstimateForm
       estimate={activeEstimate}
+      bidTitle={bidTitle}
       isEditing={isEditing}
       onEdit={() => setIsEditing(true)}
       onCancel={() => setIsEditing(false)}
@@ -92,7 +94,7 @@ export default function EstimateEditor({ bidId, organizationId }) {
   );
 }
 
-function EstimateForm({ estimate, isEditing, onEdit, onCancel, onSave, onDelete, isSaving }) {
+function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave, onDelete, isSaving }) {
   const [formData, setFormData] = useState(estimate || {
     line_items: [],
     labor_hours: 0,
@@ -162,15 +164,62 @@ function EstimateForm({ estimate, isEditing, onEdit, onCancel, onSave, onDelete,
 
   const totals = calculateTotals();
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    const title = bidTitle || 'Estimate';
+    doc.setFontSize(18);
+    doc.text(title, 14, 16);
+    doc.setFontSize(10);
+    let y = 26;
+    doc.text(`Labor: ${formData.labor_hours || 0} hrs @ $${(formData.labor_rate || 0).toLocaleString()}/hr = $${totals.labor_cost.toLocaleString()}`, 14, y); y += 7;
+    doc.text(`Materials & line items:`, 14, y); y += 6;
+    (formData.line_items || []).forEach((item, i) => {
+      doc.text(`  ${i + 1}. ${(item.description || '').slice(0, 50)} — ${item.quantity} ${item.unit} @ $${(item.unit_cost || 0).toLocaleString()} = $${(item.total_cost || 0).toLocaleString()}`, 14, y); y += 6;
+    });
+    y += 4;
+    doc.text(`Equipment: $${(formData.equipment_cost || 0).toLocaleString()} | Subcontractor: $${(formData.subcontractor_cost || 0).toLocaleString()}`, 14, y); y += 7;
+    doc.text(`Subtotal: $${totals.subtotal.toLocaleString()} | Overhead: ${formData.overhead_percent || 0}% | Profit: ${formData.profit_margin_percent || 0}%`, 14, y); y += 7;
+    doc.setFontSize(12);
+    doc.text(`Total Bid Amount: $${totals.total_bid_amount.toLocaleString()}`, 14, y);
+    if ((formData.notes || '').trim()) {
+      y += 10;
+      doc.setFontSize(10);
+      doc.text('Notes: ' + (formData.notes || '').slice(0, 200), 14, y);
+    }
+    doc.save(`estimate-${(bidTitle || 'export').replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`);
+    toast.success('Estimate downloaded as PDF');
+  };
+
+  const sendToClient = () => {
+    const subject = encodeURIComponent(`Estimate: ${bidTitle || 'Construction Estimate'}`);
+    const body = encodeURIComponent(
+      `Please find our estimate summary below.\n\n` +
+      `Total Bid Amount: $${totals.total_bid_amount.toLocaleString()}\n` +
+      `Subtotal: $${totals.subtotal.toLocaleString()}\n\n` +
+      `Download the full PDF from the app (Estimate tab → Download PDF) and attach it to this email if needed.\n\n` +
+      `Best regards`
+    );
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    toast.success('Opened email client. Attach the PDF after downloading if needed.');
+  };
+
   return (
     <div className="space-y-4">
       {/* Header Actions */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
           <CardTitle>Estimate Details</CardTitle>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {!isEditing ? (
               <>
+                <Button variant="outline" size="sm" onClick={downloadPDF}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download PDF
+                </Button>
+                <Button variant="outline" size="sm" onClick={sendToClient}>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Send to Client
+                </Button>
                 <Button variant="outline" size="sm" onClick={onEdit}>
                   <Edit className="h-4 w-4 mr-2" />
                   Edit

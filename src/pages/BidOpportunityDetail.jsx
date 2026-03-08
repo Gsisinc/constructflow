@@ -153,7 +153,7 @@ export default function BidOpportunityDetail() {
         </TabsContent>
 
         <TabsContent value="estimate" className="space-y-4">
-          <EstimateEditor bidId={bid.id} organizationId={user.organization_id} />
+          <EstimateEditor bidId={bid.id} organizationId={user.organization_id} bidTitle={bid.title || bid.project_name || 'Bid'} />
         </TabsContent>
 
         <TabsContent value="requirements" className="space-y-4">
