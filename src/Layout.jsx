@@ -165,6 +165,8 @@ export default function Layout({ children, currentPageName }) {
   const isLandingPage = currentPageName === 'Landing';
   const isRootPage = location.pathname === '/';
 
+  const PORTAL_ROLE_KEY = 'mygsis_portal_role';
+
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -173,14 +175,20 @@ export default function Layout({ children, currentPageName }) {
         
         const isAuth = await base44.auth.isAuthenticated();
         if (!isAuth && !isHomePage && !isLandingPage && !isCallback) {
+          try { sessionStorage.removeItem(PORTAL_ROLE_KEY); } catch (_) {}
           navigate(createPageUrl('Home'));
           return;
         }
         
         const userData = await base44.auth.me();
         const email = (userData?.email || userData?.user?.email || '').trim() || null;
-        // If profile.role wasn't set by backend, treat as technician when they have a Worker or TechnicianProfile record
         let role = userData?.role ?? null;
+        if (!role) {
+          try {
+            const stored = sessionStorage.getItem(PORTAL_ROLE_KEY);
+            if (stored === 'technician' || stored === 'client') role = stored;
+          } catch (_) {}
+        }
         if (!role && userData?.organization_id && email) {
           try {
             const workersWithOrg = await base44.entities.Worker.filter({ email, organization_id: userData.organization_id }).catch(() => []);
@@ -200,6 +208,9 @@ export default function Layout({ children, currentPageName }) {
           }
         }
         const effectiveRole = role ?? userData?.role;
+        if (effectiveRole === 'technician' || effectiveRole === 'client') {
+          try { sessionStorage.setItem(PORTAL_ROLE_KEY, effectiveRole); } catch (_) {}
+        }
         setUser({ ...userData, role: effectiveRole });
 
         if (!userData?.organization_id && currentPageName !== 'Onboarding' && !isHomePage && !isLandingPage) {
@@ -299,6 +310,7 @@ export default function Layout({ children, currentPageName }) {
 
   const handleLogout = async () => {
     try {
+      try { sessionStorage.removeItem('mygsis_portal_role'); } catch (_) {}
       await base44.auth.logout();
       navigate(createPageUrl('Home'));
     } catch (error) {

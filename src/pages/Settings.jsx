@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Upload, Palette, Building2, Save, Loader2, AlertTriangle } from 'lucide-react';
+import { Upload, Palette, Building2, Save, Loader2, AlertTriangle, Wrench } from 'lucide-react';
 import ApiStatusCard from '@/components/settings/ApiStatusCard';
 import { toast } from 'sonner';
 import { createPageUrl } from '../utils';
@@ -105,6 +105,30 @@ export default function Settings() {
         <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 break-words">Settings</h1>
         <p className="text-slate-500 mt-1">Manage your company profile and preferences</p>
       </div>
+
+      <Card className="border-amber-200 bg-amber-50/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Wrench className="h-4 w-4 text-amber-600" />
+            Field technician?
+          </CardTitle>
+          <p className="text-sm text-slate-600">If you work in the field and should use the Tech Portal (tasks, time cards, training) instead of the admin workspace, switch below. You can sign out and back in to return to the full workspace.</p>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="outline"
+            className="border-amber-300 text-amber-800 hover:bg-amber-100"
+            onClick={() => {
+              try { sessionStorage.setItem('mygsis_portal_role', 'technician'); } catch (_) {}
+              navigate(createPageUrl('TechnicianPortal'));
+              window.location.reload();
+            }}
+          >
+            <Wrench className="h-4 w-4 mr-2" />
+            Use Tech Portal
+          </Button>
+        </CardContent>
+      </Card>
 
       <Tabs defaultValue="company" className="w-full sm:w-auto">
         <TabsList>

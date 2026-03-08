@@ -135,6 +135,7 @@ export default function Onboarding() {
       });
       if (response?.data?.success !== false && response?.data?.error !== true) {
         toast.success(`You’ve joined as ${joinRole === 'technician' ? 'a technician' : 'a client/stakeholder'}.`);
+        try { sessionStorage.setItem('mygsis_portal_role', joinRole); } catch (_) {}
         setPendingRedirect(joinRole === 'technician' ? 'TechnicianPortal' : 'ClientPortal');
         setStep('profile');
         setProfileFullName(user?.full_name || '');
