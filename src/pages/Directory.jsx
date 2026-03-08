@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '../utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -262,6 +262,15 @@ export default function Directory() {
     enabled: !!projectId,
   });
 
+  const { data: allBids = [] } = useQuery({
+    queryKey: ['bids', 'directory', user?.organization_id],
+    queryFn: async () => {
+      if (!user?.organization_id) return [];
+      return base44.entities.BidOpportunity.filter({ organization_id: user.organization_id }, '-created_date');
+    },
+    enabled: !!user?.organization_id,
+  });
+
   const createWorkerMutation = useMutation({
     mutationFn: async (data) => {
       const payload = { ...data };
@@ -424,6 +433,22 @@ export default function Directory() {
     if (!selectedPerson || !projectId) return [];
     return projectTasks.filter(t => (t.assigned_to === selectedPerson.id || t.assignee_id === selectedPerson.id));
   }, [selectedPerson, projectId, projectTasks]);
+
+  const projectsForSelectedPerson = useMemo(() => {
+    if (!selectedPerson || !projects.length) return [];
+    const ids = [selectedPerson.current_project_id, selectedPerson.project_id].filter(Boolean);
+    return projects.filter(p => ids.includes(p.id));
+  }, [selectedPerson, projects]);
+
+  const bidsForSelectedPerson = useMemo(() => {
+    if (!selectedPerson?.id || !allBids.length) return [];
+    return allBids.filter(
+      b => b.assigned_worker_id === selectedPerson.id ||
+           b.worker_id === selectedPerson.id ||
+           b.contact_id === selectedPerson.id ||
+           b.assigned_to === selectedPerson.id
+    );
+  }, [selectedPerson?.id, allBids]);
 
   const handlePing = (person, location = 'Delivery Zone 3') => {
     toast.success(`Ping sent to ${person.name}: "Foreman needs you at ${location}."`);
@@ -879,6 +904,49 @@ export default function Directory() {
                     )}
                     {selectedPerson.phone && <div><span className="text-slate-500">Phone</span><p className="font-medium">{selectedPerson.phone}</p></div>}
                     {selectedPerson.email && <div><span className="text-slate-500">Email</span><p className="font-medium">{selectedPerson.email}</p></div>}
+
+                    <div className="border-t pt-3 mt-3">
+                      <span className="text-slate-500 font-medium block mb-2">Project assigned to</span>
+                      {projectsForSelectedPerson.length > 0 ? (
+                        <ul className="space-y-1">
+                          {projectsForSelectedPerson.map((proj) => (
+                            <li key={proj.id}>
+                              <Link to={createPageUrl('ProjectDetail') + '?id=' + proj.id} className="text-amber-600 hover:underline font-medium">
+                                {proj.name || proj.title || 'Unnamed project'}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-slate-500 italic">No project assigned</p>
+                      )}
+                    </div>
+
+                    <div className="border-t pt-3 mt-3">
+                      <span className="text-slate-500 font-medium block mb-2">Bid opportunities linked</span>
+                      {bidsForSelectedPerson.length > 0 ? (
+                        <ul className="space-y-1">
+                          {bidsForSelectedPerson.map((bid) => (
+                            <li key={bid.id}>
+                              <Link to={createPageUrl('BidOpportunityDetail') + '?id=' + bid.id} className="text-amber-600 hover:underline font-medium block truncate">
+                                {bid.title || bid.project_name || 'Untitled bid'}
+                              </Link>
+                              {bid.status && <span className="text-xs text-slate-500">({bid.status})</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-slate-500 italic">No bid opportunities linked</p>
+                      )}
+                    </div>
+
+                    {projectId && tasksForPerson.length > 0 && (
+                      <div className="border-t pt-3 mt-3">
+                        <span className="text-slate-500 font-medium block mb-2">Tasks on current project</span>
+                        <p className="font-medium">{tasksForPerson.length} task{tasksForPerson.length !== 1 ? 's' : ''} assigned</p>
+                        <Link to={createPageUrl('ProjectDetail') + '?id=' + projectId} className="text-xs text-amber-600 hover:underline">View project →</Link>
+                      </div>
+                    )}
                   </div>
                 )}
                 {detailTab === 'certs' && (
