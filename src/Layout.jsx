@@ -28,6 +28,10 @@ import {
   Grid3x3,
   ArrowLeft,
   Wrench,
+  Calendar,
+  BookOpen,
+  Banknote,
+  CalendarOff,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -67,6 +71,30 @@ const navItems = [...primaryNavItems, ...secondaryNavItems, { name: 'Settings', 
 
 const adminNavItems = [
   { name: 'User Approvals', icon: User, page: 'UserApprovals' },
+];
+
+// Technician portal: only what techs need (calendar, modules, directory, AI help, tools, time cards, tasks, pay, time off)
+const technicianPrimaryNav = [
+  { name: 'Tech Home', icon: Wrench, page: 'TechnicianPortal' },
+  { name: 'Calendar', icon: Calendar, page: 'Calendar' },
+  { name: 'Tasks', icon: FileStack, page: 'TaskTracker' },
+  { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
+];
+
+const technicianSecondaryNav = [
+  { name: 'Modules & Training', icon: BookOpen, page: 'TechnicianTraining' },
+  { name: 'Directory', icon: Users, page: 'Directory' },
+  { name: 'AI Agents (onsite help)', icon: Bot, page: 'AIAgents' },
+  { name: 'Pay Stub', icon: Banknote, page: 'PayStub' },
+  { name: 'Request Time Off', icon: CalendarOff, page: 'RequestTimeOff' },
+];
+
+// Client/stakeholder portal: projects they can see, documents, messages, support
+const clientPrimaryNav = [
+  { name: 'Dashboard', icon: LayoutDashboard, page: 'ClientPortal' },
+  { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+  { name: 'Documents', icon: FileStack, page: 'Documents' },
+  { name: 'Support', icon: Wrench, page: 'ServiceDesk' },
 ];
 
 function UserMenu({ user, onLogout }) {
@@ -158,6 +186,15 @@ export default function Layout({ children, currentPageName }) {
         }
 
         if (isHomePage && isAuth) {
+            const role = userData?.role;
+            if (role === 'technician') {
+              navigate(createPageUrl('TechnicianPortal'));
+              return;
+            }
+            if (role === 'client') {
+              navigate(createPageUrl('ClientPortal'));
+              return;
+            }
             navigate(createPageUrl('Bids'));
             return;
           }
@@ -176,6 +213,21 @@ export default function Layout({ children, currentPageName }) {
     };
     loadUser();
   }, [currentPageName]);
+
+  // Redirect technicians and clients away from admin-only pages
+  const technicianAllowedPages = new Set(['TechnicianPortal', 'Calendar', 'TaskTracker', 'TimeCards', 'TechnicianTraining', 'Directory', 'AIAgents', 'PayStub', 'RequestTimeOff', 'Settings', 'AlertSettings']);
+  const clientAllowedPages = new Set(['ClientPortal', 'Projects', 'Documents', 'ServiceDesk', 'Settings']);
+  useEffect(() => {
+    if (!user?.role) return;
+    if (user.role === 'technician' && currentPageName && !technicianAllowedPages.has(currentPageName)) {
+      navigate(createPageUrl('TechnicianPortal'));
+      return;
+    }
+    if (user.role === 'client' && currentPageName && !clientAllowedPages.has(currentPageName)) {
+      navigate(createPageUrl('ClientPortal'));
+      return;
+    }
+  }, [user?.role, currentPageName, navigate]);
 
   // Track page changes for back navigation
   useEffect(() => {
@@ -204,8 +256,12 @@ export default function Layout({ children, currentPageName }) {
     else if (previousPage && previousPage !== currentPageName) {
       navigate(-1);
     }
-    // Fallback to Bids page
-    else {
+    // Fallback by role
+    else if (user?.role === 'technician') {
+      navigate(createPageUrl('TechnicianPortal'));
+    } else if (user?.role === 'client') {
+      navigate(createPageUrl('ClientPortal'));
+    } else {
       navigate(createPageUrl('Bids'));
     }
   };
@@ -384,7 +440,30 @@ export default function Layout({ children, currentPageName }) {
         "lg:translate-x-0"
       )}>
         <nav className="p-3 sm:p-4 space-y-1">
-          {/* Primary navigation */}
+          {user?.role === 'technician' ? (
+            <>
+              {technicianPrimaryNav.map((item) => (
+                <SidebarNavItem key={item.page} item={item} isActive={currentPageName === item.page} onNavigate={handleNavigateFromSidebar} />
+              ))}
+              <div className="h-px bg-slate-200 my-2 sm:my-3" />
+              <div className="text-xs font-semibold text-slate-400 px-3 py-2 uppercase tracking-widest">My tools</div>
+              {technicianSecondaryNav.map((item) => (
+                <SidebarNavItem key={item.page} item={item} isActive={currentPageName === item.page} onNavigate={handleNavigateFromSidebar} />
+              ))}
+              <div className="h-px bg-slate-200 my-2 sm:my-3" />
+              <SidebarNavItem item={{ name: 'Settings', icon: Settings, page: 'Settings' }} isActive={currentPageName === 'Settings'} onNavigate={handleNavigateFromSidebar} />
+            </>
+          ) : user?.role === 'client' ? (
+            <>
+              {clientPrimaryNav.map((item) => (
+                <SidebarNavItem key={item.page} item={item} isActive={currentPageName === item.page} onNavigate={handleNavigateFromSidebar} />
+              ))}
+              <div className="h-px bg-slate-200 my-2 sm:my-3" />
+              <SidebarNavItem item={{ name: 'Settings', icon: Settings, page: 'Settings' }} isActive={currentPageName === 'Settings'} onNavigate={handleNavigateFromSidebar} />
+            </>
+          ) : (
+            <>
+          {/* Primary navigation (admin/default) */}
           {primaryNavItems.map((item) => (
             <SidebarNavItem
               key={item.page}
@@ -445,6 +524,8 @@ export default function Layout({ children, currentPageName }) {
               ))}
             </>
           )}
+            </>
+          )}
         </nav>
 
         {/* Sidebar Footer */}
@@ -479,7 +560,7 @@ export default function Layout({ children, currentPageName }) {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      {!isHomePage && !isLandingPage && <MobileBottomNav currentPageName={currentPageName} />}
+      {!isHomePage && !isLandingPage && <MobileBottomNav currentPageName={currentPageName} userRole={user?.role} />}
     </div>
   );
 }

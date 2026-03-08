@@ -30,6 +30,61 @@ import {
   X
 } from 'lucide-react';
 
+// Quick access for technicians only
+const technicianMenuSections = [
+  {
+    title: 'My Work',
+    items: [
+      { icon: LayoutDashboard, label: 'Tech Home', page: 'TechnicianPortal' },
+      { icon: Calendar, label: 'Calendar', page: 'Calendar' },
+      { icon: FileStack, label: 'Tasks', page: 'TaskTracker' },
+      { icon: Clock, label: 'Time Cards', page: 'TimeCards' },
+      { icon: Package, label: 'Materials', page: 'Materials' },
+    ]
+  },
+  {
+    title: 'Learning & People',
+    items: [
+      { icon: Book, label: 'Modules & Training', page: 'TechnicianTraining' },
+      { icon: Users, label: 'Directory', page: 'Directory' },
+      { icon: Bot, label: 'AI Agents (onsite help)', page: 'AIAgents' },
+    ]
+  },
+  {
+    title: 'Time & Pay',
+    items: [
+      { icon: DollarSign, label: 'Pay Stub', page: 'PayStub' },
+      { icon: Calendar, label: 'Request Time Off', page: 'RequestTimeOff' },
+    ]
+  },
+  {
+    title: 'Support',
+    items: [
+      { icon: Settings, label: 'Settings', page: 'Settings' },
+      { icon: Wrench, label: 'Service Desk', page: 'ServiceDesk' },
+    ]
+  },
+];
+
+// Quick access for clients/stakeholders only
+const clientMenuSections = [
+  {
+    title: 'Overview',
+    items: [
+      { icon: LayoutDashboard, label: 'Dashboard', page: 'ClientPortal' },
+      { icon: FolderOpen, label: 'Projects', page: 'Projects' },
+      { icon: FileStack, label: 'Documents', page: 'Documents' },
+    ]
+  },
+  {
+    title: 'Support',
+    items: [
+      { icon: Wrench, label: 'Support', page: 'ServiceDesk' },
+      { icon: Settings, label: 'Settings', page: 'Settings' },
+    ]
+  },
+];
+
 const menuSections = [
   {
     title: 'Project Management',
@@ -149,7 +204,7 @@ const menuSections = [
   }
 ];
 
-export default function MegaMenu({ isOpen, onClose }) {
+export default function MegaMenu({ isOpen, onClose, userRole }) {
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (event) => {
@@ -160,6 +215,9 @@ export default function MegaMenu({ isOpen, onClose }) {
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const sections = userRole === 'technician' ? technicianMenuSections : userRole === 'client' ? clientMenuSections : menuSections;
+  const subtitle = userRole === 'technician' ? 'Your tools, schedule, and support' : userRole === 'client' ? 'Projects and support' : 'Navigate to any feature across the platform';
 
   return (
     <>
@@ -177,7 +235,7 @@ export default function MegaMenu({ isOpen, onClose }) {
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Quick Access</h2>
-              <p className="text-sm text-slate-500 mt-1">Navigate to any feature across the platform</p>
+              <p className="text-sm text-slate-500 mt-1">{subtitle}</p>
             </div>
             <button 
               onClick={onClose} 
@@ -190,7 +248,7 @@ export default function MegaMenu({ isOpen, onClose }) {
           
           {/* Menu Grid - Professional card layout */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {menuSections.map((section, idx) => (
+            {sections.map((section, idx) => (
               <div key={idx} className="bg-slate-50 rounded-lg p-3 border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
                 <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-2">{section.title}</h3>
                 <div className="space-y-1">

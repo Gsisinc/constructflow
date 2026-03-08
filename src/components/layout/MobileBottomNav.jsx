@@ -7,18 +7,38 @@ import {
   FolderKanban,
   FileText,
   FileStack,
-  Settings
+  Settings,
+  Wrench,
+  Calendar,
+  Clock,
 } from 'lucide-react';
 
-const navItems = [
+const adminNavItems = [
   { name: 'Home', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
   { name: 'Bids', icon: FileText, page: 'Bids' },
   { name: 'Tasks', icon: FileStack, page: 'TaskTracker' },
-  { name: 'More', icon: Settings, page: 'Settings' }
+  { name: 'More', icon: Settings, page: 'Settings' },
 ];
 
-export default function MobileBottomNav({ currentPageName }) {
+const technicianNavItems = [
+  { name: 'Home', icon: Wrench, page: 'TechnicianPortal' },
+  { name: 'Calendar', icon: Calendar, page: 'Calendar' },
+  { name: 'Tasks', icon: FileStack, page: 'TaskTracker' },
+  { name: 'Time', icon: Clock, page: 'TimeCards' },
+  { name: 'More', icon: Settings, page: 'Settings' },
+];
+
+const clientNavItems = [
+  { name: 'Home', icon: LayoutDashboard, page: 'ClientPortal' },
+  { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+  { name: 'Docs', icon: FileStack, page: 'Documents' },
+  { name: 'Support', icon: Wrench, page: 'ServiceDesk' },
+  { name: 'More', icon: Settings, page: 'Settings' },
+];
+
+export default function MobileBottomNav({ currentPageName, userRole }) {
+  const navItems = userRole === 'technician' ? technicianNavItems : userRole === 'client' ? clientNavItems : adminNavItems;
   const navigate = useNavigate();
   const location = useLocation();
   const [lastTapTime, setLastTapTime] = useState({});
@@ -58,7 +78,7 @@ export default function MobileBottomNav({ currentPageName }) {
     >
       <div className="flex items-center justify-around w-full">
         {navItems.map((item) => {
-          const isActive = currentPageName === item.page;
+          const active = item.page === 'Settings' ? currentPageName === 'Settings' : currentPageName === item.page;
           const Icon = item.icon;
           return (
             <button
@@ -66,7 +86,7 @@ export default function MobileBottomNav({ currentPageName }) {
               onClick={() => handleNavClick(item.page)}
               className={cn(
                 'flex flex-col items-center justify-center flex-1 min-h-16 gap-1 transition-all duration-200 active:bg-slate-100',
-                isActive
+                active
                   ? 'text-blue-600 bg-blue-50'
                   : 'text-slate-600 hover:text-blue-600'
               )}
@@ -74,10 +94,10 @@ export default function MobileBottomNav({ currentPageName }) {
             >
               <Icon className={cn(
                 "h-5 w-5 transition-colors",
-                isActive && "drop-shadow-sm"
+                active && "drop-shadow-sm"
               )} />
               <span className="text-xs font-semibold leading-tight">{item.name}</span>
-              {isActive && (
+              {active && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-blue-700 mx-auto w-8 rounded-t-full" />
               )}
             </button>

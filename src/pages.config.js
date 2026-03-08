@@ -94,7 +94,9 @@ import Login from './pages/Login';
 import Materials from './pages/Materials';
 import Onboarding from './pages/Onboarding';
 import OngoingTraining from './pages/OngoingTraining';
+import PayStub from './pages/PayStub';
 import PMSetupGuide from './pages/PMSetupGuide';
+import RequestTimeOff from './pages/RequestTimeOff';
 import Phase2Operations from './pages/Phase2Operations';
 import Phase3Operations from './pages/Phase3Operations';
 import Phase4AIAutomation from './pages/Phase4AIAutomation';
@@ -106,6 +108,8 @@ import Projects from './pages/Projects';
 import PurchaseOrders from './pages/PurchaseOrders';
 import QuickBooksSync from './pages/QuickBooksSync';
 import RolePermissions from './pages/RolePermissions';
+import PayStub from './pages/PayStub';
+import RequestTimeOff from './pages/RequestTimeOff';
 import Safety from './pages/Safety';
 import SchedulingAI from './pages/SchedulingAI';
 import ServiceDesk from './pages/ServiceDesk';
@@ -193,6 +197,8 @@ export const PAGES = {
     "PurchaseOrders": PurchaseOrders,
     "QuickBooksSync": QuickBooksSync,
     "RolePermissions": RolePermissions,
+    "PayStub": PayStub,
+    "RequestTimeOff": RequestTimeOff,
     "Safety": Safety,
     "SchedulingAI": SchedulingAI,
     "ServiceDesk": ServiceDesk,

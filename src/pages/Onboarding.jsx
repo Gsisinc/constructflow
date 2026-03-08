@@ -4,7 +4,7 @@ import { createPageUrl } from '../utils';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { AlertCircle, Building2, Wrench, UserCheck, Loader2, Search, ChevronRight } from 'lucide-react';
+import { AlertCircle, Building2, Wrench, UserCheck, Loader2, Search, ChevronRight, User, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +23,12 @@ export default function Onboarding() {
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
   const [logoError, setLogoError] = useState(false);
+  const [pendingRedirect, setPendingRedirect] = useState(null);
+  const [profileFullName, setProfileFullName] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profilePhotoUploading, setProfilePhotoUploading] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -95,7 +101,9 @@ export default function Onboarding() {
       });
       if (response?.data?.success !== false && !response?.data?.error) {
         toast.success('Organization created. You’re the admin.');
-        navigate(createPageUrl('Dashboard'));
+        setPendingRedirect('Dashboard');
+        setStep('profile');
+        setProfileFullName(user?.full_name || '');
         return;
       }
       throw new Error(response?.data?.error || response?.data?.message || 'Failed to create');
@@ -127,11 +135,9 @@ export default function Onboarding() {
       });
       if (response?.data?.success !== false && response?.data?.error !== true) {
         toast.success(`You’ve joined as ${joinRole === 'technician' ? 'a technician' : 'a client/stakeholder'}.`);
-        if (joinRole === 'technician') {
-          navigate(createPageUrl('TechnicianPortal'));
-        } else {
-          navigate(createPageUrl('ClientPortal'));
-        }
+        setPendingRedirect(joinRole === 'technician' ? 'TechnicianPortal' : 'ClientPortal');
+        setStep('profile');
+        setProfileFullName(user?.full_name || '');
         return;
       }
       throw new Error(response?.data?.error || response?.data?.message || 'Failed to join');
@@ -149,6 +155,53 @@ export default function Onboarding() {
     setSearchResults([]);
     setSelectedOrg(null);
     setError('');
+  };
+
+  const doRedirect = () => {
+    if (pendingRedirect) {
+      navigate(createPageUrl(pendingRedirect));
+      setPendingRedirect(null);
+      setStep('choice');
+    }
+  };
+
+  const handleProfilePhoto = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setProfilePhotoUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setProfilePhotoUrl(file_url);
+      toast.success('Photo added');
+    } catch (err) {
+      toast.error(err?.message || 'Upload failed');
+    } finally {
+      setProfilePhotoUploading(false);
+    }
+  };
+
+  const handleProfileSave = async () => {
+    setProfileSaving(true);
+    setError('');
+    try {
+      if (typeof base44.auth?.updateMe === 'function') {
+        await base44.auth.updateMe({
+          full_name: profileFullName.trim() || undefined,
+          avatar_url: profilePhotoUrl || undefined,
+          phone: profilePhone.trim() || undefined,
+        });
+        toast.success('Profile updated');
+      }
+    } catch (err) {
+      setError(err?.message || 'Could not update profile');
+    } finally {
+      setProfileSaving(false);
+    }
+    doRedirect();
+  };
+
+  const handleProfileSkip = () => {
+    doRedirect();
   };
 
   return (
@@ -255,6 +308,74 @@ export default function Onboarding() {
                 <ChevronRight className="h-5 w-5 shrink-0 text-[#a8a29e] group-hover:text-[#78716c] transition-colors" />
               </div>
             </button>
+          </div>
+        )}
+
+        {/* Step: Complete your profile (after create/join) */}
+        {step === 'profile' && (
+          <div className="rounded-xl border border-[#e7e5e4] bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-[#1c1917] flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Complete your profile
+            </h2>
+            <p className="mt-1 text-sm text-[#78716c]">Add a photo and your name so your team can recognize you. You can update this later in Settings.</p>
+            <div className="mt-5 space-y-4">
+              {error && (
+                <div className="flex gap-2 rounded-lg border border-red-200 bg-red-50 p-3">
+                  <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+              <div className="flex flex-col items-center gap-3">
+                <label className="text-sm font-medium text-[#1c1917]">Photo</label>
+                <div className="relative">
+                  <div className="h-24 w-24 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden">
+                    {profilePhotoUrl ? (
+                      <img src={profilePhotoUrl} alt="You" className="h-full w-full object-cover" />
+                    ) : (
+                      <Camera className="h-10 w-10 text-slate-400" />
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePhoto}
+                    disabled={profilePhotoUploading}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+                {profilePhotoUploading && <span className="text-xs text-slate-500">Uploading...</span>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1c1917]">Full name</label>
+                <Input
+                  placeholder="e.g. Jordan Smith"
+                  value={profileFullName}
+                  onChange={(e) => setProfileFullName(e.target.value)}
+                  disabled={profileSaving}
+                  className="border-[#e7e5e4] bg-[#fafaf9]"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1c1917]">Phone (optional)</label>
+                <Input
+                  placeholder="e.g. (555) 123-4567"
+                  value={profilePhone}
+                  onChange={(e) => setProfilePhone(e.target.value)}
+                  disabled={profileSaving}
+                  className="border-[#e7e5e4] bg-[#fafaf9]"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" onClick={handleProfileSkip} disabled={profileSaving} className="flex-1 border-[#e7e5e4] text-[#57534e]">
+                  Skip for now
+                </Button>
+                <Button onClick={handleProfileSave} disabled={profileSaving} className="flex-1 bg-[#b45309] text-white hover:bg-[#92400e]">
+                  {profileSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Save & continue
+                </Button>
+              </div>
+            </div>
           </div>
         )}
 
