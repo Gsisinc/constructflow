@@ -22,6 +22,7 @@ import {
 import { toast } from 'sonner';
 import { buildDrawingAnalysisPrompt, normalizeDrawingAnalysis } from '@/lib/drawingAnalysis';
 import { parseLlmJsonResponse } from '@/lib/llmResponse';
+import { pdfToPageDataUrls } from '@/lib/pdfToImages';
 
 const CLASSIFICATIONS = [
   'general_construction',
@@ -66,6 +67,8 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
   const [scale, setScale] = useState(1); // pixels per foot
   const [isSettingScale, setIsSettingScale] = useState(false);
   const [scaleStart, setScaleStart] = useState(null);
+  const [pdfPreview, setPdfPreview] = useState({ loading: false, pages: [], pageIndex: 1, docId: null });
+  const [manualTakeoffTarget, setManualTakeoffTarget] = useState('conduit'); // conduit | cable
   
   const containerRef = useRef(null);
   const imageRef = useRef(null);
@@ -88,6 +91,36 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
     };
     if (bid?.id) loadDocs();
   }, [bid?.id]);
+
+  useEffect(() => {
+    const loadPdfPreview = async () => {
+      if (!selectedDocForPreview?.id) return;
+      const isPdf =
+        selectedDocForPreview?.file_type?.includes('pdf') ||
+        selectedDocForPreview?.name?.toLowerCase?.().endsWith('.pdf');
+
+      if (!isPdf) {
+        setPdfPreview({ loading: false, pages: [], pageIndex: 1, docId: null });
+        return;
+      }
+
+      setPdfPreview({ loading: true, pages: [], pageIndex: 1, docId: selectedDocForPreview.id });
+      try {
+        const res = await fetch(selectedDocForPreview.file_url);
+        if (!res.ok) throw new Error(`Failed to fetch PDF (${res.status})`);
+        const blob = await res.blob();
+        const file = new File([blob], selectedDocForPreview.name || 'drawing.pdf', { type: blob.type || 'application/pdf' });
+        const pages = await pdfToPageDataUrls(file, { scale: 1.5, maxPages: 10 });
+        setPdfPreview({ loading: false, pages, pageIndex: 1, docId: selectedDocForPreview.id });
+      } catch (e) {
+        console.error(e);
+        setPdfPreview({ loading: false, pages: [], pageIndex: 1, docId: selectedDocForPreview.id });
+        toast.error('Could not render PDF for visual takeoff. Try opening the PDF or upload a PNG/JPG.');
+      }
+    };
+
+    loadPdfPreview();
+  }, [selectedDocForPreview?.id]);
 
   const reanalyzeExistingDocs = async () => {
     if (!selectedDocIds?.length) {
@@ -513,6 +546,63 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
     }
   };
 
+  const applyManualMeasurementsToAnalysis = async () => {
+    if (!analysis) return;
+    if (measurements.length === 0) {
+      toast.error('No manual measurements to apply');
+      return;
+    }
+    const totalFt = measurements.reduce((acc, m) => acc + (Number(m.lengthFt) || 0), 0);
+    if (!Number.isFinite(totalFt) || totalFt <= 0) {
+      toast.error('Measurements total is invalid');
+      return;
+    }
+
+    const next = {
+      ...analysis,
+      takeoffTotals: {
+        ...analysis.takeoffTotals,
+        conduit_length_ft:
+          manualTakeoffTarget === 'conduit'
+            ? Number(analysis.takeoffTotals.conduit_length_ft || 0) + totalFt
+            : Number(analysis.takeoffTotals.conduit_length_ft || 0),
+        cable_length_ft:
+          manualTakeoffTarget === 'cable'
+            ? Number(analysis.takeoffTotals.cable_length_ft || 0) + totalFt
+            : Number(analysis.takeoffTotals.cable_length_ft || 0),
+      },
+      materials: [
+        ...analysis.materials,
+        {
+          item: `Manual takeoff — ${manualTakeoffTarget === 'conduit' ? 'Conduit' : 'Cable'} (visual)`,
+          quantity: Math.round(totalFt),
+          unit: 'ft',
+          csi_division: csiDivision,
+          notes: `Added from ${measurements.length} manual measurement(s) in visual takeoff.`,
+        },
+      ],
+    };
+
+    setAnalysis(next);
+    toast.success(`Added ${Math.round(totalFt)} ft to takeoff totals`);
+
+    try {
+      const updatedAiAnalysis = {
+        ...(bid.ai_analysis || {}),
+        drawing_analysis: next,
+        drawing_analysis_meta: {
+          ...(bid.ai_analysis?.drawing_analysis_meta || {}),
+          manual_takeoff_applied_at: new Date().toISOString(),
+        },
+      };
+      await base44.entities.BidOpportunity.update(bid.id, { ai_analysis: updatedAiAnalysis });
+      onAnalysisSaved?.();
+    } catch (e) {
+      console.error(e);
+      toast.error('Saved locally but failed to persist to bid.');
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card>
@@ -717,15 +807,86 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               onClick={handleSurfaceClick}
               onMouseMove={handleMouseMove}
             >
-              {selectedDocForPreview.file_type?.includes('pdf') ? (
-                <div className="bg-white p-8 text-center rounded shadow-lg">
-                  <Files className="h-16 w-16 mx-auto text-slate-300 mb-4" />
-                  <p className="text-slate-800 font-bold">PDF View Not Supported in Visual Mode</p>
-                  <p className="text-slate-500 text-sm mt-2 max-w-xs">Visual takeoff requires an image file. Please upload a PNG or JPG version of this plan for interactive measurements.</p>
-                  <Button variant="outline" className="mt-4" onClick={() => window.open(selectedDocForPreview.file_url, '_blank')}>
-                    Open PDF in New Tab
-                  </Button>
-                </div>
+              {(selectedDocForPreview.file_type?.includes('pdf') || selectedDocForPreview?.name?.toLowerCase?.().endsWith('.pdf')) ? (
+                <>
+                  {pdfPreview.loading && (
+                    <div className="bg-white p-8 text-center rounded shadow-lg">
+                      <Loader2 className="h-10 w-10 mx-auto text-amber-600 animate-spin mb-3" />
+                      <p className="text-slate-800 font-bold">Rendering PDF for takeoff…</p>
+                      <p className="text-slate-500 text-sm mt-2 max-w-xs">This only renders for visual measuring. AI analysis still reads the original PDF.</p>
+                    </div>
+                  )}
+
+                  {!pdfPreview.loading && pdfPreview.pages.length === 0 && (
+                    <div className="bg-white p-8 text-center rounded shadow-lg">
+                      <Files className="h-16 w-16 mx-auto text-slate-300 mb-4" />
+                      <p className="text-slate-800 font-bold">PDF preview unavailable</p>
+                      <p className="text-slate-500 text-sm mt-2 max-w-xs">Try opening the PDF in a new tab or upload a PNG/JPG for the cleanest visual takeoff.</p>
+                      <Button variant="outline" className="mt-4" onClick={() => window.open(selectedDocForPreview.file_url, '_blank')}>
+                        Open PDF in New Tab
+                      </Button>
+                    </div>
+                  )}
+
+                  {!pdfPreview.loading && pdfPreview.pages.length > 0 && (
+                    <div className="absolute top-3 left-3 z-10 flex items-center gap-2 bg-white/95 backdrop-blur border rounded px-2 py-1">
+                      <span className="text-[10px] font-semibold text-slate-700">Page</span>
+                      <select
+                        className="text-[10px] border rounded px-1 py-0.5 bg-white"
+                        value={pdfPreview.pageIndex}
+                        onChange={(e) => setPdfPreview((p) => ({ ...p, pageIndex: Number(e.target.value) || 1 }))}
+                      >
+                        {pdfPreview.pages.map((p) => (
+                          <option key={p.pageIndex} value={p.pageIndex}>{p.pageIndex}</option>
+                        ))}
+                      </select>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 px-2 text-[10px]"
+                        onClick={(e) => { e.stopPropagation(); window.open(selectedDocForPreview.file_url, '_blank'); }}
+                      >
+                        Open PDF
+                      </Button>
+                    </div>
+                  )}
+
+                  {!pdfPreview.loading && pdfPreview.pages.length > 0 && (
+                    <img
+                      ref={imageRef}
+                      src={(pdfPreview.pages.find((p) => p.pageIndex === pdfPreview.pageIndex) || pdfPreview.pages[0])?.dataUrl}
+                      alt="PDF page"
+                      className="max-w-none block"
+                      onLoad={() => toast.success("PDF page rendered. Use 'Set Scale' to calibrate.")}
+                    />
+                  )}
+
+                  {/* Render Measurements */}
+                  <svg className="absolute inset-0 pointer-events-none w-full h-full">
+                    {measurements.map((m) => (
+                      <g key={m.id}>
+                        <line x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2} stroke="#3b82f6" strokeWidth="3" strokeDasharray="4" />
+                        <circle cx={m.x1} cy={m.y1} r="4" fill="#3b82f6" />
+                        <circle cx={m.x2} cy={m.y2} r="4" fill="#3b82f6" />
+                        <rect x={(m.x1+m.x2)/2 - 30} y={(m.y1+m.y2)/2 - 12} width="60" height="20" rx="4" fill="white" stroke="#3b82f6" strokeWidth="1" />
+                        <text x={(m.x1+m.x2)/2} y={(m.y1+m.y2)/2 + 2} textAnchor="middle" fontSize="10" fontWeight="bold" fill="#1e40af">
+                          {Math.round(m.lengthFt)} ft
+                        </text>
+                      </g>
+                    ))}
+                    
+                    {tempMeasurement && (
+                      <g>
+                        <line x1={tempMeasurement.x1} y1={tempMeasurement.y1} x2={tempMeasurement.x2} y2={tempMeasurement.y2} stroke="#3b82f6" strokeWidth="2" strokeDasharray="4" />
+                        <circle cx={tempMeasurement.x1} cy={tempMeasurement.y1} r="3" fill="#3b82f6" />
+                      </g>
+                    )}
+
+                    {scaleStart && (
+                      <circle cx={scaleStart.x} cy={scaleStart.y} r="5" fill="#f59e0b" />
+                    )}
+                  </svg>
+                </>
               ) : (
                 <>
                   <img 
@@ -788,12 +949,19 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                     </div>
                   ))}
                 </div>
-                <div className="p-2 bg-slate-50 border-t">
-                  <Button size="sm" className="w-full text-[10px] h-7 bg-blue-600" onClick={() => {
-                    const total = measurements.reduce((acc, m) => acc + m.lengthFt, 0);
-                    toast.success(`Added ${Math.round(total)} ft to takeoff totals.`);
-                    // In a real app, this would update the analysis state
-                  }}>
+                <div className="p-2 bg-slate-50 border-t space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-semibold text-slate-600">Apply as</span>
+                    <select
+                      className="text-[10px] border rounded px-2 py-1 bg-white flex-1"
+                      value={manualTakeoffTarget}
+                      onChange={(e) => setManualTakeoffTarget(e.target.value)}
+                    >
+                      <option value="conduit">Conduit (ft)</option>
+                      <option value="cable">Cable (ft)</option>
+                    </select>
+                  </div>
+                  <Button size="sm" className="w-full text-[10px] h-7 bg-blue-600" onClick={applyManualMeasurementsToAnalysis} disabled={!analysis}>
                     Add to Takeoff Totals
                   </Button>
                 </div>
