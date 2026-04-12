@@ -43,7 +43,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import MegaMenu from '@/components/layout/MegaMenu';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
-// import ApiKeyBanner from '@/components/settings/ApiKeyBanner';
 
 // Primary navigation items (shown in sidebar and mobile bottom nav)
 const primaryNavItems = [
@@ -523,7 +522,6 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Main Content */}
       <main className={cn("flex-1 pt-14 sm:pt-16 pb-16 sm:pb-0 overflow-y-auto transition-all duration-300", sidebarCollapsed ? "lg:pl-20" : "lg:pl-64")}>
-        {/* <ApiKeyBanner /> */}
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

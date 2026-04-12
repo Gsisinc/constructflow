@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
@@ -12,6 +12,8 @@ import './styles/mobile-optimization.css';
 import './styles/design-system.css';
 import ErrorBoundary from '@/components/feedback/ErrorBoundary';
 import EstimatorWizard from './pages/EstimatorWizard';
+import Layout from './layout';
+import Dashboard from './pages/Dashboard';
 
 /** SPA redirect handler — restore intended path from sessionStorage */
 function SPARedirectHandler() {
@@ -53,6 +55,20 @@ const FullPageStatus = ({ title, description, actionLabel, onAction, showSpinner
     </div>
   </div>
 );
+
+const EstimatorModalWrapper = () => {
+  const location = useLocation();
+  const isEstimatorPage = location.pathname === '/estimator';
+  
+  return (
+    <>
+      <Layout currentPageName="Bids">
+        <Dashboard />
+      </Layout>
+      {isEstimatorPage && <EstimatorWizard />}
+    </>
+  );
+};
 
 const AuthenticatedApp = () => {
   const { user, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, checkAppState } = useAuth();
@@ -133,7 +149,8 @@ const AuthenticatedApp = () => {
     <>
       <SPARedirectHandler />
       <Routes>
-        <Route path="/" element={<EstimatorWizard />} />
+        <Route path="/" element={<EstimatorModalWrapper />} />
+        <Route path="/estimator" element={<EstimatorModalWrapper />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </>
