@@ -88,6 +88,7 @@ import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
 import ESignatures from './pages/ESignatures';
 import EstimateGenerator from './pages/EstimateGenerator';
+import EstimatorWizard from './pages/EstimatorWizard';
 import Estimates from './pages/Estimates';
 import FeatureTesting from './pages/FeatureTesting';
 import FieldHoursApproval from './pages/FieldHoursApproval';
@@ -188,6 +189,7 @@ export const PAGES = {
     "Documents": Documents,
     "ESignatures": ESignatures,
     "EstimateGenerator": EstimateGenerator,
+    "EstimatorWizard": EstimatorWizard,
     "Estimates": Estimates,
     "FeatureTesting": FeatureTesting,
     "FieldHoursApproval": FieldHoursApproval,
