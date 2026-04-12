@@ -1,0 +1,99 @@
+{
+  "name": "Estimate",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "Reference to Organization"
+    },
+    "project_name": {
+      "type": "string",
+      "description": "Project name"
+    },
+    "project_address": {
+      "type": "string",
+      "description": "Project site address"
+    },
+    "gc_name": {
+      "type": "string",
+      "description": "General Contractor name"
+    },
+    "location": {
+      "type": "string",
+      "enum": [
+        "in-state",
+        "out-of-state"
+      ],
+      "description": "Project location (CA-based or out of state)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "estimating",
+        "ready_for_bid",
+        "submitted",
+        "won",
+        "lost"
+      ],
+      "default": "draft",
+      "description": "Estimate status"
+    },
+    "marked_up_plan_url": {
+      "type": "string",
+      "description": "URL to marked-up plan PDF with device circles and measurements"
+    },
+    "bid_documents": {
+      "type": "object",
+      "description": "URLs to generated bid documents keyed by scope (AV, Data, FireAlarm, etc.)",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "bom_csv_url": {
+      "type": "string",
+      "description": "URL to Bill of Materials CSV"
+    },
+    "conflict_report_url": {
+      "type": "string",
+      "description": "URL to Plan vs Spec Conflict Report (if specs uploaded)"
+    },
+    "estimate_data_json": {
+      "type": "string",
+      "description": "Complete estimate data stored as JSON string for audit trail"
+    },
+    "total_bid_amount": {
+      "type": "number",
+      "description": "Total bid price across all scopes"
+    },
+    "detected_scopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of detected scopes (AV, Data, FireAlarm, etc.)"
+    },
+    "device_count": {
+      "type": "number",
+      "description": "Total number of detected devices"
+    },
+    "total_cable_lf": {
+      "type": "number",
+      "description": "Total cable footage (after waste factor)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "User notes and special instructions"
+    },
+    "plan_scale": {
+      "type": "string",
+      "description": "Drawing scale confirmed from plan (e.g., '1/4 = 1-0')"
+    }
+  },
+  "required": [
+    "project_name",
+    "project_address",
+    "gc_name",
+    "location"
+  ]
+}
