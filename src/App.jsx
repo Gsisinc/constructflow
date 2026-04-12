@@ -12,7 +12,7 @@ import './styles/mobile-optimization.css';
 import './styles/design-system.css';
 import ErrorBoundary from '@/components/feedback/ErrorBoundary';
 import EstimatorWizard from './pages/EstimatorWizard';
-import Layout from '@/layout.jsx';
+import Layout from '@/layout';
 import Dashboard from './pages/Dashboard';
 
 /** SPA redirect handler — restore intended path from sessionStorage */
