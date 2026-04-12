@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate, useLocation, useNavig
 import PageNotFound from './lib/PageNotFound';
 // SAFEGUARD: Dashboard is always the improved version. Do not remove — Base44 auto-gen often overwrites pages.config and breaks the Dashboard route.
 import DashboardPage from './pages/Dashboard.ImprovedVersion';
+import EstimatorWizard from './pages/EstimatorWizard';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -203,6 +204,8 @@ const AuthenticatedApp = () => {
       {/* Lowercase redirects so /dashboard and /home always work */}
       <Route path="/dashboard" element={<Navigate to="/Dashboard" replace />} />
       <Route path="/home" element={<Navigate to="/Home" replace />} />
+      <Route path="/EstimatorWizard" element={<EstimatorWizard />} />
+      <Route path="/Estimates" element={<Navigate to="/EstimatorWizard" replace />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
