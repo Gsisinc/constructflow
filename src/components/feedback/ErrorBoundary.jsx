@@ -105,7 +105,7 @@ class ErrorBoundary extends React.Component {
               </div>
 
               {/* Error Details (collapsible in production) */}
-              {process.env.NODE_ENV === 'development' && (
+              {import.meta.env.DEV && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 overflow-auto max-h-48">
                   <div className="flex items-center gap-2 mb-2">
                     <Bug className="h-4 w-4 text-red-600" />

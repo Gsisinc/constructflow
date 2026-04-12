@@ -412,7 +412,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Sidebar - on mobile leave room for bottom nav (4rem) so nothing is cut off */}
       <aside className={cn(
-        "fixed top-14 sm:top-16 left-0 bg-white border-r border-gray-200 shadow-sm z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
+        "fixed top-14 sm:top-16 left-0 bg-amber-50 border-r border-gray-200 shadow-sm z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
         "h-[calc(100vh-3.5rem-4rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)]",
         sidebarCollapsed ? "lg:w-20" : "lg:w-64",
         sidebarOpen ? "translate-x-0" : "-translate-x-full",
