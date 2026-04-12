@@ -13,7 +13,7 @@ import './styles/design-system.css';
 import ErrorBoundary from '@/components/feedback/ErrorBoundary';
 import EstimatorWizard from './pages/EstimatorWizard';
 
-/** When static host serves 404.html we redirect to app root and store URL here; restore the intended path. */
+/** SPA redirect handler — restore intended path from sessionStorage */
 function SPARedirectHandler() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -30,22 +30,6 @@ function SPARedirectHandler() {
     } catch (_) {}
   }, [navigate]);
   return null;
-}
-
-/** All routes go through the app (auth + app shell). No separate public website. */
-function RouteGate() {
-  return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <SPARedirectHandler />
-        <NavigationTracker />
-        <Routes>
-          <Route path="*" element={<AuthenticatedApp />} />
-        </Routes>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
-  );
 }
 
 const FullPageStatus = ({ title, description, actionLabel, onAction, showSpinner = false, secondaryActions }) => (
@@ -82,12 +66,12 @@ const AuthenticatedApp = () => {
     }
   }, [authError, hasStartedLoginRedirect, navigateToLogin]);
 
-  // If loading takes more than 4s, show Retry / Sign in so user isn't stuck
   useEffect(() => {
     if (!(isLoadingPublicSettings || isLoadingAuth)) return;
     const t = setTimeout(() => setShowLoadingFallback(true), 4000);
     return () => clearTimeout(t);
   }, [isLoadingPublicSettings, isLoadingAuth]);
+
   useEffect(() => {
     if (!(isLoadingPublicSettings || isLoadingAuth)) setShowLoadingFallback(false);
   }, [isLoadingPublicSettings, isLoadingAuth]);
@@ -145,12 +129,14 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Render the Bid Estimator only
   return (
-    <Routes>
-      <Route path="/" element={<EstimatorWizard />} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+    <>
+      <SPARedirectHandler />
+      <Routes>
+        <Route path="/" element={<EstimatorWizard />} />
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
+    </>
   );
 };
 
@@ -162,9 +148,15 @@ function App() {
       <ThemeProvider>
         <div className="min-h-screen bg-slate-100" style={{ minHeight: '100vh', display: 'block' }}>
           <Router basename={basename}>
-            <Routes>
-              <Route path="*" element={<RouteGate />} />
-            </Routes>
+            <AuthProvider>
+              <QueryClientProvider client={queryClientInstance}>
+                <NavigationTracker />
+                <Routes>
+                  <Route path="*" element={<AuthenticatedApp />} />
+                </Routes>
+                <Toaster />
+              </QueryClientProvider>
+            </AuthProvider>
           </Router>
         </div>
       </ThemeProvider>
