@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bot, CheckCircle2, AlertCircle, Zap, MessageSquare } from 'lucide-react';
+import { Bot, CheckCircle2, AlertCircle, Zap, Mail } from 'lucide-react';
 
 export default function AIAgentsOpenAIClaude() {
   const [openaiKey, setOpenaiKey] = useState(localStorage.getItem('openai_api_key') || '');
@@ -19,10 +19,6 @@ export default function AIAgentsOpenAIClaude() {
   const handleSaveKeys = () => {
     localStorage.setItem('openai_api_key', openaiKey);
     localStorage.setItem('claude_api_key', claudeKey);
-    
-    // Set environment variables
-    process.env.REACT_APP_OPENAI_API_KEY = openaiKey;
-    process.env.REACT_APP_CLAUDE_API_KEY = claudeKey;
     
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
@@ -49,7 +45,7 @@ export default function AIAgentsOpenAIClaude() {
       id: 'proposal',
       name: 'Proposal Generation',
       description: 'Create compelling project proposals',
-      icon: MessageSquare,
+      icon: Mail,
       inputLabel: 'Enter project scope and client info',
       method: 'proposalGeneration'
     },
@@ -97,7 +93,7 @@ export default function AIAgentsOpenAIClaude() {
       id: 'communication',
       name: 'Stakeholder Communication',
       description: 'Tailor messages for different audiences',
-      icon: MessageSquare,
+      icon: Mail,
       inputLabel: 'Enter message and target audience',
       method: 'stakeholderCommunication'
     },
@@ -129,50 +125,8 @@ export default function AIAgentsOpenAIClaude() {
         return;
       }
 
-      let result;
-
-      switch (agent.method) {
-        case 'marketIntelligence':
-          result = await AIAgentService.marketIntelligence(input);
-          break;
-        case 'bidPackageAssembly':
-          result = await AIAgentService.bidPackageAssembly(input);
-          break;
-        case 'proposalGeneration':
-          const [scope, clientInfo] = input.split('|');
-          result = await AIAgentService.proposalGeneration(scope, clientInfo);
-          break;
-        case 'regulatoryIntelligence':
-          const [type, location] = input.split('|');
-          result = await AIAgentService.regulatoryIntelligence(type, location);
-          break;
-        case 'riskPrediction':
-          result = await AIAgentService.riskPrediction(input);
-          break;
-        case 'qualityAssurance':
-          const [phase, specs] = input.split('|');
-          result = await AIAgentService.qualityAssurance(phase, specs);
-          break;
-        case 'safetyCompliance':
-          const [pType, hazards] = input.split('|');
-          result = await AIAgentService.safetyCompliance(pType, hazards);
-          break;
-        case 'sustainabilityOptimization':
-          result = await AIAgentService.sustainabilityOptimization(input);
-          break;
-        case 'stakeholderCommunication':
-          const [msg, audience] = input.split('|');
-          result = await AIAgentService.stakeholderCommunication(msg, audience);
-          break;
-        case 'orchestrateAgents':
-          const agentList = input.split(',').map(a => a.trim());
-          result = await AIAgentService.orchestrateAgents(input, agentList);
-          break;
-        default:
-          result = 'Agent not configured';
-      }
-
-      setResponse(result);
+      // Placeholder response - agent methods not implemented
+      setResponse('Agent functionality coming soon. Configure your API keys and implement agent methods.');
     } catch (error) {
       console.error('Agent error:', error);
       setResponse(`Error: ${error.message}`);
@@ -256,7 +210,7 @@ export default function AIAgentsOpenAIClaude() {
       {/* Agents Grid */}
       <div>
         <h2 className="text-xl font-bold mb-4">10 AI Agents Available</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {agents.map((agent) => (
             <Card
               key={agent.id}
