@@ -1,28 +1,58 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { createPageUrl } from '@/utils';
+import { toast } from 'sonner';
+// Do not import base44 at top level — Base44 can break the app; load dynamically so Dashboard still renders.
+
+// UI Components
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Icons
 import {
-  Briefcase, CheckCircle2, AlertCircle, Zap, Mail, Search, Plus,
-  Clock, DollarSign, Users, FileText, Bot, ChevronRight, Bell, Sparkles,
-  TrendingUp, Activity, MoreVertical, ArrowUpRight, ArrowDownRight
+  Briefcase,
+  FileText,
+  Users,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Calendar,
+  ChevronRight,
+  Plus,
+  ArrowUpRight,
+  MoreHorizontal,
+  Sparkles,
+  Zap,
+  Bot,
+  Bell,
+  CheckCircle2,
+  AlertCircle,
+  Timer,
+  Target,
+  Filter,
+  Search,
+  CalculatorIcon,
+  MessageSquare,
+  LayoutDashboard,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { format } from 'date-fns';
-import { formatDistanceToNow } from 'date-fns';
-import { createPageUrl } from '@/utils';
+
+import { format, formatDistanceToNow, isToday, isTomorrow, isPast } from 'date-fns';
 
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
   },
 };
 
@@ -31,100 +61,196 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.3 },
+    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
 
-// KPI Card Component
-function KPICard(props) {
-  const { title, value, icon: Icon, color, subtitle, trend, onClick } = props;
+const cardHoverVariants = {
+  rest: { scale: 1 },
+  hover: { 
+    scale: 1.02, 
+    y: -4,
+    transition: { duration: 0.2, ease: 'easeOut' }
+  },
+};
 
+function KPICard({ title, value, change, changeType, icon: Icon, color, subtitle, onClick, trend }) {
+  const isPositive = changeType === 'positive';
+  
   return (
-    <motion.div variants={itemVariants} onClick={onClick} className="cursor-pointer">
-      <Card className="premium-card border-none hover:shadow-lg transition-all duration-200">
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between mb-4">
-            <div className={`p-3 rounded-xl ${color} text-white`}>
-              <Icon className="h-6 w-6" />
+    <motion.div variants={itemVariants} whileHover="hover" initial="rest" animate="rest">
+      <motion.div variants={cardHoverVariants}>
+        <Card 
+          className="relative overflow-hidden cursor-pointer group border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-slate-800"
+          onClick={onClick}
+        >
+          <div className={`absolute top-0 right-0 w-40 h-40 opacity-5 rounded-full -translate-y-1/2 translate-x-1/2 ${color}`} />
+          
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</p>
+                  {change && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className={`flex items-center gap-0.5 text-xs ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+                            {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                            <span>{change}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{isPositive ? 'Increased' : 'Decreased'} by {change} vs last month</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{value}</h3>
+                {subtitle && (
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{subtitle}</p>
+                )}
+              </div>
+              <div className={`p-3 rounded-xl ${color} bg-opacity-10 transition-transform group-hover:scale-110`}>
+                <Icon className={`h-6 w-6 ${color.replace('bg-', 'text-')}`} />
+              </div>
             </div>
+            
             {trend !== undefined && (
-              <div className="flex items-center gap-1 text-sm font-semibold text-emerald-600">
-                <TrendingUp className="h-4 w-4" />
-                {trend}%
+              <div className="mt-4">
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-slate-400">Progress</span>
+                  <span className="font-medium text-slate-600 dark:text-slate-300">{trend}%</span>
+                </div>
+                <Progress value={trend} className="h-1.5" />
               </div>
             )}
+          </CardContent>
+        </Card>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function QuickAction({ icon: Icon, label, description, color, onClick, badge }) {
+  return (
+    <motion.button
+      whileHover={{ scale: 1.03, y: -2 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className="flex flex-col items-start gap-3 p-4 rounded-xl bg-white dark:bg-slate-800 shadow-md hover:shadow-lg transition-all duration-300 border border-slate-100 dark:border-slate-700 group text-left w-full"
+    >
+      <div className="flex items-center justify-between w-full">
+        <div className={`p-2.5 rounded-lg ${color} transition-transform group-hover:scale-110 shadow-sm`}>
+          <Icon className="h-5 w-5 text-white" />
+        </div>
+        {badge && (
+          <Badge variant="secondary" className="text-xs">
+            {badge}
+          </Badge>
+        )}
+      </div>
+      <div>
+        <span className="text-sm font-semibold text-slate-900 dark:text-white block">{label}</span>
+        {description && (
+          <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 block">{description}</span>
+        )}
+      </div>
+    </motion.button>
+  );
+}
+
+function ProjectCard({ project, onClick }) {
+  const progress = project.progress || 0;
+  const isOverdue = project.end_date && isPast(new Date(project.end_date)) && project.status !== 'completed';
+  
+  const statusConfig = {
+    in_progress: { label: 'In Progress', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300', icon: Timer },
+    completed: { label: 'Completed', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300', icon: CheckCircle2 },
+    on_hold: { label: 'On Hold', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', icon: AlertCircle },
+    planning: { label: 'Planning', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300', icon: Target },
+  };
+  
+  const status = statusConfig[project.status] || statusConfig.planning;
+  const StatusIcon = status.icon;
+
+  return (
+    <motion.div variants={itemVariants} whileHover={{ y: -4 }}>
+      <Card 
+        className="group cursor-pointer border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-white dark:bg-slate-800 overflow-hidden"
+        onClick={onClick}
+      >
+        <div className={`h-1 w-full ${progress === 100 ? 'bg-emerald-500' : progress > 50 ? 'bg-blue-500' : 'bg-amber-500'}`} />
+        
+        <CardContent className="p-5">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1 min-w-0">
+              <h4 className="font-semibold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {project.name}
+              </h4>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{project.client_name || 'No client assigned'}</p>
+            </div>
+            <Badge className={`${status.color} text-xs font-medium`}>
+              <StatusIcon className="h-3 w-3 mr-1" />
+              {status.label}
+            </Badge>
           </div>
-          <p className="text-sm font-medium text-slate-600 mb-1">{title}</p>
-          <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
-          {subtitle && (
-            <p className="text-xs text-slate-500 mt-2">{subtitle}</p>
-          )}
+          
+          <div className="space-y-3">
+            <div>
+              <div className="flex items-center justify-between text-sm mb-1.5">
+                <span className="text-slate-500 dark:text-slate-400">Progress</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{progress}%</span>
+              </div>
+              <div className="relative">
+                <Progress value={progress} className="h-2" />
+                {progress === 100 && (
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-800" />
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-7 w-7 border-2 border-white dark:border-slate-800">
+                  <AvatarFallback className="text-xs bg-gradient-to-br from-blue-500 to-blue-600 text-white font-medium">
+                    {project.manager?.[0] || 'P'}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{project.manager || 'Unassigned'}</span>
+              </div>
+              <div className={`flex items-center gap-1 text-xs ${isOverdue ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                <Calendar className="h-3 w-3" />
+                {project.end_date ? (
+                  isOverdue ? (
+                    `Overdue by ${formatDistanceToNow(new Date(project.end_date))}`
+                  ) : isToday(new Date(project.end_date)) ? (
+                    'Due today'
+                  ) : isTomorrow(new Date(project.end_date)) ? (
+                    'Due tomorrow'
+                  ) : (
+                    format(new Date(project.end_date), 'MMM d, yyyy')
+                  )
+                ) : (
+                  'No deadline'
+                )}
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </motion.div>
   );
 }
 
-// Quick Action Component
-function QuickAction(props) {
-  const { icon: Icon, label, description, color, onClick, badge } = props;
-
-  return (
-    <motion.div variants={itemVariants}>
-      <button
-        onClick={onClick}
-        className="w-full h-full text-left p-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-200 group"
-      >
-        <div className={`p-3 rounded-lg ${color} text-white w-fit mb-3 group-hover:scale-110 transition-transform`}>
-          <Icon className="h-5 w-5" />
-        </div>
-        <h4 className="font-semibold text-slate-900 text-sm">{label}</h4>
-        <p className="text-xs text-slate-500 mt-1">{description}</p>
-        {badge && (
-          <Badge variant="secondary" className="mt-2 text-xs">
-            {badge}
-          </Badge>
-        )}
-      </button>
-    </motion.div>
-  );
-}
-
-// Project Card Component
-function ProjectCard(props) {
-  const { project, onClick } = props;
-
-  return (
-    <Card className="premium-card cursor-pointer hover:shadow-md transition-all" onClick={onClick}>
-      <CardContent className="p-4">
-        <div className="space-y-2">
-          <h4 className="font-semibold text-slate-900 line-clamp-1">{project.name}</h4>
-          <p className="text-xs text-slate-600">{project.client_name}</p>
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-            <div className="flex items-center gap-1 text-xs text-slate-600">
-              <MoreVertical className="h-3 w-3" />
-              {project.progress}% complete
-            </div>
-            <Badge variant="secondary" className="text-xs capitalize">
-              {project.status}
-            </Badge>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// Activity Item Component
-function ActivityItem(props) {
-  const { activity } = props;
-
+function ActivityItem({ activity }) {
   const iconConfig = {
     bid: { icon: FileText, color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
     project: { icon: Briefcase, color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' },
     task: { icon: CheckCircle2, color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' },
     ai: { icon: Sparkles, color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' },
-    message: { icon: Mail, color: 'bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400' },
+    message: { icon: MessageSquare, color: 'bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400' },
     alert: { icon: AlertCircle, color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
   };
 
@@ -158,6 +284,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [greeting, setGreeting] = useState('');
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     const hour = currentTime.getHours();
@@ -290,7 +417,7 @@ export default function Dashboard() {
             <div className="h-4 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="h-32 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
           ))}
@@ -303,10 +430,33 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-900/50">
+      {/* Top Nav Menu */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10"
+        className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-20"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-transparent border-b border-slate-200 dark:border-slate-700 h-auto p-0 rounded-none">
+              <TabsTrigger value="overview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent gap-2">
+                <LayoutDashboard className="h-4 w-4" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </TabsTrigger>
+              <TabsTrigger value="estimator" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent gap-2">
+                <CalculatorIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">Estimator</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </motion.div>
+
+      {/* Header Section */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-12 sm:top-11 z-10"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -338,13 +488,14 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      <motion.div
+      {/* Tab Content */}
+      {activeTab === 'overview' && <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 sm:px-6 md:px-8 py-4 sm:py-6 space-y-6"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {kpiData.map((kpi, index) => (
             <KPICard key={index} {...kpi} />
           ))}
@@ -359,7 +510,7 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 sm:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 {quickActions.map((action, index) => (
                   <QuickAction key={index} {...action} />
                 ))}
@@ -368,7 +519,7 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           <motion.div variants={itemVariants} className="lg:col-span-2 space-y-4">
             <Card className="border-0 shadow-md bg-white dark:bg-slate-800">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -405,7 +556,7 @@ export default function Dashboard() {
                     <Button onClick={() => navigate(createPageUrl('Projects'))}>Create Project</Button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 gap-4">
                     {activeProjects.slice(0, 4).map((project) => (
                       <ProjectCard 
                         key={project.id} 
@@ -474,7 +625,34 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </motion.div>
-      </motion.div>
+      </motion.div>}
+
+      {/* Estimator Tab */}
+      {activeTab === 'estimator' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 sm:px-6 md:px-8 py-4 sm:py-6"
+        >
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 sm:p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <CalculatorIcon className="h-8 w-8 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Project Estimator</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
+              Use our advanced estimating tool to generate accurate bids from construction plans.
+            </p>
+            <Button 
+              size="lg"
+              className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+              onClick={() => navigate('/estimator')}
+            >
+              <Plus className="h-4 w-4" />
+              Open Estimator
+            </Button>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
