@@ -69,7 +69,7 @@ class ErrorBoundary extends React.Component {
                   Oops! Something went wrong
                 </h1>
                 <p className="text-slate-600 text-sm">
-                  We&apos;ve logged this error and our team will look into it.
+                  We've logged this error and our team will look into it.
                 </p>
               </div>
 
@@ -80,23 +80,6 @@ class ErrorBoundary extends React.Component {
                   {this.state.errorId ?? 'unknown'}
                 </code>
               </div>
-
-              {/* Error Details (development only) */}
-              {typeof process !== 'undefined' && process.env?.NODE_ENV === 'development' && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 overflow-auto max-h-48">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Bug className="h-4 w-4 text-red-600" />
-                    <span className="text-sm font-medium text-red-800">
-                      Development Mode - Error Details
-                    </span>
-                  </div>
-                  <pre className="text-xs text-red-700 whitespace-pre-wrap">
-                    {this.state.error?.toString()}
-                    {'\n\n'}
-                    {this.state.errorInfo?.componentStack}
-                  </pre>
-                </div>
-              )}
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
