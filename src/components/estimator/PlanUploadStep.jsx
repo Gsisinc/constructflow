@@ -125,7 +125,7 @@ export default function PlanUploadStep({ data, onComplete }) {
         <Input
           value={manualScale}
           onChange={(e) => setManualScale(e.target.value)}
-          placeholder="e.g., 1/4 = 1'-0 or 1:100"
+          placeholder='e.g., 1/4 = 1\'-0" or 1:100'
           className="text-lg"
         />
         <p className="text-xs text-slate-500 flex items-center gap-2">

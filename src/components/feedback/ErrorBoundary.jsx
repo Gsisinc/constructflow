@@ -1,17 +1,17 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bug, RefreshCw, Home, AlertTriangle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 import { toast } from 'sonner';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
+    this.state = { 
+      hasError: false, 
+      error: null, 
       errorInfo: null,
-      errorId: null,
+      errorId: null 
     };
   }
 
@@ -20,25 +20,51 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
+    // Generate unique error ID
+    const errorId = `ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
     this.setState({
       error,
       errorInfo,
-      errorId: `ERR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      errorId
     });
 
-    // Log to console and external service
-    console.error('ErrorBoundary caught:', error, errorInfo);
+    // Log error to console
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
 
-    // You could send this to Sentry or another error tracking service
-    // logErrorToService(error, errorInfo, this.state.errorId);
+    // Send error to monitoring service (replace with your service)
+    this.logError(error, errorInfo, errorId);
+
+    // Show toast notification
+    toast.error('Something went wrong', {
+      description: `Error ID: ${errorId}. Our team has been notified.`,
+    });
   }
+
+  logError = (error, errorInfo, errorId) => {
+    // Replace with your error logging service (Sentry, LogRocket, etc.)
+    // Example:
+    // Sentry.captureException(error, {
+    //   extra: { errorInfo, errorId }
+    // });
+    
+    // For now, just log to console
+    console.log('Error logged:', {
+      errorId,
+      error: error?.toString(),
+      componentStack: errorInfo?.componentStack,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    });
+  };
 
   handleReset = () => {
     this.setState({
       hasError: false,
       error: null,
       errorInfo: null,
-      errorId: null,
+      errorId: null
     });
   };
 
@@ -47,39 +73,53 @@ class ErrorBoundary extends React.Component {
   };
 
   handleGoHome = () => {
-    window.location.href = '/';
+    const base = (typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL) ? String(import.meta.env.BASE_URL).replace(/\/$/, '') : '';
+    window.location.href = base ? `${base}/` : '/';
   };
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-4">
-          <Card className="max-w-lg border-red-200 shadow-2xl">
-            <CardContent className="p-8 space-y-6">
-              {/* Error Icon */}
-              <div className="flex justify-center">
-                <div className="p-4 bg-red-100 rounded-full">
-                  <AlertTriangle className="h-8 w-8 text-red-600" />
-                </div>
+        <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
+          <Card className="max-w-lg w-full border-0 shadow-xl">
+            <CardHeader className="text-center pb-2">
+              <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="h-8 w-8 text-red-600" />
               </div>
-
-              {/* Error Message */}
-              <div className="text-center space-y-2">
-                <h1 className="text-2xl font-bold text-slate-900">
-                  Oops! Something went wrong
-                </h1>
-                <p className="text-slate-600 text-sm">
-                  We've logged this error and our team will look into it.
-                </p>
-              </div>
-
+              <CardTitle className="text-2xl font-bold text-slate-900">
+                Oops! Something went wrong
+              </CardTitle>
+              <CardDescription className="text-slate-500">
+                We're sorry for the inconvenience. Our team has been notified.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
               {/* Error ID */}
-              <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                <p className="text-xs font-medium text-slate-500 mb-1">Error ID</p>
+              <div className="bg-slate-100 rounded-lg p-3">
+                <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
+                  Error Reference ID
+                </p>
                 <code className="text-sm font-mono text-slate-700">
                   {this.state.errorId ?? 'unknown'}
                 </code>
               </div>
+
+              {/* Error Details (collapsible in production) */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 overflow-auto max-h-48">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Bug className="h-4 w-4 text-red-600" />
+                    <span className="text-sm font-medium text-red-800">
+                      Development Mode - Error Details
+                    </span>
+                  </div>
+                  <pre className="text-xs text-red-700 whitespace-pre-wrap">
+                    {this.state.error?.toString()}
+                    {'\n\n'}
+                    {this.state.errorInfo?.componentStack}
+                  </pre>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">

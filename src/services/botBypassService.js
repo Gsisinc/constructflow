@@ -23,9 +23,9 @@ const REQUEST_DELAYS = {
 
 // Proxy configuration (optional)
 const PROXY_CONFIG = {
-  enabled: import.meta.env.VITE_PROXY_ENABLED === 'true',
-  url: import.meta.env.VITE_PROXY_URL || null,
-  rotation: import.meta.env.VITE_PROXY_ROTATION === 'true'
+  enabled: import.meta.env.VITE_PROXY_ENABLED === 'true' || process.env.PROXY_ENABLED === 'true',
+  url: import.meta.env.VITE_PROXY_URL || process.env.PROXY_URL || null,
+  rotation: import.meta.env.VITE_PROXY_ROTATION === 'true' || process.env.PROXY_ROTATION === 'true'
 };
 
 // Request tracking for rate limiting

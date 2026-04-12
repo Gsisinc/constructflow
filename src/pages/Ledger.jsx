@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
 import { Account } from "@/entities/Account";
 import { Transaction } from "@/entities/Transaction";
 import { Project } from "@/entities/Project";
@@ -44,11 +43,12 @@ export default function Ledger() {
     const loadData = async () => {
         setLoading(true);
         try {
-            const projectsData = await base44.entities.Company.filter({});
-            setProjects(projectsData);
-            if (projectsData.length > 0) {
-                const companyId = localStorage.getItem('selectedProjectId') || projectsData[0].id;
-                setSelectedProject(projectsData.find(c => c.id === companyId) || projectsData[0]);
+            const user = await User.me();
+            const projectsData = await Company.filter({ created_by: user.email });
+            setProjects(companiesData);
+            if (companiesData.length > 0) {
+                const companyId = localStorage.getItem('selectedProjectId') || companiesData[0].id;
+                setSelectedProject(companiesData.find(c => c.id === companyId) || companiesData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);

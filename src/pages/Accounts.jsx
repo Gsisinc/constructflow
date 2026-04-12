@@ -1,5 +1,5 @@
+
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
 import { Account } from "@/entities/Account";
 import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
@@ -34,10 +34,11 @@ export default function Accounts() {
     const loadData = async () => {
         setLoading(true);
         try {
-            const projectsData = await base44.entities.Company.filter({});
-            setProjects(projectsData);
-            if (projectsData.length > 0) {
-                setSelectedProject(projectsData[0]);
+            const user = await User.me();
+            const projectsData = await Company.filter({ created_by: user.email });
+            setProjects(companiesData);
+            if (companiesData.length > 0) {
+                setSelectedProject(companiesData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);
