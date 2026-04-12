@@ -51,6 +51,7 @@ const primaryNavItems = [
   { name: 'Bids', icon: FileText, page: 'Bids' },
   { name: 'Projects', icon: FolderKanban, page: 'Projects' },
   { name: 'Tasks', icon: FileStack, page: 'TaskTracker' },
+  { name: 'Estimator', icon: DollarSign, page: 'EstimatorWizard' },
 ];
 
 // Secondary navigation items
