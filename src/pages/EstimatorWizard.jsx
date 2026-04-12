@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ChevronRight, ChevronLeft, Upload, Check, AlertCircle, Loader2,
+  ChevronRight, ChevronLeft, Upload, Check, AlertCircle, Loader2, Menu, X,
   LayoutDashboard, Plus, Archive, TrendingUp, FileText, Download, BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ export default function EstimatorWizard() {
   const [activeTab, setActiveTab] = useState('estimator');
   const [currentStep, setCurrentStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [estimateData, setEstimateData] = useState({
     planFile: null,
     planScale: null,
@@ -144,29 +145,14 @@ export default function EstimatorWizard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Top Nav */}
-      <motion.header
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white border-b border-slate-200 px-6 py-4 shadow-sm sticky top-0 z-40"
+    <div className="flex h-screen bg-slate-50">
+      {/* Sidebar */}
+      <motion.aside
+        initial={{ x: -280 }}
+        animate={{ x: sidebarOpen ? 0 : -280 }}
+        className="fixed left-0 top-0 h-full w-72 bg-white border-r border-slate-200 shadow-lg z-50 md:static md:translate-x-0"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-slate-900 text-white flex items-center justify-center font-bold text-sm">G</div>
-            <h1 className="text-xl font-bold text-slate-900">GSIS Estimator</h1>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">K</div>
-        </div>
-      </motion.header>
-
-      {/* Tab Navigation */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="bg-white border-b border-slate-200 px-6 sticky top-16 z-30"
-      >
-        <div className="flex gap-1 overflow-x-auto no-scrollbar">
+        <nav className="p-4 space-y-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -176,45 +162,77 @@ export default function EstimatorWizard() {
                 onClick={() => {
                   setActiveTab(tab.id);
                   if (tab.id === 'estimator') setCurrentStep(0);
+                  setSidebarOpen(false);
                 }}
-                className={`flex items-center gap-2 px-4 py-3 border-b-2 text-sm font-medium transition-colors whitespace-nowrap ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                {tab.label}
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                <span>{tab.label}</span>
               </button>
             );
           })}
-        </div>
-      </motion.div>
+        </nav>
+      </motion.aside>
 
-      {/* Content */}
-      <div className="max-w-6xl mx-auto p-6">
-        <AnimatePresence mode="wait">
-          {activeTab === 'estimator' ? (
-            <motion.div
-              key="estimator"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
+      {/* Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <motion.header
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 hover:bg-slate-100 rounded transition-colors md:hidden"
             >
-              <div>
-                {/* Step Title */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mb-6"
-                >
-                  <h2 className="text-2xl font-bold text-slate-900">{steps[currentStep].title}</h2>
-                  {currentStep === 0 && <p className="text-slate-600 text-sm mt-1">Start by uploading your project plans</p>}
-                </motion.div>
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-slate-900">GSIS Estimator</h1>
+              <p className="text-xs text-slate-500">Low voltage construction estimating</p>
+            </div>
+          </div>
+          <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">K</div>
+        </motion.header>
 
-                {/* Step Content */}
-                <Card className="border-slate-200 mb-6">
+        {/* Content Area */}
+        <div className="flex-1 overflow-hidden flex gap-6 p-6">
+          {/* Left: Main Wizard */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Step Title */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mb-6"
+            >
+              <h2 className="text-2xl font-bold text-slate-900">{steps[currentStep].title}</h2>
+              {currentStep === 0 && <p className="text-slate-600 text-sm mt-1">Start by uploading your project plans</p>}
+            </motion.div>
+
+            {/* Step Content */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="border-slate-200">
                   <CardContent className="p-8">
                     {isProcessing ? (
                       <div className="flex flex-col items-center justify-center py-12 gap-4">
@@ -229,74 +247,125 @@ export default function EstimatorWizard() {
                     )}
                   </CardContent>
                 </Card>
+              </motion.div>
+            </AnimatePresence>
 
-                {/* Navigation */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-between items-center gap-4"
-                >
-                  <Button
-                    variant="outline"
-                    onClick={handlePrevious}
-                    disabled={currentStep === 0 || isProcessing}
-                    className="gap-2"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Back
-                  </Button>
-
-                  <div className="text-sm text-slate-500">
-                    Step {currentStep + 1} of {steps.length}
-                  </div>
-
-                  {currentStep === steps.length - 1 ? (
-                    <Button
-                      onClick={handleFinish}
-                      disabled={isProcessing}
-                      className="gap-2 bg-orange-500 hover:bg-orange-600"
-                    >
-                      {isProcessing ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Check className="w-4 h-4" />
-                          Generate Bids
-                        </>
-                      )}
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1))}
-                      disabled={isProcessing}
-                      className="gap-2"
-                    >
-                      Next
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  )}
-                </motion.div>
-              </div>
-            </motion.div>
-          ) : (
+            {/* Navigation */}
             <motion.div
-              key="other"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
+              className="flex justify-between items-center mt-8 gap-4"
             >
-              <Card className="border-slate-200">
-                <CardContent className="p-12 text-center">
-                  <p className="text-slate-600 text-lg">Coming soon: {tabs.find(t => t.id === activeTab)?.label}</p>
-                </CardContent>
-              </Card>
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentStep === 0 || isProcessing}
+                className="gap-2"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </Button>
+
+              <div className="text-sm text-slate-500">
+                Step {currentStep + 1} of {steps.length}
+              </div>
+
+              {currentStep === steps.length - 1 ? (
+                <Button
+                  onClick={handleFinish}
+                  disabled={isProcessing}
+                  className="gap-2 bg-orange-500 hover:bg-orange-600"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Generate Bids
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1))}
+                  disabled={isProcessing}
+                  className="gap-2"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              )}
             </motion.div>
-          )}
-        </AnimatePresence>
+          </div>
+
+          {/* Right: Summary Panel */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="w-80 overflow-y-auto"
+          >
+            <Card className="border-slate-200 sticky top-0">
+              <CardHeader>
+                <CardTitle className="text-lg">Bid Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Project Info */}
+                {estimateData.projectName && (
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-sm text-slate-900">Hillview Elementary</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Location</span>
+                        <span className="font-medium">Alameda, CA</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Material Markup %</span>
+                        <span className="font-medium">$854,200</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Profit Margin %</span>
+                        <span className="font-medium">$125,800</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Labor Rate</span>
+                        <span className="font-medium">Hourly</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Scopes */}
+                {Object.keys(estimateData.scopes || {}).length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-sm text-slate-900 mb-2">Detected Scopes</h3>
+                    <div className="space-y-2">
+                      {Object.keys(estimateData.scopes).map((scope) => (
+                        <Badge key={scope} variant="secondary" className="text-xs">
+                          {scope}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Export Options */}
+                <div className="pt-4 border-t border-slate-200 space-y-2">
+                  <Button variant="outline" size="sm" className="w-full gap-2">
+                    <Download className="w-4 h-4" />
+                    Generate PDF
+                  </Button>
+                  <Button variant="outline" size="sm" className="w-full gap-2">
+                    <FileText className="w-4 h-4" />
+                    View Report
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
