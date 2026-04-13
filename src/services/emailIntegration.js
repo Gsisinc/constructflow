@@ -203,7 +203,7 @@ export async function sendForSignature(signatureRequest) {
           role: signer.role || 'Signer'
         })),
         documents: [{
-          documentBase64: Buffer.from(content).toString('base64'),
+          documentBase64: btoa(unescape(encodeURIComponent(content))),
           name: title,
           fileExtension: 'pdf',
           documentId: sourceId

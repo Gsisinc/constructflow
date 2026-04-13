@@ -45,10 +45,10 @@ export default function Reports() {
         setLoading(true);
         try {
             const user = await User.me();
-            const projectsData = await Company.filter({ created_by: user.email });
-            setProjects(companiesData);
-            if (companiesData.length > 0) {
-                setSelectedProject(companiesData[0]);
+            const projectsData = await Project.filter({ created_by: user.email });
+            setProjects(projectsData);
+            if (projectsData.length > 0) {
+                setSelectedProject(projectsData[0]);
             }
         } catch (error) {
             console.error("Error loading data:", error);

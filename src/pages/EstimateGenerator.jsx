@@ -43,7 +43,7 @@ export default function EstimateGenerator() {
     setError(null);
 
     try {
-      const apiKey = import.meta.env.VITE_CLAUDE_API_KEY ?? process.env.REACT_APP_CLAUDE_API_KEY;
+      const apiKey = import.meta.env.VITE_CLAUDE_API_KEY;
       
       if (!apiKey) {
         throw new Error('Claude API key not configured. Add VITE_CLAUDE_API_KEY to .env.local and restart the dev server. See Settings → Preferences → API status.');

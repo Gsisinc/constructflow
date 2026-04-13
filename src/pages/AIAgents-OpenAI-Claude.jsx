@@ -19,11 +19,6 @@ export default function AIAgentsOpenAIClaude() {
   const handleSaveKeys = () => {
     localStorage.setItem('openai_api_key', openaiKey);
     localStorage.setItem('claude_api_key', claudeKey);
-    
-    // Set environment variables
-    process.env.REACT_APP_OPENAI_API_KEY = openaiKey;
-    process.env.REACT_APP_CLAUDE_API_KEY = claudeKey;
-    
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -129,47 +124,11 @@ export default function AIAgentsOpenAIClaude() {
         return;
       }
 
-      let result;
+      let result = 'AI Agent service requires configuration. Please use the main AI Agents page.';
 
       switch (agent.method) {
-        case 'marketIntelligence':
-          result = await AIAgentService.marketIntelligence(input);
-          break;
-        case 'bidPackageAssembly':
-          result = await AIAgentService.bidPackageAssembly(input);
-          break;
-        case 'proposalGeneration':
-          const [scope, clientInfo] = input.split('|');
-          result = await AIAgentService.proposalGeneration(scope, clientInfo);
-          break;
-        case 'regulatoryIntelligence':
-          const [type, location] = input.split('|');
-          result = await AIAgentService.regulatoryIntelligence(type, location);
-          break;
-        case 'riskPrediction':
-          result = await AIAgentService.riskPrediction(input);
-          break;
-        case 'qualityAssurance':
-          const [phase, specs] = input.split('|');
-          result = await AIAgentService.qualityAssurance(phase, specs);
-          break;
-        case 'safetyCompliance':
-          const [pType, hazards] = input.split('|');
-          result = await AIAgentService.safetyCompliance(pType, hazards);
-          break;
-        case 'sustainabilityOptimization':
-          result = await AIAgentService.sustainabilityOptimization(input);
-          break;
-        case 'stakeholderCommunication':
-          const [msg, audience] = input.split('|');
-          result = await AIAgentService.stakeholderCommunication(msg, audience);
-          break;
-        case 'orchestrateAgents':
-          const agentList = input.split(',').map(a => a.trim());
-          result = await AIAgentService.orchestrateAgents(input, agentList);
-          break;
         default:
-          result = 'Agent not configured';
+          result = 'AI Agent service requires configuration. Please use the main AI Agents page.';
       }
 
       setResponse(result);
