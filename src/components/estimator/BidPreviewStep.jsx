@@ -22,7 +22,7 @@ export default function BidPreviewStep({ data }) {
   const cableLength = useMemo(() => {
     let total = 0;
     Object.values(data.cables || {}).forEach(scope => {
-      if (scope.totalLF) total += scope.totalLF;
+      if (scope && scope.totalLF) total += parseFloat(scope.totalLF) || 0;
     });
     return total;
   }, [data.cables]);

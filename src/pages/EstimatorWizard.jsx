@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, Component } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Upload, Check, AlertCircle, Loader2 } from 'lucide-react';
@@ -14,6 +14,27 @@ import PricingConfigStep from '@/components/estimator/PricingConfigStep';
 import BidPreviewStep from '@/components/estimator/BidPreviewStep';
 
 const STORAGE_KEY = 'gsis_estimator_draft';
+
+// Step-level error boundary — catches render crashes without killing the whole app
+class StepErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="p-8 text-center space-y-4">
+          <div className="w-16 h-16 mx-auto rounded-full bg-red-100 flex items-center justify-center">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900">Step failed to render</h3>
+          <p className="text-sm text-slate-500">{this.state.error?.message || 'Unknown error'}</p>
+          <Button variant="outline" onClick={() => this.setState({ error: null })}>Try Again</Button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function EstimatorWizard() {
   const navigate = useNavigate();
@@ -108,43 +129,43 @@ export default function EstimatorWizard() {
     setCurrentStep(prev => Math.max(prev - 1, 0));
   };
 
+  const handleReset = () => {
+    try {
+      sessionStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(STORAGE_KEY + '_step');
+    } catch {}
+    setCurrentStep(0);
+    setEstimateData({
+      planFile: null, planScale: null, projectName: '', projectAddress: '',
+      gcName: '', location: 'in-state', specFiles: [], notes: '',
+      symbols: {}, devices: [], scopes: {}, prices: {}, cables: {}, labor: [], materials: [],
+    });
+  };
+
   const handleFinish = async () => {
     try {
       setIsProcessing(true);
 
-      // Generate bid documents for all detected scopes
-      const result = await base44.functions.invoke('generateBidDocuments', {
-        estimateData: {
-          ...estimateData,
-          projectName: estimateData.projectName,
-          projectAddress: estimateData.projectAddress,
-          gcName: estimateData.gcName,
-          location: estimateData.location,
-        },
-      });
-
-      if (result.data.error) {
-        toast.error(`Bid generation failed: ${result.data.error}`);
-        return;
-      }
-
-      toast.success('Bid documents generated successfully!');
-      
-      // Store estimate in database
+      // Save estimate to database
       const estimate = await base44.entities.BidOpportunity.create({
-        title: estimateData.projectName,
+        title: estimateData.projectName || 'Untitled Estimate',
         project_name: estimateData.projectName,
         client_name: estimateData.gcName,
         location: estimateData.projectAddress,
         status: 'estimating',
-        marked_up_plan_url: result.data.markedUpPlanUrl,
-        bid_documents: result.data.bidDocumentUrls,
-        bom_csv_url: result.data.bomCsvUrl,
-        estimate_data_json: JSON.stringify(estimateData),
+        scope_of_work: JSON.stringify({
+          scopes: estimateData.scopes,
+          devices: estimateData.devices,
+          cables: estimateData.cables,
+          prices: estimateData.prices,
+        }),
+        description: estimateData.notes,
       });
 
       toast.success('Estimate saved!');
-      navigate(`/estimate/${estimate.id}`);
+      // Clear draft
+      try { sessionStorage.removeItem(STORAGE_KEY); sessionStorage.removeItem(STORAGE_KEY + '_step'); } catch {}
+      navigate('/Bids');
     } catch (error) {
       toast.error(`Error saving estimate: ${error.message}`);
     } finally {
@@ -219,10 +240,12 @@ export default function EstimatorWizard() {
                     <p className="text-slate-600">Processing your plan...</p>
                   </div>
                 ) : (
+                  <StepErrorBoundary key={currentStep}>
                   <CurrentStepComponent
                     data={estimateData}
                     onComplete={handleStepComplete}
                   />
+                </StepErrorBoundary>
                 )}
               </CardContent>
             </Card>
@@ -245,8 +268,11 @@ export default function EstimatorWizard() {
             Back
           </Button>
 
-          <div className="text-sm text-slate-500">
-            Step {currentStep + 1} of {steps.length}
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-sm text-slate-500">Step {currentStep + 1} of {steps.length}</span>
+            <button onClick={handleReset} className="text-xs text-slate-400 hover:text-red-500 transition-colors underline">
+              Start Over
+            </button>
           </div>
 
           {currentStep === steps.length - 1 ? (

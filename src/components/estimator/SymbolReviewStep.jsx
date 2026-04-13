@@ -63,8 +63,8 @@ export default function SymbolReviewStep({ data, onComplete }) {
             <CardContent className="p-4 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-semibold text-slate-900">{symbolData.name}</p>
-                  <p className="text-xs text-slate-500 mt-1">{symbolData.description}</p>
+                  <p className="font-semibold text-slate-900">{symbolData?.name || symbolId}</p>
+                  {symbolData?.description && <p className="text-xs text-slate-500 mt-1">{symbolData.description}</p>}
                 </div>
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
               </div>
