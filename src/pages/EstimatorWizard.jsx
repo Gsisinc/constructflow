@@ -94,18 +94,27 @@ export default function EstimatorWizard() {
       try {
         let processedData = { symbolMap: {}, detectedDevices: [], detectedScopes: {}, cableRuns: {} };
         try {
-          const result = await base44.functions.invoke('processPlanDocument', {
-            planFileUrl: stepData.planFile.url,
-            manualScale: stepData.planScale,
-            specs: stepData.specFiles || [],
-          });
+          // 45-second timeout so the page never hangs indefinitely
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Processing timed out')), 45000)
+          );
+          const result = await Promise.race([
+            base44.functions.invoke('processPlanDocument', {
+              planFileUrl: stepData.planFile.url,
+              manualScale: stepData.planScale,
+              specs: stepData.specFiles || [],
+            }),
+            timeoutPromise,
+          ]);
           if (result?.data && !result.data.error) {
             processedData = result.data;
           } else if (result?.data?.error) {
             toast.warning(`Plan analysis partial: ${result.data.error}. You can still proceed manually.`);
           }
         } catch (aiError) {
-          toast.warning('Plan analysis had an issue. Proceeding — you can enter symbols manually.');
+          toast.warning(aiError.message === 'Processing timed out'
+            ? 'Plan analysis timed out. Proceeding — you can review symbols manually.'
+            : 'Plan analysis had an issue. Proceeding — you can enter symbols manually.');
         }
 
         setEstimateData(prev => ({
