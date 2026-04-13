@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 export default function SymbolReviewStep({ data, onComplete }) {
   const [symbols, setSymbols] = useState(data.symbols || {});
   const [unknownSymbols, setUnknownSymbols] = useState([]);
-  const [allResolved, setAllResolved] = useState(Object.keys(data.symbols || {}).length > 0);
+  const [allResolved, setAllResolved] = useState(true); // always allow proceeding
 
   const handleResolveSymbol = (symbolId, interpretation) => {
     setSymbols(prev => ({ ...prev, [symbolId]: interpretation }));
@@ -16,10 +16,7 @@ export default function SymbolReviewStep({ data, onComplete }) {
   };
 
   const handleNext = () => {
-    if (Object.keys(symbols).length === 0) {
-      toast.error('No symbols detected. Please ensure the plan is clear and readable.');
-      return;
-    }
+    // Allow proceeding even if no symbols — user may add manually later
     onComplete({ symbols });
   };
 

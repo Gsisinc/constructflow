@@ -92,25 +92,29 @@ export default function EstimatorWizard() {
       // Process plan document (extract scale, detect symbols, devices)
       setIsProcessing(true);
       try {
-        const result = await base44.functions.invoke('processPlanDocument', {
-          planFileUrl: stepData.planFile.url,
-          manualScale: stepData.planScale,
-          specs: stepData.specFiles || [],
-        });
-
-        if (result.data.error) {
-          toast.error(`Plan processing failed: ${result.data.error}`);
-          setIsProcessing(false);
-          return;
+        let processedData = { symbolMap: {}, detectedDevices: [], detectedScopes: {}, cableRuns: {} };
+        try {
+          const result = await base44.functions.invoke('processPlanDocument', {
+            planFileUrl: stepData.planFile.url,
+            manualScale: stepData.planScale,
+            specs: stepData.specFiles || [],
+          });
+          if (result?.data && !result.data.error) {
+            processedData = result.data;
+          } else if (result?.data?.error) {
+            toast.warning(`Plan analysis partial: ${result.data.error}. You can still proceed manually.`);
+          }
+        } catch (aiError) {
+          toast.warning('Plan analysis had an issue. Proceeding — you can enter symbols manually.');
         }
 
         setEstimateData(prev => ({
           ...prev,
           ...stepData,
-          symbols: result.data.symbolMap || {},
-          devices: result.data.detectedDevices || [],
-          scopes: result.data.detectedScopes || {},
-          cables: result.data.cableRuns || {},
+          symbols: processedData.symbolMap || {},
+          devices: processedData.detectedDevices || [],
+          scopes: processedData.detectedScopes || {},
+          cables: processedData.cableRuns || {},
         }));
 
         setCurrentStep(prev => prev + 1);
