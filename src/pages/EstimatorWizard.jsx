@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Upload, Check, AlertCircle, Loader2 } from 'lucide-react';
@@ -13,27 +13,45 @@ import SymbolReviewStep from '@/components/estimator/SymbolReviewStep';
 import PricingConfigStep from '@/components/estimator/PricingConfigStep';
 import BidPreviewStep from '@/components/estimator/BidPreviewStep';
 
+const STORAGE_KEY = 'gsis_estimator_draft';
+
 export default function EstimatorWizard() {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [estimateData, setEstimateData] = useState({
-    planFile: null,
-    planScale: null,
-    projectName: '',
-    projectAddress: '',
-    gcName: '',
-    location: 'in-state',
-    specFiles: [],
-    notes: '',
-    symbols: {}, // Symbol map from legend
-    devices: [], // Detected devices
-    scopes: {}, // Detected scopes
-    prices: {}, // Pricing config
-    cables: {}, // Cable runs by scope
-    labor: {}, // Labor rates
-    materials: [], // Material takeoff
+  const [currentStep, setCurrentStep] = useState(() => {
+    try { return parseInt(sessionStorage.getItem(STORAGE_KEY + '_step') || '0', 10); } catch { return 0; }
   });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [estimateData, setEstimateData] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {
+      planFile: null,
+      planScale: null,
+      projectName: '',
+      projectAddress: '',
+      gcName: '',
+      location: 'in-state',
+      specFiles: [],
+      notes: '',
+      symbols: {},
+      devices: [],
+      scopes: {},
+      prices: {},
+      cables: {},
+      labor: {},
+      materials: [],
+    };
+  });
+
+  // Persist draft to sessionStorage whenever data or step changes
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(estimateData));
+      sessionStorage.setItem(STORAGE_KEY + '_step', String(currentStep));
+    } catch {}
+  }, [estimateData, currentStep]);
 
   const steps = [
     { title: 'Upload Plans', icon: Upload, component: PlanUploadStep },
