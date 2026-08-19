@@ -1,0 +1,85 @@
+{
+  "name": "TrainingCourse",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "level_id": {
+      "type": "string",
+      "description": "Reference to CourseLevel"
+    },
+    "module_number": {
+      "type": "string",
+      "description": "e.g., 1.1, 1.2, 2.3"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string",
+      "description": "Rich HTML/markdown content"
+    },
+    "duration_hours": {
+      "type": "number"
+    },
+    "has_practical_exam": {
+      "type": "boolean",
+      "default": false
+    },
+    "has_written_exam": {
+      "type": "boolean",
+      "default": false
+    },
+    "required_field_hours": {
+      "type": "number",
+      "default": 0
+    },
+    "learning_objectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "sequence_in_level": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "organization_id",
+    "level_id",
+    "title"
+  ]
+}

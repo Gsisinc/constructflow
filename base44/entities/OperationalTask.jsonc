@@ -1,0 +1,95 @@
+{
+  "name": "OperationalTask",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "Organization this task belongs to"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Related project ID"
+    },
+    "bid_id": {
+      "type": "string",
+      "description": "Related bid opportunity ID (if auto-generated)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Task title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed task description"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "bid_analysis",
+        "documentation",
+        "procurement",
+        "scheduling",
+        "safety",
+        "quality",
+        "compliance",
+        "communication",
+        "follow_up",
+        "other"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed",
+        "blocked"
+      ],
+      "default": "pending"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of assigned user"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "completion_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "auto_generated",
+        "manual",
+        "template"
+      ],
+      "description": "How task was created"
+    },
+    "auto_generated_from": {
+      "type": "string",
+      "description": "Template or process that generated this task"
+    }
+  },
+  "required": [
+    "organization_id",
+    "project_id",
+    "title",
+    "category"
+  ]
+}

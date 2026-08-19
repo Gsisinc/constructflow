@@ -1,0 +1,62 @@
+{
+  "name": "VehicleLog",
+  "type": "object",
+  "properties": {
+    "vehicle_id": {
+      "type": "string"
+    },
+    "vehicle_name": {
+      "type": "string"
+    },
+    "driver": {
+      "type": "string"
+    },
+    "log_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "starting_mileage": {
+      "type": "number"
+    },
+    "ending_mileage": {
+      "type": "number"
+    },
+    "total_miles": {
+      "type": "number"
+    },
+    "purpose": {
+      "type": "string",
+      "enum": [
+        "job_site",
+        "material_pickup",
+        "client_meeting",
+        "office",
+        "personal",
+        "other"
+      ]
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "fuel_added": {
+      "type": "number"
+    },
+    "fuel_cost": {
+      "type": "number"
+    },
+    "maintenance_performed": {
+      "type": "string"
+    },
+    "maintenance_cost": {
+      "type": "number"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "vehicle_name",
+    "driver",
+    "log_date"
+  ]
+}

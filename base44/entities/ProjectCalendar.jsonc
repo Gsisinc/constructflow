@@ -1,0 +1,27 @@
+{
+  "name": "ProjectCalendar",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "calendar_name": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string",
+      "default": "#3b82f6"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "calendar_name"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "name": "Material",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "concrete",
+        "steel",
+        "lumber",
+        "electrical",
+        "plumbing",
+        "hvac",
+        "finishing",
+        "equipment",
+        "safety",
+        "other"
+      ]
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit of measurement (e.g., cubic yards, tons, linear feet)"
+    },
+    "unit_price": {
+      "type": "number"
+    },
+    "quantity_in_stock": {
+      "type": "number",
+      "default": 0
+    },
+    "minimum_stock": {
+      "type": "number",
+      "default": 0
+    },
+    "supplier": {
+      "type": "string"
+    },
+    "last_price_update": {
+      "type": "string",
+      "format": "date"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "If allocated to specific project"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "unit"
+  ]
+}

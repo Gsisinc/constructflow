@@ -1,0 +1,163 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "Organization this project belongs to"
+    },
+    "name": {
+      "type": "string"
+    },
+    "client_name": {
+      "type": "string"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Client portal access email"
+    },
+    "project_type": {
+      "type": "string",
+      "enum": [
+        "residential",
+        "commercial",
+        "industrial",
+        "infrastructure",
+        "renovation",
+        "fire_alarm_new_construction",
+        "fire_alarm_tenant_improvement",
+        "fire_alarm_retrofit",
+        "fire_alarm_service_inspection",
+        "fire_alarm_special_hazard",
+        "low_voltage_structured_cabling",
+        "low_voltage_access_control",
+        "low_voltage_cctv",
+        "low_voltage_av",
+        "low_voltage_nurse_call",
+        "isp_fiber_backbone",
+        "isp_fiber_installation",
+        "isp_dark_fiber",
+        "isp_wireless",
+        "isp_underground"
+      ]
+    },
+    "project_subtype": {
+      "type": "string",
+      "description": "Additional subtype detail"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "bidding",
+        "awarded",
+        "planning",
+        "in_progress",
+        "on_hold",
+        "completed",
+        "cancelled"
+      ],
+      "default": "bidding"
+    },
+    "current_phase": {
+      "type": "string",
+      "enum": [
+        "preconstruction",
+        "foundation",
+        "superstructure",
+        "enclosure",
+        "mep_rough",
+        "interior_finishes",
+        "commissioning",
+        "closeout"
+      ],
+      "default": "preconstruction"
+    },
+    "address": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "budget": {
+      "type": "number"
+    },
+    "committed_costs": {
+      "type": "number",
+      "default": 0
+    },
+    "pending_costs": {
+      "type": "number",
+      "default": 0
+    },
+    "spent": {
+      "type": "number",
+      "default": 0
+    },
+    "projected_final_cost": {
+      "type": "number"
+    },
+    "contingency_percent": {
+      "type": "number",
+      "default": 10
+    },
+    "progress": {
+      "type": "number",
+      "default": 0
+    },
+    "health_status": {
+      "type": "string",
+      "enum": [
+        "green",
+        "yellow",
+        "red"
+      ],
+      "default": "green"
+    },
+    "description": {
+      "type": "string"
+    },
+    "project_manager": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "cash_flow_forecast": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string"
+          },
+          "projected_income": {
+            "type": "number"
+          },
+          "projected_expenses": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "name",
+    "client_name",
+    "project_type"
+  ]
+}

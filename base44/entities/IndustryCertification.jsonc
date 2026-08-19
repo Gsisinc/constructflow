@@ -1,0 +1,69 @@
+{
+  "name": "IndustryCertification",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "cert_name": {
+      "type": "string",
+      "description": "e.g., OSHA 10, BICSI Installer 1, NICET I"
+    },
+    "issuing_body": {
+      "type": "string",
+      "description": "e.g., OSHA, BICSI, NICET"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "safety",
+        "cabling",
+        "security",
+        "fire_alarm",
+        "isp",
+        "leadership"
+      ],
+      "description": "Certification category"
+    },
+    "description": {
+      "type": "string"
+    },
+    "cost": {
+      "type": "number",
+      "description": "Estimated cost"
+    },
+    "renewal_years": {
+      "type": "number",
+      "description": "Years before expiration (0 if no renewal needed)"
+    },
+    "required_for_level": {
+      "type": "number",
+      "description": "Which training level requires this"
+    },
+    "target_timeline": {
+      "type": "string",
+      "description": "When should tech earn this (e.g., Week 1, After Level 2)"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Prerequisites or requirements"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "recommended",
+        "optional"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "organization_id",
+    "cert_name",
+    "issuing_body"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "name": "ExamResult",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "course_assignment_id": {
+      "type": "string",
+      "description": "Reference to CourseAssignment"
+    },
+    "technician_email": {
+      "type": "string"
+    },
+    "technician_name": {
+      "type": "string"
+    },
+    "course_id": {
+      "type": "string"
+    },
+    "course_title": {
+      "type": "string"
+    },
+    "module_number": {
+      "type": "string"
+    },
+    "exam_type": {
+      "type": "string",
+      "enum": [
+        "written",
+        "practical"
+      ],
+      "description": "Type of exam"
+    },
+    "exam_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "score": {
+      "type": "number",
+      "description": "Score percentage or Pass/Fail"
+    },
+    "passing_score": {
+      "type": "number",
+      "default": 80,
+      "description": "Minimum score required"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail",
+        "pending"
+      ],
+      "default": "pending"
+    },
+    "examiner_name": {
+      "type": "string"
+    },
+    "examiner_email": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "retake_eligible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Can retake if failed"
+    }
+  },
+  "required": [
+    "organization_id",
+    "technician_email",
+    "exam_type"
+  ]
+}

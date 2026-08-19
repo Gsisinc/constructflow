@@ -1,0 +1,61 @@
+{
+  "name": "ProjectRole",
+  "type": "object",
+  "properties": {
+    "role_name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "permissions": {
+      "type": "object",
+      "properties": {
+        "view_project": {
+          "type": "boolean",
+          "default": true
+        },
+        "edit_project": {
+          "type": "boolean",
+          "default": false
+        },
+        "manage_tasks": {
+          "type": "boolean",
+          "default": false
+        },
+        "approve_change_orders": {
+          "type": "boolean",
+          "default": false
+        },
+        "manage_safety": {
+          "type": "boolean",
+          "default": false
+        },
+        "make_decisions": {
+          "type": "boolean",
+          "default": false
+        },
+        "manage_team": {
+          "type": "boolean",
+          "default": false
+        },
+        "view_financials": {
+          "type": "boolean",
+          "default": false
+        },
+        "approve_expenses": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "is_system_role": {
+      "type": "boolean",
+      "default": false,
+      "description": "System roles cannot be deleted"
+    }
+  },
+  "required": [
+    "role_name"
+  ]
+}

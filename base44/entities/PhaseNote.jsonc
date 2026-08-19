@@ -1,0 +1,51 @@
+{
+  "name": "PhaseNote",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "phase_name": {
+      "type": "string",
+      "enum": [
+        "preconstruction",
+        "foundation",
+        "superstructure",
+        "enclosure",
+        "mep_rough",
+        "interior_finishes",
+        "commissioning",
+        "closeout"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "note_type": {
+      "type": "string",
+      "enum": [
+        "general",
+        "meeting",
+        "inspection",
+        "issue",
+        "decision"
+      ],
+      "default": "general"
+    },
+    "author": {
+      "type": "string"
+    },
+    "is_pinned": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "project_id",
+    "phase_name",
+    "content"
+  ]
+}

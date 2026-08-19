@@ -1,0 +1,80 @@
+{
+  "name": "TemplateLibrary",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "enum": [
+        "contracts",
+        "bid_forms",
+        "safety",
+        "punch_lists",
+        "schedules",
+        "equipment_logs",
+        "rfi_forms",
+        "submittals",
+        "daily_logs",
+        "change_orders",
+        "closeout",
+        "inspection"
+      ],
+      "description": "Template category"
+    },
+    "name": {
+      "type": "string",
+      "description": "Template name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Template description and purpose"
+    },
+    "content": {
+      "type": "string",
+      "description": "Template content/body"
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Template sections with content"
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Dynamic fields to fill in (e.g., [Project Name], [Date], [Contractor])"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "usage_count": {
+      "type": "number",
+      "default": 0
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "category",
+    "name",
+    "content"
+  ]
+}

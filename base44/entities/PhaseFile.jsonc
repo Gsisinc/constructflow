@@ -1,0 +1,39 @@
+{
+  "name": "PhaseFile",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "phase_name": {
+      "type": "string"
+    },
+    "file_name": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "file_type": {
+      "type": "string",
+      "enum": [
+        "photo",
+        "document",
+        "other"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "parent_folder_id": {
+      "type": "string",
+      "description": "ID of the parent folder if file is inside a folder"
+    }
+  },
+  "required": [
+    "project_id",
+    "phase_name",
+    "file_name",
+    "file_url"
+  ]
+}

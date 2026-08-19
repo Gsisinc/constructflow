@@ -1,0 +1,52 @@
+{
+  "name": "CashFlowForecast",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "phase_name": {
+      "type": "string",
+      "enum": [
+        "preconstruction",
+        "foundation",
+        "superstructure",
+        "enclosure",
+        "mep_rough",
+        "interior_finishes",
+        "commissioning",
+        "closeout"
+      ]
+    },
+    "forecast_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "projected_income": {
+      "type": "number",
+      "default": 0
+    },
+    "projected_expenses": {
+      "type": "number",
+      "default": 0
+    },
+    "net_cash_flow": {
+      "type": "number",
+      "default": 0
+    },
+    "cumulative_cash": {
+      "type": "number",
+      "default": 0
+    },
+    "confidence_level": {
+      "type": "number",
+      "default": 0,
+      "description": "Prediction confidence 0-100"
+    }
+  },
+  "required": [
+    "project_id",
+    "phase_name",
+    "forecast_date"
+  ]
+}

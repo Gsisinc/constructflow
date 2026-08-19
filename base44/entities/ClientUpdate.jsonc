@@ -1,0 +1,86 @@
+{
+  "name": "ClientUpdate",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "update_type": {
+      "type": "string",
+      "enum": [
+        "daily_log",
+        "milestone",
+        "photo_update",
+        "video_update",
+        "announcement",
+        "report"
+      ],
+      "default": "daily_log"
+    },
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "posted_by": {
+      "type": "string"
+    },
+    "media_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reactions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    },
+    "comments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "client",
+        "team",
+        "all"
+      ],
+      "default": "all"
+    }
+  },
+  "required": [
+    "project_id",
+    "title",
+    "content"
+  ]
+}

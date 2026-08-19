@@ -1,0 +1,48 @@
+{
+  "name": "AlertThreshold",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "budget",
+        "deadline",
+        "safety",
+        "quality",
+        "custom"
+      ]
+    },
+    "threshold_value": {
+      "type": "number",
+      "description": "The threshold value (percentage, days, etc.)"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "warning",
+        "info"
+      ],
+      "default": "warning"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "name",
+    "type",
+    "threshold_value"
+  ]
+}

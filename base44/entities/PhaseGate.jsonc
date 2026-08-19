@@ -1,0 +1,107 @@
+{
+  "name": "PhaseGate",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "from_phase": {
+      "type": "string",
+      "enum": [
+        "preconstruction",
+        "foundation",
+        "superstructure",
+        "enclosure",
+        "mep_rough",
+        "interior_finishes",
+        "commissioning"
+      ]
+    },
+    "to_phase": {
+      "type": "string",
+      "enum": [
+        "foundation",
+        "superstructure",
+        "enclosure",
+        "mep_rough",
+        "interior_finishes",
+        "commissioning",
+        "closeout"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_review",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "checklist_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "auto_verified": {
+            "type": "boolean"
+          },
+          "completed_date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    },
+    "required_signoffs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "signed": {
+            "type": "boolean"
+          },
+          "signed_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "comments": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "initiated_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "completed_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "from_phase",
+    "to_phase"
+  ]
+}

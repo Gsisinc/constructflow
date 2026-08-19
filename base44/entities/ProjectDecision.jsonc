@@ -1,0 +1,108 @@
+{
+  "name": "ProjectDecision",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "decision_number": {
+      "type": "string",
+      "description": "Auto-generated DEC-XXXX-XXX"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "decision_type": {
+      "type": "string",
+      "enum": [
+        "design",
+        "material",
+        "schedule",
+        "budget",
+        "safety",
+        "quality",
+        "regulatory"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_review",
+        "decided",
+        "implemented",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "requested_by": {
+      "type": "string"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Decision maker"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date"
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "option": {
+            "type": "string"
+          },
+          "pros": {
+            "type": "string"
+          },
+          "cons": {
+            "type": "string"
+          },
+          "cost_impact": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "string",
+      "description": "Final decision made"
+    },
+    "justification": {
+      "type": "string"
+    },
+    "decided_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "impact_assessment": {
+      "type": "string"
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "project_id",
+    "title",
+    "decision_type"
+  ]
+}

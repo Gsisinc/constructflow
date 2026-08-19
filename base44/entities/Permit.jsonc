@@ -1,0 +1,103 @@
+{
+  "name": "Permit",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "permit_type": {
+      "type": "string",
+      "enum": [
+        "building",
+        "electrical",
+        "plumbing",
+        "mechanical",
+        "fire",
+        "demolition",
+        "environmental",
+        "occupancy",
+        "other"
+      ]
+    },
+    "permit_number": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "preparing",
+        "submitted",
+        "under_review",
+        "approved",
+        "rejected",
+        "expired"
+      ],
+      "default": "not_started"
+    },
+    "issuing_authority": {
+      "type": "string"
+    },
+    "application_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "approval_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "inspections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "scheduled_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "passed",
+              "failed",
+              "rescheduled"
+            ]
+          },
+          "inspector": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fees": {
+      "type": "number"
+    },
+    "linked_phase": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "permit_type"
+  ]
+}

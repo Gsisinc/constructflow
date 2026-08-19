@@ -1,0 +1,101 @@
+{
+  "name": "RFI",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "rfi_number": {
+      "type": "string",
+      "description": "RFI number"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "question": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "design",
+        "specification",
+        "schedule",
+        "cost",
+        "safety",
+        "quality",
+        "other"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
+      "default": "medium"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "submitted",
+        "under_review",
+        "answered",
+        "closed"
+      ],
+      "default": "draft"
+    },
+    "submitted_by": {
+      "type": "string"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "directed_to": {
+      "type": "string"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "response": {
+      "type": "string"
+    },
+    "responded_by": {
+      "type": "string"
+    },
+    "response_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "drawing_references": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cost_impact": {
+      "type": "number",
+      "default": 0
+    },
+    "schedule_impact_days": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "project_id",
+    "subject",
+    "question"
+  ]
+}

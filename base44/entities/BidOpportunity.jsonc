@@ -1,0 +1,121 @@
+{
+  "name": "BidOpportunity",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "project_name": {
+      "type": "string",
+      "description": "Name of the project"
+    },
+    "agency": {
+      "type": "string",
+      "description": "Government agency or organization issuing bid"
+    },
+    "source": {
+      "type": "string",
+      "description": "Where the bid opportunity was found"
+    },
+    "url": {
+      "type": "string",
+      "description": "Direct link to the bid posting"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "project_type": {
+      "type": "string",
+      "enum": [
+        "low_voltage",
+        "data_cabling",
+        "security_systems",
+        "av_systems",
+        "fiber_optic",
+        "access_control",
+        "electrical",
+        "hvac",
+        "plumbing",
+        "general_contractor",
+        "other"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "estimated_value": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "closing_soon",
+        "upcoming",
+        "new",
+        "analyzing",
+        "estimating",
+        "submitted",
+        "won",
+        "lost",
+        "declined"
+      ],
+      "default": "new"
+    },
+    "client_name": {
+      "type": "string"
+    },
+    "client_email": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "scope_of_work": {
+      "type": "string"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "win_probability": {
+      "type": "number",
+      "description": "Estimated probability of winning (0-100)"
+    },
+    "ai_analysis": {
+      "type": "object",
+      "properties": {
+        "complexity_score": {
+          "type": "number"
+        },
+        "recommended_markup": {
+          "type": "number"
+        },
+        "risk_factors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "similar_projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

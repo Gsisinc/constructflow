@@ -1,0 +1,80 @@
+{
+  "name": "Submittal",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "submittal_number": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "submittal_type": {
+      "type": "string",
+      "enum": [
+        "shop_drawings",
+        "product_data",
+        "samples",
+        "test_reports",
+        "certificates",
+        "other"
+      ]
+    },
+    "specification_section": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "preparing",
+        "submitted",
+        "under_review",
+        "approved",
+        "approved_as_noted",
+        "revise_and_resubmit",
+        "rejected"
+      ],
+      "default": "preparing"
+    },
+    "submitted_by": {
+      "type": "string"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "required_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "reviewed_by": {
+      "type": "string"
+    },
+    "review_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "review_notes": {
+      "type": "string"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "revision_number": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "project_id",
+    "title"
+  ]
+}

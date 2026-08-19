@@ -1,0 +1,49 @@
+{
+  "name": "PhaseBudget",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "phase_name": {
+      "type": "string",
+      "enum": [
+        "preconstruction",
+        "foundation",
+        "superstructure",
+        "enclosure",
+        "mep_rough",
+        "interior_finishes",
+        "commissioning",
+        "closeout"
+      ]
+    },
+    "budgeted_amount": {
+      "type": "number"
+    },
+    "spent_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "committed_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "is_locked": {
+      "type": "boolean",
+      "default": false
+    },
+    "locked_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "locked_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "phase_name",
+    "budgeted_amount"
+  ]
+}

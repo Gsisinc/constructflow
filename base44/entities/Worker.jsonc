@@ -1,0 +1,106 @@
+{
+  "name": "Worker",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "foreman",
+        "carpenter",
+        "electrician",
+        "plumber",
+        "mason",
+        "welder",
+        "operator",
+        "laborer",
+        "engineer",
+        "supervisor"
+      ]
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "hourly_rate": {
+      "type": "number"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Skills cloud - welding, BIM 360, etc."
+    },
+    "certifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "valid",
+              "expiring_soon",
+              "expired"
+            ]
+          }
+        }
+      }
+    },
+    "equipment_licenses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Forklift, Crane, etc."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "available",
+        "assigned",
+        "on_leave",
+        "inactive"
+      ],
+      "default": "available"
+    },
+    "current_project_id": {
+      "type": "string"
+    },
+    "productivity_score": {
+      "type": "number",
+      "description": "0-100 productivity rating"
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "onboarding_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "company": {
+      "type": "string",
+      "description": "Subcontractor company if applicable"
+    }
+  },
+  "required": [
+    "organization_id",
+    "name",
+    "role"
+  ]
+}

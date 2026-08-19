@@ -1,0 +1,104 @@
+{
+  "name": "WorkOrder",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "wo_number": {
+      "type": "string",
+      "description": "Work Order number"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "work_type": {
+      "type": "string",
+      "enum": [
+        "installation",
+        "repair",
+        "maintenance",
+        "inspection",
+        "emergency",
+        "other"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
+      "default": "medium"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "scheduled",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "assigned_to": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scheduled_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "completion_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "estimated_hours": {
+      "type": "number"
+    },
+    "actual_hours": {
+      "type": "number"
+    },
+    "location": {
+      "type": "string"
+    },
+    "materials_required": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "material": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "completed_by": {
+      "type": "string"
+    },
+    "completion_notes": {
+      "type": "string"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "project_id",
+    "title"
+  ]
+}

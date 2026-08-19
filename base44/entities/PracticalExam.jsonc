@@ -1,0 +1,71 @@
+{
+  "name": "PracticalExam",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "course_id": {
+      "type": "string",
+      "description": "Reference to TrainingCourse"
+    },
+    "module_number": {
+      "type": "string"
+    },
+    "exam_name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "checklist_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "points": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Exam checklist with point values"
+    },
+    "total_points": {
+      "type": "number"
+    },
+    "passing_score": {
+      "type": "number",
+      "default": 85
+    },
+    "time_limit_minutes": {
+      "type": "number"
+    },
+    "equipment_needed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "safety_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "version": {
+      "type": "number",
+      "default": 1
+    }
+  },
+  "required": [
+    "organization_id",
+    "course_id",
+    "exam_name"
+  ]
+}

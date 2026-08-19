@@ -1,0 +1,57 @@
+{
+  "name": "BidDocument",
+  "type": "object",
+  "properties": {
+    "bid_opportunity_id": {
+      "type": "string"
+    },
+    "organization_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "file_type": {
+      "type": "string"
+    },
+    "file_size": {
+      "type": "number"
+    },
+    "ai_processed": {
+      "type": "boolean",
+      "default": false
+    },
+    "extracted_data": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deadlines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "key_points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "bid_opportunity_id",
+    "organization_id",
+    "name",
+    "file_url"
+  ]
+}

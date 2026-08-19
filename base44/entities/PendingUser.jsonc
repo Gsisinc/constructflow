@@ -1,0 +1,53 @@
+{
+  "name": "PendingUser",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "requested_role": {
+      "type": "string",
+      "enum": [
+        "project_manager",
+        "foreman",
+        "team_member",
+        "stakeholder"
+      ],
+      "description": "Role requested by the user"
+    },
+    "company": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string",
+      "description": "Why they want to join"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "reviewed_by": {
+      "type": "string"
+    },
+    "reviewed_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "full_name",
+    "email",
+    "requested_role"
+  ]
+}

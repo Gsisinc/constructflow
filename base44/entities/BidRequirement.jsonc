@@ -1,0 +1,67 @@
+{
+  "name": "BidRequirement",
+  "type": "object",
+  "properties": {
+    "bid_opportunity_id": {
+      "type": "string",
+      "description": "Related bid opportunity"
+    },
+    "organization_id": {
+      "type": "string"
+    },
+    "requirement_text": {
+      "type": "string",
+      "description": "The actual requirement"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "technical",
+        "legal",
+        "financial",
+        "compliance",
+        "timeline",
+        "deliverable",
+        "other"
+      ],
+      "default": "other"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed",
+        "blocked"
+      ],
+      "default": "pending"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of assigned user"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "ai_extracted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this was extracted by AI"
+    }
+  },
+  "required": [
+    "bid_opportunity_id",
+    "organization_id",
+    "requirement_text"
+  ]
+}

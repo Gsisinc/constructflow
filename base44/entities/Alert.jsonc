@@ -1,0 +1,63 @@
+{
+  "name": "Alert",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "overdue",
+        "upcoming",
+        "budget",
+        "issue",
+        "safety",
+        "custom"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "warning",
+        "info"
+      ],
+      "default": "info"
+    },
+    "title": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "reference_id": {
+      "type": "string",
+      "description": "ID of related entity (issue, task, etc.)"
+    },
+    "reference_type": {
+      "type": "string",
+      "description": "Type of related entity"
+    },
+    "dismissed": {
+      "type": "boolean",
+      "default": false
+    },
+    "dismissed_by": {
+      "type": "string"
+    },
+    "dismissed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "organization_id",
+    "type",
+    "severity",
+    "message"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "name": "TrainingScheduleItem",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "week_number": {
+      "type": "number"
+    },
+    "month_number": {
+      "type": "number"
+    },
+    "course_id": {
+      "type": "string"
+    },
+    "course_title": {
+      "type": "string"
+    },
+    "level_number": {
+      "type": "number"
+    },
+    "monday": {
+      "type": "string"
+    },
+    "tuesday": {
+      "type": "string"
+    },
+    "wednesday": {
+      "type": "string"
+    },
+    "thursday": {
+      "type": "string"
+    },
+    "friday": {
+      "type": "string"
+    },
+    "field_hours": {
+      "type": "number",
+      "default": 0
+    },
+    "instructor": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "week_number"
+  ]
+}

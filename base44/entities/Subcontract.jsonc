@@ -1,0 +1,107 @@
+{
+  "name": "Subcontract",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "contract_number": {
+      "type": "string"
+    },
+    "subcontractor": {
+      "type": "string"
+    },
+    "contact_person": {
+      "type": "string"
+    },
+    "trade": {
+      "type": "string",
+      "enum": [
+        "electrical",
+        "plumbing",
+        "hvac",
+        "concrete",
+        "framing",
+        "drywall",
+        "painting",
+        "flooring",
+        "roofing",
+        "landscaping",
+        "other"
+      ]
+    },
+    "scope_of_work": {
+      "type": "string"
+    },
+    "contract_amount": {
+      "type": "number"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "completion_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sent",
+        "signed",
+        "active",
+        "completed",
+        "terminated"
+      ],
+      "default": "draft"
+    },
+    "payment_schedule": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "milestone": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "paid": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "total_paid": {
+      "type": "number",
+      "default": 0
+    },
+    "retention_percent": {
+      "type": "number",
+      "default": 10
+    },
+    "insurance_certificate": {
+      "type": "string"
+    },
+    "insurance_expiry": {
+      "type": "string",
+      "format": "date"
+    },
+    "contract_document": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "subcontractor",
+    "trade"
+  ]
+}

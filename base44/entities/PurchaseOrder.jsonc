@@ -1,0 +1,96 @@
+{
+  "name": "PurchaseOrder",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "po_number": {
+      "type": "string"
+    },
+    "vendor": {
+      "type": "string"
+    },
+    "vendor_contact": {
+      "type": "string"
+    },
+    "po_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "required_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sent",
+        "acknowledged",
+        "partially_received",
+        "received",
+        "cancelled"
+      ],
+      "default": "draft"
+    },
+    "line_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "unit_price": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "cost_code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "subtotal": {
+      "type": "number"
+    },
+    "tax": {
+      "type": "number"
+    },
+    "shipping": {
+      "type": "number"
+    },
+    "total": {
+      "type": "number"
+    },
+    "payment_terms": {
+      "type": "string"
+    },
+    "shipping_address": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "approval_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "project_id",
+    "vendor"
+  ]
+}

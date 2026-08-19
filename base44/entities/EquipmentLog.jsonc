@@ -1,0 +1,69 @@
+{
+  "name": "EquipmentLog",
+  "type": "object",
+  "properties": {
+    "equipment_id": {
+      "type": "string"
+    },
+    "equipment_name": {
+      "type": "string"
+    },
+    "equipment_type": {
+      "type": "string",
+      "enum": [
+        "excavator",
+        "loader",
+        "crane",
+        "forklift",
+        "generator",
+        "compressor",
+        "saw",
+        "drill",
+        "other"
+      ]
+    },
+    "operator": {
+      "type": "string"
+    },
+    "log_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "hours_used": {
+      "type": "number"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "fuel_used": {
+      "type": "number"
+    },
+    "maintenance_performed": {
+      "type": "string"
+    },
+    "maintenance_cost": {
+      "type": "number"
+    },
+    "condition": {
+      "type": "string",
+      "enum": [
+        "excellent",
+        "good",
+        "fair",
+        "needs_repair"
+      ],
+      "default": "good"
+    },
+    "issues_reported": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "equipment_name",
+    "operator",
+    "log_date"
+  ]
+}

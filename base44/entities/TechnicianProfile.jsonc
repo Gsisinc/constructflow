@@ -1,0 +1,101 @@
+{
+  "name": "TechnicianProfile",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "current_level": {
+      "type": "number",
+      "description": "Highest completed level (0-6)"
+    },
+    "current_level_status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "completed",
+        "passed"
+      ],
+      "default": "not_started"
+    },
+    "specializations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "fire_alarm",
+          "low_voltage",
+          "cctv",
+          "access_control",
+          "isp"
+        ]
+      }
+    },
+    "certifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "level": {
+            "type": "number"
+          },
+          "earned_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "valid",
+              "expiring_soon",
+              "expired"
+            ]
+          }
+        }
+      }
+    },
+    "total_field_hours": {
+      "type": "number",
+      "default": 0
+    },
+    "projects_completed": {
+      "type": "number",
+      "default": 0
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "hire_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "employment_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "on_leave",
+        "terminated"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "organization_id",
+    "email",
+    "full_name"
+  ]
+}

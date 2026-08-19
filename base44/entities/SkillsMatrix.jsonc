@@ -1,0 +1,71 @@
+{
+  "name": "SkillsMatrix",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "technician_email": {
+      "type": "string"
+    },
+    "technician_name": {
+      "type": "string"
+    },
+    "skill_name": {
+      "type": "string",
+      "description": "e.g., Copper Termination, Fiber Splicing"
+    },
+    "skill_category": {
+      "type": "string",
+      "enum": [
+        "safety",
+        "cabling",
+        "access_control",
+        "cctv",
+        "fire_alarm",
+        "isp"
+      ],
+      "description": "Skill category"
+    },
+    "self_rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Technician self-assessment (1-5)"
+    },
+    "supervisor_rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Supervisor assessment (1-5)"
+    },
+    "last_assessed": {
+      "type": "string",
+      "format": "date"
+    },
+    "gap_notes": {
+      "type": "string",
+      "description": "Notes on gaps or development areas"
+    },
+    "training_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Formal training completed for this skill"
+    },
+    "field_hours": {
+      "type": "number",
+      "default": 0,
+      "description": "Hours of practice on this skill"
+    },
+    "projects_completed": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of projects using this skill"
+    }
+  },
+  "required": [
+    "organization_id",
+    "technician_email",
+    "skill_name"
+  ]
+}

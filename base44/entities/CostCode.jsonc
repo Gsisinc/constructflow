@@ -1,0 +1,73 @@
+{
+  "name": "CostCode",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "phase_name": {
+      "type": "string",
+      "enum": [
+        "preconstruction",
+        "foundation",
+        "superstructure",
+        "enclosure",
+        "mep_rough",
+        "interior_finishes",
+        "commissioning",
+        "closeout"
+      ]
+    },
+    "code": {
+      "type": "string",
+      "description": "Cost code identifier (e.g., 03-110)"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "labor",
+        "materials",
+        "equipment",
+        "subcontractor",
+        "overhead",
+        "contingency"
+      ]
+    },
+    "budgeted_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "committed_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "spent_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "forecasted_amount": {
+      "type": "number",
+      "default": 0,
+      "description": "AI-predicted final cost"
+    },
+    "risk_score": {
+      "type": "number",
+      "default": 0,
+      "description": "Volatility score 0-100"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "project_id",
+    "phase_name",
+    "code",
+    "description",
+    "category"
+  ]
+}

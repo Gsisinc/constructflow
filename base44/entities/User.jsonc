@@ -1,0 +1,54 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "organization_name": {
+      "type": "string"
+    },
+    "user_role": {
+      "type": "string",
+      "enum": [
+        "owner",
+        "administrator",
+        "project_manager",
+        "team_member",
+        "stakeholder"
+      ],
+      "description": "Organization-level role"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "department": {
+      "type": "string"
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "notifications": {
+          "type": "boolean",
+          "default": true
+        },
+        "email_updates": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  },
+  "required": [
+    "organization_id",
+    "organization_name",
+    "user_role",
+    "phone",
+    "avatar_url",
+    "department",
+    "preferences"
+  ]
+}

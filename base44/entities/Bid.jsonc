@@ -1,0 +1,63 @@
+{
+  "name": "Bid",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "Related project ID"
+    },
+    "rfp_name": {
+      "type": "string",
+      "description": "RFP or bid name"
+    },
+    "client_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "submitted",
+        "under_review",
+        "won",
+        "lost",
+        "withdrawn"
+      ],
+      "default": "draft"
+    },
+    "bid_amount": {
+      "type": "number"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "win_probability": {
+      "type": "number",
+      "description": "Estimated win probability 0-100"
+    },
+    "competitors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "rfp_name",
+    "client_name"
+  ]
+}

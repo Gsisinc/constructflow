@@ -1,0 +1,55 @@
+{
+  "name": "ProjectTeam",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "role_id": {
+      "type": "string",
+      "description": "Reference to ProjectRole"
+    },
+    "role_name": {
+      "type": "string",
+      "description": "Role name for display"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "on_leave"
+      ],
+      "default": "active"
+    },
+    "responsibilities": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "user_email",
+    "user_name",
+    "role_name"
+  ]
+}

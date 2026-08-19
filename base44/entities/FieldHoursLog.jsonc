@@ -1,0 +1,68 @@
+{
+  "name": "FieldHoursLog",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "technician_email": {
+      "type": "string"
+    },
+    "technician_name": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "project_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Reference to Project entity"
+    },
+    "task_type": {
+      "type": "string",
+      "enum": [
+        "rough_in",
+        "termination",
+        "testing",
+        "installation",
+        "troubleshooting",
+        "supervision",
+        "other"
+      ],
+      "description": "Type of field work"
+    },
+    "task_description": {
+      "type": "string"
+    },
+    "hours": {
+      "type": "number"
+    },
+    "module_id": {
+      "type": "string",
+      "description": "Which module this counts toward (e.g., 2.3)"
+    },
+    "supervisor_name": {
+      "type": "string"
+    },
+    "supervisor_email": {
+      "type": "string"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": false
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "technician_email",
+    "date",
+    "hours"
+  ]
+}

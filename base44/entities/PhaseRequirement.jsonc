@@ -1,0 +1,35 @@
+{
+  "name": "PhaseRequirement",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "Reference to Project"
+    },
+    "phase_name": {
+      "type": "string",
+      "description": "Phase name (e.g., 'Bidding & Estimating')"
+    },
+    "requirement_text": {
+      "type": "string",
+      "description": "The requirement text"
+    },
+    "order": {
+      "type": "number",
+      "description": "Order within phase"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "project_id",
+    "phase_name",
+    "requirement_text"
+  ]
+}

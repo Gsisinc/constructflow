@@ -1,0 +1,87 @@
+{
+  "name": "PhaseChangeOrder",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "phase_name": {
+      "type": "string",
+      "enum": [
+        "preconstruction",
+        "foundation",
+        "superstructure",
+        "enclosure",
+        "mep_rough",
+        "interior_finishes",
+        "commissioning",
+        "closeout"
+      ]
+    },
+    "co_number": {
+      "type": "string",
+      "description": "Change order number"
+    },
+    "description": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "design_change",
+        "unforeseen_conditions",
+        "owner_request",
+        "code_requirement",
+        "value_engineering",
+        "error_correction"
+      ]
+    },
+    "cost_impact": {
+      "type": "number"
+    },
+    "schedule_impact_days": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "pending_approval",
+        "approved",
+        "rejected",
+        "implemented"
+      ],
+      "default": "proposed"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "predicted_by_ai": {
+      "type": "boolean",
+      "default": false,
+      "description": "Was this predicted before it occurred"
+    }
+  },
+  "required": [
+    "project_id",
+    "phase_name",
+    "description",
+    "cost_impact"
+  ]
+}

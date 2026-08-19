@@ -1,0 +1,106 @@
+{
+  "name": "DailyLog",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "log_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "weather": {
+      "type": "object",
+      "properties": {
+        "temperature": {
+          "type": "number"
+        },
+        "conditions": {
+          "type": "string"
+        },
+        "precipitation": {
+          "type": "string"
+        }
+      }
+    },
+    "work_performed": {
+      "type": "string"
+    },
+    "crew_on_site": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "hours": {
+            "type": "number"
+          },
+          "trade": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "equipment_used": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "equipment": {
+            "type": "string"
+          },
+          "hours": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "materials_delivered": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "material": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "supplier": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "visitors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "safety_issues": {
+      "type": "string"
+    },
+    "delays": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "submitted_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "log_date"
+  ]
+}

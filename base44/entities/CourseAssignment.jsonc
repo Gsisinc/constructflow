@@ -1,0 +1,75 @@
+{
+  "name": "CourseAssignment",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "technician_email": {
+      "type": "string",
+      "description": "Email of assigned technician"
+    },
+    "technician_name": {
+      "type": "string"
+    },
+    "course_id": {
+      "type": "string",
+      "description": "Reference to TrainingCourse"
+    },
+    "course_title": {
+      "type": "string"
+    },
+    "level_number": {
+      "type": "number"
+    },
+    "assigned_by": {
+      "type": "string",
+      "description": "Email of admin who assigned"
+    },
+    "assigned_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "assigned",
+        "in_progress",
+        "completed",
+        "passed",
+        "failed"
+      ],
+      "default": "assigned"
+    },
+    "completion_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "written_exam_score": {
+      "type": "number"
+    },
+    "practical_exam_score": {
+      "type": "number"
+    },
+    "field_hours_logged": {
+      "type": "number",
+      "default": 0
+    },
+    "notes": {
+      "type": "string"
+    },
+    "supervisor_sign_off": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "organization_id",
+    "technician_email",
+    "course_id"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "name": "Expense",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "labor",
+        "materials",
+        "equipment",
+        "subcontractor",
+        "permits",
+        "overhead",
+        "other"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "vendor": {
+      "type": "string"
+    },
+    "invoice_number": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "paid",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "receipt_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "category",
+    "amount"
+  ]
+}

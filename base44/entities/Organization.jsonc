@@ -1,0 +1,82 @@
+{
+  "name": "Organization",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "primary_color": {
+      "type": "string",
+      "default": "#1e40af"
+    },
+    "secondary_color": {
+      "type": "string",
+      "default": "#3b82f6"
+    },
+    "accent_color": {
+      "type": "string",
+      "default": "#60a5fa"
+    },
+    "industry": {
+      "type": "string",
+      "enum": [
+        "general_contractor",
+        "low_voltage",
+        "electrical",
+        "plumbing",
+        "hvac",
+        "specialty"
+      ],
+      "default": "general_contractor"
+    },
+    "subscription_tier": {
+      "type": "string",
+      "enum": [
+        "free",
+        "starter",
+        "professional",
+        "enterprise"
+      ],
+      "default": "starter"
+    },
+    "owner_email": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "timezone": {
+      "type": "string",
+      "default": "America/New_York"
+    },
+    "date_format": {
+      "type": "string",
+      "default": "MM/dd/yyyy"
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD"
+    },
+    "work_hours_start": {
+      "type": "string",
+      "default": "08:00"
+    },
+    "work_hours_end": {
+      "type": "string",
+      "default": "17:00"
+    }
+  },
+  "required": [
+    "name",
+    "owner_email"
+  ]
+}

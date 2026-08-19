@@ -1,0 +1,84 @@
+{
+  "name": "BidEstimate",
+  "type": "object",
+  "properties": {
+    "bid_opportunity_id": {
+      "type": "string"
+    },
+    "organization_id": {
+      "type": "string"
+    },
+    "line_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "unit_cost": {
+            "type": "number"
+          },
+          "total_cost": {
+            "type": "number"
+          },
+          "category": {
+            "type": "string"
+          },
+          "material_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "labor_hours": {
+      "type": "number"
+    },
+    "labor_rate": {
+      "type": "number"
+    },
+    "labor_cost": {
+      "type": "number"
+    },
+    "material_cost": {
+      "type": "number"
+    },
+    "equipment_cost": {
+      "type": "number"
+    },
+    "subcontractor_cost": {
+      "type": "number"
+    },
+    "overhead_percent": {
+      "type": "number",
+      "default": 15
+    },
+    "profit_margin_percent": {
+      "type": "number",
+      "default": 20
+    },
+    "subtotal": {
+      "type": "number"
+    },
+    "total_bid_amount": {
+      "type": "number"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "version": {
+      "type": "number",
+      "default": 1
+    }
+  },
+  "required": [
+    "bid_opportunity_id",
+    "organization_id"
+  ]
+}

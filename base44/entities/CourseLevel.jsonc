@@ -1,0 +1,47 @@
+{
+  "name": "CourseLevel",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "level_number": {
+      "type": "number",
+      "description": "1-6 certification level"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "duration_weeks": {
+      "type": "number"
+    },
+    "sequence": {
+      "type": "number",
+      "description": "Order in which levels must be completed"
+    },
+    "required_field_hours": {
+      "type": "number"
+    },
+    "required_exam_score": {
+      "type": "number",
+      "default": 80
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "archived"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "organization_id",
+    "level_number",
+    "title"
+  ]
+}
