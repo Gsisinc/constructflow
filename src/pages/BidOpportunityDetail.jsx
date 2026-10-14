@@ -18,13 +18,16 @@ import DrawingDesignerTab from '@/components/bids/DrawingDesignerTab';
 import EstimateEditor from '@/components/bids/EstimateEditor';
 
 const statusColors = {
-  new: 'bg-blue-100 text-blue-800',
-  analyzing: 'bg-purple-100 text-purple-800',
-  estimating: 'bg-yellow-100 text-yellow-800',
+  review: 'bg-blue-100 text-blue-800',
+  intake: 'bg-cyan-100 text-cyan-800',
+  off_pricing: 'bg-amber-100 text-amber-800',
+  user_analyzing: 'bg-purple-100 text-purple-800',
+  estimated: 'bg-indigo-100 text-indigo-800',
   submitted: 'bg-green-100 text-green-800',
   won: 'bg-emerald-100 text-emerald-800',
   lost: 'bg-red-100 text-red-800',
-  declined: 'bg-slate-100 text-slate-800'
+  no_bid: 'bg-slate-100 text-slate-800',
+  closed: 'bg-slate-200 text-slate-700'
 };
 
 export default function BidOpportunityDetail() {
@@ -95,7 +98,14 @@ export default function BidOpportunityDetail() {
         </div>
 
         <div className="flex gap-2">
-          {bid.status === 'won' && <BidToProject bid={bid} organizationId={user.organization_id} />}
+          {bid.linked_project_id ? (
+            <Button onClick={() => navigate(createPageUrl('ProjectDetail') + `?id=${bid.linked_project_id}`)} className="gap-2">
+              <ArrowLeft className="h-4 w-4 rotate-180" />
+              View Project
+            </Button>
+          ) : bid.status === 'won' ? (
+            <BidToProject bid={bid} organizationId={user.organization_id} />
+          ) : null}
           <Button
             variant="outline"
             size="icon"

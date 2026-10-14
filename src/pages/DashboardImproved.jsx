@@ -53,7 +53,7 @@ const PRIORITY_STYLE = {
   medium: 'bg-amber-100 text-amber-700', low: 'bg-slate-100 text-slate-600',
 };
 const ACTIVE_STATUSES = ['awarded', 'in_progress'];
-const PIPELINE_STATUSES = ['new', 'qualified', 'analyzing', 'estimating', 'kemar_review', 'submitted', 'bid_in', 'closing_soon', 'upcoming', 'active'];
+const PIPELINE_STATUSES = ['review', 'intake', 'off_pricing', 'user_analyzing', 'estimated', 'submitted'];
 const OPEN_PO_STATUSES = ['draft', 'sent', 'acknowledged', 'partially_received'];
 
 const fmtMoney = (n) => (n ? '$' + Math.round(n).toLocaleString('en-US') : '$0');

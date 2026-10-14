@@ -676,6 +676,16 @@ Description: ${(opportunity.description || '').slice(0, 2000)}`;
     const [analysis, setAnalysis] = useState(null);
     
     const statusColors = {
+      review: 'bg-blue-100 text-blue-700',
+      intake: 'bg-cyan-100 text-cyan-700',
+      off_pricing: 'bg-amber-100 text-amber-700',
+      user_analyzing: 'bg-purple-100 text-purple-700',
+      estimated: 'bg-indigo-100 text-indigo-700',
+      submitted: 'bg-green-100 text-green-700',
+      won: 'bg-emerald-100 text-emerald-700',
+      lost: 'bg-red-100 text-red-700',
+      no_bid: 'bg-slate-100 text-slate-700',
+      closed: 'bg-slate-200 text-slate-600',
       active: 'bg-green-100 text-green-700',
       upcoming: 'bg-blue-100 text-blue-700',
       closing_soon: 'bg-orange-100 text-orange-700'

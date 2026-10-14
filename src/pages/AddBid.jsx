@@ -801,7 +801,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
         project_type: finalFormData.project_type,
         location: finalFormData.location,
         win_probability: Number(finalFormData.win_probability || 50),
-        status: uploadedFiles.length > 0 ? 'estimating' : 'new',
+        status: uploadedFiles.length > 0 ? 'user_analyzing' : 'review',
         source: 'manual_entry'
       });
       setCreatedBidId(bid.id);

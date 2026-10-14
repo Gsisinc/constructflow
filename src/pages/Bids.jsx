@@ -17,25 +17,25 @@ import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
 import { normalizeBidAnalysis } from '@/lib/bidAnalysis';
 import { getPhaseTemplate } from '../components/projects/projectTemplates';
+import { convertBidToProject } from '@/lib/bidConversion';
 
+// Owner's bid status list (replaces the spec's): Review, Intake, Off Pricing,
+// No Bid, User Analyzing, Estimated — plus Submitted, Won, Lost, Closed so the
+// pipeline still ends somewhere.
 const statusColors = {
-  new: 'bg-blue-100 text-blue-800',
-  analyzing: 'bg-purple-100 text-purple-800',
-  estimating: 'bg-yellow-100 text-yellow-800',
+  review: 'bg-blue-100 text-blue-800',
+  intake: 'bg-cyan-100 text-cyan-800',
+  off_pricing: 'bg-amber-100 text-amber-800',
+  user_analyzing: 'bg-purple-100 text-purple-800',
+  estimated: 'bg-indigo-100 text-indigo-800',
   submitted: 'bg-green-100 text-green-800',
   won: 'bg-emerald-100 text-emerald-800',
   lost: 'bg-red-100 text-red-800',
-  declined: 'bg-slate-100 text-slate-800',
-  closed: 'bg-slate-200 text-slate-700',
-  active: 'bg-blue-100 text-blue-800',
-  closing_soon: 'bg-orange-100 text-orange-800',
-  upcoming: 'bg-cyan-100 text-cyan-800',
-  qualified: 'bg-teal-100 text-teal-800',
-  kemar_review: 'bg-indigo-100 text-indigo-800',
-  bid_in: 'bg-green-100 text-green-800'
+  no_bid: 'bg-slate-100 text-slate-800',
+  closed: 'bg-slate-200 text-slate-700'
 };
 
-const bidStatuses = ['All', 'new', 'qualified', 'analyzing', 'estimating', 'kemar_review', 'submitted', 'bid_in', 'won', 'lost', 'declined', 'closed'];
+const bidStatuses = ['All', 'review', 'intake', 'off_pricing', 'user_analyzing', 'estimated', 'submitted', 'won', 'lost', 'no_bid', 'closed'];
 
 const DIVISIONS = [
   { value: 'fire_alarm', label: 'Fire Alarm' },
@@ -107,22 +107,47 @@ export default function Bids() {
       ...data, 
       organization_id: user.organization_id 
     }),
-    onSuccess: () => {
+    onSuccess: async (bid, data) => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
       setShowDialog(false);
       setEditingBid(null);
       toast.success('Bid saved');
-    }
+      // Auto-create a linked project if a bid is created directly as Won
+      if (data.status === 'won' && bid && !bid.linked_project_id) {
+        try {
+          const res = await convertBidToProject({ base44Client: base44, bid, organizationId: user.organization_id });
+          queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+          queryClient.invalidateQueries({ queryKey: ['projects'] });
+          if (!res.already_exists) toast.success('Awarded — project auto-created');
+        } catch (e) { toast.error('Auto-create project failed: ' + (e.message || '')); }
+      }
+    },
+    onError: (e) => toast.error('Save failed: ' + (e.message || ''))
   });
 
   const updateBidMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.BidOpportunity.update(id, data),
-    onSuccess: () => {
+    onSuccess: async (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
       setShowDialog(false);
       setEditingBid(null);
       toast.success('Bid updated');
-    }
+      // Auto-create a linked project when an edit changes status to Won
+      if (variables.data.status === 'won') {
+        const fresh = (await base44.entities.BidOpportunity.filter({ id: variables.id }))?.[0];
+        if (fresh && !fresh.linked_project_id) {
+          try {
+            const res = await convertBidToProject({ base44Client: base44, bid: fresh, organizationId: user.organization_id });
+            queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+            queryClient.invalidateQueries({ queryKey: ['projects'] });
+            if (!res.already_exists) toast.success('Awarded — project auto-created');
+          } catch (e) { toast.error('Auto-create project failed: ' + (e.message || '')); }
+        }
+      }
+    },
+    onError: (e) => toast.error('Update failed: ' + (e.message || ''))
   });
 
   const deleteBidMutation = useMutation({
@@ -131,7 +156,8 @@ export default function Bids() {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
       queryClient.invalidateQueries({ queryKey: ['bids-all'] });
       toast.success('Bid deleted');
-    }
+    },
+    onError: (e) => toast.error('Delete failed: ' + (e.message || ''))
   });
 
   const tagBidMutation = useMutation({
@@ -139,53 +165,42 @@ export default function Bids() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids-all'] });
       toast.success('Bid status updated');
-    }
+    },
+    onError: (e) => toast.error('Status update failed: ' + (e.message || ''))
   });
 
+  // Manual "Convert to Project" shortcut (optional — Awarded auto-creates too).
+  // Uses the shared helper so it's idempotent and never duplicates a project.
   const convertToProjectMutation = useMutation({
-    mutationFn: async (bid) => {
-      const project = await base44.entities.Project.create({
-        name: bid.title || bid.project_name || 'Converted Project',
-        client_name: bid.client_name || bid.agency || '',
-        project_type: divisionToProjectType(bid.division),
-        address: bid.location || '',
-        budget: bid.estimated_value || 0,
-        description: bid.scope_of_work || bid.description || '',
-        status: 'awarded',
-        organization_id: user.organization_id,
-      });
-
-      // Seed default phases + requirements the same way New Project does
-      const projType = divisionToProjectType(bid.division);
-      const tpl = getPhaseTemplate(projType);
-      const phasesToCreate = tpl.map((p) => ({ ...p, items: p.items.map((it) => ({ text: it, completed: false })) }));
-      const customPhases = phasesToCreate.map((phase, idx) => ({
-        project_id: project.id,
-        phase_name: phase.phase,
-        display_name: phase.phase,
-        order: idx,
-        status: 'pending',
-      }));
-      if (customPhases.length) await base44.entities.CustomPhase.bulkCreate(customPhases);
-      const reqs = [];
-      phasesToCreate.forEach((phase) => phase.items.forEach((item) => {
-        if (item.text.trim()) reqs.push({ project_id: project.id, phase_name: phase.phase, requirement_text: item.text.trim(), status: 'pending' });
-      }));
-      if (reqs.length) await base44.entities.PhaseRequirement.bulkCreate(reqs);
-
-      await base44.entities.BidOpportunity.update(bid.id, {
-        status: 'won',
-        linked_project_id: project.id,
-      });
-      return project;
-    },
-    onSuccess: (project, bid) => {
+    mutationFn: (bid) => convertBidToProject({ base44Client: base44, bid, organizationId: user.organization_id }),
+    onSuccess: (res, bid) => {
       queryClient.invalidateQueries({ queryKey: ['bids-all'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      toast.success('Converted to project');
-      navigate(createPageUrl('ProjectDetail') + `?id=${project.id}`);
-    }
+      toast.success(res.already_exists ? 'Project already exists' : 'Converted to project');
+      navigate(createPageUrl('ProjectDetail') + `?id=${res.id}`);
+    },
+    onError: (e) => toast.error('Convert failed: ' + (e.message || '')),
   });
+
+  // Auto-create a linked Project whenever a bid is marked Won (owner rule).
+  const handleMarkWon = async (bid) => {
+    try {
+      await base44.entities.BidOpportunity.update(bid.id, { status: 'won' });
+      if (!bid.linked_project_id) {
+        const res = await convertBidToProject({ base44Client: base44, bid: { ...bid, status: 'won' }, organizationId: user.organization_id });
+        queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+        queryClient.invalidateQueries({ queryKey: ['projects'] });
+        toast.success(res.already_exists ? 'Project already exists' : 'Awarded — project auto-created');
+        navigate(createPageUrl('ProjectDetail') + `?id=${res.id}`);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+        toast.success('Marked Awarded');
+      }
+    } catch (e) {
+      toast.error('Failed to mark won: ' + (e.message || ''));
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+    }
+  };
 
   const filteredBids = bids.filter((bid) => {
     const matchesStatus = statusFilter === 'All' || bid.status === statusFilter;
@@ -200,7 +215,7 @@ export default function Bids() {
   const stats = {
     total: bids.length,
     won: bids.filter(b => b.status === 'won').length,
-    active: bids.filter(b => ['new', 'analyzing', 'estimating', 'submitted'].includes(b.status)).length,
+    active: bids.filter(b => ['review', 'intake', 'off_pricing', 'user_analyzing', 'estimated', 'submitted'].includes(b.status)).length,
     value: bids.reduce((sum, b) => sum + (b.estimated_value || 0), 0)
   };
 
@@ -377,12 +392,12 @@ export default function Bids() {
                     <div className="flex flex-wrap gap-1.5">
                       <Button size="sm" variant={bid.status === 'submitted' ? 'default' : 'outline'}
                         className={bid.status === 'submitted' ? 'bg-green-600 hover:bg-green-700 h-8 px-3 text-xs' : 'h-8 px-3 text-xs'}
-                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'bid_in' }); }}>
-                        Bid In
+                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'submitted' }); }}>
+                        Submitted
                       </Button>
                       <Button size="sm" variant={bid.status === 'won' ? 'default' : 'outline'}
                         className={bid.status === 'won' ? 'bg-emerald-600 hover:bg-emerald-700 h-8 px-3 text-xs' : 'h-8 px-3 text-xs'}
-                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'won' }); }}>
+                        onClick={(e) => { e.stopPropagation(); handleMarkWon(bid); }}>
                         Awarded
                       </Button>
                       <Button size="sm" variant={bid.status === 'lost' ? 'default' : 'outline'}
@@ -426,7 +441,7 @@ function BidForm({ bid, onSubmit }) {
     division: '',
     lv_domain: '',
     owner_name: '',
-    status: 'new',
+    status: 'review',
     estimated_value: '',
     due_date: '',
     description: '',

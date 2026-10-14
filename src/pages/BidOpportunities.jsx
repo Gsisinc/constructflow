@@ -14,13 +14,16 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 const statusColors = {
-  new: 'bg-blue-100 text-blue-800',
-  analyzing: 'bg-purple-100 text-purple-800',
-  estimating: 'bg-yellow-100 text-yellow-800',
+  review: 'bg-blue-100 text-blue-800',
+  intake: 'bg-cyan-100 text-cyan-800',
+  off_pricing: 'bg-amber-100 text-amber-800',
+  user_analyzing: 'bg-purple-100 text-purple-800',
+  estimated: 'bg-indigo-100 text-indigo-800',
   submitted: 'bg-green-100 text-green-800',
   won: 'bg-emerald-100 text-emerald-800',
   lost: 'bg-red-100 text-red-800',
-  declined: 'bg-slate-100 text-slate-800'
+  no_bid: 'bg-slate-100 text-slate-800',
+  closed: 'bg-slate-200 text-slate-700'
 };
 
 export default function BidOpportunities() {

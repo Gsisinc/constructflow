@@ -38,7 +38,9 @@
         "isp_fiber_installation",
         "isp_dark_fiber",
         "isp_wireless",
-        "isp_underground"
+        "isp_underground",
+        "training",
+        "other"
       ]
     },
     "project_subtype": {
@@ -136,6 +138,10 @@
     },
     "image_url": {
       "type": "string"
+    },
+    "linked_bid_id": {
+      "type": "string",
+      "description": "BidOpportunity this project was awarded from (if bid-originated)"
     },
     "cash_flow_forecast": {
       "type": "array",

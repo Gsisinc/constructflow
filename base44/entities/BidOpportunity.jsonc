@@ -80,22 +80,18 @@
     "status": {
       "type": "string",
       "enum": [
-        "active",
-        "closing_soon",
-        "upcoming",
-        "new",
-        "qualified",
-        "analyzing",
-        "estimating",
-        "kemar_review",
+        "review",
+        "intake",
+        "off_pricing",
+        "no_bid",
+        "user_analyzing",
+        "estimated",
         "submitted",
-        "bid_in",
         "won",
         "lost",
-        "declined",
         "closed"
       ],
-      "default": "new"
+      "default": "review"
     },
     "client_name": {
       "type": "string"
