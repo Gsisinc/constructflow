@@ -33,6 +33,7 @@ import {
   BookOpen,
   Banknote,
   CalendarOff,
+  Plus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -45,47 +46,52 @@ import MegaMenu from '@/components/layout/MegaMenu';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 // import ApiKeyBanner from '@/components/settings/ApiKeyBanner';
 
-// Primary navigation items (shown in sidebar and mobile bottom nav)
-const primaryNavItems = [
-  { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
-  { name: 'Bids', icon: FileText, page: 'Bids' },
-  { name: 'Projects', icon: FolderKanban, page: 'Projects' },
-  { name: 'Tasks', icon: FileStack, page: 'TaskTracker' },
-  { name: 'Estimator', icon: DollarSign, page: 'EstimatorWizard' },
+// Grouped navigation for admin/default users (Kemar's master layout)
+const navGroups = [
+  { items: [
+    { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
+    { name: 'Schedule', icon: Calendar, page: 'Calendar' },
+  ]},
+  { label: 'Sales / Estimating', items: [
+    { name: 'Bids', icon: FileText, page: 'Bids' },
+    { name: 'Add Bid', icon: Plus, page: 'AddBid' },
+    { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
+    { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
+    { name: 'Estimator', icon: DollarSign, page: 'EstimatorWizard' },
+  ]},
+  { label: 'Procurement', items: [
+    { name: 'Purchase Orders', icon: FileText, page: 'PurchaseOrders' },
+    { name: 'Materials', icon: Grid3x3, page: 'Materials' },
+    { name: 'Vendors', icon: Users, page: 'Companies' },
+  ]},
+  { items: [
+    { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+  ]},
+  { label: 'Billing', items: [
+    { name: 'Billing', icon: Banknote, page: 'Billing' },
+    { name: 'Sales Invoices', icon: FileText, page: 'SalesInvoices' },
+    { name: 'Purchase Invoices', icon: FileText, page: 'PurchaseInvoices' },
+    { name: 'Transactions', icon: Banknote, page: 'Transactions' },
+  ]},
 ];
 
-// Secondary navigation items
-const secondaryNavItems = [
-  { name: 'System Builder', icon: Grid3x3, page: 'SystemBuilder' },
-  { name: 'Labor Force', icon: Users, page: 'TeamManagement' },
-  { name: 'Templates', icon: FileText, page: 'TemplateLibrary' },
-  { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
-  { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
-  { name: 'Add Bid', icon: FileText, page: 'AddBid' },
-  { name: 'Time Cards', icon: Clock, page: 'TimeCards' },
-  { name: 'Directory', icon: Users, page: 'Directory' },
-  { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
-  { name: 'PM Guide', icon: FileText, page: 'PMSetupGuide' },
-];
-
-// Financial module navigation items
-const financialNavItems = [
-  { name: 'Financial Dashboard', icon: DollarSign, page: 'FinancialDashboard' },
-  { name: 'Sales Invoices', icon: FileText, page: 'SalesInvoices' },
-  { name: 'Purchase Invoices', icon: FileText, page: 'PurchaseInvoices' },
-  { name: 'Transactions', icon: Banknote, page: 'Transactions' },
-  { name: 'Chart of Accounts', icon: DollarSign, page: 'Accounts' },
-  { name: 'Reports', icon: FileStack, page: 'Reports' },
-  { name: 'Inventory', icon: Grid3x3, page: 'Inventory' },
-  { name: 'Warehouses', icon: Wrench, page: 'Warehouses' },
-];
-
-// All navigation items for backward compatibility
-const navItems = [...primaryNavItems, ...secondaryNavItems, ...financialNavItems, { name: 'Settings', icon: Settings, page: 'Settings' }, { name: 'Role Permissions', icon: Settings, page: 'RolePermissions' }, { name: 'Audit Trail', icon: FileStack, page: 'AuditTrail' }, { name: 'Service Desk', icon: Wrench, page: 'ServiceDesk' }];
-
-const adminNavItems = [
+const settingsAdminItems = [
+  { name: 'Settings', icon: Settings, page: 'Settings' },
+  { name: 'Role Permissions', icon: Settings, page: 'RolePermissions' },
   { name: 'User Approvals', icon: User, page: 'UserApprovals' },
+  { name: 'AI Agents', icon: Bot, page: 'AIAgents' },
+  { name: 'Alerts', icon: AlertTriangle, page: 'AlertSettings' },
+  { name: 'Templates', icon: FileText, page: 'TemplateLibrary' },
+  { name: 'Audit Trail', icon: FileStack, page: 'AuditTrail' },
+  { name: 'Service Desk', icon: Wrench, page: 'ServiceDesk' },
 ];
+
+// Backward-compat flat lists (used by MobileBottomNav / MegaMenu if referenced)
+const primaryNavItems = navGroups.flatMap(g => g.items);
+const secondaryNavItems = navGroups.slice(1).flatMap(g => g.items);
+const financialNavItems = navGroups.find(g => g.label === 'Billing')?.items || [];
+const adminNavItems = settingsAdminItems;
+const navItems = primaryNavItems.concat(settingsAdminItems);
 
 // Technician portal: dashboard + calendar, tasks, time cards, modules, directory, etc.
 const technicianPrimaryNav = [
@@ -154,11 +160,11 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
       className={cn(
         "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px]",
         isActive
-          ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
-          : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+          ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/90 border-l-2 border-[hsl(var(--gold))]"
+          : "text-slate-700 hover:bg-slate-100 hover:text-primary"
       )}
     >
-      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-gray-500")} />
+      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-[hsl(var(--gold))]" : "text-slate-500")} />
       <span className="truncate">{item.name}</span>
     </Link>
   );
@@ -413,7 +419,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Sidebar - on mobile leave room for bottom nav (4rem) so nothing is cut off */}
       <aside className={cn(
-        "fixed top-14 sm:top-16 left-0 bg-amber-50 border-r border-gray-200 shadow-sm z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
+        "fixed top-14 sm:top-16 left-0 bg-white border-r border-slate-200 shadow-sm z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
         "h-[calc(100vh-3.5rem-4rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)]",
         sidebarCollapsed ? "lg:w-20" : "lg:w-64",
         sidebarOpen ? "translate-x-0" : "-translate-x-full",
@@ -443,67 +449,28 @@ export default function Layout({ children, currentPageName }) {
             </>
           ) : (
             <>
-          {/* Primary navigation (admin/default) */}
-          {primaryNavItems.map((item) => (
-            <SidebarNavItem
-              key={item.page}
-              item={item}
-              isActive={currentPageName === item.page}
-              onNavigate={handleNavigateFromSidebar}
-            />
-          ))}
-
-          {/* Divider */}
-          <div className="h-px bg-slate-200 my-2 sm:my-3" />
-
-          {/* Secondary navigation */}
-          <div className="text-xs font-semibold text-slate-400 px-3 py-2 uppercase tracking-widest">
-            Tools
-          </div>
-          {secondaryNavItems.map((item) => (
-            <SidebarNavItem
-              key={item.page}
-              item={item}
-              isActive={currentPageName === item.page}
-              onNavigate={handleNavigateFromSidebar}
-            />
-          ))}
-
-          {/* Settings section */}
-          <div className="h-px bg-slate-200 my-2 sm:my-3" />
-          <div className="text-xs font-semibold text-slate-400 px-3 py-2 uppercase tracking-widest">
-            Settings
-          </div>
-          {[
-            { name: 'Settings', icon: Settings, page: 'Settings' },
-            { name: 'Alerts', icon: AlertTriangle, page: 'AlertSettings' },
-            { name: 'Role Permissions', icon: Settings, page: 'RolePermissions' },
-          ].map((item) => (
-            <SidebarNavItem
-              key={item.page}
-              item={item}
-              isActive={currentPageName === item.page}
-              onNavigate={handleNavigateFromSidebar}
-            />
-          ))}
-
-          {/* Admin section */}
-          {user?.role === 'admin' && (
-            <>
-              <div className="h-px bg-slate-200 my-2 sm:my-3" />
-              <div className="text-xs font-semibold text-slate-400 px-3 py-2 uppercase tracking-widest">
-                Admin
-              </div>
-              {adminNavItems.map((item) => (
-                <SidebarNavItem
-                  key={item.page}
-                  item={item}
-                  isActive={currentPageName === item.page}
-                  onNavigate={handleNavigateFromSidebar}
-                />
+          {navGroups.map((group, gi) => (
+            <React.Fragment key={gi}>
+              {gi > 0 && <div className="h-px bg-slate-200 my-2 sm:my-3" />}
+              {group.label && (
+                <div className="text-xs font-semibold text-slate-400 px-3 py-2 uppercase tracking-widest">
+                  {group.label}
+                </div>
+              )}
+              {group.items.map((item) => (
+                <SidebarNavItem key={item.page} item={item} isActive={currentPageName === item.page} onNavigate={handleNavigateFromSidebar} />
               ))}
-            </>
-          )}
+            </React.Fragment>
+          ))}
+
+          {/* Settings / Admin gear section */}
+          <div className="h-px bg-slate-200 my-2 sm:my-3" />
+          <div className="text-xs font-semibold text-slate-400 px-3 py-2 uppercase tracking-widest flex items-center gap-1.5">
+            <Settings className="h-3.5 w-3.5" /> Admin
+          </div>
+          {settingsAdminItems.map((item) => (
+            <SidebarNavItem key={item.page} item={item} isActive={currentPageName === item.page} onNavigate={handleNavigateFromSidebar} />
+          ))}
             </>
           )}
         </nav>

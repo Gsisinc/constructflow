@@ -1,282 +1,180 @@
-import React, { useState, useEffect } from "react";
-import { Project } from "@/entities/Project";
-import { Account } from "@/entities/Account";
-import { Transaction } from "@/entities/Transaction";
-import { User } from "@/entities/User";
-import { Button } from "@/components/ui/button";
-import {
-    Building2,
-    TrendingUp,
-    TrendingDown,
-    DollarSign,
-    FileText,
-    Calendar,
-    Banknote,
-    MapPin
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import { format } from "date-fns";
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { TrendingUp, TrendingDown, DollarSign, FileText, Banknote, MapPin, BarChart3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
-import StatsCard from "../components/financial-dashboard/StatsCard";
-import RecentTransactions from "../components/financial-dashboard/RecentTransactions";
-import FinancialChart from "../components/financial-dashboard/FinancialChart";
-import CompanyOverview from "../components/financial-dashboard/CompanyOverview";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+const safeNum = (n) => (Number.isFinite(n) ? n : 0);
 
 export default function FinancialDashboard() {
-    const [projects, setProjects] = useState([]);
-    const [selectedProject, setSelectedProject] = useState(null);
-    const [selectedPhase, setSelectedPhase] = useState(null);
-    const [phases, setPhases] = useState([]);
-    const [transactions, setTransactions] = useState([]);
-    const [accounts, setAccounts] = useState([]);
-    const [financialData, setFinancialData] = useState({
-        totalRevenue: 0,
-        totalExpenses: 0,
-        netProfit: 0,
-        totalAssets: 0,
-        cashFlow: 0,
-        budgetUtilization: 0
-    });
-    const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState('all');
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        loadDashboardData();
-    }, []);
+  useEffect(() => { load(); }, []);
 
-    useEffect(() => {
-        if (selectedProject) {
-            loadProjectFinancials();
-        }
-    }, [selectedProject, selectedPhase]);
+  const load = async () => {
+    setLoading(true);
+    try {
+      const [projPage, expPage] = await Promise.all([
+        base44.entities.Project.filter({}, { sort: '-created_date', limit: 200, fields: ['name', 'client_name', 'budget', 'committed_costs', 'spent', 'projected_final_cost', 'status'] }),
+        base44.entities.Expense.filter({}, { sort: '-date', limit: 200, fields: ['project_id', 'amount', 'category', 'status', 'date', 'vendor'] }),
+      ]);
+      setProjects(projPage?.items || []);
+    } catch (e) { console.error('FinancialDashboard load', e); }
+    setLoading(false);
+  };
 
-    const loadDashboardData = async () => {
-        setLoading(true);
-        try {
-            const user = await User.me();
-            // Load projects instead of companies
-            const projectsData = await Project.filter({ created_by: user.email });
-            setProjects(projectsData);
+  if (loading) return <div className="p-8 text-slate-500">Loading financial dashboard…</div>;
 
-            if (projectsData.length > 0) {
-                const project = projectsData[0];
-                setSelectedProject(project);
-                
-                // Load project phases if available
-                if (project.phases && Array.isArray(project.phases)) {
-                    setPhases(project.phases);
-                    if (project.phases.length > 0) {
-                        setSelectedPhase(project.phases[0].id);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error loading dashboard:", error);
-        }
-        setLoading(false);
-    };
+  const selected = selectedProjectId !== 'all' ? projects.find(p => p.id === selectedProjectId) : null;
 
-    const loadProjectFinancials = async () => {
-        try {
-            if (!selectedProject) return;
-
-            const filters = { 
-                project_id: selectedProject.id,
-                status: "Posted"
-            };
-
-            // Add phase filter if selected
-            if (selectedPhase) {
-                filters.phase_id = selectedPhase;
-            }
-
-            const [transactionsData, accountsData] = await Promise.all([
-                Transaction.filter(filters, "-date", 10),
-                Account.filter({ project_id: selectedProject.id, is_active: true })
-            ]);
-
-            setTransactions(transactionsData);
-            setAccounts(accountsData);
-            
-            // Calculate financial metrics for project
-            calculateFinancialMetrics(transactionsData, accountsData, selectedProject);
-        } catch (error) {
-            console.error("Error loading project financials:", error);
-        }
-    };
-
-    const calculateFinancialMetrics = (transactions, accounts, project) => {
-        let totalRevenue = 0;
-        let totalExpenses = 0;
-        let totalAssets = 0;
-        let budgetUtilization = 0;
-
-        // Calculate from accounts
-        accounts.forEach(account => {
-            switch (account.type) {
-                case 'Revenue':
-                    totalRevenue += account.balance || 0;
-                    break;
-                case 'Expenses':
-                    totalExpenses += account.balance || 0;
-                    break;
-                case 'Assets':
-                    totalAssets += account.balance || 0;
-                    break;
-            }
-        });
-
-        // Calculate budget utilization for construction project
-        if (project.budget) {
-            budgetUtilization = (totalExpenses / project.budget) * 100;
-        }
-
-        const netProfit = totalRevenue - totalExpenses;
-        const cashFlow = transactions
-            .filter(t => t.type === 'Receipt' || t.type === 'Payment')
-            .reduce((sum, t) => sum + (t.type === 'Receipt' ? t.total_amount : -t.total_amount), 0);
-
-        setFinancialData({
-            totalRevenue,
-            totalExpenses,
-            netProfit,
-            totalAssets,
-            cashFlow,
-            budgetUtilization
-        });
-    };
-
-    if (loading) {
-        return <div className="p-8">Loading financial dashboard...</div>;
-    }
-
-    return (
-        <div className="space-y-8 p-8">
-            {/* Header with Project Selection */}
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold">Project Financial Dashboard</h1>
-                    <Link to={createPageUrl("Projects")}>
-                        <Button variant="outline">View All Projects</Button>
-                    </Link>
-                </div>
-
-                {/* Project and Phase Selection */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="text-sm font-medium">Select Project</label>
-                        <Select value={selectedProject?.id || ""} onValueChange={(id) => {
-                            const project = projects.find(p => p.id === id);
-                            setSelectedProject(project);
-                        }}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Choose a project" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {projects.map(project => (
-                                    <SelectItem key={project.id} value={project.id}>
-                                        <div className="flex items-center gap-2">
-                                            <MapPin className="w-4 h-4" />
-                                            {project.name}
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    {phases.length > 0 && (
-                        <div>
-                            <label className="text-sm font-medium">Select Phase (Optional)</label>
-                            <Select value={selectedPhase || ""} onValueChange={setSelectedPhase}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="All phases" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="">All Phases</SelectItem>
-                                    {phases.map(phase => (
-                                        <SelectItem key={phase.id} value={phase.id}>
-                                            {phase.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Financial Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <StatsCard
-                    title="Total Revenue"
-                    value={`$${financialData.totalRevenue.toLocaleString()}`}
-                    icon={<TrendingUp className="w-5 h-5" />}
-                    trend="+12%"
-                />
-                <StatsCard
-                    title="Total Expenses"
-                    value={`$${financialData.totalExpenses.toLocaleString()}`}
-                    icon={<TrendingDown className="w-5 h-5" />}
-                    trend="+8%"
-                />
-                <StatsCard
-                    title="Net Profit"
-                    value={`$${financialData.netProfit.toLocaleString()}`}
-                    icon={<DollarSign className="w-5 h-5" />}
-                    trend={financialData.netProfit > 0 ? "+5%" : "-3%"}
-                />
-                <StatsCard
-                    title="Cash Flow"
-                    value={`$${financialData.cashFlow.toLocaleString()}`}
-                    icon={<Banknote className="w-5 h-5" />}
-                    trend="+2%"
-                />
-                <StatsCard
-                    title="Budget Utilization"
-                    value={`${financialData.budgetUtilization.toFixed(1)}%`}
-                    icon={<FileText className="w-5 h-5" />}
-                    trend={financialData.budgetUtilization > 100 ? "Over budget" : "On track"}
-                />
-            </div>
-
-            {/* Charts and Details */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                    <FinancialChart transactions={transactions} />
-                </div>
-                <div>
-                    <CompanyOverview project={selectedProject} financialData={financialData} />
-                </div>
-            </div>
-
-            {/* Recent Transactions */}
-            <div>
-                <RecentTransactions transactions={transactions} />
-            </div>
-
-            {/* Quick Links */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Link to={createPageUrl("SalesInvoices")}>
-                    <Button variant="outline" className="w-full">View Invoices</Button>
-                </Link>
-                <Link to={createPageUrl("Transactions")}>
-                    <Button variant="outline" className="w-full">View Transactions</Button>
-                </Link>
-                <Link to={createPageUrl("Reports")}>
-                    <Button variant="outline" className="w-full">View Reports</Button>
-                </Link>
-                <Link to={createPageUrl("Budget")}>
-                    <Button variant="outline" className="w-full">Budget Tracking</Button>
-                </Link>
-            </div>
+  return (
+    <div className="space-y-6 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Financial Dashboard</h1>
+          <p className="text-sm text-slate-500 mt-1">Project-level financial overview</p>
         </div>
-    );
+        <Link to={createPageUrl('Projects')}><Button variant="outline">View All Projects</Button></Link>
+      </div>
+
+      <div className="max-w-xs">
+        <label className="text-sm font-medium text-slate-600">Project</label>
+        <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+          <SelectTrigger><SelectValue placeholder="All projects" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Projects</SelectItem>
+            {projects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {projects.length === 0 ? (
+        <Card><CardContent className="py-16 text-center text-slate-400">No projects yet. Financials appear once projects and expenses are added.</CardContent></Card>
+      ) : (
+        <ProjectFinancials projectId={selected?.id} project={selected} />
+      )}
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Link to={createPageUrl('Billing')}><Button variant="outline" className="w-full">Billing</Button></Link>
+        <Link to={createPageUrl('JobCosting')}><Button variant="outline" className="w-full">Job Costing</Button></Link>
+        <Link to={createPageUrl('Budget')}><Button variant="outline" className="w-full">Budget</Button></Link>
+        <Link to={createPageUrl('Reports')}><Button variant="outline" className="w-full">Reports</Button></Link>
+      </div>
+    </div>
+  );
+}
+
+export function ProjectFinancials({ projectId, project }) {
+  const [data, setData] = useState({ expenses: [], changeOrders: [], pos: [], subs: [] });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!projectId) { setLoading(false); return; }
+    setLoading(true);
+    (async () => {
+      try {
+        const q = { project_id: projectId };
+        const [exp, co, po, sub] = await Promise.all([
+          base44.entities.Expense.filter(q, { limit: 500, fields: ['amount', 'category', 'status', 'date'] }),
+          base44.entities.ChangeOrder.filter(q, { limit: 200, fields: ['cost_impact', 'status', 'title'] }),
+          base44.entities.PurchaseOrder.filter(q, { limit: 200, fields: ['total', 'amount', 'status'] }).catch(() => ({ items: [] })),
+          base44.entities.Subcontract.filter(q, { limit: 200, fields: ['amount', 'value', 'status'] }).catch(() => ({ items: [] })),
+        ]);
+        setData({
+          expenses: exp?.items || [],
+          changeOrders: co?.items || [],
+          pos: (po?.items) || [],
+          subs: (sub?.items) || [],
+        });
+      } catch (e) { console.error('ProjectFinancials', e); }
+      setLoading(false);
+    })();
+  }, [projectId]);
+
+  const originalBudget = safeNum(project?.budget);
+  const approvedCO = data.changeOrders
+    .filter(c => c.status === 'approved' || c.status === 'executed')
+    .reduce((s, c) => s + safeNum(c.cost_impact), 0);
+  const pendingCO = data.changeOrders
+    .filter(c => c.status === 'pending_review' || c.status === 'client_review' || c.status === 'draft')
+    .reduce((s, c) => s + safeNum(c.cost_impact), 0);
+  const revisedBudget = originalBudget + approvedCO;
+  const committed = [...data.pos, ...data.subs].reduce((s, r) => s + safeNum(r.total || r.amount || r.value), 0);
+  const actual = data.expenses.filter(e => e.status === 'paid' || e.status === 'approved').reduce((s, e) => s + safeNum(e.amount), 0);
+  const costToComplete = safeNum(project?.projected_final_cost) - actual;
+  const eac = actual + committed + costToComplete;
+  const fade = revisedBudget - eac;
+  const overRun = fade < 0;
+
+  const rows = [
+    { label: 'Original Budget (locked estimate)', value: originalBudget, bold: true },
+    { label: 'Approved Change Orders', value: approvedCO },
+    { label: 'Revised Budget', value: revisedBudget, bold: true },
+    { label: 'Committed (POs + Subcontracts)', value: committed },
+    { label: 'Actual to Date', value: actual },
+    { label: 'Cost to Complete (PM entry)', value: costToComplete },
+    { label: 'Estimate at Completion', value: eac, bold: true },
+  ];
+
+  if (loading) return <Card><CardContent className="py-8 text-slate-400">Loading financials…</CardContent></Card>;
+  if (!projectId) return <Card><CardContent className="py-8 text-slate-400">Select a project to view financials.</CardContent></Card>;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <KPI label="Revised Budget" value={fmt(revisedBudget)} icon={DollarSign} tone="slate" />
+        <KPI label="Actual + Committed" value={fmt(actual + committed)} icon={TrendingUp} tone="blue" />
+        <KPI label="Est. at Completion" value={fmt(eac)} icon={BarChart3} tone="amber" />
+        <KPI label="Fade / Variance" value={`${fade < 0 ? '-' : '+'}${fmt(Math.abs(fade))}`} icon={fade < 0 ? TrendingDown : TrendingUp} tone={fade < 0 ? 'red' : 'green'} />
+      </div>
+
+      <Card>
+        <CardHeader><CardTitle className="text-base">Budget Breakdown</CardTitle></CardHeader>
+        <CardContent>
+          <table className="w-full text-sm">
+            <tbody>
+              {rows.map(r => (
+                <tr key={r.label} className={r.bold ? 'border-t-2 border-slate-200 font-semibold' : 'border-b border-slate-100'}>
+                  <td className="py-2.5 text-slate-600">{r.label}</td>
+                  <td className="py-2.5 text-right text-slate-900">{fmt(r.value)}</td>
+                </tr>
+              ))}
+              <tr className="border-t-2 border-slate-200">
+                <td className="py-2.5 font-semibold text-slate-700">Fade / Variance</td>
+                <td className={`py-2.5 text-right font-bold ${overRun ? 'text-red-600' : 'text-green-600'}`}>
+                  {overRun ? 'OVER RUN' : 'ON TRACK'} · {fade < 0 ? '-' : '+'}{fmt(Math.abs(fade))}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          {pendingCO > 0 && (
+            <p className="text-xs text-amber-600 mt-3">⚠ {fmt(pendingCO)} in pending change orders shown as risk only.</p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function KPI({ label, value, icon: Icon, tone }) {
+  const tones = { slate: 'bg-slate-100 text-slate-600', blue: 'bg-blue-100 text-blue-600', amber: 'bg-amber-100 text-amber-600', red: 'bg-red-100 text-red-600', green: 'bg-green-100 text-green-600' };
+  return (
+    <Card><CardContent className="pt-4 pb-3">
+      <div className="flex items-center gap-3">
+        <div className={`p-2 rounded-lg ${tones[tone] || tones.slate}`}><Icon className="h-5 w-5" /></div>
+        <div><p className="text-lg font-bold text-slate-900">{value}</p><p className="text-xs text-slate-500">{label}</p></div>
+      </div>
+    </CardContent></Card>
+  );
+}
+
+function fmt(n) {
+  const v = safeNum(n);
+  if (Math.abs(v) >= 1000) return `$${(v / 1000).toFixed(0)}K`;
+  return `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }

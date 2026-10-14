@@ -6,6 +6,60 @@
       "type": "string",
       "description": "Reference to Organization"
     },
+    "estimate_number": {
+      "type": "string",
+      "description": "Human-readable estimate number (e.g. EST-0001)"
+    },
+    "version": {
+      "type": "number",
+      "default": 1,
+      "description": "Version number; increments on each revision"
+    },
+    "is_current": {
+      "type": "boolean",
+      "default": true,
+      "description": "True for the active version of this bid/job; prior versions are false"
+    },
+    "linked_bid_id": {
+      "type": "string",
+      "description": "BidOpportunity this estimate is for (if bid-originated)"
+    },
+    "linked_project_id": {
+      "type": "string",
+      "description": "Project this estimate is for (if project-originated)"
+    },
+    "division": {
+      "type": "string",
+      "enum": [
+        "fire_alarm",
+        "low_voltage",
+        "drone",
+        "software",
+        "other",
+        ""
+      ],
+      "description": "Division this estimate covers"
+    },
+    "lv_domain": {
+      "type": "string",
+      "enum": [
+        "cameras",
+        "access_control",
+        "structured_cabling",
+        "networking",
+        "av",
+        "monitoring",
+        ""
+      ],
+      "description": "Low-voltage domain"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "Estimator/owner user id"
+    },
+    "owner_name": {
+      "type": "string"
+    },
     "project_name": {
       "type": "string",
       "description": "Project name"
@@ -22,7 +76,8 @@
       "type": "string",
       "enum": [
         "in-state",
-        "out-of-state"
+        "out-of-state",
+        ""
       ],
       "description": "Project location (CA-based or out of state)"
     },
@@ -34,7 +89,8 @@
         "ready_for_bid",
         "submitted",
         "won",
-        "lost"
+        "lost",
+        "archived"
       ],
       "default": "draft",
       "description": "Estimate status"
@@ -62,9 +118,82 @@
       "type": "string",
       "description": "Complete estimate data stored as JSON string for audit trail"
     },
+    "line_items": {
+      "type": "array",
+      "description": "Structured line items (labor, material, sub, etc.)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "unit_price": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "labor_total": {
+      "type": "number",
+      "description": "Total labor cost"
+    },
+    "material_total": {
+      "type": "number",
+      "description": "Total material cost"
+    },
+    "subcontractor_total": {
+      "type": "number"
+    },
+    "equipment_total": {
+      "type": "number"
+    },
+    "overhead_percent": {
+      "type": "number",
+      "default": 0
+    },
+    "overhead_amount": {
+      "type": "number"
+    },
+    "profit_percent": {
+      "type": "number",
+      "default": 0
+    },
+    "profit_amount": {
+      "type": "number"
+    },
+    "contingency_percent": {
+      "type": "number",
+      "default": 0
+    },
+    "contingency_amount": {
+      "type": "number"
+    },
+    "tax_percent": {
+      "type": "number",
+      "default": 0
+    },
+    "tax_amount": {
+      "type": "number"
+    },
+    "subtotal": {
+      "type": "number",
+      "description": "Sum before overhead/profit/tax"
+    },
     "total_bid_amount": {
       "type": "number",
-      "description": "Total bid price across all scopes"
+      "description": "Total bid price across all scopes (grand total)"
     },
     "detected_scopes": {
       "type": "array",
@@ -91,9 +220,6 @@
     }
   },
   "required": [
-    "project_name",
-    "project_address",
-    "gc_name",
-    "location"
+    "project_name"
   ]
 }

@@ -39,6 +39,7 @@ import {
   Target,
   Filter,
   Search,
+  MessageSquare,
 } from 'lucide-react';
 
 import { format, formatDistanceToNow, isToday, isTomorrow, isPast } from 'date-fns';
@@ -447,9 +448,9 @@ export default function Dashboard() {
                   {format(currentTime, 'EEEE, MMMM d')}
                 </span>
               </div>
-              <Button 
-                size="sm" 
-                className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+              <Button
+                size="sm"
+                className="gap-2 bg-primary hover:bg-primary/90 shadow-lg"
                 onClick={() => navigate(createPageUrl('Projects'))}
               >
                 <Plus className="h-4 w-4" />
@@ -562,7 +563,7 @@ export default function Dashboard() {
         </div>
 
         <motion.div variants={itemVariants}>
-          <Card className="border-0 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 text-white overflow-hidden relative">
+          <Card className="border-0 shadow-lg bg-gradient-to-r from-primary to-slate-800 text-white overflow-hidden relative">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
             

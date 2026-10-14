@@ -43,6 +43,30 @@
         "other"
       ]
     },
+    "division": {
+      "type": "string",
+      "enum": [
+        "fire_alarm",
+        "low_voltage",
+        "drone",
+        "software",
+        "other"
+      ],
+      "description": "Primary division this bid belongs to"
+    },
+    "lv_domain": {
+      "type": "string",
+      "enum": [
+        "cameras",
+        "access_control",
+        "structured_cabling",
+        "networking",
+        "av",
+        "monitoring",
+        ""
+      ],
+      "description": "Low-voltage domain (when division is low_voltage)"
+    },
     "description": {
       "type": "string"
     },
@@ -65,7 +89,8 @@
         "submitted",
         "won",
         "lost",
-        "declined"
+        "declined",
+        "closed"
       ],
       "default": "new"
     },
@@ -90,6 +115,31 @@
     "win_probability": {
       "type": "number",
       "description": "Estimated probability of winning (0-100)"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "User who owns/logged this bid"
+    },
+    "owner_name": {
+      "type": "string"
+    },
+    "attachment_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Uploaded bid documents"
+    },
+    "linked_project_id": {
+      "type": "string",
+      "description": "Project created when this bid was awarded"
+    },
+    "linked_estimate_id": {
+      "type": "string",
+      "description": "Current estimate linked to this bid"
+    },
+    "notes": {
+      "type": "string"
     },
     "ai_analysis": {
       "type": "object",

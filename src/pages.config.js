@@ -74,6 +74,7 @@ import BidOpportunities from './pages/BidOpportunities';
 import BidOpportunityDetail from './pages/BidOpportunityDetail';
 import Bids from './pages/Bids';
 import BillApprovals from './pages/BillApprovals';
+import Billing from './pages/Billing';
 import Budget from './pages/Budget';
 import Calendar from './pages/Calendar';
 import CertificationRoadmap from './pages/CertificationRoadmap';
@@ -163,6 +164,7 @@ export const PAGES = {
     "BidOpportunityDetail": BidOpportunityDetail,
     "Bids": Bids,
     "BillApprovals": BillApprovals,
+    "Billing": Billing,
     "Budget": Budget,
     "Accounts": Accounts,
     "Companies": Companies,

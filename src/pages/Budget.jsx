@@ -70,18 +70,18 @@ export default function Budget() {
   const queryClient = useQueryClient();
 
   const { data: expenses = [], isLoading } = useQuery({
-    queryKey: ['expenses'],
-    queryFn: () => base44.entities.Expense.list('-created_date'),
+    queryKey: ['expenses-budget'],
+    queryFn: async () => (await base44.entities.Expense.filter({}, { sort: '-created_date', limit: 500 }))?.items || [],
   });
 
   const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryKey: ['projects-budget'],
+    queryFn: async () => (await base44.entities.Project.filter({}, { sort: '-created_date', limit: 200 }))?.items || [],
   });
 
   const { data: changeOrders = [] } = useQuery({
-    queryKey: ['changeOrders'],
-    queryFn: () => base44.entities.ChangeOrder.list('-created_date'),
+    queryKey: ['changeOrders-budget'],
+    queryFn: async () => (await base44.entities.ChangeOrder.filter({}, { sort: '-created_date', limit: 200 }))?.items || [],
   });
 
   const createMutation = useMutation({

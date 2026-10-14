@@ -25,12 +25,38 @@ const statusColors = {
   won: 'bg-emerald-100 text-emerald-800',
   lost: 'bg-red-100 text-red-800',
   declined: 'bg-slate-100 text-slate-800',
+  closed: 'bg-slate-200 text-slate-700',
   active: 'bg-blue-100 text-blue-800',
   closing_soon: 'bg-orange-100 text-orange-800',
   upcoming: 'bg-cyan-100 text-cyan-800'
 };
 
-const bidStatuses = ['All', 'new', 'analyzing', 'estimating', 'submitted', 'won', 'lost', 'declined'];
+const bidStatuses = ['All', 'new', 'analyzing', 'estimating', 'submitted', 'won', 'lost', 'declined', 'closed'];
+
+const DIVISIONS = [
+  { value: 'fire_alarm', label: 'Fire Alarm' },
+  { value: 'low_voltage', label: 'Low Voltage' },
+  { value: 'drone', label: 'Drone' },
+  { value: 'software', label: 'Software' },
+  { value: 'other', label: 'Other' },
+];
+const LV_DOMAINS = [
+  { value: 'cameras', label: 'Cameras' },
+  { value: 'access_control', label: 'Access Control' },
+  { value: 'structured_cabling', label: 'Structured Cabling' },
+  { value: 'networking', label: 'Networking' },
+  { value: 'av', label: 'AV' },
+  { value: 'monitoring', label: 'Monitoring' },
+];
+
+// Map a bid division to a Project project_type
+const divisionToProjectType = (d) => ({
+  fire_alarm: 'fire_alarm_new_construction',
+  low_voltage: 'low_voltage_structured_cabling',
+  drone: 'other',
+  software: 'other',
+  other: 'other',
+}[d] || 'other');
 
 export default function Bids() {
   const [user, setUser] = useState(null);
@@ -50,22 +76,26 @@ export default function Bids() {
   }, []);
 
   const { data: bids = [], isLoading } = useQuery({
-    queryKey: ['bids', user?.organization_id],
+    queryKey: ['bids-all', user?.organization_id],
     queryFn: async () => {
-      const list = await base44.entities.BidOpportunity.filter({ 
-        organization_id: user.organization_id 
-      });
-      // Filter out demo bids
-      return list.filter(b => 
-        !b.title?.includes('Downtown Plaza') && 
+      // Load every bid visible to this org, including legacy records that have no
+      // organization_id set (the 26 imported bids). An $or keeps org-matched records
+      // and unassigned records, so nothing is hidden by the filter.
+      const orgId = user?.organization_id;
+      const query = orgId
+        ? { $or: [{ organization_id: orgId }, { organization_id: { $in: [null, ''] } }, { organization_id: { $exists: false } }] }
+        : {};
+      const page = await base44.entities.BidOpportunity.filter(query, { sort: '-created_date', limit: 500 });
+      return (page?.items || page || []).filter(b =>
+        !b.title?.includes('Downtown Plaza') &&
         !b.title?.includes('Highway 101') &&
         !b.title?.includes('Springfield') &&
-        !b.project_name?.includes('Downtown Plaza') && 
+        !b.project_name?.includes('Downtown Plaza') &&
         !b.project_name?.includes('Highway 101') &&
         !b.project_name?.includes('Springfield')
       );
     },
-    enabled: !!user?.organization_id
+    enabled: !!user
   });
 
   const createBidMutation = useMutation({
@@ -95,7 +125,41 @@ export default function Bids() {
     mutationFn: (id) => base44.entities.BidOpportunity.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
       toast.success('Bid deleted');
+    }
+  });
+
+  const tagBidMutation = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.BidOpportunity.update(id, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+      toast.success('Bid status updated');
+    }
+  });
+
+  const convertToProjectMutation = useMutation({
+    mutationFn: async (bid) => {
+      const project = await base44.entities.Project.create({
+        name: bid.title || bid.project_name || 'Converted Project',
+        client_name: bid.client_name || bid.agency || '',
+        project_type: divisionToProjectType(bid.division),
+        address: bid.location || '',
+        budget: bid.estimated_value || 0,
+        description: bid.scope_of_work || bid.description || '',
+        status: 'awarded',
+      });
+      await base44.entities.BidOpportunity.update(bid.id, {
+        status: 'won',
+        linked_project_id: project.id,
+      });
+      return project;
+    },
+    onSuccess: (project, bid) => {
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast.success('Converted to project');
+      navigate(createPageUrl('ProjectDetail') + `?id=${project.id}`);
     }
   });
 
@@ -285,31 +349,39 @@ export default function Bids() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 border-t md:border-t-0 pt-4 md:pt-0">
-                    <div className="hidden lg:flex flex-col items-end mr-4">
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Probability</p>
-                      <div className="flex items-center gap-2">
-                        <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-primary" style={{ width: '65%' }} />
-                        </div>
-                        <span className="text-sm font-bold text-slate-900 break-words">65%</span>
-                      </div>
+                  <div className="flex flex-col items-stretch gap-2 border-t md:border-t-0 pt-4 md:pt-0 md:items-end">
+                    <div className="flex flex-wrap gap-1.5">
+                      <Button size="sm" variant={bid.status === 'submitted' ? 'default' : 'outline'}
+                        className={bid.status === 'submitted' ? 'bg-green-600 hover:bg-green-700 h-8 px-3 text-xs' : 'h-8 px-3 text-xs'}
+                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'submitted' }); }}>
+                        Bid In
+                      </Button>
+                      <Button size="sm" variant={bid.status === 'won' ? 'default' : 'outline'}
+                        className={bid.status === 'won' ? 'bg-emerald-600 hover:bg-emerald-700 h-8 px-3 text-xs' : 'h-8 px-3 text-xs'}
+                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'won' }); }}>
+                        Awarded
+                      </Button>
+                      <Button size="sm" variant={bid.status === 'lost' ? 'default' : 'outline'}
+                        className={bid.status === 'lost' ? 'bg-red-600 hover:bg-red-700 h-8 px-3 text-xs' : 'h-8 px-3 text-xs'}
+                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'lost' }); }}>
+                        Lost
+                      </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-12 w-12 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-900 break-words"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingBid(bid);
-                        setShowDialog(true);
-                      }}
-                    >
-                      <Plus className="h-5 w-5" />
-                    </Button>
-                    <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-primary/10 group-hover:text-primary transition-all">
-                      <ChevronRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
-                    </div>
+                    {bid.status === 'won' && !bid.linked_project_id && (
+                      <Button size="sm"
+                        className="h-8 px-3 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                        disabled={convertToProjectMutation.isPending}
+                        onClick={(e) => { e.stopPropagation(); convertToProjectMutation.mutate(bid); }}>
+                        {convertToProjectMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />}
+                        Convert to Project
+                      </Button>
+                    )}
+                    {bid.linked_project_id && (
+                      <Button size="sm" variant="ghost" className="h-8 px-3 text-xs text-emerald-600"
+                        onClick={(e) => { e.stopPropagation(); navigate(createPageUrl('ProjectDetail') + `?id=${bid.linked_project_id}`); }}>
+                        View Project
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -327,6 +399,9 @@ function BidForm({ bid, onSubmit }) {
     project_name: '',
     client_name: '',
     agency: '',
+    division: '',
+    lv_domain: '',
+    owner_name: '',
     status: 'new',
     estimated_value: '',
     due_date: '',
@@ -570,6 +645,39 @@ function BidForm({ bid, onSubmit }) {
           />
         </div>
       </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-semibold">Division</label>
+          <select
+            value={formData.division || ''}
+            onChange={(e) => setFormData({ ...formData, division: e.target.value })}
+            className="w-full border rounded p-2"
+          >
+            <option value="">— Select —</option>
+            {DIVISIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="text-sm font-semibold">LV Domain</label>
+          <select
+            value={formData.lv_domain || ''}
+            onChange={(e) => setFormData({ ...formData, lv_domain: e.target.value })}
+            className="w-full border rounded p-2"
+            disabled={formData.division !== 'low_voltage'}
+          >
+            <option value="">— Select —</option>
+            {LV_DOMAINS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label className="text-sm font-semibold">Owner</label>
+        <Input
+          value={formData.owner_name || ''}
+          onChange={(e) => setFormData({ ...formData, owner_name: e.target.value })}
+          placeholder="Who is responsible for this bid"
+        />
+      </div>
       <div>
         <label className="text-sm font-semibold">Location</label>
         <Input
@@ -584,6 +692,15 @@ function BidForm({ bid, onSubmit }) {
           value={formData.url}
           onChange={(e) => setFormData({ ...formData, url: e.target.value })}
           placeholder="https://..."
+        />
+      </div>
+      <div>
+        <label className="text-sm font-semibold">Notes</label>
+        <Textarea
+          value={formData.notes || ''}
+          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+          placeholder="Internal notes..."
+          className="h-20"
         />
       </div>
       </div>
