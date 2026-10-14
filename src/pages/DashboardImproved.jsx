@@ -1,361 +1,383 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { motion } from 'framer-motion';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
-import {
-  TrendingUp,
-  DollarSign,
-  Users,
-  Clock,
-  AlertCircle,
-  CheckCircle,
-  MessageSquare,
-  Calendar,
-  Zap,
-  Target,
-  Award,
-  Activity,
+  HardHat,
+  FileText,
+  Wallet,
+  AlertTriangle,
+  ShoppingCart,
+  CalendarClock,
+  Briefcase,
+  Receipt,
   ChevronRight,
-  ArrowUp,
-  ArrowDown,
-  FolderKanban,
-  BarChart3,
+  Plus,
   Flag,
+  Inbox,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { format } from 'date-fns';
+import { format, isWithinInterval, addDays, startOfDay } from 'date-fns';
 
-// KPI Card Component
-const KPICard = ({ title, value, change, icon: Icon, color, trend }) => (
-  <motion.div whileHover={{ y: -4 }} className="h-full">
-    <Card className="premium-card border-none">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className={`p-3 rounded-lg ${color}`}>
-            <Icon className="h-6 w-6 text-white" />
-          </div>
-          {change !== undefined && (
-            <div className={`flex items-center gap-1 text-sm font-semibold ${trend === 'up' ? 'text-emerald-600' : 'text-red-600'}`}>
-              {trend === 'up' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-              {change}%
-            </div>
-          )}
-        </div>
-        <p className="text-sm text-slate-500 font-medium">{title}</p>
-        <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">{value}</p>
-      </CardContent>
-    </Card>
-  </motion.div>
-);
+const NAVY = '#0F1B2D';
+const GOLD = '#E8B547';
 
-// Quick Action Button
-const QuickAction = ({ icon: Icon, label, description, onClick }) => (
-  <motion.button
-    whileHover={{ scale: 1.05 }}
-    onClick={onClick}
-    className="w-full h-full text-left p-6 rounded-xl bg-white border border-slate-200 hover:border-primary hover:shadow-lg transition-all"
-  >
-    <div className={`h-12 w-12 rounded-lg flex items-center justify-center mb-3 bg-blue-50 text-blue-600`}>
-      <Icon className="h-6 w-6" />
-    </div>
-    <p className="font-bold text-slate-900">{label}</p>
-    <p className="text-xs text-slate-500 mt-1">{description}</p>
-  </motion.button>
-);
+const PROJECT_TYPE_LABELS = {
+  residential: 'Residential', commercial: 'Commercial', industrial: 'Industrial',
+  infrastructure: 'Infrastructure', renovation: 'Renovation',
+  fire_alarm_new_construction: 'Fire Alarm — New', fire_alarm_tenant_improvement: 'Fire Alarm — TI',
+  fire_alarm_retrofit: 'Fire Alarm — Retrofit', fire_alarm_service_inspection: 'Fire Alarm — Service',
+  fire_alarm_special_hazard: 'Fire Alarm — Special Hazard',
+  low_voltage_structured_cabling: 'Structured Cabling', low_voltage_access_control: 'Access Control',
+  low_voltage_cctv: 'CCTV', low_voltage_av: 'AV Systems', low_voltage_nurse_call: 'Nurse Call',
+  isp_fiber_backbone: 'Fiber Backbone', isp_fiber_installation: 'Fiber Installation',
+  isp_dark_fiber: 'Dark Fiber', isp_wireless: 'Wireless', isp_underground: 'Underground',
+};
+const PHASE_LABELS = {
+  preconstruction: 'Preconstruction', foundation: 'Foundation', superstructure: 'Superstructure',
+  enclosure: 'Enclosure', mep_rough: 'MEP Rough-in', interior_finishes: 'Interior Finishes',
+  commissioning: 'Commissioning', closeout: 'Closeout',
+};
+const PO_STATUS_STYLE = {
+  draft: 'bg-slate-100 text-slate-600', sent: 'bg-blue-100 text-blue-700',
+  acknowledged: 'bg-indigo-100 text-indigo-700', partially_received: 'bg-amber-100 text-amber-700',
+  received: 'bg-emerald-100 text-emerald-700', cancelled: 'bg-red-100 text-red-700',
+};
+const PRIORITY_STYLE = {
+  critical: 'bg-red-100 text-red-700', high: 'bg-orange-100 text-orange-700',
+  medium: 'bg-amber-100 text-amber-700', low: 'bg-slate-100 text-slate-600',
+};
+const ACTIVE_STATUSES = ['awarded', 'in_progress'];
+const PIPELINE_STATUSES = ['new', 'qualified', 'analyzing', 'estimating', 'kemar_review', 'submitted', 'bid_in', 'closing_soon', 'upcoming', 'active'];
+const OPEN_PO_STATUSES = ['draft', 'sent', 'acknowledged', 'partially_received'];
 
-// Project Card Component
-const ProjectCard = ({ project, onClick }) => (
-  <motion.div whileHover={{ y: -2 }} onClick={onClick} className="cursor-pointer">
-    <Card className="premium-card border-none group">
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          <div>
-            <div className="flex items-start justify-between mb-2">
-              <h3 className="font-bold text-lg text-slate-900 group-hover:text-primary transition-colors line-clamp-2">
-                {project.name}
-              </h3>
-              <Badge className={`${project.health_status === 'green' ? 'bg-emerald-100 text-emerald-800' : project.health_status === 'yellow' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'} capitalize`}>
-                {project.health_status || 'green'}
-              </Badge>
-            </div>
-            <p className="text-sm text-slate-500">{project.client_name}</p>
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600 font-medium">Progress</span>
-              <span className="font-bold text-slate-900">{project.progress || 0}%</span>
-            </div>
-            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full" style={{ width: `${project.progress || 0}%` }} />
-            </div>
-          </div>
-          <div className="flex items-center justify-between text-xs text-slate-500">
-            <span>{project.current_phase || 'Planning'}</span>
-            <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+const fmtMoney = (n) => (n ? '$' + Math.round(n).toLocaleString('en-US') : '$0');
+const fmtCompact = (n) => {
+  if (!n) return '$0';
+  if (Math.abs(n) >= 1e6) return '$' + (n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1) + 'M';
+  if (Math.abs(n) >= 1e3) return '$' + Math.round(n / 1e3) + 'K';
+  return '$' + Math.round(n).toLocaleString('en-US');
+};
+
+function KpiCard({ title, value, sub, icon: Icon, accent, loading, progress }) {
+  return (
+    <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+      <CardContent className="p-5">
+        <div className="flex items-center justify-between">
+          <div className="h-10 w-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: NAVY }}>
+            <Icon className="h-5 w-5" style={{ color: accent === 'gold' ? GOLD : '#fff' }} />
           </div>
         </div>
+        <p className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{title}</p>
+        {loading ? (
+          <Skeleton className="h-8 w-24 mt-1.5" />
+        ) : (
+          <p className="mt-1 text-2xl font-bold text-slate-900 leading-tight">{value}</p>
+        )}
+        {sub && <p className="mt-1 text-xs text-slate-500">{sub}</p>}
+        {progress !== undefined && (
+          <div className="mt-2.5 h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+            <div className="h-full rounded-full" style={{ width: `${Math.min(100, progress)}%`, backgroundColor: NAVY }} />
+          </div>
+        )}
       </CardContent>
     </Card>
-  </motion.div>
-);
+  );
+}
 
-// Activity Item Component
-const ActivityItem = ({ icon: Icon, title, description, time, color }) => (
-  <div className="flex gap-4 pb-4 last:pb-0">
-    <div className={`h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 ${color}`}>
-      <Icon className="h-5 w-5 text-white" />
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="font-medium text-slate-900 truncate">{title}</p>
-      <p className="text-sm text-slate-500 truncate">{description}</p>
-      <p className="text-xs text-slate-400 mt-1">{time}</p>
-    </div>
-  </div>
-);
+function SectionCard({ title, icon: Icon, action, children, empty, loading }) {
+  return (
+    <Card className="bg-white border-slate-200 shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b border-slate-100">
+        <div className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(15,27,45,0.08)' }}>
+            <Icon className="h-4 w-4" style={{ color: NAVY }} />
+          </div>
+          <CardTitle className="text-base font-semibold text-slate-900">{title}</CardTitle>
+        </div>
+        {action}
+      </CardHeader>
+      <CardContent className="p-0">
+        {loading ? (
+          <div className="p-4 space-y-3">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+        ) : empty ? (
+          <div className="p-8 text-center">
+            <Inbox className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+            <p className="text-sm text-slate-400">{empty}</p>
+          </div>
+        ) : children}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
+  const orgId = user?.organization_id;
 
-  useEffect(() => {
-    const loadUser = async () => {
-      const userData = await base44.auth.me();
-      setUser(userData);
-    };
-    loadUser();
-  }, []);
-
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects', user?.organization_id],
+  const { data: projects = [], isLoading: loadingProjects } = useQuery({
+    queryKey: ['dash-projects', orgId],
     queryFn: async () => {
-      const list = await base44.entities.Project.filter({});
-      return list.filter(p => p.organization_id === user?.organization_id).slice(0, 4);
+      const res = await base44.entities.Project.filter({ organization_id: orgId }, { sort: '-created_date', limit: 200 });
+      return res?.items || [];
     },
-    enabled: !!user?.organization_id,
+    enabled: !!orgId,
   });
 
-  const { data: tasks = [] } = useQuery({
-    queryKey: ['tasks', user?.organization_id],
+  const { data: openPOs = [], isLoading: loadingPOs } = useQuery({
+    queryKey: ['dash-open-pos', orgId],
     queryFn: async () => {
-      const list = await base44.entities.Task.filter({});
-      return list.filter(t => projects.some(p => p.id === t.project_id)).slice(0, 5);
+      const res = await base44.entities.PurchaseOrder.filter({ project_id: { $ne: '' } }, { sort: '-created_date', limit: 50 });
+      const items = res?.items || [];
+      return items.filter((po) => OPEN_PO_STATUSES.includes(po.status));
     },
-    enabled: !!user?.organization_id && projects.length > 0,
+    enabled: !!orgId,
   });
 
-  const { data: bids = [] } = useQuery({
-    queryKey: ['bids', user?.organization_id],
+  const today = startOfDay(new Date());
+  const weekEnd = addDays(today, 7);
+  const { data: upcomingTasks = [], isLoading: loadingTasks } = useQuery({
+    queryKey: ['dash-upcoming-tasks', orgId],
     queryFn: async () => {
-      const list = await base44.entities.BidOpportunity.filter({
-        organization_id: user?.organization_id,
+      const res = await base44.entities.Task.filter(
+        { due_date: { $gte: format(today, 'yyyy-MM-dd'), $lte: format(weekEnd, 'yyyy-MM-dd') } },
+        { sort: 'due_date', limit: 50, fields: ['name', 'project_id', 'due_date', 'priority', 'status'] }
+      );
+      const items = res?.items || [];
+      return items.filter((t) => t.status !== 'completed');
+    },
+    enabled: !!orgId,
+  });
+
+  const { data: bidRows = [], isLoading: loadingBids } = useQuery({
+    queryKey: ['dash-bids-agg', orgId],
+    queryFn: async () => {
+      const res = await base44.entities.BidOpportunity.aggregate({
+        query: { organization_id: orgId, status: { $in: PIPELINE_STATUSES } },
+        groupBy: 'status',
+        sum: ['estimated_value'],
       });
-      return list.filter(b => !b.title?.includes('Downtown Plaza')).slice(0, 10);
+      return res?.rows || [];
     },
-    enabled: !!user?.organization_id,
+    enabled: !!orgId,
   });
 
-  const { data: redFlagStages = [] } = useQuery({
-    queryKey: ['dualtrack-redflags', user?.organization_id],
-    queryFn: async () => (await base44.entities.DualTrackStage.filter({ $or: [{ field_track_status: 'blocked' }, { money_track_status: 'blocked' }] }, { limit: 100, fields: ['project_id', 'stage_name', 'stage_number'] }))?.items || [],
-    enabled: !!user?.organization_id,
+  const { data: expenseRows = [], isLoading: loadingBilling } = useQuery({
+    queryKey: ['dash-billing-agg', orgId],
+    queryFn: async () => {
+      const res = await base44.entities.Expense.aggregate({
+        query: { status: { $in: ['pending', 'approved'] } },
+        groupBy: 'status',
+        sum: ['amount'],
+      });
+      return res?.rows || [];
+    },
+    enabled: !!orgId,
   });
+
+  // ---- KPI computations (real data only) ----
+  const activeJobs = projects.filter((p) => ACTIVE_STATUSES.includes(p.status));
+  const sumBudgetActive = activeJobs.reduce((s, p) => s + (p.budget || 0), 0);
+  const sumSpentActive = activeJobs.reduce((s, p) => s + (p.spent || 0), 0);
+  const overBudgetProjects = projects.filter(
+    (p) => p.budget && (p.projected_final_cost || p.spent || 0) > p.budget
+  );
+  const pipelineCount = bidRows.reduce((s, r) => s + (r.count || 0), 0);
+  const pipelineValue = bidRows.reduce((s, r) => s + (r.sum_estimated_value || 0), 0);
+  const billingOutstanding = expenseRows.reduce((s, r) => s + (r.sum_amount || 0), 0);
+  const costPct = sumBudgetActive ? (sumSpentActive / sumBudgetActive) * 100 : 0;
+
+  const projectMap = React.useMemo(() => {
+    const m = {};
+    projects.forEach((p) => { m[p.id] = p; });
+    return m;
+  }, [projects]);
 
   const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 18) return 'Good afternoon';
     return 'Good evening';
   };
 
-  const stats = {
-    activeProjects: projects.filter(p => p.status === 'in_progress').length,
-    completedProjects: projects.filter(p => p.status === 'completed').length,
-    activeBids: bids.filter(b => ['new', 'analyzing', 'estimating', 'submitted'].includes(b.status)).length,
-    wonBids: bids.filter(b => b.status === 'won').length,
-    totalRevenue: projects.reduce((sum, p) => sum + (p.budget || 0), 0),
-    pipelineValue: bids.reduce((sum, b) => sum + (b.estimated_value || 0), 0),
-    teamMembers: 0,
-    overdueTasks: tasks.filter(t => t.status === 'pending').length,
+  const fadeFlag = (p) => {
+    const forecast = p.projected_final_cost || p.spent || 0;
+    if (!p.budget) return { label: '—', tone: 'muted' };
+    return forecast > p.budget
+      ? { label: 'Fade', tone: 'red' }
+      : { label: 'On Track', tone: 'green' };
   };
-
-  const chartData = [
-    { month: 'Jan', revenue: 65000, target: 80000 },
-    { month: 'Feb', revenue: 78000, target: 80000 },
-    { month: 'Mar', revenue: 92000, target: 80000 },
-    { month: 'Apr', revenue: 81000, target: 80000 },
-    { month: 'May', revenue: 95000, target: 80000 },
-    { month: 'Jun', revenue: 88000, target: 80000 },
-  ];
-
-  const statusData = [
-    { name: 'Active', value: stats.activeProjects, fill: '#3b82f6' },
-    { name: 'Completed', value: stats.completedProjects, fill: '#10b981' },
-  ];
+  const flagStyle = { red: 'bg-red-100 text-red-700', green: 'bg-emerald-100 text-emerald-700', muted: 'bg-slate-100 text-slate-500' };
 
   return (
-    <div className="space-y-8 max-w-[1600px] mx-auto animate-slide-up">
+    <div className="space-y-6 max-w-[1600px] mx-auto">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">
-          {getGreeting()}, {user?.full_name || 'there'}! 👋
-        </h1>
-        <p className="text-slate-500 text-lg">Here's what's happening with your projects today.</p>
-      </motion.div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{getGreeting()}, {user?.full_name || 'there'}</h1>
+          <p className="text-sm text-slate-500 mt-0.5">{format(new Date(), 'EEEE, MMMM d, yyyy')} — Operations overview</p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => navigate(createPageUrl('AddBid'))} className="gap-1.5" style={{ backgroundColor: NAVY, color: '#fff' }}>
+            <Plus className="h-4 w-4" /> New Bid
+          </Button>
+          <Button variant="outline" onClick={() => navigate(createPageUrl('Projects'))} className="gap-1.5">
+            <Plus className="h-4 w-4" /> New Project
+          </Button>
+        </div>
+      </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard title="Active Projects" value={stats.activeProjects} icon={Activity} color="bg-blue-600" />
-        <KPICard title="Won Bids" value={stats.wonBids} icon={Award} color="bg-emerald-600" />
-        <KPICard title="Pipeline Value" value={`$${(stats.pipelineValue / 1000000).toFixed(1)}M`} icon={TrendingUp} color="bg-purple-600" />
-        <KPICard title="Overdue Tasks" value={stats.overdueTasks} icon={AlertCircle} color="bg-orange-600" />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <KpiCard title="Active Jobs" value={activeJobs.length} icon={HardHat} loading={loadingProjects} />
+        <KpiCard title="Total Contract Value" value={fmtCompact(sumBudgetActive)} sub="across active jobs" icon={FileText} loading={loadingProjects} />
+        <KpiCard title="Cost to Date vs Budget" value={fmtCompact(sumSpentActive)} sub={`of ${fmtCompact(sumBudgetActive)} budget`} icon={Wallet} loading={loadingProjects} progress={costPct} />
+        <KpiCard title="Projects Over Budget" value={overBudgetProjects.length} sub={overBudgetProjects.length ? 'needs attention' : 'all on budget'} icon={AlertTriangle} accent="gold" loading={loadingProjects} />
+        <KpiCard title="Open POs" value={openPOs.length} sub="awaiting fulfillment" icon={ShoppingCart} loading={loadingPOs} />
+        <KpiCard title="Upcoming Milestones" value={upcomingTasks.length} sub="next 7 days" icon={CalendarClock} loading={loadingTasks} />
+        <KpiCard title="Bids in Pipeline" value={pipelineCount} sub={`${fmtCompact(pipelineValue)} value`} icon={Briefcase} loading={loadingBids} />
+        <KpiCard title="Billing Outstanding" value={fmtCompact(billingOutstanding)} sub="unpaid bills" icon={Receipt} loading={loadingBilling} />
       </div>
 
-      {redFlagStages.length > 0 && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="p-5">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-red-100"><Flag className="h-5 w-5 text-red-600" /></div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-red-900">{redFlagStages.length} DualTrack stage{redFlagStages.length > 1 ? 's' : ''} flagged</p>
-                <p className="text-sm text-red-700 truncate">Blocked tracks: {redFlagStages.slice(0, 4).map(s => s.stage_name).join(', ')}{redFlagStages.length > 4 ? '…' : ''}</p>
-              </div>
-              <Button size="sm" variant="outline" onClick={() => navigate(createPageUrl('Projects'))}>Review</Button>
+      {/* All Jobs table */}
+      <Card className="bg-white border-slate-200 shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(15,27,45,0.08)' }}>
+              <HardHat className="h-4 w-4" style={{ color: NAVY }} />
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="premium-card border-none lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Revenue Trend</CardTitle>
-            <CardDescription>Monthly revenue vs target</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="month" stroke="#94a3b8" />
-                <YAxis stroke="#94a3b8" />
-                <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }} />
-                <Legend />
-                <Bar dataKey="revenue" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="target" fill="#cbd5e1" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="premium-card border-none">
-          <CardHeader>
-            <CardTitle>Project Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie data={statusData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={2} dataKey="value">
-                  {statusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-4 space-y-2">
-              {statusData.map((item) => (
-                <div key={item.name} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.fill }} />
-                    <span className="text-slate-600">{item.name}</span>
-                  </div>
-                  <span className="font-bold text-slate-900">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-          <Zap className="h-5 w-5 text-amber-500" />
-          Quick Actions
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <QuickAction icon={Target} label="New Bid" description="Create a new bid opportunity" onClick={() => navigate(createPageUrl('AddBid'))} />
-          <QuickAction icon={FolderKanban} label="New Project" description="Start a new project" onClick={() => navigate(createPageUrl('Projects'))} />
-          <QuickAction icon={Users} label="Team" description="Manage your team members" onClick={() => navigate(createPageUrl('TeamManagement'))} />
-          <QuickAction icon={BarChart3} label="Reports" description="View project analytics" onClick={() => navigate(createPageUrl('Reports'))} />
-        </div>
-      </div>
-
-      {/* Projects Grid */}
-      {projects.length > 0 && (
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Projects</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} onClick={() => navigate(createPageUrl('ProjectDetail') + `?id=${project.id}`)} />
-            ))}
+            <CardTitle className="text-base font-semibold text-slate-900">All Jobs</CardTitle>
           </div>
-        </div>
-      )}
+          <Button variant="ghost" size="sm" onClick={() => navigate(createPageUrl('Projects'))} className="text-slate-500 hover:text-slate-900">
+            View all <ChevronRight className="h-4 w-4" />
+          </Button>
+        </CardHeader>
+        <CardContent className="p-0">
+          {loadingProjects ? (
+            <div className="p-4 space-y-3">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+          ) : projects.length === 0 ? (
+            <div className="p-10 text-center">
+              <HardHat className="h-10 w-10 mx-auto mb-3 text-slate-300" />
+              <p className="text-sm font-medium text-slate-600">No jobs yet</p>
+              <p className="text-xs text-slate-400 mt-1">Create a project or convert a won bid to see your jobs here.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400 bg-slate-50/60">
+                    <th className="px-4 py-3 font-semibold">Job</th>
+                    <th className="px-4 py-3 font-semibold">Type</th>
+                    <th className="px-4 py-3 font-semibold">Milestone</th>
+                    <th className="px-4 py-3 font-semibold w-40">% Complete</th>
+                    <th className="px-4 py-3 font-semibold text-right">Budget</th>
+                    <th className="px-4 py-3 font-semibold text-right">Cost to Date</th>
+                    <th className="px-4 py-3 font-semibold text-center">Forecast</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {projects.map((p) => {
+                    const flag = fadeFlag(p);
+                    return (
+                      <tr
+                        key={p.id}
+                        onClick={() => navigate(createPageUrl('ProjectDetail') + `?id=${p.id}`)}
+                        className="cursor-pointer hover:bg-slate-50 transition-colors"
+                      >
+                        <td className="px-4 py-3">
+                          <p className="font-semibold text-slate-900 truncate max-w-[220px]">{p.name}</p>
+                          <p className="text-xs text-slate-500 truncate max-w-[220px]">{p.client_name || '—'}</p>
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">{PROJECT_TYPE_LABELS[p.project_type] || p.project_type || '—'}</td>
+                        <td className="px-4 py-3 text-slate-600">{PHASE_LABELS[p.current_phase] || '—'}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                              <div className="h-full rounded-full" style={{ width: `${p.progress || 0}%`, backgroundColor: NAVY }} />
+                            </div>
+                            <span className="text-xs font-semibold text-slate-600 w-8 text-right">{p.progress || 0}%</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right font-medium text-slate-700">{fmtMoney(p.budget)}</td>
+                        <td className="px-4 py-3 text-right font-medium text-slate-700">{fmtMoney(p.spent)}</td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${flagStyle[flag.tone]}`}>{flag.label}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-      {/* Activity Feed */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="premium-card border-none lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {tasks.slice(0, 5).map((task, i) => (
-              <ActivityItem
-                key={task.id}
-                icon={[CheckCircle, Clock, MessageSquare, AlertCircle, Zap][i % 5]}
-                title={task.name}
-                description={task.description || 'Task updated'}
-                time={task.updated_date ? format(new Date(task.updated_date), 'MMM d, HH:mm') : 'Recently'}
-                color={['bg-emerald-600', 'bg-blue-600', 'bg-purple-600', 'bg-orange-600', 'bg-pink-600'][i % 5]}
-              />
-            ))}
-          </CardContent>
-        </Card>
+      {/* Upcoming Schedule + Open POs */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SectionCard
+          title="Upcoming Schedule"
+          icon={CalendarClock}
+          loading={loadingTasks}
+          empty={upcomingTasks.length === 0 ? 'No milestones due in the next 7 days.' : null}
+          action={<Button variant="ghost" size="sm" onClick={() => navigate(createPageUrl('Calendar'))} className="text-slate-500 hover:text-slate-900">Calendar <ChevronRight className="h-4 w-4" /></Button>}
+        >
+          <ul className="divide-y divide-slate-100">
+            {upcomingTasks.map((t) => {
+              const proj = projectMap[t.project_id];
+              return (
+                <li key={t.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                  <div className="h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(232,181,71,0.15)' }}>
+                    <Flag className="h-4 w-4" style={{ color: GOLD }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 truncate">{t.name}</p>
+                    <p className="text-xs text-slate-500 truncate">{proj?.name || 'Unassigned'}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    {t.due_date && <p className="text-xs font-semibold text-slate-700">{format(new Date(t.due_date), 'EEE, MMM d')}</p>}
+                    {t.priority && <span className={`mt-0.5 inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold ${PRIORITY_STYLE[t.priority]}`}>{t.priority}</span>}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </SectionCard>
 
-        <Card className="premium-card border-none">
-          <CardHeader>
-            <CardTitle>Upcoming</CardTitle>
-            <CardDescription>Next 7 days</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {tasks.slice(0, 3).map((task) => (
-              <div key={task.id} className="p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-primary transition-colors cursor-pointer">
-                <p className="text-sm font-semibold text-slate-900 truncate">{task.name}</p>
-                {task.due_date && <p className="text-xs text-slate-500 mt-1">{format(new Date(task.due_date), 'MMM d')}</p>}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <SectionCard
+          title="Open Purchase Orders"
+          icon={ShoppingCart}
+          loading={loadingPOs}
+          empty={openPOs.length === 0 ? 'No open purchase orders right now.' : null}
+          action={<Button variant="ghost" size="sm" onClick={() => navigate(createPageUrl('PurchaseOrders'))} className="text-slate-500 hover:text-slate-900">All POs <ChevronRight className="h-4 w-4" /></Button>}
+        >
+          <ul className="divide-y divide-slate-100">
+            {openPOs.map((po) => {
+              const proj = projectMap[po.project_id];
+              return (
+                <li key={po.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                  <div className="h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(15,27,45,0.08)' }}>
+                    <ShoppingCart className="h-4 w-4" style={{ color: NAVY }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 truncate">{po.po_number || 'PO'} — {po.vendor}</p>
+                    <p className="text-xs text-slate-500 truncate">{proj?.name || 'Unassigned'}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-semibold text-slate-700">{fmtMoney(po.total)}</p>
+                    <span className={`mt-0.5 inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold ${PO_STATUS_STYLE[po.status] || 'bg-slate-100 text-slate-600'}`}>{po.status}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </SectionCard>
       </div>
     </div>
   );

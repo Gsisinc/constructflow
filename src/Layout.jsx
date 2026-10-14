@@ -123,7 +123,7 @@ function UserMenu({ user, onLogout }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 transition-colors">
-          <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white text-xs sm:text-sm font-semibold">
+          <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold flex-shrink-0" style={{ backgroundColor: '#0F1B2D', color: '#E8B547' }}>
             {user.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
           </div>
           <div className="text-left hidden sm:block">
@@ -161,11 +161,11 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
       className={cn(
         "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px]",
         isActive
-          ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/90 border-l-2 border-[hsl(var(--gold))]"
-          : "text-slate-700 hover:bg-slate-100 hover:text-primary"
+          ? "bg-[#0F1B2D] text-white shadow-md border-l-2 border-[#E8B547]"
+          : "text-slate-700 hover:bg-slate-100 hover:text-[#0F1B2D]"
       )}
     >
-      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-[hsl(var(--gold))]" : "text-slate-500")} />
+      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-[#E8B547]" : "text-slate-500")} />
       <span className="truncate">{item.name}</span>
     </Link>
   );
@@ -480,7 +480,7 @@ export default function Layout({ children, currentPageName }) {
         {/* Sidebar Footer */}
         <div className="sticky bottom-0 p-3 sm:p-4 border-t border-slate-200 bg-white">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: '#0F1B2D', color: '#E8B547' }}>
               {organization?.name?.[0] || 'G'}
             </div>
             <div className="min-w-0 flex-1">
