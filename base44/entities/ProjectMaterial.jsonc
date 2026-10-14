@@ -1,0 +1,77 @@
+{
+  "name": "ProjectMaterial",
+  "type": "object",
+  "description": "Material line item scoped to a project (Materials tab)",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Project this material belongs to"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "number",
+      "default": 0
+    },
+    "unit": {
+      "type": "string",
+      "default": "units"
+    },
+    "unit_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "supplier": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "User who added the material"
+    }
+  },
+  "required": [
+    "project_id",
+    "name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

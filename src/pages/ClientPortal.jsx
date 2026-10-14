@@ -72,7 +72,8 @@ export default function ClientPortal() {
       queryClient.invalidateQueries({ queryKey: ['clientUpdates'] });
       setShowCommentDialog(false);
       toast.success('Comment posted');
-    }
+    },
+    onError: (e) => toast.error('Failed to post comment: ' + (e.message || ''))
   });
 
   const createChangeOrderMutation = useMutation({
@@ -269,11 +270,13 @@ export default function ClientPortal() {
                           rows={4}
                         />
                         <Button 
-                          onClick={() => createCommentMutation.mutate({ 
+                          onClick={() => createCommentMutation.mutate({
                             project_id: selectedProject.id,
-                            update_type: 'comment',
-                            message: commentForm.message,
-                            sent_by: user.email
+                            update_type: 'daily_log',
+                            title: 'Client Comment',
+                            content: commentForm.message,
+                            posted_by: user.email,
+                            visibility: 'client'
                           })}
                           className="w-full sm:w-auto"
                         >

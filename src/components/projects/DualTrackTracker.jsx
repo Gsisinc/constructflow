@@ -1,40 +1,49 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Flag, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Loader2, Flag, CheckCircle2, AlertTriangle, Eye, Plus, X, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Kemar's DualTrack: 12 stages, 3 phases, Field + Money tracks
-const STAGE_TEMPLATE = [
-  { phase: 'proposal_handoff', stages: [
-    { n: 1, name: 'Bid Intake & Qualification', gate: 'Bid reviewed and go/no-go decided' },
-    { n: 2, name: 'Estimate & Pricing', gate: 'Estimate built and margin approved' },
-    { n: 3, name: 'Proposal & Contract', gate: 'Proposal submitted and contract signed' },
-    { n: 4, name: 'Handoff to Project', gate: 'Estimating handed off to PM; kickoff scheduled' },
-  ]},
-  { phase: 'engineering', stages: [
-    { n: 5, name: 'Design & Shop Drawings', gate: 'Drawings approved for fabrication' },
-    { n: 6, name: 'Submittals', gate: 'All submittals approved' },
-    { n: 7, name: 'RFI Resolution', gate: 'Open RFIs resolved or closed' },
-    { n: 8, name: 'Pre-Construction & Mobilization', gate: 'Site ready; materials & crew mobilized' },
-  ]},
-  { phase: 'execution', stages: [
-    { n: 9, name: 'Installation & Field Work', gate: 'Installation complete per approved drawings' },
-    { n: 10, name: 'Testing & Commissioning', gate: 'System tested and commissioned' },
-    { n: 11, name: 'Closeout', gate: 'As-builts, test reports, photos, warranty, training sign-off complete' },
-    { n: 12, name: 'Handoff to Billing', gate: 'Closeout package handed to Billing' },
-  ]},
+// ─── D1 (OPEN DECISION — FLAG TO OWNER) ───────────────────────────────────
+// 12 stages / 3 phases (GSIS Field Manual) vs 13 stages / 4 phases (DualTrack spec).
+// Currently configured as Phase A = stages 1-2, Phase B = 3-6, Phase C = 7-12.
+// Edit DUALTRACK_PHASES below to change grouping (no entity/schema change needed).
+const STAGE_DEFS = [
+  { n: 1, name: 'Bid Intake & Qualification', gate: 'Bid reviewed and go/no-go decided' },
+  { n: 2, name: 'Estimate & Pricing', gate: 'Estimate built and margin approved' },
+  { n: 3, name: 'Proposal & Contract', gate: 'Proposal submitted and contract signed' },
+  { n: 4, name: 'Handoff to Project', gate: 'Estimating handed off to PM; kickoff scheduled' },
+  { n: 5, name: 'Design & Shop Drawings', gate: 'Drawings approved for fabrication' },
+  { n: 6, name: 'Submittals', gate: 'All submittals approved' },
+  { n: 7, name: 'RFI Resolution', gate: 'Open RFIs resolved or closed' },
+  { n: 8, name: 'Pre-Construction & Mobilization', gate: 'Site ready; materials & crew mobilized' },
+  { n: 9, name: 'Installation & Field Work', gate: 'Installation complete per approved drawings' },
+  { n: 10, name: 'Testing & Commissioning', gate: 'System tested and commissioned' },
+  { n: 11, name: 'Closeout', gate: 'As-builts, test reports, photos, warranty, training sign-off complete' },
+  { n: 12, name: 'Handoff to Billing', gate: 'Closeout package handed to Billing' },
 ];
-const PHASE_LABEL = { proposal_handoff: 'Proposal & Handoff', engineering: 'Engineering', execution: 'Execution' };
-const TRACKS = ['not_started', 'in_progress', 'passed', 'blocked'];
-const trackColor = { not_started: 'bg-slate-100 text-slate-600', in_progress: 'bg-blue-100 text-blue-700', passed: 'bg-green-100 text-green-700', blocked: 'bg-red-100 text-red-700' };
+
+const DUALTRACK_PHASES = [
+  { key: 'phase_a', label: 'Phase A (Stages 1-2)', stages: [1, 2] },
+  { key: 'phase_b', label: 'Phase B (Stages 3-6)', stages: [3, 4, 5, 6] },
+  { key: 'phase_c', label: 'Phase C (Stages 7-12)', stages: [7, 8, 9, 10, 11, 12] },
+];
+
+const phaseKeyForStage = (n) => DUALTRACK_PHASES.find((p) => p.stages.includes(n))?.key || 'phase_c';
+
 const safe = (n) => (Number.isFinite(n) ? n : 0);
+const trackPass = (items) => Array.isArray(items) && items.length > 0 && items.every((i) => i.completed);
+const trackStatus = (items, blocked) => {
+  if (blocked) return 'blocked';
+  if (!items || items.length === 0) return 'not_started';
+  if (items.every((i) => i.completed)) return 'passed';
+  return 'in_progress';
+};
 
 export default function DualTrackTracker({ projectId, project }) {
   const qc = useQueryClient();
@@ -46,53 +55,61 @@ export default function DualTrackTracker({ projectId, project }) {
     enabled: !!projectId,
   });
 
-  // Seed the 12 default stages if none exist
+  // Seed the 12 default stages if none exist. Each track starts with one
+  // action item seeded from the stage's exit-gate criteria.
   useEffect(() => {
     if (isLoading || stages.length > 0 || seeding || !projectId) return;
     setSeeding(true);
     (async () => {
       try {
-        const records = STAGE_TEMPLATE.flatMap(ph => ph.stages.map(s => ({
+        const records = STAGE_DEFS.map((s) => ({
           project_id: projectId,
           organization_id: project?.organization_id,
-          phase: ph.phase,
+          phase: phaseKeyForStage(s.n),
           stage_number: s.n,
           stage_name: s.name,
           gate_criteria: s.gate,
           field_track_status: 'not_started',
           money_track_status: 'not_started',
+          field_track_items: [{ text: s.gate, completed: false }],
+          money_track_items: [{ text: s.gate, completed: false }],
           exit_gate_passed: false,
           budget: 0, committed: 0, actual: 0, cost_to_complete: 0,
-        })));
+        }));
         await base44.entities.DualTrackStage.bulkCreate(records);
         qc.invalidateQueries({ queryKey: ['dualtrack-stages', projectId] });
-      } catch (e) { console.error('seed fail', e); }
+      } catch (e) {
+        console.error('seed fail', e);
+        toast.error('Failed to seed tracker stages');
+      }
       setSeeding(false);
     })();
   }, [isLoading, stages.length, projectId, seeding]);
 
   const updateStage = async (id, patch) => {
-    try { await base44.entities.DualTrackStage.update(id, patch); qc.invalidateQueries({ queryKey: ['dualtrack-stages', projectId] }); }
-    catch (e) { toast.error('Update failed'); }
+    try {
+      await base44.entities.DualTrackStage.update(id, patch);
+      qc.invalidateQueries({ queryKey: ['dualtrack-stages', projectId] });
+    } catch (e) {
+      toast.error('Update failed: ' + (e.message || ''));
+    }
   };
 
-  // Project-level rollups
-  const redFlags = useMemo(() => stages.filter(s => {
+  const redFlags = useMemo(() => stages.filter((s) => {
     const remaining = safe(s.budget) - safe(s.actual) - safe(s.committed);
     const fade = safe(s.cost_to_complete) - remaining;
     return fade > 0 || s.field_track_status === 'blocked' || s.money_track_status === 'blocked';
   }), [stages]);
-  const clearedStages = stages.filter(s => s.exit_gate_passed).length;
+  const clearedStages = stages.filter((s) => s.exit_gate_passed).length;
 
   return (
     <div className="space-y-6">
-      {/* Rollup header */}
       <Card>
         <CardContent className="pt-5 pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-bold text-slate-900">DualTrack Tracker</h2>
-              <p className="text-sm text-slate-500">Field Track + Money Track · a stage clears only when both tracks pass its gate</p>
+              <p className="text-sm text-slate-500">A stage clears only when both its Field Track and Money Track action items are complete.</p>
             </div>
             <div className="flex gap-4">
               <div className="text-center"><p className="text-2xl font-bold text-slate-900">{clearedStages}/12</p><p className="text-xs text-slate-500">Stages Cleared</p></div>
@@ -105,17 +122,18 @@ export default function DualTrackTracker({ projectId, project }) {
       {isLoading || seeding ? (
         <div className="py-10 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-slate-400" /></div>
       ) : (
-        STAGE_TEMPLATE.map((ph) => (
-          <div key={ph.phase}>
+        DUALTRACK_PHASES.map((ph) => (
+          <div key={ph.key}>
             <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">{PHASE_LABEL[ph.phase]}</h3>
+              <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">{ph.label}</h3>
               <div className="flex-1 h-px bg-slate-200" />
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {ph.stages.map((tmpl) => {
-                const s = stages.find(x => x.stage_number === tmpl.n);
-                if (!s) return null;
-                return <StageCard key={tmpl.n} stage={s} onUpdate={updateStage} />;
+              {ph.stages.map((n) => {
+                const tmpl = STAGE_DEFS.find((s) => s.n === n);
+                const s = stages.find((x) => x.stage_number === n);
+                if (!s || !tmpl) return null;
+                return <StageCard key={n} stage={s} gate={tmpl.gate} onUpdate={updateStage} />;
               })}
             </div>
           </div>
@@ -125,34 +143,96 @@ export default function DualTrackTracker({ projectId, project }) {
   );
 }
 
-function StageCard({ stage, onUpdate }) {
+function StageCard({ stage, gate, onUpdate }) {
   const remaining = safe(stage.budget) - safe(stage.actual) - safe(stage.committed);
   const fade = safe(stage.cost_to_complete) - remaining;
   const blocked = stage.field_track_status === 'blocked' || stage.money_track_status === 'blocked';
+  const fieldItems = stage.field_track_items || [];
+  const moneyItems = stage.money_track_items || [];
+  const fieldPassed = trackPass(fieldItems);
+  const moneyPassed = trackPass(moneyItems);
+  const gatePassed = fieldPassed && moneyPassed;
   const redFlag = fade > 0 || blocked;
-  const gatePassed = stage.field_track_status === 'passed' && stage.money_track_status === 'passed';
+  const watch = !gatePassed && !redFlag && (fieldPassed !== moneyPassed);
+
+  const incomplete = [
+    ...fieldItems.filter((i) => !i.completed).map((i) => `Field: ${i.text || gate}`),
+    ...moneyItems.filter((i) => !i.completed).map((i) => `Money: ${i.text || gate}`),
+  ];
+
+  const toggleItem = (track, idx) => {
+    const items = (track === 'field' ? fieldItems : moneyItems).map((it, i) =>
+      i === idx ? { ...it, completed: !it.completed } : it
+    );
+    const passed = trackPass(items);
+    const patch =
+      track === 'field'
+        ? { field_track_items: items, field_track_status: trackStatus(items, false) }
+        : { money_track_items: items, money_track_status: trackStatus(items, false) };
+    const otherPassed = track === 'field' ? moneyPassed : fieldPassed;
+    patch.exit_gate_passed = passed && otherPassed;
+    onUpdate(stage.id, patch);
+  };
+
+  const addItem = (track, text) => {
+    if (!text.trim()) return;
+    const items = [...(track === 'field' ? fieldItems : moneyItems), { text: text.trim(), completed: false }];
+    const patch = track === 'field'
+      ? { field_track_items: items, field_track_status: trackStatus(items, false) }
+      : { money_track_items: items, money_track_status: trackStatus(items, false) };
+    onUpdate(stage.id, patch);
+  };
+
+  const removeItem = (track, idx) => {
+    const items = (track === 'field' ? fieldItems : moneyItems).filter((_, i) => i !== idx);
+    const passed = trackPass(items);
+    const patch =
+      track === 'field'
+        ? { field_track_items: items, field_track_status: trackStatus(items, false) }
+        : { money_track_items: items, money_track_status: trackStatus(items, false) };
+    const otherPassed = track === 'field' ? moneyPassed : fieldPassed;
+    patch.exit_gate_passed = passed && otherPassed;
+    onUpdate(stage.id, patch);
+  };
+
+  const cardTone = redFlag ? 'border-red-300 bg-red-50/30' : watch ? 'border-amber-300 bg-amber-50/20' : gatePassed ? 'border-green-300' : '';
+  const statusBadge = gatePassed
+    ? <Badge className="bg-green-100 text-green-700"><CheckCircle2 className="h-3 w-3 mr-1" />Cleared</Badge>
+    : redFlag
+    ? <Badge className="bg-red-100 text-red-700"><Flag className="h-3 w-3 mr-1" />Red Flag</Badge>
+    : watch
+    ? <Badge className="bg-amber-100 text-amber-700"><Eye className="h-3 w-3 mr-1" />Watch</Badge>
+    : <Badge variant="secondary">In Progress</Badge>;
 
   return (
-    <Card className={redFlag ? 'border-red-300 bg-red-50/30' : gatePassed ? 'border-green-300' : ''}>
+    <Card className={cardTone}>
       <CardContent className="pt-4 pb-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="flex items-center justify-center h-7 w-7 rounded-full bg-slate-900 text-white text-xs font-bold">{stage.stage_number}</span>
             <div>
               <p className="font-semibold text-slate-900 text-sm">{stage.stage_name}</p>
-              <p className="text-xs text-slate-500">Gate: {stage.gate_criteria}</p>
+              <p className="text-xs text-slate-500">Gate: {stage.gate_criteria || gate}</p>
             </div>
           </div>
-          {gatePassed ? <Badge className="bg-green-100 text-green-700"><CheckCircle2 className="h-3 w-3 mr-1" />Cleared</Badge>
-            : redFlag ? <Badge className="bg-red-100 text-red-700"><Flag className="h-3 w-3 mr-1" />Red Flag</Badge>
-            : <Badge variant="secondary">In Progress</Badge>}
+          {statusBadge}
         </div>
 
-        {/* Tracks */}
-        <div className="grid grid-cols-2 gap-2 mt-3">
-          <TrackSelect label="Field Track" value={stage.field_track_status} onChange={(v) => onUpdate(stage.id, { field_track_status: v, exit_gate_passed: v === 'passed' && stage.money_track_status === 'passed' })} />
-          <TrackSelect label="Money Track" value={stage.money_track_status} onChange={(v) => onUpdate(stage.id, { money_track_status: v, exit_gate_passed: v === 'passed' && stage.field_track_status === 'passed' })} />
+        {/* Action items per track */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+          <TrackItems label="Field Track" items={fieldItems} onToggle={(i) => toggleItem('field', i)} onAdd={(t) => addItem('field', t)} onRemove={(i) => removeItem('field', i)} passed={fieldPassed} />
+          <TrackItems label="Money Track" items={moneyItems} onToggle={(i) => toggleItem('money', i)} onAdd={(t) => addItem('money', t)} onRemove={(i) => removeItem('money', i)} passed={moneyPassed} />
         </div>
+
+        {/* Blocking */}
+        {!gatePassed && incomplete.length > 0 && (
+          <div className="mt-3 rounded-md bg-amber-50 border border-amber-200 p-2">
+            <p className="text-xs font-semibold text-amber-800 flex items-center gap-1"><Lock className="h-3 w-3" />Blocking close:</p>
+            <ul className="mt-1 ml-4 list-disc text-xs text-amber-700 space-y-0.5">
+              {incomplete.slice(0, 5).map((t, i) => <li key={i}>{t}</li>)}
+            </ul>
+          </div>
+        )}
 
         {/* Money inputs */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
@@ -178,13 +258,28 @@ function StageCard({ stage, onUpdate }) {
   );
 }
 
-function TrackSelect({ label, value, onChange }) {
+function TrackItems({ label, items, onToggle, onAdd, onRemove, passed }) {
+  const [draft, setDraft] = useState('');
   return (
-    <div>
-      <Label className="text-xs text-slate-500">{label}</Label>
-      <select className={`w-full border rounded p-1.5 text-xs font-medium mt-0.5 ${trackColor[value]}`} value={value} onChange={(e) => onChange(e.target.value)}>
-        {TRACKS.map(t => <option key={t} value={t}>{t.replace('_',' ')}</option>)}
-      </select>
+    <div className={`rounded-md border p-2 ${passed ? 'border-green-200 bg-green-50/40' : 'border-slate-200 bg-slate-50/60'}`}>
+      <div className="flex items-center justify-between mb-1.5">
+        <Label className="text-xs font-semibold text-slate-600">{label}</Label>
+        {passed && <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />}
+      </div>
+      <div className="space-y-1">
+        {items.map((it, i) => (
+          <div key={i} className="flex items-start gap-1.5">
+            <input type="checkbox" checked={!!it.completed} onChange={() => onToggle(i)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-gold-500 focus:ring-gold-500" />
+            <span className={`text-xs flex-1 ${it.completed ? 'line-through text-slate-400' : 'text-slate-700'}`}>{it.text}</span>
+            <button onClick={() => onRemove(i)} className="text-slate-300 hover:text-red-500"><X className="h-3 w-3" /></button>
+          </div>
+        ))}
+        {items.length === 0 && <p className="text-[11px] text-slate-400">No items — add one below.</p>}
+      </div>
+      <div className="flex gap-1 mt-1.5">
+        <Input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Add action item…" className="h-7 text-xs" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); onAdd(draft); setDraft(''); } }} />
+        <Button type="button" size="icon" variant="ghost" className="h-7 w-7" onClick={() => { onAdd(draft); setDraft(''); }}><Plus className="h-3.5 w-3.5" /></Button>
+      </div>
     </div>
   );
 }

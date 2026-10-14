@@ -17,6 +17,7 @@ import SafetyManager from '../components/safety/SafetyManager';
 import DecisionManager from '../components/decisions/DecisionManager';
 import TeamRoleManager from '../components/team/TeamRoleManager';
 import ProjectMaterials from '../components/project/ProjectMaterials';
+import PermitFormDialog from '../components/projects/PermitFormDialog';
 import DualTrackTracker from '../components/projects/DualTrackTracker';
 import SubmittalsTab from '../components/projects/SubmittalsTab';
 import RFITab from '../components/projects/RFITab';
@@ -77,6 +78,7 @@ export default function ProjectDetail() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showGateChecklist, setShowGateChecklist] = useState(false);
   const [selectedGate, setSelectedGate] = useState(null);
+  const [showPermitForm, setShowPermitForm] = useState(false);
 
   const { data: project, isLoading } = useQuery({
     queryKey: ['project', projectId],
@@ -498,7 +500,7 @@ export default function ProjectDetail() {
             <div className="flex justify-end">
               <PermitUploader projectId={projectId} />
             </div>
-            <PermitDashboard permits={permits} />
+            <PermitDashboard permits={permits} onAddPermit={() => setShowPermitForm(true)} />
           </div>
         </TabsContent>
 
@@ -567,6 +569,14 @@ export default function ProjectDetail() {
         onOpenChange={setShowEditForm}
         project={project}
         onSubmit={(data) => updateMutation.mutate(data)}
+      />
+
+      {/* Add Permit */}
+      <PermitFormDialog
+        open={showPermitForm}
+        onOpenChange={setShowPermitForm}
+        projectId={projectId}
+        onCreated={() => queryClient.invalidateQueries({ queryKey: ['permits', projectId] })}
       />
 
       {/* Phase Gate Checklist */}

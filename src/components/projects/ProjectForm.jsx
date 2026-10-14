@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,14 +19,13 @@ import {
 import { Loader2, Upload, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import { PROJECT_TYPE_CATALOG } from './projectTemplates';
 
-const PROJECT_TYPES = [
-  { value: 'residential', label: 'Residential' },
-  { value: 'commercial', label: 'Commercial' },
-  { value: 'industrial', label: 'Industrial' },
-  { value: 'infrastructure', label: 'Infrastructure' },
-  { value: 'renovation', label: 'Renovation' },
-];
+// Build the flat type list from the same catalog the create wizard uses,
+// so a saved wizard type (e.g. fire_alarm_new_construction) stays selected.
+const PROJECT_TYPES = PROJECT_TYPE_CATALOG.flatMap((cat) =>
+  cat.types.map((t) => ({ value: t.value, label: t.label }))
+);
 
 const STATUSES = [
   { value: 'bidding', label: 'Bidding' },
@@ -44,23 +43,31 @@ const PRIORITIES = [
   { value: 'critical', label: 'Critical' },
 ];
 
+const EMPTY = {
+  name: '',
+  client_name: '',
+  project_type: 'commercial',
+  status: 'bidding',
+  priority: 'medium',
+  address: '',
+  start_date: '',
+  end_date: '',
+  budget: '',
+  description: '',
+  project_manager: '',
+  image_url: '',
+};
+
 export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
-  const [formData, setFormData] = useState(project || {
-    name: '',
-    client_name: '',
-    project_type: 'commercial',
-    status: 'bidding',
-    priority: 'medium',
-    address: '',
-    start_date: '',
-    end_date: '',
-    budget: '',
-    description: '',
-    project_manager: '',
-    image_url: '',
-  });
+  const [formData, setFormData] = useState(project || EMPTY);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  // Re-sync local form whenever the project being edited changes
+  // (so editing a second project doesn't keep the first one's values).
+  useEffect(() => {
+    if (open) setFormData(project || EMPTY);
+  }, [open, project?.id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,6 +94,12 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
       setUploading(false);
     }
   };
+
+  // If the saved type isn't in the catalog (legacy), still show it so it isn't lost.
+  const typeOptions =
+    formData.project_type && !PROJECT_TYPES.some((t) => t.value === formData.project_type)
+      ? [{ value: formData.project_type, label: formData.project_type.replace(/_/g, ' ') }, ...PROJECT_TYPES]
+      : PROJECT_TYPES;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -122,14 +135,14 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
             <div className="space-y-2">
               <Label>Project Type *</Label>
               <Select
-                value={formData.project_type}
+                value={formData.project_type || ''}
                 onValueChange={(value) => setFormData({ ...formData, project_type: value })}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {PROJECT_TYPES.map((type) => (
+                  {typeOptions.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
                     </SelectItem>
@@ -284,7 +297,7 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
               Cancel
             </Button>
             <Button type="submit" disabled={loading} className="bg-slate-900 hover:bg-slate-800">
-              {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {loading && <Loader2 className="h-4 w-4 mr-2" />}
               {project ? 'Update Project' : 'Create Project'}
             </Button>
           </div>

@@ -38,7 +38,7 @@ export default function ProjectMaterials({ projectId, organizationId }) {
       return base44.entities.ProjectMaterial.filter({ 
         project_id: projectId,
         organization_id: organizationId 
-      }, '-created_at');
+      }, '-created_date');
     },
     enabled: !!projectId && !!organizationId
   });
@@ -65,7 +65,8 @@ export default function ProjectMaterials({ projectId, organizationId }) {
       });
       setShowForm(false);
       toast.success('Material added successfully');
-    }
+    },
+    onError: (e) => toast.error('Failed to add material: ' + (e.message || ''))
   });
 
   // Update mutation
@@ -86,7 +87,8 @@ export default function ProjectMaterials({ projectId, organizationId }) {
       });
       setShowForm(false);
       toast.success('Material updated successfully');
-    }
+    },
+    onError: (e) => toast.error('Failed to update material: ' + (e.message || ''))
   });
 
   // Delete mutation
@@ -95,7 +97,8 @@ export default function ProjectMaterials({ projectId, organizationId }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projectMaterials'] });
       toast.success('Material deleted successfully');
-    }
+    },
+    onError: (e) => toast.error('Failed to delete material: ' + (e.message || ''))
   });
 
   const handleSubmit = () => {

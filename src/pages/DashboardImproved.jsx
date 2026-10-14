@@ -63,6 +63,7 @@ const fmtCompact = (n) => {
   if (Math.abs(n) >= 1e3) return '$' + Math.round(n / 1e3) + 'K';
   return '$' + Math.round(n).toLocaleString('en-US');
 };
+const safe = (n) => (Number.isFinite(n) ? n : 0);
 
 function KpiCard({ title, value, sub, icon: Icon, accent, loading, progress }) {
   return (
@@ -155,28 +156,23 @@ export default function Dashboard() {
     enabled: !!orgId,
   });
 
-  const { data: bidRows = [], isLoading: loadingBids } = useQuery({
-    queryKey: ['dash-bids-agg', orgId],
+  const { data: bidList = [], isLoading: loadingBids } = useQuery({
+    queryKey: ['dash-bids-list', orgId],
     queryFn: async () => {
-      const res = await base44.entities.BidOpportunity.aggregate({
-        query: { organization_id: orgId, status: { $in: PIPELINE_STATUSES } },
-        groupBy: 'status',
-        sum: ['estimated_value'],
-      });
-      return res?.rows || [];
+      const query = orgId
+        ? { $or: [{ organization_id: orgId }, { organization_id: { $in: [null, ''] } }, { organization_id: { $exists: false } }] }
+        : {};
+      const page = await base44.entities.BidOpportunity.filter(query, { sort: '-created_date', limit: 500, fields: ['status', 'estimated_value'] });
+      return (page?.items || page || []);
     },
     enabled: !!orgId,
   });
 
-  const { data: expenseRows = [], isLoading: loadingBilling } = useQuery({
-    queryKey: ['dash-billing-agg', orgId],
+  const { data: dualStages = [], isLoading: loadingDual } = useQuery({
+    queryKey: ['dash-dualtrack', orgId],
     queryFn: async () => {
-      const res = await base44.entities.Expense.aggregate({
-        query: { status: { $in: ['pending', 'approved'] } },
-        groupBy: 'status',
-        sum: ['amount'],
-      });
-      return res?.rows || [];
+      const res = await base44.entities.DualTrackStage.filter({ organization_id: orgId }, { limit: 500, fields: ['project_id', 'budget', 'actual', 'committed', 'cost_to_complete', 'field_track_status', 'money_track_status'] });
+      return res?.items || [];
     },
     enabled: !!orgId,
   });
@@ -185,13 +181,25 @@ export default function Dashboard() {
   const activeJobs = projects.filter((p) => ACTIVE_STATUSES.includes(p.status));
   const sumBudgetActive = activeJobs.reduce((s, p) => s + (p.budget || 0), 0);
   const sumSpentActive = activeJobs.reduce((s, p) => s + (p.spent || 0), 0);
-  const overBudgetProjects = projects.filter(
-    (p) => p.budget && (p.projected_final_cost || p.spent || 0) > p.budget
-  );
-  const pipelineCount = bidRows.reduce((s, r) => s + (r.count || 0), 0);
-  const pipelineValue = bidRows.reduce((s, r) => s + (r.sum_estimated_value || 0), 0);
-  const billingOutstanding = expenseRows.reduce((s, r) => s + (r.sum_amount || 0), 0);
+  // Bids in Pipeline — counts the actual bids list (same data as the Bids page)
+  const pipelineBids = bidList.filter((b) => PIPELINE_STATUSES.includes(b.status));
+  const pipelineCount = pipelineBids.length;
+  const pipelineValue = pipelineBids.reduce((s, b) => s + (b.estimated_value || 0), 0);
+  // Billing Outstanding — matches the Billing page (contract − billed for awarded/in_progress/completed)
+  const billingProjects = projects.filter((p) => ['awarded', 'in_progress', 'completed'].includes(p.status));
+  const billingOutstanding = billingProjects.reduce((s, p) => s + Math.max(0, (p.budget || 0) - (p.spent || 0)), 0);
   const costPct = sumBudgetActive ? (sumSpentActive / sumBudgetActive) * 100 : 0;
+
+  // DualTrack red flags — a project is flagged if any of its stages has a fade or a blocked track
+  const redFlagProjectIds = React.useMemo(() => {
+    const set = new Set();
+    dualStages.forEach((s) => {
+      const remaining = safe(s.budget) - safe(s.actual) - safe(s.committed);
+      const fade = safe(s.cost_to_complete) - remaining;
+      if (fade > 0 || s.field_track_status === 'blocked' || s.money_track_status === 'blocked') set.add(s.project_id);
+    });
+    return set;
+  }, [dualStages]);
 
   const projectMap = React.useMemo(() => {
     const m = {};
@@ -207,6 +215,7 @@ export default function Dashboard() {
   };
 
   const fadeFlag = (p) => {
+    if (redFlagProjectIds.has(p.id)) return { label: 'Red Flag', tone: 'red' };
     const forecast = p.projected_final_cost || p.spent || 0;
     if (!p.budget) return { label: '—', tone: 'muted' };
     return forecast > p.budget
@@ -235,14 +244,14 @@ export default function Dashboard() {
 
       {/* KPI Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <KpiCard title="Active Jobs" value={activeJobs.length} icon={HardHat} loading={loadingProjects} />
+        <KpiCard title="All Jobs" value={projects.length} sub={`${activeJobs.length} active`} icon={HardHat} loading={loadingProjects} />
         <KpiCard title="Total Contract Value" value={fmtCompact(sumBudgetActive)} sub="across active jobs" icon={FileText} loading={loadingProjects} />
         <KpiCard title="Cost to Date vs Budget" value={fmtCompact(sumSpentActive)} sub={`of ${fmtCompact(sumBudgetActive)} budget`} icon={Wallet} loading={loadingProjects} progress={costPct} />
-        <KpiCard title="Projects Over Budget" value={overBudgetProjects.length} sub={overBudgetProjects.length ? 'needs attention' : 'all on budget'} icon={AlertTriangle} accent="gold" loading={loadingProjects} />
+        <KpiCard title="DualTrack Red Flags" value={redFlagProjectIds.size} sub="projects off track" icon={Flag} accent="gold" loading={loadingDual} />
         <KpiCard title="Open POs" value={openPOs.length} sub="awaiting fulfillment" icon={ShoppingCart} loading={loadingPOs} />
         <KpiCard title="Upcoming Milestones" value={upcomingTasks.length} sub="next 7 days" icon={CalendarClock} loading={loadingTasks} />
         <KpiCard title="Bids in Pipeline" value={pipelineCount} sub={`${fmtCompact(pipelineValue)} value`} icon={Briefcase} loading={loadingBids} />
-        <KpiCard title="Billing Outstanding" value={fmtCompact(billingOutstanding)} sub="unpaid bills" icon={Receipt} loading={loadingBilling} />
+        <KpiCard title="Billing Outstanding" value={fmtCompact(billingOutstanding)} sub="contract − billed" icon={Receipt} loading={loadingProjects} />
       </div>
 
       {/* All Jobs table */}

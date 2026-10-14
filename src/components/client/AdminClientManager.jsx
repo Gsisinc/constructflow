@@ -37,7 +37,8 @@ export default function AdminClientManager({ projectId }) {
       setShowUpdateDialog(false);
       setUpdateForm({ update_type: 'progress', message: '', milestone_name: '', photo_urls: [] });
       toast.success('Update sent to client');
-    }
+    },
+    onError: (e) => toast.error('Failed to send update: ' + (e.message || ''))
   });
 
   const deleteUpdateMutation = useMutation({
@@ -185,8 +186,12 @@ export default function AdminClientManager({ projectId }) {
                   <Button
                     onClick={() => createUpdateMutation.mutate({
                       project_id: projectId,
-                      ...updateForm,
-                      sent_by: 'admin'
+                      update_type: updateForm.update_type === 'milestone' ? 'milestone' : 'daily_log',
+                      title: updateForm.milestone_name || updateForm.update_type,
+                      content: updateForm.message,
+                      media_urls: updateForm.photo_urls,
+                      posted_by: 'admin',
+                      visibility: 'client'
                     })}
                     className="w-full"
                   >

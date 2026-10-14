@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
 import { normalizeBidAnalysis } from '@/lib/bidAnalysis';
+import { getPhaseTemplate } from '../components/projects/projectTemplates';
 
 const statusColors = {
   new: 'bg-blue-100 text-blue-800',
@@ -151,7 +152,27 @@ export default function Bids() {
         budget: bid.estimated_value || 0,
         description: bid.scope_of_work || bid.description || '',
         status: 'awarded',
+        organization_id: user.organization_id,
       });
+
+      // Seed default phases + requirements the same way New Project does
+      const projType = divisionToProjectType(bid.division);
+      const tpl = getPhaseTemplate(projType);
+      const phasesToCreate = tpl.map((p) => ({ ...p, items: p.items.map((it) => ({ text: it, completed: false })) }));
+      const customPhases = phasesToCreate.map((phase, idx) => ({
+        project_id: project.id,
+        phase_name: phase.phase,
+        display_name: phase.phase,
+        order: idx,
+        status: 'pending',
+      }));
+      if (customPhases.length) await base44.entities.CustomPhase.bulkCreate(customPhases);
+      const reqs = [];
+      phasesToCreate.forEach((phase) => phase.items.forEach((item) => {
+        if (item.text.trim()) reqs.push({ project_id: project.id, phase_name: phase.phase, requirement_text: item.text.trim(), status: 'pending' });
+      }));
+      if (reqs.length) await base44.entities.PhaseRequirement.bulkCreate(reqs);
+
       await base44.entities.BidOpportunity.update(bid.id, {
         status: 'won',
         linked_project_id: project.id,

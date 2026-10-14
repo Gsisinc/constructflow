@@ -14,7 +14,10 @@
       "enum": [
         "proposal_handoff",
         "engineering",
-        "execution"
+        "execution",
+        "phase_a",
+        "phase_b",
+        "phase_c"
       ]
     },
     "stage_number": {
@@ -44,10 +47,42 @@
       ],
       "default": "not_started"
     },
+    "field_track_items": {
+      "type": "array",
+      "description": "Field Track action items (checkboxes). A track passes when all are completed.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "money_track_items": {
+      "type": "array",
+      "description": "Money Track action items (checkboxes). A track passes when all are completed.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
     "exit_gate_passed": {
       "type": "boolean",
       "default": false,
-      "description": "True when both tracks pass the stage gate"
+      "description": "True when both Field Track and Money Track items pass the stage gate"
     },
     "budget": {
       "type": "number",
