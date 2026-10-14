@@ -4,18 +4,47 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		},
+		fontFamily: {
+			sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+			heading: ['Inter', 'system-ui', 'sans-serif'],
+			body: ['Inter', 'system-ui', 'sans-serif'],
+		},
+		borderRadius: {
+			lg: 'var(--radius)',
+			md: 'calc(var(--radius) - 2px)',
+			sm: 'calc(var(--radius) - 4px)'
+		},
+		boxShadow: {
+			card: '0 1px 2px rgba(15, 23, 42, 0.06)',
+			'card-hover': '0 4px 12px rgba(15, 23, 42, 0.08)',
+		},
   		colors: {
   			navy: {
-  				50: '#f0f4f8', 100: '#d9e2ec', 200: '#bcccdc', 300: '#9fb3c8', 400: '#829ab1', 500: '#627d98', 600: '#486581', 700: '#334e68', 800: '#243b53', 900: '#102a43',
+  				50: '#EEF2F8', 100: '#D8E0EC', 200: '#B9C6D8', 300: '#94A6BF',
+  				400: '#6F84A6', 500: '#4E6788', 600: '#344F73', 700: '#16335C',
+  				800: '#102744', 900: '#0B1F3A',
   			},
   			gold: {
-  				50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24', 500: '#d4a012', 600: '#b45309', 700: '#92400e', 800: '#78350f', 900: '#451a03',
+  				50: '#FBF5E1', 100: '#F4E6B8', 200: '#E8D08A', 300: '#DDBD5C',
+  				400: '#D4AC3D', 500: '#C9A227', 600: '#B08C1E', 700: '#8F721A',
+  				800: '#6E5816', 900: '#4A3C12',
   			},
+  			success: {
+  				DEFAULT: '#15803D', 50: '#F0FDF4', 100: '#DCFCE7', 600: '#15803D', 700: '#166534',
+  			},
+  			warning: {
+  				DEFAULT: '#B45309', 50: '#FFFBEB', 100: '#FEF3C7', 600: '#B45309', 700: '#92400E',
+  			},
+  			danger: {
+  				DEFAULT: '#B91C1C', 50: '#FEF2F2', 100: '#FEE2E2', 600: '#B91C1C', 700: '#991B1B',
+  			},
+  			info: {
+  				DEFAULT: '#1D4ED8', 50: '#EFF6FF', 100: '#DBEAFE', 600: '#1D4ED8', 700: '#1E40AF',
+  			},
+  			neutral: {
+  				DEFAULT: '#64748B', 50: '#F8FAFC', 100: '#F1F5F9', 600: '#64748B', 700: '#475569',
+  			},
+  			meta: '#94A3B8',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -69,20 +98,12 @@ module.exports = {
   		},
   		keyframes: {
   			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
+  				from: { height: '0' },
+  				to: { height: 'var(--radix-accordion-content-height)' }
   			},
   			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
+  				from: { height: 'var(--radix-accordion-content-height)' },
+  				to: { height: '0' }
   			}
   		},
   		animation: {

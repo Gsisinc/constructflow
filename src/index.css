@@ -1,91 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ========================================
-   CONSTRUCTFLOW v3.0 - DESIGN SYSTEM
+   MYGSIS — Professional construction PM theme
+   Brand: Navy 900 #0B1F3A · Navy 700 #16335C · GSIS Gold #C9A227
    ======================================== */
-
-/* Import the complete design system first */
-@import './styles/design-system.css';
-
-/* Additional theme imports */
-@import './styles/enhanced-theme.css';
-@import './styles/professional-theme.css';
-@import './styles/alvys-design-system.css';
 
 @layer base {
   :root {
-    /* Professional theme: indigo primary, slate neutrals */
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: 216 33% 97%;          /* #F5F7FA content bg */
+    --foreground: 222 47% 11%;          /* #0F172A */
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 222 47% 22%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
+    --primary: 46 68% 47%;              /* GSIS Gold #C9A227 */
+    --primary-foreground: 214 68% 14%;  /* Navy 900 */
+    --secondary: 215 30% 95%;
     --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 98%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 43 74% 50%;
-    --accent-foreground: 222 47% 15%;
-    --gold: 43 74% 50%;
-    --destructive: 0 72% 51%;
+    --muted: 215 30% 96%;
+    --muted-foreground: 215 19% 35%;    /* #475569 (AA-readable) */
+    --accent: 215 30% 95%;
+    --accent-foreground: 222 47% 11%;
+    --gold: 46 68% 47%;
+    --gold-foreground: 214 68% 14%;
+    --destructive: 0 72% 42%;           /* #B91C1C */
     --destructive-foreground: 0 0% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 243 75% 59%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --success: 142 72% 29%;            /* #15803D */
+    --warning: 26 90% 37%;             /* #B45309 */
+    --info: 224 76% 48%;               /* #1D4ED8 */
+    --border: 215 27% 91%;             /* #E3E8EF */
+    --input: 215 27% 91%;
+    --ring: 46 68% 47%;                 /* gold focus ring */
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-1: 214 68% 22%;
+    --chart-2: 46 68% 47%;
+    --chart-3: 142 60% 40%;
+    --chart-4: 224 76% 48%;
+    --chart-5: 26 90% 50%;
+    --sidebar-background: 214 68% 14%;
+    --sidebar-foreground: 215 25% 78%;
+    --sidebar-primary: 46 68% 47%;
+    --sidebar-primary-foreground: 214 68% 14%;
+    --sidebar-accent: 215 45% 26%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 30% 22%;
+    --sidebar-ring: 46 68% 47%;
   }
 
   .dark {
-    --background: 0 0% 3.9%;
+    --background: 214 68% 10%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
+    --card: 214 50% 14%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+    --popover: 214 50% 14%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
+    --primary: 46 68% 47%;
+    --primary-foreground: 214 68% 14%;
+    --secondary: 215 30% 18%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
+    --muted: 215 30% 18%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 215 30% 20%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 215 30% 22%;
+    --input: 215 30% 22%;
+    --ring: 46 68% 47%;
   }
 }
 
@@ -95,8 +80,19 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
   }
+}
+
+@layer components {
+  .page-title { @apply text-2xl font-semibold text-slate-900; }
+  .section-title { @apply text-lg font-semibold text-slate-900; }
+  .card-title { @apply text-sm font-semibold text-slate-900; }
+  .kpi-label { @apply text-xs font-medium uppercase tracking-wide text-slate-400; }
+  .meta-label { @apply text-xs font-medium uppercase tracking-wide text-slate-400; }
+  .num { @apply tabular-nums; }
 }
 
 /* ========================================
@@ -164,52 +160,36 @@
     display: none !important;
   }
 }
-/* Mobile View Optimizations - BALANCED */
+
+/* Mobile View Optimizations */
 @media (max-width: 768px) {
-  /* Fix heading sizes - maintain hierarchy */
-  h1 { font-size: 1.75rem; line-height: 2rem; }
-  h2 { font-size: 1.5rem; line-height: 1.875rem; }
-  h3 { font-size: 1.25rem; line-height: 1.5rem; }
-  h4, h5, h6 { font-size: 1.125rem; line-height: 1.5rem; }
-  
-  /* Fix body text - readable size */
-  body, p { font-size: 1rem; }
-  span, label { font-size: 0.9375rem; }
-  
-  /* Table heading styles */
-  th { font-size: 0.875rem; padding: 0.75rem; }
-  td { font-size: 0.9375rem; padding: 0.75rem; }
-  
-  /* Fix button sizes - touch-friendly */
-  button, [role="button"] { padding: 0.75rem 1.25rem; font-size: 1rem; min-height: 2.75rem; }
-  
-  /* Fix form elements */
-  input, select, textarea { font-size: 16px; padding: 0.75rem; min-height: 2.75rem; }
-  
-  /* Fix card padding */
-  .card, [role="card"] { padding: 1.25rem; }
-  
-  /* Fix sidebar */
-  [role="navigation"] { width: 100%; max-width: 280px; }
+  h1 { font-size: 1.5rem; line-height: 1.3; }
+  h2 { font-size: 1.25rem; line-height: 1.3; }
+  h3 { font-size: 1.1rem; line-height: 1.3; }
+  h4, h5, h6 { font-size: 1rem; line-height: 1.3; }
+
+  th { font-size: 0.75rem; padding: 0.5rem; }
+  td { font-size: 0.875rem; padding: 0.5rem; }
+
+  input, select, textarea { font-size: 16px; }
 }
 
 /* Scrollbar styling for mobile */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
 }
 
 /* Disable pull-to-refresh on mobile */

@@ -123,7 +123,7 @@ function UserMenu({ user, onLogout }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 transition-colors">
-          <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold flex-shrink-0" style={{ backgroundColor: '#0F1B2D', color: '#E8B547' }}>
+          <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold flex-shrink-0" style={{ backgroundColor: '#0B1F3A', color: '#C9A227' }}>
             {user.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
           </div>
           <div className="text-left hidden sm:block">
@@ -158,14 +158,15 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
     <Link
       to={createPageUrl(item.page)}
       onClick={onNavigate}
+      title={item.name}
       className={cn(
-        "group flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px]",
+        "group flex items-center gap-3 px-4 py-2.5 rounded-r-lg text-sm font-medium transition-all duration-200 min-h-[44px] border-l-[3px]",
         isActive
-          ? "bg-[#E8B547] text-[#0F1B2D] font-semibold shadow-md"
-          : "text-slate-300 hover:bg-white/5 hover:text-white"
+          ? "bg-[#16335C] text-white font-semibold border-[#C9A227] shadow-sm"
+          : "text-white/70 border-transparent hover:bg-[#16335C] hover:text-white"
       )}
     >
-      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-[#0F1B2D]" : "text-[#E8B547]/70 group-hover:text-[#E8B547]")} />
+      <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-[#C9A227]" : "text-[#C9A227]/70 group-hover:text-[#C9A227]")} />
       <span className="truncate">{item.name}</span>
     </Link>
   );
@@ -174,7 +175,9 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
 export default function Layout({ children, currentPageName }) {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem('mygsis_sidebar_collapsed') === 'true'; } catch { return false; }
+  });
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [organization, setOrganization] = useState(null);
@@ -265,6 +268,14 @@ export default function Layout({ children, currentPageName }) {
 
   const handleNavigateFromSidebar = () => {
     setSidebarOpen(false);
+  };
+
+  const toggleSidebarCollapsed = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try { localStorage.setItem('mygsis_sidebar_collapsed', String(next)); } catch {}
+      return next;
+    });
   };
 
   function hexToHSL(hex) {
@@ -387,8 +398,8 @@ export default function Layout({ children, currentPageName }) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="inline-flex h-8 sm:h-9 px-1.5 sm:px-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 flex-shrink-0"
+              onClick={toggleSidebarCollapsed}
+              className="inline-flex h-8 sm:h-9 px-1.5 sm:px-2 text-slate-600 hover:text-navy-700 hover:bg-slate-100 flex-shrink-0"
               title="Toggle sidebar"
             >
               {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -397,7 +408,7 @@ export default function Layout({ children, currentPageName }) {
               variant="ghost"
               size="sm"
               onClick={() => setMegaMenuOpen(!megaMenuOpen)}
-              className="h-8 sm:h-9 px-1.5 sm:px-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 flex-shrink-0"
+              className="h-8 sm:h-9 px-1.5 sm:px-2 text-slate-600 hover:text-navy-700 hover:bg-slate-100 flex-shrink-0"
               title="Quick Access"
             >
               <Grid3x3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -421,24 +432,27 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Sidebar - on mobile leave room for bottom nav (4rem) so nothing is cut off */}
       <aside className={cn(
-        "fixed top-14 sm:top-16 left-0 bg-[#0F1B2D] border-r border-[#E8B547]/20 shadow-lg z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
+        "fixed top-14 sm:top-16 left-0 bg-[#0B1F3A] border-r border-[#C9A227]/20 shadow-lg z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
         "h-[calc(100vh-3.5rem-4rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)]",
         sidebarCollapsed ? "lg:w-20" : "lg:w-64",
         sidebarOpen ? "translate-x-0" : "-translate-x-full",
         "lg:translate-x-0"
       )}>
+        <div className={cn("flex items-center px-4 h-12 border-b border-[#C9A227]/15", sidebarCollapsed && "lg:hidden")}>
+          <span className="text-lg font-bold tracking-tight text-[#C9A227]">GSIS</span>
+        </div>
         <nav className="p-3 sm:p-4 pb-6 sm:pb-4 space-y-1">
           {user?.role === 'technician' ? (
             <>
               {technicianPrimaryNav.map((item) => (
                 <SidebarNavItem key={item.page} item={item} isActive={currentPageName === item.page} onNavigate={handleNavigateFromSidebar} />
               ))}
-              <div className="h-px bg-[#E8B547]/15 my-2 sm:my-3" />
-              <div className="text-xs font-semibold text-[#E8B547]/70 px-3 py-2 uppercase tracking-widest">My tools</div>
+              <div className="h-px bg-white/10 my-2 sm:my-3" />
+              <div className="text-[11px] font-semibold text-white/40 px-3 py-2 uppercase tracking-widest">My tools</div>
               {technicianSecondaryNav.map((item) => (
                 <SidebarNavItem key={item.page} item={item} isActive={currentPageName === item.page} onNavigate={handleNavigateFromSidebar} />
               ))}
-              <div className="h-px bg-[#E8B547]/15 my-2 sm:my-3" />
+              <div className="h-px bg-white/10 my-2 sm:my-3" />
               <SidebarNavItem item={{ name: 'Settings', icon: Settings, page: 'Settings' }} isActive={currentPageName === 'Settings'} onNavigate={handleNavigateFromSidebar} />
             </>
           ) : user?.role === 'client' ? (
@@ -446,16 +460,16 @@ export default function Layout({ children, currentPageName }) {
               {clientPrimaryNav.map((item) => (
                 <SidebarNavItem key={item.page} item={item} isActive={currentPageName === item.page} onNavigate={handleNavigateFromSidebar} />
               ))}
-              <div className="h-px bg-[#E8B547]/15 my-2 sm:my-3" />
+              <div className="h-px bg-white/10 my-2 sm:my-3" />
               <SidebarNavItem item={{ name: 'Settings', icon: Settings, page: 'Settings' }} isActive={currentPageName === 'Settings'} onNavigate={handleNavigateFromSidebar} />
             </>
           ) : (
             <>
           {navGroups.map((group, gi) => (
             <React.Fragment key={gi}>
-              {gi > 0 && <div className="h-px bg-[#E8B547]/15 my-2 sm:my-3" />}
+              {gi > 0 && <div className="h-px bg-white/10 my-2 sm:my-3" />}
               {group.label && (
-                <div className="text-xs font-semibold text-[#E8B547]/70 px-3 py-2 uppercase tracking-widest">
+                <div className="text-[11px] font-semibold text-white/40 px-3 py-2 uppercase tracking-widest">
                   {group.label}
                 </div>
               )}
@@ -466,8 +480,8 @@ export default function Layout({ children, currentPageName }) {
           ))}
 
           {/* Settings / Admin gear section */}
-          <div className="h-px bg-[#E8B547]/15 my-2 sm:my-3" />
-          <div className="text-xs font-semibold text-[#E8B547]/70 px-3 py-2 uppercase tracking-widest flex items-center gap-1.5">
+          <div className="h-px bg-white/10 my-2 sm:my-3" />
+          <div className="text-[11px] font-semibold text-white/40 px-3 py-2 uppercase tracking-widest flex items-center gap-1.5">
             <Settings className="h-3.5 w-3.5" /> Admin
           </div>
           {settingsAdminItems.map((item) => (
@@ -478,14 +492,14 @@ export default function Layout({ children, currentPageName }) {
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="sticky bottom-0 p-3 sm:p-4 border-t border-[#E8B547]/20 bg-[#0F1B2D]">
+        <div className="sticky bottom-0 p-3 sm:p-4 border-t border-[#C9A227]/20 bg-[#0B1F3A]">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="h-8 w-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ backgroundColor: '#E8B547', color: '#0F1B2D' }}>
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ backgroundColor: '#C9A227', color: '#0B1F3A' }}>
               {organization?.name?.[0] || 'G'}
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-sm font-semibold text-white truncate">{organization?.name || 'GSIS Manager'}</p>
-              <p className="text-xs text-[#E8B547]">Pro Plan</p>
+              <p className="text-xs text-[#C9A227]">Pro Plan</p>
             </div>
           </div>
         </div>
