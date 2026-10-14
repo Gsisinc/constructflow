@@ -63,6 +63,7 @@ const navGroups = [
   ]},
   { items: [
     { name: 'Projects', icon: FolderKanban, page: 'Projects' },
+    { name: 'Documents', icon: FileStack, page: 'Documents' },
   ]},
   { label: 'Billing', items: [
     { name: 'Billing', icon: Banknote, page: 'Billing' },

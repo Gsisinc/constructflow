@@ -3,7 +3,8 @@
   "type": "object",
   "properties": {
     "project_id": {
-      "type": "string"
+      "type": "string",
+      "description": "Project this document belongs to (required \u2014 no loose documents)"
     },
     "name": {
       "type": "string"
@@ -18,11 +19,16 @@
         "report",
         "photo",
         "invoice",
+        "log",
+        "submittal",
+        "test_report",
         "other"
-      ]
+      ],
+      "description": "Document type"
     },
     "file_url": {
-      "type": "string"
+      "type": "string",
+      "description": "Private storage URI of the uploaded file"
     },
     "version": {
       "type": "number",
@@ -38,6 +44,15 @@
       ],
       "default": "draft"
     },
+    "doc_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Document date"
+    },
+    "uploaded_by": {
+      "type": "string",
+      "description": "Name of the uploader"
+    },
     "notes": {
       "type": "string"
     },
@@ -52,5 +67,33 @@
     "project_id",
     "name",
     "type"
-  ]
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }

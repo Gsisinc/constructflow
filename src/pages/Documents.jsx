@@ -1,446 +1,119 @@
-import React, { useMemo, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
-import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Plus, FileText, Download, Trash2, GitCompare, History, Upload } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Plus, Search, Loader2, FileStack, FolderKanban, ChevronDown, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
-import { createAuditLog } from '@/lib/auditLog';
-import { hasPermission, loadPolicy } from '@/lib/permissions';
-
-async function safeCreateDocumentVersion(payload) {
-  try {
-    return await base44.entities.DocumentVersion.create(payload);
-  } catch (error) {
-    console.warn('DocumentVersion entity unavailable. Skipping version record.', error);
-    return null;
-  }
-}
-
-async function safeListDocumentVersions(documentId) {
-  try {
-    return await base44.entities.DocumentVersion.filter({ document_id: documentId }, '-version_number');
-  } catch (error) {
-    console.warn('DocumentVersion entity unavailable. Returning empty list.', error);
-    return [];
-  }
-}
+import { format } from 'date-fns';
+import { DocRow, DocumentDialog, DOC_TYPES, typeColor, typeLabel } from '@/components/projects/DocumentsTab';
 
 export default function Documents() {
-  const queryClient = useQueryClient();
-  const [selectedProject, setSelectedProject] = useState('');
-  const [showForm, setShowForm] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [selectedDocForHistory, setSelectedDocForHistory] = useState(null);
-  const [compareLeft, setCompareLeft] = useState('');
-  const [compareRight, setCompareRight] = useState('');
-  const [newVersionFile, setNewVersionFile] = useState(null);
-  const [newVersionDoc, setNewVersionDoc] = useState('');
+  const qc = useQueryClient();
+  const [fProject, setFProject] = useState('all');
+  const [fType, setFType] = useState('all');
+  const [fFrom, setFFrom] = useState('');
+  const [fTo, setFTo] = useState('');
+  const [search, setSearch] = useState('');
+  const [collapsed, setCollapsed] = useState({});
+  const [showCreate, setShowCreate] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    type: 'drawing',
-    status: 'draft'
+  const { data: projects = [], isLoading: lp } = useQuery({
+    queryKey: ['projects-all-docs'],
+    queryFn: async () => (await base44.entities.Project.filter({}, { limit: 500, fields: ['name', 'organization_id'] }))?.items || [],
+  });
+  const projName = (id) => projects.find(p => p.id === id)?.name || 'Unknown project';
+
+  const { data: docs = [], isLoading: ld } = useQuery({
+    queryKey: ['all-documents'],
+    queryFn: async () => (await base44.entities.Document.filter({}, { sort: '-created_date', limit: 500 }))?.items || [],
   });
 
-  const { data: user } = useQuery({
-    queryKey: ['currentUser', 'documents-page'],
-    queryFn: () => base44.auth.me()
-  });
+  const filtered = useMemo(() => docs.filter(d => {
+    if (fProject !== 'all' && d.project_id !== fProject) return false;
+    if (fType !== 'all' && d.type !== fType) return false;
+    const dd = d.doc_date || (d.created_date ? d.created_date.split('T')[0] : '');
+    if (fFrom && dd < fFrom) return false;
+    if (fTo && dd > fTo) return false;
+    if (search && !(d.name || '').toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  }), [docs, fProject, fType, fFrom, fTo, search]);
 
-  const { data: policy } = useQuery({
-    queryKey: ['permissionPolicy', user?.organization_id],
-    queryFn: () => loadPolicy({ organizationId: user.organization_id }),
-    enabled: !!user?.organization_id
-  });
+  const grouped = useMemo(() => {
+    const map = {};
+    filtered.forEach(d => { (map[d.project_id] = map[d.project_id] || []).push(d); });
+    return map;
+  }, [filtered]);
 
-  const role = user?.role || user?.user_role || 'viewer';
-  const canCreateDocuments = hasPermission({ policy, role, module: 'documents', action: 'create' });
-  const canDeleteDocuments = hasPermission({ policy, role, module: 'documents', action: 'delete' });
-
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list()
-  });
-
-  const { data: documents = [] } = useQuery({
-    queryKey: ['documents', selectedProject],
-    queryFn: () => (selectedProject ? base44.entities.Document.filter({ project_id: selectedProject }, '-created_date') : Promise.resolve([])),
-    enabled: !!selectedProject
-  });
-
-  const { data: versions = [] } = useQuery({
-    queryKey: ['documentVersions', selectedDocForHistory?.id],
-    queryFn: () => safeListDocumentVersions(selectedDocForHistory.id),
-    enabled: !!selectedDocForHistory?.id
-  });
-
-  const compareSelection = useMemo(() => {
-    const left = versions.find((v) => v.id === compareLeft);
-    const right = versions.find((v) => v.id === compareRight);
-    return { left, right };
-  }, [versions, compareLeft, compareRight]);
-
-  const createMutation = useMutation({
-    mutationFn: async () => {
-      let fileMeta = null;
-      if (selectedFile) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file: selectedFile });
-        fileMeta = {
-          file_url,
-          file_name: selectedFile.name,
-          file_type: selectedFile.type,
-          file_size: selectedFile.size
-        };
-      }
-
-      const document = await base44.entities.Document.create({
-        ...formData,
-        ...fileMeta,
-        project_id: selectedProject,
-        organization_id: user?.organization_id || null,
-        version: 1
-      });
-
-      await safeCreateDocumentVersion({
-        document_id: document.id,
-        organization_id: user?.organization_id || null,
-        version_number: 1,
-        file_url: fileMeta?.file_url || null,
-        notes: 'Initial upload',
-        created_by: user?.id || null
-      });
-
-      await createAuditLog({
-        organizationId: user?.organization_id,
-        userId: user?.id,
-        action: 'document_created',
-        entityType: 'Document',
-        entityId: document.id,
-        after: document,
-        metadata: { project_id: selectedProject }
-      });
-
-      return document;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documents', selectedProject] });
-      setFormData({ name: '', type: 'drawing', status: 'draft' });
-      setSelectedFile(null);
-      setShowForm(false);
-      toast.success('Document uploaded and versioned successfully');
-    },
-    onError: (error) => {
-      console.error(error);
-      toast.error('Failed to upload document');
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (doc) => {
-      await base44.entities.Document.delete(doc.id);
-      await createAuditLog({
-        organizationId: user?.organization_id,
-        userId: user?.id,
-        action: 'document_deleted',
-        entityType: 'Document',
-        entityId: doc.id,
-        before: doc,
-        metadata: { project_id: doc.project_id }
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documents', selectedProject] });
-      toast.success('Document deleted');
-    }
-  });
-
-  const uploadVersionMutation = useMutation({
-    mutationFn: async () => {
-      const doc = documents.find((item) => item.id === newVersionDoc);
-      if (!doc || !newVersionFile) return;
-
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: newVersionFile });
-      const nextVersion = Number(doc.version || 1) + 1;
-
-      const updatedDoc = await base44.entities.Document.update(doc.id, {
-        file_url,
-        file_name: newVersionFile.name,
-        file_type: newVersionFile.type,
-        file_size: newVersionFile.size,
-        version: nextVersion,
-        status: 'pending_review'
-      });
-
-      await safeCreateDocumentVersion({
-        document_id: doc.id,
-        organization_id: user?.organization_id || null,
-        version_number: nextVersion,
-        file_url,
-        notes: 'Uploaded new version',
-        created_by: user?.id || null
-      });
-
-      await createAuditLog({
-        organizationId: user?.organization_id,
-        userId: user?.id,
-        action: 'document_version_uploaded',
-        entityType: 'Document',
-        entityId: doc.id,
-        before: doc,
-        after: updatedDoc,
-        metadata: { version: nextVersion }
-      });
-
-      return doc.id;
-    },
-    onSuccess: (docId) => {
-      queryClient.invalidateQueries({ queryKey: ['documents', selectedProject] });
-      queryClient.invalidateQueries({ queryKey: ['documentVersions', docId] });
-      setNewVersionDoc('');
-      setNewVersionFile(null);
-      toast.success('New version uploaded');
-    },
-    onError: () => toast.error('Failed to upload new version')
-  });
-
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'drawing': return 'bg-blue-100 text-blue-800';
-      case 'specification': return 'bg-purple-100 text-purple-800';
-      case 'contract': return 'bg-red-100 text-red-800';
-      case 'permit': return 'bg-green-100 text-green-800';
-      case 'report': return 'bg-orange-100 text-orange-800';
-      case 'photo': return 'bg-pink-100 text-pink-800';
-      default: return 'bg-slate-100 text-slate-800';
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'pending_review': return 'bg-yellow-100 text-yellow-800';
-      case 'superseded': return 'bg-slate-100 text-slate-800';
-      default: return 'bg-slate-100 text-slate-800';
-    }
-  };
+  const projectIds = Object.keys(grouped);
+  const counts = useMemo(() => {
+    const byType = {};
+    docs.forEach(d => { byType[d.type] = (byType[d.type] || 0) + 1; });
+    return byType;
+  }, [docs]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap justify-between items-center gap-3">
-        <h1 className="text-2xl md:text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Project Documents</h1>
-        <div className="flex gap-2">
-          <Dialog open={showForm} onOpenChange={setShowForm}>
-            <DialogTrigger asChild>
-              <Button className="bg-amber-600 hover:bg-amber-700" disabled={!canCreateDocuments}>
-                <Plus className="h-4 w-4 mr-2" /> Upload Document
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Upload New Document</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <Select value={selectedProject} onValueChange={setSelectedProject}>
-                  <SelectTrigger><SelectValue placeholder="Select Project" /></SelectTrigger>
-                  <SelectContent>
-                    {projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-
-                <Input
-                  placeholder="Document Name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-
-                <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="drawing">Drawing</SelectItem>
-                    <SelectItem value="specification">Specification</SelectItem>
-                    <SelectItem value="contract">Contract</SelectItem>
-                    <SelectItem value="permit">Permit</SelectItem>
-                    <SelectItem value="report">Report</SelectItem>
-                    <SelectItem value="photo">Photo</SelectItem>
-                    <SelectItem value="invoice">Invoice</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <label className="block text-sm">
-                  <span className="text-slate-700 break-words">File</span>
-                  <Input type="file" className="mt-1" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
-                </label>
-
-                <Button
-                  onClick={() => createMutation.mutate()}
-                  disabled={!selectedProject || !formData.name || createMutation.isPending || !canCreateDocuments}
-                  className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700"
-                >
-                  {createMutation.isPending ? 'Uploading...' : 'Upload Document'}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" disabled={!canCreateDocuments || !documents.length}>
-                <Upload className="h-4 w-4 mr-2" /> Upload New Version
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>Upload New Document Version</DialogTitle></DialogHeader>
-              <div className="space-y-4">
-                <Select value={newVersionDoc} onValueChange={setNewVersionDoc}>
-                  <SelectTrigger><SelectValue placeholder="Choose document" /></SelectTrigger>
-                  <SelectContent>
-                    {documents.map((doc) => <SelectItem key={doc.id} value={doc.id}>{doc.name} (v{doc.version || 1})</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                <Input type="file" onChange={(e) => setNewVersionFile(e.target.files?.[0] || null)} />
-                <Button
-                  className="w-full sm:w-auto"
-                  disabled={!newVersionDoc || !newVersionFile || uploadVersionMutation.isPending}
-                  onClick={() => uploadVersionMutation.mutate()}
-                >
-                  {uploadVersionMutation.isPending ? 'Uploading...' : 'Upload Version'}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+    <div className="space-y-6 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Documents</h1>
+          <p className="text-sm text-slate-500 mt-1">All project documents, grouped by project · {docs.length} total</p>
         </div>
+        <Button className="bg-primary hover:bg-primary/90 gap-2" onClick={() => setShowCreate(true)}><Plus className="h-4 w-4" /> Add Document</Button>
       </div>
 
-      <div className="mb-2">
-        <Select value={selectedProject} onValueChange={setSelectedProject}>
-          <SelectTrigger className="w-72"><SelectValue placeholder="Select a Project" /></SelectTrigger>
-          <SelectContent>
-            {projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {!selectedProject ? (
-        <Card><CardContent className="pt-12 pb-12 text-center"><FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" /><p className="text-slate-500">Select a project to view documents</p></CardContent></Card>
-      ) : documents.length === 0 ? (
-        <Card><CardContent className="pt-12 pb-12 text-center"><FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" /><p className="text-slate-500">No documents yet</p></CardContent></Card>
-      ) : (
-        <div className="grid gap-4">
-          {documents.map((doc) => (
-            <Card key={doc.id}>
-              <CardHeader>
-                <div className="flex justify-between items-start gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <FileText className="h-5 w-5 text-slate-400" />
-                      <CardTitle className="text-lg">{doc.name}</CardTitle>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className={getTypeColor(doc.type)}>{doc.type.replace('_', ' ')}</Badge>
-                      <Badge className={getStatusColor(doc.status)}>{doc.status.replace('_', ' ')}</Badge>
-                      <Badge variant="outline">v{doc.version || 1}</Badge>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => setSelectedDocForHistory(doc)}>
-                      <History className="h-4 w-4" />
-                    </Button>
-                    {doc.file_url && (
-                      <Button variant="ghost" size="sm" asChild>
-                        <a href={doc.file_url} target="_blank" rel="noopener noreferrer"><Download className="h-4 w-4" /></a>
-                      </Button>
-                    )}
-                    <Button variant="ghost" size="sm" onClick={() => deleteMutation.mutate(doc)} disabled={!canDeleteDocuments}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              {doc.notes && <CardContent><p className="text-sm text-slate-600">{doc.notes}</p></CardContent>}
-            </Card>
-          ))}
-        </div>
-      )}
-
-      <Dialog open={!!selectedDocForHistory} onOpenChange={(open) => !open && setSelectedDocForHistory(null)}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Version History & Compare — {selectedDocForHistory?.name}</DialogTitle>
-          </DialogHeader>
-
-          {versions.length === 0 ? (
-            <p className="text-sm text-slate-500">No version history available.</p>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Filters</CardTitle>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 mt-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input placeholder="Search name…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+            </div>
+            <select className="border rounded-lg px-3 py-2 text-sm bg-white" value={fProject} onChange={(e) => setFProject(e.target.value)}>
+              <option value="all">All Projects</option>{projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+            <select className="border rounded-lg px-3 py-2 text-sm bg-white" value={fType} onChange={(e) => setFType(e.target.value)}>
+              <option value="all">All Types</option>{DOC_TYPES.map(t => <option key={t} value={t}>{typeLabel(t)}</option>)}
+            </select>
+            <div><Label className="text-xs">From</Label><Input type="date" value={fFrom} onChange={(e) => setFFrom(e.target.value)} /></div>
+            <div><Label className="text-xs">To</Label><Input type="date" value={fTo} onChange={(e) => setFTo(e.target.value)} /></div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {lp || ld ? (
+            <div className="py-10 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-slate-400" /></div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-12"><FileStack className="h-12 w-12 text-slate-300 mx-auto mb-3" /><p className="text-slate-400">No documents match your filters.</p></div>
           ) : (
             <div className="space-y-4">
-              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-3">
-                <Select value={compareLeft} onValueChange={setCompareLeft}>
-                  <SelectTrigger><SelectValue placeholder="Left version" /></SelectTrigger>
-                  <SelectContent>
-                    {versions.map((v) => (
-                      <SelectItem key={v.id} value={v.id}>Version {v.version_number}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={compareRight} onValueChange={setCompareRight}>
-                  <SelectTrigger><SelectValue placeholder="Right version" /></SelectTrigger>
-                  <SelectContent>
-                    {versions.map((v) => (
-                      <SelectItem key={v.id} value={v.id}>Version {v.version_number}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center gap-2"><GitCompare className="h-4 w-4" /> Left</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm space-y-1">
-                    <p>Version: {compareSelection.left?.version_number || '—'}</p>
-                    <p>Created by: {compareSelection.left?.created_by || '—'}</p>
-                    <p>Notes: {compareSelection.left?.notes || '—'}</p>
-                    {compareSelection.left?.file_url && <a href={compareSelection.left.file_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">Open file</a>}
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center gap-2"><GitCompare className="h-4 w-4" /> Right</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm space-y-1">
-                    <p>Version: {compareSelection.right?.version_number || '—'}</p>
-                    <p>Created by: {compareSelection.right?.created_by || '—'}</p>
-                    <p>Notes: {compareSelection.right?.notes || '—'}</p>
-                    {compareSelection.right?.file_url && <a href={compareSelection.right.file_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">Open file</a>}
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-base">All Versions</CardTitle></CardHeader>
-                <CardContent className="space-y-2 max-h-48 overflow-auto">
-                  {versions.map((v) => (
-                    <div key={v.id} className="flex items-center justify-between text-sm border rounded px-3 py-2">
-                      <div>
-                        <p className="font-medium">Version {v.version_number}</p>
-                        <p className="text-slate-500">{v.notes || 'No notes'}</p>
+              {projectIds.map(pid => {
+                const items = grouped[pid];
+                const isCol = collapsed[pid];
+                return (
+                  <div key={pid} className="border border-slate-200 rounded-lg overflow-hidden">
+                    <button type="button" onClick={() => setCollapsed({ ...collapsed, [pid]: !isCol })} className="w-full flex items-center gap-2 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left">
+                      {isCol ? <ChevronRight className="h-4 w-4 text-slate-500" /> : <ChevronDown className="h-4 w-4 text-slate-500" />}
+                      <FolderKanban className="h-4 w-4 text-primary" />
+                      <span className="font-semibold text-slate-900 text-sm">{projName(pid)}</span>
+                      <span className="text-xs text-slate-500 ml-1">({items.length})</span>
+                    </button>
+                    {!isCol && (
+                      <div className="p-2 space-y-2 bg-white">
+                        {items.map(d => <DocRow key={d.id} doc={d} onDelete={async (doc) => { try { await base44.entities.Document.delete(doc.id); qc.invalidateQueries({ queryKey: ['all-documents'] }); toast.success('Deleted'); } catch (e) { toast.error('Delete failed'); } }} />)}
                       </div>
-                      {v.file_url && <a className="text-blue-600 underline" href={v.file_url} target="_blank" rel="noreferrer">Open</a>}
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+      </Card>
+
+      <DocumentDialog open={showCreate} onOpenChange={setShowCreate} onSaved={() => qc.invalidateQueries({ queryKey: ['all-documents'] })} projectOptions={projects} />
     </div>
   );
 }

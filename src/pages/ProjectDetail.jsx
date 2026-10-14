@@ -21,6 +21,7 @@ import DualTrackTracker from '../components/projects/DualTrackTracker';
 import SubmittalsTab from '../components/projects/SubmittalsTab';
 import RFITab from '../components/projects/RFITab';
 import PunchListTab from '../components/projects/PunchListTab';
+import DocumentsTab from '../components/projects/DocumentsTab';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -417,6 +418,7 @@ export default function ProjectDetail() {
           <TabsTrigger value="submittals">Submittals</TabsTrigger>
           <TabsTrigger value="rfis">RFIs</TabsTrigger>
           <TabsTrigger value="punchlist">Punch List</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="changeorders">Change Orders</TabsTrigger>
           <TabsTrigger value="safety">Safety</TabsTrigger>
           <TabsTrigger value="decisions">Decisions</TabsTrigger>
@@ -465,6 +467,10 @@ export default function ProjectDetail() {
 
         <TabsContent value="punchlist" className="mt-6">
           <PunchListTab projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="documents" className="mt-6">
+          <DocumentsTab projectId={projectId} />
         </TabsContent>
 
         <TabsContent value="changeorders" className="mt-6">
