@@ -33,7 +33,9 @@ import {
   BookOpen,
   Banknote,
   CalendarOff,
-  Plus,
+  Building2,
+  Truck,
+  Tag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -52,26 +54,22 @@ const navGroups = [
     { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
     { name: 'Schedule', icon: Calendar, page: 'Calendar' },
   ]},
-  { label: 'Sales / Estimating', items: [
+  { label: 'Sales & Estimating', items: [
     { name: 'Bids', icon: FileText, page: 'Bids' },
-    { name: 'Add Bid', icon: Plus, page: 'AddBid' },
-    { name: 'Bid Discovery', icon: Search, page: 'BidDiscovery' },
+    { name: 'Leads', icon: Users, page: 'Leads' },
+    { name: 'Contractor Directory', icon: Building2, page: 'ContractorDirectory' },
     { name: 'Estimates', icon: DollarSign, page: 'Estimates' },
-    { name: 'Estimator', icon: DollarSign, page: 'EstimatorWizard' },
-  ]},
-  { label: 'Procurement', items: [
-    { name: 'Purchase Orders', icon: FileText, page: 'PurchaseOrders' },
-    { name: 'Materials', icon: Grid3x3, page: 'Materials' },
-    { name: 'Vendors', icon: Users, page: 'Companies' },
+    { name: 'Rate Card', icon: Tag, page: 'RateCard' },
   ]},
   { items: [
     { name: 'Projects', icon: FolderKanban, page: 'Projects' },
   ]},
   { label: 'Billing', items: [
     { name: 'Billing', icon: Banknote, page: 'Billing' },
-    { name: 'Sales Invoices', icon: FileText, page: 'SalesInvoices' },
-    { name: 'Purchase Invoices', icon: FileText, page: 'PurchaseInvoices' },
-    { name: 'Transactions', icon: Banknote, page: 'Transactions' },
+  ]},
+  { label: 'Procurement', items: [
+    { name: 'Suppliers', icon: Truck, page: 'Suppliers' },
+    { name: 'Purchase Orders', icon: FileText, page: 'PurchaseOrders' },
   ]},
 ];
 

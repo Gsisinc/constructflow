@@ -1,0 +1,109 @@
+{
+  "name": "DualTrackStage",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Project this stage belongs to"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "proposal_handoff",
+        "engineering",
+        "execution"
+      ]
+    },
+    "stage_number": {
+      "type": "number",
+      "description": "1-12 stage order"
+    },
+    "stage_name": {
+      "type": "string"
+    },
+    "field_track_status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "passed",
+        "blocked"
+      ],
+      "default": "not_started"
+    },
+    "money_track_status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "passed",
+        "blocked"
+      ],
+      "default": "not_started"
+    },
+    "exit_gate_passed": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when both tracks pass the stage gate"
+    },
+    "budget": {
+      "type": "number",
+      "default": 0
+    },
+    "committed": {
+      "type": "number",
+      "default": 0
+    },
+    "actual": {
+      "type": "number",
+      "default": 0
+    },
+    "cost_to_complete": {
+      "type": "number",
+      "default": 0,
+      "description": "PM-entered estimate to complete each period"
+    },
+    "gate_criteria": {
+      "type": "string",
+      "description": "Exit gate criteria for this stage"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "stage_name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

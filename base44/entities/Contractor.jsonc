@@ -1,0 +1,93 @@
+{
+  "name": "Contractor",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "description": "Contractor / GC company name"
+    },
+    "website": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "county": {
+      "type": "string",
+      "description": "Northern California county"
+    },
+    "region": {
+      "type": "string",
+      "description": "Region e.g. Bay Area, Sacramento, North State"
+    },
+    "cslb_license": {
+      "type": "string",
+      "description": "CSLB license number"
+    },
+    "classification": {
+      "type": "string",
+      "description": "License classification e.g. A, B, C10, C7"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "source_link": {
+      "type": "string",
+      "description": "URL where the contractor was found"
+    },
+    "division_fit": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "fire_alarm",
+          "low_voltage",
+          "drone",
+          "software",
+          "other"
+        ]
+      },
+      "description": "Divisions this contractor fits"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "prospect",
+        "do_not_use",
+        "inactive"
+      ],
+      "default": "active"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -17,6 +17,10 @@ import SafetyManager from '../components/safety/SafetyManager';
 import DecisionManager from '../components/decisions/DecisionManager';
 import TeamRoleManager from '../components/team/TeamRoleManager';
 import ProjectMaterials from '../components/project/ProjectMaterials';
+import DualTrackTracker from '../components/projects/DualTrackTracker';
+import SubmittalsTab from '../components/projects/SubmittalsTab';
+import RFITab from '../components/projects/RFITab';
+import PunchListTab from '../components/projects/PunchListTab';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -408,7 +412,11 @@ export default function ProjectDetail() {
       {/* Tabs for detailed views */}
       <Tabs defaultValue="phases" className="w-full sm:w-auto">
         <TabsList className="w-full sm:w-auto justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-slate-100 rounded-lg">
+          <TabsTrigger value="tracker">Tracker</TabsTrigger>
           <TabsTrigger value="phases">Phases</TabsTrigger>
+          <TabsTrigger value="submittals">Submittals</TabsTrigger>
+          <TabsTrigger value="rfis">RFIs</TabsTrigger>
+          <TabsTrigger value="punchlist">Punch List</TabsTrigger>
           <TabsTrigger value="changeorders">Change Orders</TabsTrigger>
           <TabsTrigger value="safety">Safety</TabsTrigger>
           <TabsTrigger value="decisions">Decisions</TabsTrigger>
@@ -419,6 +427,10 @@ export default function ProjectDetail() {
           <TabsTrigger value="financials">Financials</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="tracker" className="mt-6">
+          <DualTrackTracker projectId={projectId} project={project} />
+        </TabsContent>
 
         <TabsContent value="phases" className="mt-6">
           <div className="space-y-6">
@@ -436,11 +448,23 @@ export default function ProjectDetail() {
                 updateMutation.mutate({ current_phase: newPhase });
               }}
             />
-            <PhaseManager 
-              projectId={projectId} 
-              currentPhase={project.current_phase || 'preconstruction'} 
+            <PhaseManager
+              projectId={projectId}
+              currentPhase={project.current_phase || 'preconstruction'}
             />
           </div>
+        </TabsContent>
+
+        <TabsContent value="submittals" className="mt-6">
+          <SubmittalsTab projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="rfis" className="mt-6">
+          <RFITab projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="punchlist" className="mt-6">
+          <PunchListTab projectId={projectId} />
         </TabsContent>
 
         <TabsContent value="changeorders" className="mt-6">

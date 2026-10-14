@@ -1,0 +1,68 @@
+{
+  "name": "RateCard",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "item_name": {
+      "type": "string",
+      "description": "Labor role, material, equipment or service line"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "labor",
+        "material",
+        "equipment",
+        "subcontractor",
+        "other"
+      ],
+      "default": "labor"
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit of measure: hr, LF, EA, day, etc."
+    },
+    "unit_price": {
+      "type": "number",
+      "default": 0
+    },
+    "division": {
+      "type": "string",
+      "enum": [
+        "fire_alarm",
+        "low_voltage",
+        "drone",
+        "software",
+        "other",
+        ""
+      ],
+      "default": ""
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "item_name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

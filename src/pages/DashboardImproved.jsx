@@ -38,6 +38,7 @@ import {
   ArrowDown,
   FolderKanban,
   BarChart3,
+  Flag,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -172,6 +173,12 @@ export default function Dashboard() {
     enabled: !!user?.organization_id,
   });
 
+  const { data: redFlagStages = [] } = useQuery({
+    queryKey: ['dualtrack-redflags', user?.organization_id],
+    queryFn: async () => (await base44.entities.DualTrackStage.filter({ $or: [{ field_track_status: 'blocked' }, { money_track_status: 'blocked' }] }, { limit: 100, fields: ['project_id', 'stage_name', 'stage_number'] }))?.items || [],
+    enabled: !!user?.organization_id,
+  });
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
@@ -221,6 +228,21 @@ export default function Dashboard() {
         <KPICard title="Pipeline Value" value={`$${(stats.pipelineValue / 1000000).toFixed(1)}M`} icon={TrendingUp} color="bg-purple-600" />
         <KPICard title="Overdue Tasks" value={stats.overdueTasks} icon={AlertCircle} color="bg-orange-600" />
       </div>
+
+      {redFlagStages.length > 0 && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-red-100"><Flag className="h-5 w-5 text-red-600" /></div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-red-900">{redFlagStages.length} DualTrack stage{redFlagStages.length > 1 ? 's' : ''} flagged</p>
+                <p className="text-sm text-red-700 truncate">Blocked tracks: {redFlagStages.slice(0, 4).map(s => s.stage_name).join(', ')}{redFlagStages.length > 4 ? '…' : ''}</p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => navigate(createPageUrl('Projects'))}>Review</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

@@ -89,8 +89,12 @@ import DocumentTracking from './pages/DocumentTracking';
 import Documents from './pages/Documents';
 import ESignatures from './pages/ESignatures';
 import EstimateGenerator from './pages/EstimateGenerator';
+import ContractorDirectory from './pages/ContractorDirectory';
 import Estimates from './pages/Estimates';
 import FeatureTesting from './pages/FeatureTesting';
+import Leads from './pages/Leads';
+import RateCard from './pages/RateCard';
+import Suppliers from './pages/Suppliers';
 import FieldHoursApproval from './pages/FieldHoursApproval';
 
 import Home from './pages/Home';
@@ -190,8 +194,12 @@ export const PAGES = {
     "Documents": Documents,
     "ESignatures": ESignatures,
     "EstimateGenerator": EstimateGenerator,
+    "ContractorDirectory": ContractorDirectory,
     "Estimates": Estimates,
     "FeatureTesting": FeatureTesting,
+    "Leads": Leads,
+    "RateCard": RateCard,
+    "Suppliers": Suppliers,
     "FieldHoursApproval": FieldHoursApproval,
 
     "Home": Home,
