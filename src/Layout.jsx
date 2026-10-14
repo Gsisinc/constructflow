@@ -36,6 +36,7 @@ import {
   Building2,
   Truck,
   Tag,
+  Mic,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -46,6 +47,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import MegaMenu from '@/components/layout/MegaMenu';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import AgentChat from '@/components/agents/AgentChat';
 // import ApiKeyBanner from '@/components/settings/ApiKeyBanner';
 
 // Grouped navigation for admin/default users (Kemar's master layout)
@@ -174,6 +176,7 @@ export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
   const [organization, setOrganization] = useState(null);
   const [previousPage, setPreviousPage] = useState(null);
   const location = useLocation();
@@ -507,6 +510,28 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Mobile Bottom Navigation */}
       {!isHomePage && !isLandingPage && <MobileBottomNav currentPageName={currentPageName} userRole={user?.role} />}
+
+      {/* Floating voice agent — available on every app page, aware of the current page/project */}
+      {!isHomePage && !isLandingPage && (
+        <>
+          <button
+            onClick={() => setVoiceOpen(true)}
+            className="fixed bottom-20 lg:bottom-6 right-4 z-40 h-14 w-14 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-lg flex items-center justify-center transition-transform hover:scale-105"
+            title="Voice agent"
+            type="button"
+          >
+            <Mic className="h-6 w-6" />
+          </button>
+          {voiceOpen && (
+            <AgentChat
+              agent={{ id: 'central_orchestrator', name: 'Central Orchestrator', description: 'Coordinate specialist agents and execute tasks', color: 'from-slate-500 to-slate-600' }}
+              pageName={currentPageName}
+              autoListen
+              onClose={() => setVoiceOpen(false)}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

@@ -1,0 +1,91 @@
+{
+  "description": "Generic specialist agent backing The Agency library \u2014 adopts the role described in the conversation and uses app data tools",
+  "instructions": "You are a versatile specialist agent. The first message in the conversation tells you which role you are acting as and which page the user is viewing. Adopt that role fully and answer accordingly.\n\nUse your entity tools to pull relevant data from the user's app (projects, bids, tasks, documents, RFIs, submittals, leads, etc.) whenever the user asks about the current page/project or needs real data. Never fabricate records \u2014 if data is missing, say so.\n\nWhen asked to write an email or message, draft it in full in your reply for the user to review and send themselves; never claim to send it automatically. Be concise, practical, and stay within the adopted role's domain.",
+  "tool_configs": [
+    {
+      "entity_name": "Project",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "BidOpportunity",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Task",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "OperationalTask",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Document",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Issue",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "RFI",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Submittal",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Punchlist",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Lead",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Contractor",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Supplier",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Estimate",
+      "allowed_operations": [
+        "read"
+      ]
+    },
+    {
+      "entity_name": "DailyLog",
+      "allowed_operations": [
+        "read"
+      ]
+    }
+  ],
+  "name": "agency_specialist"
+}

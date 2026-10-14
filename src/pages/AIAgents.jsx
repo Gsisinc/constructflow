@@ -7,7 +7,7 @@ import MinibrowserLauncher, { openMinibrowser } from '@/components/MinibrowserLa
 import { AGENT_WORKFLOWS } from '@/config/agentWorkflows';
 import { AGENCY_DIVISIONS, SPECIAL_AGENTS, filterSpecialAgents } from '@/config/specialAgents';
 import { useAuth } from '@/lib/AuthContext';
-import { Maximize2, Bot, Sparkles, Search, ExternalLink, Wrench } from 'lucide-react';
+import { Maximize2, Bot, Sparkles, Search, ExternalLink, Wrench, Mic } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const WORKFLOW_ICONS = {
@@ -47,6 +47,8 @@ export default function AIAgents() {
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [chatAgent, setChatAgent] = useState(null);
   const [specialChatAgent, setSpecialChatAgent] = useState(null);
+  const [chatAutoListen, setChatAutoListen] = useState(false);
+  const [specialAutoListen, setSpecialAutoListen] = useState(false);
   const [agencySearch, setAgencySearch] = useState('');
   const [agencyDivision, setAgencyDivision] = useState('');
 
@@ -133,6 +135,14 @@ export default function AIAgents() {
           <p className="text-[var(--cf-muted)] mt-2 text-base">
             Custom construction agents (real AI) and quick access to external AI in minibrowsers
           </p>
+          <div className="mt-4">
+            <Button
+              className="bg-red-600 hover:bg-red-700 text-white gap-2"
+              onClick={() => { setChatAutoListen(true); setChatAgent({ id: 'central_orchestrator', name: 'Central Orchestrator', description: AGENT_WORKFLOWS.central_orchestrator?.purpose, color: 'from-slate-500 to-slate-600' }); }}
+            >
+              <Mic className="h-4 w-4" /> Voice agent
+            </Button>
+          </div>
         </header>
 
         {/* Technician: highlight Field Guide */}
@@ -258,12 +268,22 @@ export default function AIAgents() {
                     <p className="text-sm text-[var(--cf-muted)] mt-1">{agent.description}</p>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <Button
-                      className={`w-full bg-gradient-to-r ${agent.color || 'from-cyan-500 to-cyan-600'} text-white hover:opacity-90`}
-                      onClick={() => setSpecialChatAgent(agent)}
-                    >
-                      {specialChatAgent?.id === agent.id ? 'Chat open' : 'Use agent'}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        className={`flex-1 bg-gradient-to-r ${agent.color || 'from-cyan-500 to-cyan-600'} text-white hover:opacity-90`}
+                        onClick={() => { setSpecialAutoListen(false); setSpecialChatAgent(agent); }}
+                      >
+                        {specialChatAgent?.id === agent.id ? 'Chat open' : 'Use agent'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        title="Voice chat"
+                        onClick={() => { setSpecialAutoListen(true); setSpecialChatAgent(agent); }}
+                      >
+                        <Mic className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -295,15 +315,30 @@ export default function AIAgents() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <p className="text-sm text-[var(--cf-muted)]">{agent.desc}</p>
-                    <Button
-                      className={`w-full ${selectedAgent === agent.id ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-violet-600 hover:bg-violet-700'} text-white`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setChatAgent({ id: agent.id, name: agent.name, description: agent.desc, color: agent.color });
-                      }}
-                    >
-                      {chatAgent?.id === agent.id ? 'Chat open' : 'Use agent'}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        className={`flex-1 ${selectedAgent === agent.id ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-violet-600 hover:bg-violet-700'} text-white`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setChatAutoListen(false);
+                          setChatAgent({ id: agent.id, name: agent.name, description: agent.desc, color: agent.color });
+                        }}
+                      >
+                        {chatAgent?.id === agent.id ? 'Chat open' : 'Use agent'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        title="Voice chat"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setChatAutoListen(true);
+                          setChatAgent({ id: agent.id, name: agent.name, description: agent.desc, color: agent.color });
+                        }}
+                      >
+                        <Mic className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -391,14 +426,18 @@ export default function AIAgents() {
         {chatAgent && (
           <AgentChat
             agent={chatAgent}
-            onClose={() => setChatAgent(null)}
+            pageName="AIAgents"
+            autoListen={chatAutoListen}
+            onClose={() => { setChatAgent(null); setChatAutoListen(false); }}
           />
         )}
 
         {specialChatAgent && (
           <LocalAgentChat
             agent={specialChatAgent}
-            onClose={() => setSpecialChatAgent(null)}
+            pageName="AIAgents"
+            autoListen={specialAutoListen}
+            onClose={() => { setSpecialChatAgent(null); setSpecialAutoListen(false); }}
           />
         )}
       </div>

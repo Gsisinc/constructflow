@@ -1,36 +1,59 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Send, X, Paperclip, Bot, User, Sparkles } from 'lucide-react';
+import { Loader2, Send, X, Paperclip, Bot, User, Sparkles, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import BlueprintUploader from '@/components/agents/BlueprintUploader';
 import BlueprintEstimateResult from '@/components/agents/BlueprintEstimateResult';
 import { analyzeBlueprintWithVision, analyzeBlueprintFromPDF } from '@/services/bidDocumentAnalysisService';
+import { useVoiceChat } from '@/hooks/useVoiceChat';
+import { buildPageContext, AGENT_GROUNDING } from '@/lib/agentContext';
 
-export default function AgentChat({ agent, onClose, initialPrompt }) {
-  const { user } = useAuth();
+export default function AgentChat({ agent, onClose, initialPrompt, pageName = 'AIAgents', autoListen = false }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [conversation, setConversation] = useState(null);
   const [blueprintResult, setBlueprintResult] = useState(null);
+  const [preamble, setPreamble] = useState('');
+  const preambleSentRef = useRef(false);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const sentInitial = useRef(false);
   const unsubscribeRef = useRef(null);
+  const lastSpokenRef = useRef(null);
+  const pendingTranscriptRef = useRef('');
 
+  const { listening, toggleListening, speak, stopSpeaking, voiceEnabled, setVoiceEnabled, supported: voiceSupported } = useVoiceChat({
+    onFinalTranscript: (txt) => { pendingTranscriptRef.current = txt; setInput(txt); },
+  });
+
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages.length]);
+
+  // Speak the latest assistant message when it lands
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    const last = messages[messages.length - 1];
+    if (last && last.role === 'assistant' && last.id && last.id !== lastSpokenRef.current) {
+      lastSpokenRef.current = last.id;
+      speak(last.content);
     }
-  }, [messages.length]);
+  }, [messages, speak]);
 
-  // Init conversation and subscribe (resilient to base44 failures)
+  // Build preamble (page context) once
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const ctx = await buildPageContext(pageName);
+      if (!cancelled) setPreamble(`${ctx}.${AGENT_GROUNDING}`);
+    })();
+    return () => { cancelled = true; };
+  }, [pageName]);
+
+  // Init conversation + subscribe
   useEffect(() => {
     let cancelled = false;
     const init = async () => {
@@ -38,7 +61,6 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
         const conv = await base44.agents.createConversation({ agent_name: agent.id });
         if (cancelled) return;
         setConversation(conv);
-
         unsubscribeRef.current = base44.agents.subscribeToConversation(conv.id, (updated) => {
           const agentMessages = (updated?.messages || [])
             .filter(m => m.role === 'assistant' || m.role === 'user')
@@ -47,38 +69,37 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
           setLoading(false);
         });
       } catch (err) {
-        console.error('Failed to create conversation:', err);
-        setMessages([{ id: crypto.randomUUID(), role: 'assistant', content: `Chat is temporarily unavailable (${err.message || 'service error'}). You can still use the blueprint analyzer below.` }]);
-        setLoading(false);
+        setMessages([{ id: crypto.randomUUID(), role: 'assistant', content: `Chat is temporarily unavailable (${err.message || 'service error'}).` }]);
       }
     };
     init();
-    return () => {
-      cancelled = true;
-      if (unsubscribeRef.current) unsubscribeRef.current();
-    };
+    return () => { cancelled = true; if (unsubscribeRef.current) unsubscribeRef.current(); stopSpeaking(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agent.id]);
 
-  // Send initial prompt once conversation is ready
+  // Auto-listen on open if requested
+  useEffect(() => { if (autoListen && conversation) toggleListening(); /* eslint-disable-next-line */ }, [conversation]);
+
   useEffect(() => {
     if (conversation && initialPrompt && !sentInitial.current) {
       sentInitial.current = true;
       setTimeout(() => sendMessage(initialPrompt), 200);
     }
+    // eslint-disable-next-line
   }, [conversation, initialPrompt]);
 
   const sendMessage = async (overrideText) => {
-    const text = typeof overrideText === 'string' ? overrideText.trim() : input.trim();
+    const text = (typeof overrideText === 'string' ? overrideText : input).trim();
     if (!text || loading || !conversation) return;
-
+    let payload = text;
+    if (!preambleSentRef.current && preamble) { payload = `${preamble}\n\nUser: ${text}`; preambleSentRef.current = true; }
     setInput('');
     setLoading(true);
-
+    stopSpeaking();
     try {
-      await base44.agents.addMessage(conversation, { role: 'user', content: text });
+      await base44.agents.addMessage(conversation, { role: 'user', content: payload });
     } catch (err) {
-      console.error('Send error:', err);
-      toast.error('Failed to send message: ' + err.message);
+      toast.error('Failed to send: ' + err.message);
       setLoading(false);
     }
   };
@@ -88,172 +109,98 @@ export default function AgentChat({ agent, onClose, initialPrompt }) {
     if (!file) return;
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      await sendMessage(`I've uploaded a file: ${file.name}. URL: ${file_url}. Please analyze it.`);
+      const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+      await sendMessage(`I uploaded a file: ${file.name} (stored privately). I can't read binary directly — please ask me to paste relevant text, or use the blueprint analyzer for images/PDFs. Reference: ${file_uri}`);
       toast.success('File uploaded');
     } catch (err) {
-      if (conversation) {
-        await sendMessage(`I tried to attach a file: ${file.name}. (Upload unavailable — you can paste content or use the blueprint analyzer for images.)`);
-      }
-      toast.error('Upload unavailable' + (conversation ? '. Message sent without file.' : '.'));
-    } finally {
-      setUploading(false);
-      e.target.value = '';
-    }
+      toast.error('Upload unavailable');
+    } finally { setUploading(false); e.target.value = ''; }
   };
 
   const handleBlueprintAnalysis = async (imageUrl, options = {}) => {
     if (loading) return;
     setLoading(true);
-
-    const isPdf = !!options.pdfFile;
-    const userMsg = { id: crypto.randomUUID(), role: 'user', content: isPdf ? '📐 Analyzing PDF (all pages) with computer vision...' : '📐 Analyzing uploaded blueprint with computer vision...' };
-    setMessages(prev => [...prev, userMsg]);
-
-    const userPrompt = input.trim() || 'Analyze this blueprint. Extract all dimensions, quantities of materials, and generate a complete material takeoff table and cost estimate with labor and materials broken down.';
-
+    setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'user', content: options.pdfFile ? '📐 Analyzing PDF with computer vision...' : '📐 Analyzing uploaded blueprint with computer vision...' }]);
+    const userPrompt = input.trim() || 'Analyze this blueprint. Extract dimensions, material quantities, and generate a takeoff table and cost estimate.';
     try {
       let structured;
-      if (isPdf) {
-        const { combined, pages } = await analyzeBlueprintFromPDF(options.pdfFile, userPrompt, { maxPages: 50 });
-        structured = { ...combined, _pdfPages: pages };
+      if (options.pdfFile) {
+        const { combined } = await analyzeBlueprintFromPDF(options.pdfFile, userPrompt, { maxPages: 50 });
+        structured = combined;
       } else {
         structured = await analyzeBlueprintWithVision(imageUrl, userPrompt, options);
       }
       setBlueprintResult({ ...structured, imageUrl: imageUrl || undefined });
       setInput('');
     } catch (err) {
-      console.error('Blueprint analysis error:', err);
-      setMessages(prev => [...prev, {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: `Error: ${err.message}. Please check your connection or try again later.`,
-        error: true,
-      }]);
+      setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'assistant', content: `Blueprint analysis error: ${err.message}.`, error: true }]);
       toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   const isReady = !!conversation;
-
   const agentColor = agent.color || 'from-blue-500 to-blue-600';
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-0 sm:p-4">
       <Card className="w-full max-w-2xl h-full sm:h-[80vh] flex flex-col shadow-2xl rounded-none sm:rounded-xl">
-        {/* Header */}
         <CardHeader className="border-b pb-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg bg-gradient-to-br ${agentColor} text-white`}>
-                <Bot className="h-5 w-5" />
-              </div>
+              <div className={`p-2 rounded-lg bg-gradient-to-br ${agentColor} text-white`}><Bot className="h-5 w-5" /></div>
               <div>
                 <CardTitle className="text-base">{agent.name}</CardTitle>
-                <CardDescription className="text-xs">{agent.description}</CardDescription>
+                <CardDescription className="text-xs">{agent.description} · Voice-enabled</CardDescription>
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
+            <Button variant="ghost" size="sm" onClick={onClose}><X className="h-4 w-4" /></Button>
           </div>
         </CardHeader>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full text-center">
               <div>
-                {!isReady ? (
-                  <>
-                    <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />
-                    <p className="text-slate-500 font-medium">Starting {agent.name}...</p>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                    <p className="text-slate-500 font-medium">Start a conversation with {agent.name}</p>
-                    <p className="text-xs text-slate-400 mt-1">Ask questions or describe your needs</p>
-                  </>
-                )}
+                {isReady ? <Sparkles className="h-12 w-12 mx-auto mb-4 text-slate-300" /> : <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-300 animate-spin" />}
+                <p className="text-slate-500 font-medium">{isReady ? `Tap the mic and speak to ${agent.name}` : `Starting ${agent.name}...`}</p>
+                <p className="text-xs text-slate-400 mt-1">{isReady && !voiceSupported ? 'Voice not supported in this browser — type instead.' : 'e.g. "hey agent, what\'s on this page?"'}</p>
               </div>
             </div>
           )}
           {messages.map((msg) => (
             <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {msg.role === 'assistant' && (
-                <div className={`p-2 rounded-lg bg-gradient-to-br ${agentColor} text-white flex-shrink-0 h-8 w-8 flex items-center justify-center`}>
-                  <Bot className="h-4 w-4" />
-                </div>
-              )}
+              {msg.role === 'assistant' && <div className={`p-2 rounded-lg bg-gradient-to-br ${agentColor} text-white flex-shrink-0 h-8 w-8 flex items-center justify-center`}><Bot className="h-4 w-4" /></div>}
               <div className={`max-w-md p-3 rounded-lg text-sm ${msg.role === 'user' ? 'bg-blue-100 text-blue-900' : msg.error ? 'bg-red-50 text-red-700' : 'bg-slate-100 text-slate-900'}`}>
                 <ReactMarkdown className="prose prose-sm max-w-none">{msg.content}</ReactMarkdown>
               </div>
-              {msg.role === 'user' && (
-                <div className="p-2 rounded-lg bg-blue-500 text-white flex-shrink-0 h-8 w-8 flex items-center justify-center">
-                  <User className="h-4 w-4" />
-                </div>
-              )}
+              {msg.role === 'user' && <div className="p-2 rounded-lg bg-blue-500 text-white flex-shrink-0 h-8 w-8 flex items-center justify-center"><User className="h-4 w-4" /></div>}
             </div>
           ))}
           {loading && (
             <div className="flex gap-3">
-              <div className={`p-2 rounded-lg bg-gradient-to-br ${agentColor} text-white flex-shrink-0 h-8 w-8 flex items-center justify-center`}>
-                <Bot className="h-4 w-4" />
-              </div>
-              <div className="bg-slate-100 p-3 rounded-lg flex items-center gap-2 text-sm text-slate-500">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Thinking...
-              </div>
+              <div className={`p-2 rounded-lg bg-gradient-to-br ${agentColor} text-white flex-shrink-0 h-8 w-8 flex items-center justify-center`}><Bot className="h-4 w-4" /></div>
+              <div className="bg-slate-100 p-3 rounded-lg flex items-center gap-2 text-sm text-slate-500"><Loader2 className="h-4 w-4 animate-spin" />Thinking...</div>
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Blueprint Estimate Result Panel */}
         {blueprintResult && (
-          <div className="px-4 pb-2">
-            <BlueprintEstimateResult
-              result={blueprintResult}
-              imageUrl={blueprintResult.imageUrl}
-              onClose={() => setBlueprintResult(null)}
-            />
-          </div>
+          <div className="px-4 pb-2"><BlueprintEstimateResult result={blueprintResult} imageUrl={blueprintResult.imageUrl} onClose={() => setBlueprintResult(null)} /></div>
         )}
 
-        {/* Input */}
         <div className="border-t p-4 flex-shrink-0 space-y-3">
-          {/* Blueprint uploader — shown for blueprint agent or any agent */}
-          {isReady && (
-            <BlueprintUploader onAnalysis={handleBlueprintAnalysis} disabled={loading} />
-          )}
-          <div className="flex gap-2">
-            <Input
-              placeholder="Ask me anything..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && !loading && sendMessage()}
-              disabled={loading || !isReady}
-              className="flex-1"
-            />
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              variant="outline"
-              size="icon"
-              disabled={loading || uploading || !isReady}
-              title="Attach file"
-            >
-              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Paperclip className="h-4 w-4" />}
+          {isReady && <BlueprintUploader onAnalysis={handleBlueprintAnalysis} disabled={loading} />}
+          <div className="flex gap-2 items-center">
+            <Button onClick={toggleListening} variant={listening ? 'default' : 'outline'} size="icon" disabled={!isReady || !voiceSupported} title={voiceSupported ? 'Speak' : 'Voice not supported'} className={listening ? 'bg-red-600 hover:bg-red-700 animate-pulse' : ''}>
+              {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>
-            <Button
-              onClick={() => sendMessage()}
-              disabled={loading || !input.trim() || !isReady}
-              size="icon"
-            >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            <Button onClick={() => setVoiceEnabled(v => !v)} variant="ghost" size="icon" title={voiceEnabled ? 'Mute replies' : 'Unmute replies'} disabled={!isReady}>
+              {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </Button>
+            <Input placeholder={listening ? 'Listening…' : 'Ask me anything…'} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && !loading && sendMessage()} disabled={loading || !isReady} className="flex-1" />
+            <Button onClick={() => fileInputRef.current?.click()} variant="outline" size="icon" disabled={loading || uploading || !isReady} title="Attach file">{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Paperclip className="h-4 w-4" />}</Button>
+            <Button onClick={() => sendMessage()} disabled={loading || !input.trim() || !isReady} size="icon">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}</Button>
           </div>
           <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileUpload} />
         </div>
