@@ -28,8 +28,8 @@ export default function SalesInvoices() {
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ['sales_invoices'],
     queryFn: async () => {
-      const result = await base44.entities.SalesInvoice.list('-created_date', 100);
-      return result || [];
+      const page = await base44.entities.SalesInvoice.list({ sort: '-created_date', limit: 100 });
+      return page?.items || [];
     },
   });
 
@@ -37,8 +37,8 @@ export default function SalesInvoices() {
   const { data: products = [] } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      const result = await base44.entities.Product.list('name', 100);
-      return result || [];
+      const page = await base44.entities.Product.list({ sort: 'name', limit: 100 });
+      return page?.items || [];
     },
   });
 
@@ -46,8 +46,8 @@ export default function SalesInvoices() {
   const { data: selectedProject } = useQuery({
     queryKey: ['selected_project'],
     queryFn: async () => {
-      const projects = await base44.entities.Project.list('-updated_date', 1);
-      return projects?.[0] || null;
+      const page = await base44.entities.Project.list({ sort: '-updated_date', limit: 1 });
+      return page?.items?.[0] || null;
     },
   });
 

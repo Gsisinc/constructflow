@@ -28,10 +28,13 @@ const statusColors = {
   closed: 'bg-slate-200 text-slate-700',
   active: 'bg-blue-100 text-blue-800',
   closing_soon: 'bg-orange-100 text-orange-800',
-  upcoming: 'bg-cyan-100 text-cyan-800'
+  upcoming: 'bg-cyan-100 text-cyan-800',
+  qualified: 'bg-teal-100 text-teal-800',
+  kemar_review: 'bg-indigo-100 text-indigo-800',
+  bid_in: 'bg-green-100 text-green-800'
 };
 
-const bidStatuses = ['All', 'new', 'analyzing', 'estimating', 'submitted', 'won', 'lost', 'declined', 'closed'];
+const bidStatuses = ['All', 'new', 'qualified', 'analyzing', 'estimating', 'kemar_review', 'submitted', 'bid_in', 'won', 'lost', 'declined', 'closed'];
 
 const DIVISIONS = [
   { value: 'fire_alarm', label: 'Fire Alarm' },
@@ -353,7 +356,7 @@ export default function Bids() {
                     <div className="flex flex-wrap gap-1.5">
                       <Button size="sm" variant={bid.status === 'submitted' ? 'default' : 'outline'}
                         className={bid.status === 'submitted' ? 'bg-green-600 hover:bg-green-700 h-8 px-3 text-xs' : 'h-8 px-3 text-xs'}
-                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'submitted' }); }}>
+                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'bid_in' }); }}>
                         Bid In
                       </Button>
                       <Button size="sm" variant={bid.status === 'won' ? 'default' : 'outline'}

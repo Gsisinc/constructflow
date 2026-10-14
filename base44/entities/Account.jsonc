@@ -1,0 +1,78 @@
+{
+  "name": "Account",
+  "type": "object",
+  "description": "Chart of accounts ledger account, scoped to a Company (stored as project_id for legacy compatibility)",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Company this account belongs to"
+    },
+    "account_code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Assets",
+        "Liabilities",
+        "Equity",
+        "Revenue",
+        "Expenses"
+      ]
+    },
+    "subtype": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "balance": {
+      "type": "number",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "project_id",
+    "account_code",
+    "name",
+    "type"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

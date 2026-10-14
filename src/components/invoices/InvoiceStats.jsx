@@ -4,9 +4,9 @@ import { FileText, DollarSign, Clock, CheckCircle } from 'lucide-react';
 
 export default function InvoiceStats({ invoices }) {
     const totalInvoices = invoices.length;
-    const totalRevenue = invoices.filter(i => i.status === 'Paid').reduce((sum, i) => sum + i.total_amount, 0);
-    const pendingAmount = invoices.filter(i => i.status === 'Sent').reduce((sum, i) => sum + i.total_amount, 0);
-    const overdueCount = invoices.filter(i => i.status === 'Overdue').length;
+    const totalRevenue = invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + i.total_amount, 0);
+    const pendingAmount = invoices.filter(i => i.status === 'sent').reduce((sum, i) => sum + i.total_amount, 0);
+    const overdueCount = invoices.filter(i => i.status === 'overdue').length;
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

@@ -314,6 +314,10 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
   };
 
   const handleCreate = async () => {
+    if (!formData.name || !formData.client_name) {
+      toast.error('Project name and client name are required');
+      return;
+    }
     setSaving(true);
     try {
       const project = await base44.entities.Project.create({
@@ -323,9 +327,15 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         budget: formData.budget ? parseFloat(formData.budget) : null,
       });
 
+      // Ensure default phases exist (fall back to the type template if none were prepared)
+      let phasesToCreate = phases;
+      if (!phasesToCreate || phasesToCreate.length === 0) {
+        phasesToCreate = getPhaseTemplate(selectedType).map(p => ({ ...p, items: p.items.map(item => ({ text: item, completed: false })) }));
+      }
+
       // Create CustomPhases for each phase
       const customPhases = [];
-      phases.forEach((phase, idx) => {
+      phasesToCreate.forEach((phase, idx) => {
         customPhases.push({
           project_id: project.id,
           phase_name: phase.phase,
@@ -341,7 +351,7 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
 
       // Create PhaseRequirements
       const allRequirements = [];
-      phases.forEach((phase) => {
+      phasesToCreate.forEach((phase) => {
         phase.items.forEach((item) => {
           if (item.text.trim()) {
             allRequirements.push({
@@ -433,7 +443,7 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
                Next <ChevronRight className="h-4 w-4 ml-1" />
              </Button>
            ) : (
-             <Button onClick={handleCreate} disabled={saving} className="bg-green-600 hover:bg-green-700">
+             <Button onClick={handleCreate} disabled={saving || !canProceedStep2} className="bg-green-600 hover:bg-green-700">
                {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
                Create Project
              </Button>

@@ -9,13 +9,13 @@ import { format } from 'date-fns';
 export default function InvoiceList({ invoices, onEdit }) {
     const getStatusBadge = (status) => {
         const colors = {
-            'Draft': 'bg-gray-100 text-gray-800',
-            'Sent': 'bg-blue-100 text-blue-800',
-            'Paid': 'bg-green-100 text-green-800',
-            'Overdue': 'bg-red-100 text-red-800',
-            'Cancelled': 'bg-yellow-100 text-yellow-800'
+            'draft': 'bg-gray-100 text-gray-800',
+            'sent': 'bg-blue-100 text-blue-800',
+            'paid': 'bg-green-100 text-green-800',
+            'overdue': 'bg-red-100 text-red-800',
+            'cancelled': 'bg-yellow-100 text-yellow-800'
         };
-        return <Badge className={colors[status] || 'bg-gray-100'}>{status}</Badge>;
+        return <Badge className={colors[status] || 'bg-gray-100'}>{status ? status.charAt(0).toUpperCase() + status.slice(1) : status}</Badge>;
     };
 
     return (
@@ -39,7 +39,7 @@ export default function InvoiceList({ invoices, onEdit }) {
                         {invoices.length > 0 ? invoices.map(inv => (
                             <TableRow key={inv.id}>
                                 <TableCell className="font-mono">{inv.invoice_number}</TableCell>
-                                <TableCell>{format(new Date(inv.invoice_date), 'MMM dd, yyyy')}</TableCell>
+                                <TableCell>{format(new Date((inv.invoice_date || '').toString().slice(0, 10) + 'T00:00:00'), 'MMM dd, yyyy')}</TableCell>
                                 <TableCell className="font-medium">{inv.customer_name}</TableCell>
                                 <TableCell className="text-right font-mono">${inv.total_amount.toLocaleString()}</TableCell>
                                 <TableCell>{getStatusBadge(inv.status)}</TableCell>

@@ -29,6 +29,7 @@ export default function Estimates() {
   const [fStatus, setFStatus] = useState('all');
   const [fOwner, setFOwner] = useState('all');
   const [showCreate, setShowCreate] = useState(false);
+  const [viewing, setViewing] = useState(null);
   const qc = useQueryClient();
   const navigate = useNavigate();
 
@@ -151,7 +152,7 @@ export default function Estimates() {
                           <p className="text-xs text-slate-500">Total</p>
                           <p className="text-lg font-bold text-slate-900">{fmt(current.total_bid_amount)}</p>
                         </div>
-                        <Button size="sm" variant="outline" onClick={() => navigate(createPageUrl('EstimatorWizard'))}>Open</Button>
+                        <Button size="sm" variant="outline" onClick={() => setViewing(current)}>Open</Button>
                       </div>
                     </div>
                     {versions.length > 1 && (
@@ -175,7 +176,93 @@ export default function Estimates() {
       </Card>
 
       <CreateEstimateDialog open={showCreate} onOpenChange={setShowCreate} projects={projects} bids={bids} onCreated={() => qc.invalidateQueries({ queryKey: ['estimates-list'] })} />
+
+      {viewing && <EstimateDetailDialog estimate={viewing} onClose={() => setViewing(null)} />}
     </div>
+  );
+}
+
+function EstimateDetailDialog({ estimate, onClose }) {
+  const safeNum = (n) => (Number.isFinite(n) ? n : 0);
+  const fmt = (n) => `$${safeNum(n).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  const lineItems = Array.isArray(estimate.line_items) ? estimate.line_items : [];
+  return (
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{estimate.project_name || estimate.estimate_number || 'Estimate'}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+            <div><span className="text-slate-500">Estimate #</span><p className="font-medium">{estimate.estimate_number || '—'}</p></div>
+            <div><span className="text-slate-500">Version</span><p className="font-medium">v{estimate.version || 1}</p></div>
+            <div><span className="text-slate-500">Status</span><p className="font-medium">{(estimate.status || 'draft').replace('_', ' ')}</p></div>
+            <div><span className="text-slate-500">Division</span><p className="font-medium">{estimate.division ? estimate.division.replace('_', ' ') : '—'}</p></div>
+            <div><span className="text-slate-500">Project Address</span><p className="font-medium">{estimate.project_address || '—'}</p></div>
+            <div><span className="text-slate-500">GC</span><p className="font-medium">{estimate.gc_name || '—'}</p></div>
+            <div><span className="text-slate-500">Plan Scale</span><p className="font-medium">{estimate.plan_scale || '—'}</p></div>
+            <div><span className="text-slate-500">Devices</span><p className="font-medium">{estimate.device_count ?? '—'}</p></div>
+          </div>
+
+          {estimate.detected_scopes?.length > 0 && (
+            <div><span className="text-sm text-slate-500">Detected Scopes</span>
+              <div className="flex flex-wrap gap-1.5 mt-1">{estimate.detected_scopes.map(s => <Badge key={s} variant="secondary">{s}</Badge>)}</div>
+            </div>
+          )}
+
+          {lineItems.length > 0 && (
+            <div>
+              <p className="text-sm font-semibold text-slate-700 mb-2">Line Items</p>
+              <div className="overflow-x-auto border rounded-lg">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 text-left text-slate-500">
+                    <tr>
+                      <th className="p-2">Description</th>
+                      <th className="p-2">Category</th>
+                      <th className="p-2 text-right">Qty</th>
+                      <th className="p-2 text-right">Unit Price</th>
+                      <th className="p-2 text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {lineItems.map((li, i) => (
+                      <tr key={i}>
+                        <td className="p-2">{li.description || '—'}</td>
+                        <td className="p-2">{li.category || '—'}</td>
+                        <td className="p-2 text-right">{li.quantity ?? ''} {li.unit || ''}</td>
+                        <td className="p-2 text-right">{fmt(li.unit_price)}</td>
+                        <td className="p-2 text-right font-medium">{fmt(li.total)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
+            <div className="bg-slate-50 rounded p-2"><span className="text-slate-500">Labor</span><p className="font-semibold">{fmt(estimate.labor_total)}</p></div>
+            <div className="bg-slate-50 rounded p-2"><span className="text-slate-500">Material</span><p className="font-semibold">{fmt(estimate.material_total)}</p></div>
+            <div className="bg-slate-50 rounded p-2"><span className="text-slate-500">Subcontractor</span><p className="font-semibold">{fmt(estimate.subcontractor_total)}</p></div>
+            <div className="bg-slate-50 rounded p-2"><span className="text-slate-500">Equipment</span><p className="font-semibold">{fmt(estimate.equipment_total)}</p></div>
+            <div className="bg-slate-50 rounded p-2"><span className="text-slate-500">Overhead</span><p className="font-semibold">{fmt(estimate.overhead_amount)}</p></div>
+            <div className="bg-slate-50 rounded p-2"><span className="text-slate-500">Profit</span><p className="font-semibold">{fmt(estimate.profit_amount)}</p></div>
+            <div className="bg-slate-50 rounded p-2"><span className="text-slate-500">Contingency</span><p className="font-semibold">{fmt(estimate.contingency_amount)}</p></div>
+            <div className="bg-slate-50 rounded p-2"><span className="text-slate-500">Tax</span><p className="font-semibold">{fmt(estimate.tax_amount)}</p></div>
+            <div className="bg-primary/10 rounded p-2"><span className="text-slate-500">Total Bid</span><p className="font-bold text-lg">{fmt(estimate.total_bid_amount)}</p></div>
+          </div>
+
+          {estimate.notes && <div><span className="text-sm text-slate-500">Notes</span><p className="text-sm mt-1 whitespace-pre-wrap">{estimate.notes}</p></div>}
+
+          {estimate.marked_up_plan_url && (
+            <a href={estimate.marked_up_plan_url} target="_blank" rel="noreferrer" className="text-sm text-primary underline">View marked-up plan</a>
+          )}
+        </div>
+        <div className="flex justify-end gap-2 pt-2 border-t">
+          <Button variant="outline" onClick={onClose}>Close</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

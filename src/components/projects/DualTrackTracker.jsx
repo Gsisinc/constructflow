@@ -190,10 +190,25 @@ function TrackSelect({ label, value, onChange }) {
 }
 
 function MoneyInput({ label, value, onChange }) {
+  const [local, setLocal] = useState(value == null ? '' : String(value));
+  const [focused, setFocused] = useState(false);
+  useEffect(() => { if (!focused) setLocal(value == null ? '' : String(value)); }, [value, focused]);
+  const commit = () => {
+    setFocused(false);
+    const n = local === '' ? 0 : Number(local);
+    onChange(Number.isFinite(n) ? n : 0);
+  };
   return (
     <div>
       <Label className="text-xs text-slate-500">{label}</Label>
-      <Input type="number" className="h-8 text-sm mt-0.5" value={value ?? ''} onChange={(e) => onChange(e.target.value ? Number(e.target.value) : 0)} />
+      <Input
+        type="number"
+        className="h-8 text-sm mt-0.5"
+        value={local}
+        onFocus={() => setFocused(true)}
+        onBlur={commit}
+        onChange={(e) => setLocal(e.target.value)}
+      />
     </div>
   );
 }

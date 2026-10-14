@@ -24,7 +24,7 @@ export default function InvoiceForm({ invoice, products, company, onSave, onCanc
         total_amount: 0,
         payment_terms: 'Net 30',
         notes: '',
-        status: 'Draft'
+        status: 'draft'
     });
 
     useEffect(() => {
@@ -209,10 +209,10 @@ export default function InvoiceForm({ invoice, products, company, onSave, onCanc
                         <Select value={formData.status} onValueChange={(val) => setFormData(prev => ({...prev, status: val}))}>
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="Draft">Draft</SelectItem>
-                                <SelectItem value="Sent">Sent</SelectItem>
-                                <SelectItem value="Paid">Paid</SelectItem>
-                                <SelectItem value="Overdue">Overdue</SelectItem>
+                                <SelectItem value="draft">Draft</SelectItem>
+                                <SelectItem value="sent">Sent</SelectItem>
+                                <SelectItem value="paid">Paid</SelectItem>
+                                <SelectItem value="overdue">Overdue</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

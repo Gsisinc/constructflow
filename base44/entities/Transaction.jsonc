@@ -1,0 +1,107 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "description": "Double-entry accounting transaction scoped to a Company (stored as project_id for legacy compatibility)",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Company this transaction belongs to"
+    },
+    "transaction_number": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Journal Entry",
+        "Sales Invoice",
+        "Purchase Bill",
+        "Payment",
+        "Receipt",
+        "Expense"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "reference": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Posted",
+        "Reversed"
+      ],
+      "default": "Draft"
+    },
+    "total_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "string"
+          },
+          "debit": {
+            "type": "number",
+            "default": 0
+          },
+          "credit": {
+            "type": "number",
+            "default": 0
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "project_id",
+    "transaction_number",
+    "type",
+    "date"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

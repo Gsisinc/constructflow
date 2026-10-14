@@ -24,7 +24,7 @@ export default function Companies() {
         setLoading(true);
         try {
             const user = await User.me();
-            const data = await Company.filter({ created_by: user.email });
+            const data = await Company.filter({ created_by_id: user.id });
             setCompanies(data);
         } catch (error) {
             console.error("Error loading companies:", error);

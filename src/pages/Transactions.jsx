@@ -36,7 +36,7 @@ export default function Transactions() {
         setLoading(true);
         try {
             const user = await User.me();
-            const projectsData = await Project.filter({ created_by: user.email });
+            const projectsData = await Project.filter({ created_by_id: user.id });
             setProjects(projectsData);
             if (projectsData.length > 0) {
                 setSelectedProject(projectsData[0]);
@@ -123,21 +123,42 @@ export default function Transactions() {
                         {selectedProject?.name} • {transactions.length} transactions
                     </p>
                 </div>
-                <Button
-                    onClick={() => setShowForm(true)}
-                    className="bg-gradient-to-r from-emerald-500 to-emerald-600"
-                    disabled={!selectedProject || accounts.length === 0}
-                >
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Transaction
-                </Button>
+                <div className="flex items-center gap-3">
+                    <select
+                        value={selectedProject?.id || ''}
+                        onChange={(e) => {
+                            const p = projects.find((x) => x.id === e.target.value);
+                            setSelectedProject(p || null);
+                            setTransactions([]);
+                        }}
+                        className="border rounded-lg px-3 py-2.5 text-sm bg-white"
+                        disabled={projects.length === 0}
+                    >
+                        {projects.length === 0 && <option value="">No companies yet</option>}
+                        {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    </select>
+                    <Button
+                        onClick={() => setShowForm(true)}
+                        className="bg-gradient-to-r from-emerald-500 to-emerald-600"
+                        disabled={!selectedProject || accounts.length === 0}
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        New Transaction
+                    </Button>
+                </div>
             </div>
 
-            {!selectedProject ? (
+            {projects.length === 0 ? (
                 <div className="text-center py-16">
                     <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Selected</h2>
-                    <p className="text-gray-500">Please select a company to manage transactions</p>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2">No Company Yet</h2>
+                    <p className="text-gray-500">Create a company first (Companies page), then set up its chart of accounts to record transactions.</p>
+                </div>
+            ) : !selectedProject ? (
+                <div className="text-center py-16">
+                    <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2">Select a Company</h2>
+                    <p className="text-gray-500">Choose a company above to manage its transactions</p>
                 </div>
             ) : accounts.length === 0 ? (
                 <div className="text-center py-16">

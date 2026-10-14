@@ -34,7 +34,7 @@ export default function Accounts() {
         setLoading(true);
         try {
             const user = await User.me();
-            const projectsData = await Project.filter({ created_by: user.email });
+            const projectsData = await Project.filter({ created_by_id: user.id });
             setProjects(projectsData);
             if (projectsData.length > 0) {
                 setSelectedProject(projectsData[0]);

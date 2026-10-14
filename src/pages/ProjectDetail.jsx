@@ -316,7 +316,7 @@ export default function ProjectDetail() {
                 <Calendar className="h-4 w-4 text-slate-400" />
                 <div>
                   <p className="text-slate-500">Start</p>
-                  <p className="font-medium">{format(new Date(project.start_date), 'MMM d, yyyy')}</p>
+                  <p className="font-medium">{format(new Date(String(project.start_date).slice(0, 10) + 'T00:00:00'), 'MMM d, yyyy')}</p>
                 </div>
               </div>
             )}
@@ -325,7 +325,7 @@ export default function ProjectDetail() {
                 <Calendar className="h-4 w-4 text-slate-400" />
                 <div>
                   <p className="text-slate-500">End</p>
-                  <p className="font-medium">{format(new Date(project.end_date), 'MMM d, yyyy')}</p>
+                  <p className="font-medium">{format(new Date(String(project.end_date).slice(0, 10) + 'T00:00:00'), 'MMM d, yyyy')}</p>
                 </div>
               </div>
             )}
