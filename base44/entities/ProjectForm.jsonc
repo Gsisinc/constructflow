@@ -1,0 +1,81 @@
+{
+  "name": "ProjectForm",
+  "type": "object",
+  "description": "Saved Appendix A-I field-manual form instance, scoped to a project",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "Project this form belongs to"
+    },
+    "appendix": {
+      "type": "string",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I"
+      ],
+      "description": "Which Appendix form (A=Handoff, B=Risk, C=Huddle, D=SiteWalk, E=RFI, F=ChangeOrder, G=Cutover, H=Closeout, I=WeeklyStatus)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Display title (e.g. 'Appendix A: Handoff Review Checklist')"
+    },
+    "form_data": {
+      "type": "object",
+      "description": "Filled form payload. Checklists: { rowKey: { done, notes } }. Field tables: { rowKey: value }.",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "submitted"
+      ],
+      "default": "draft"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional overall notes for this form instance"
+    }
+  },
+  "required": [
+    "project_id",
+    "appendix",
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

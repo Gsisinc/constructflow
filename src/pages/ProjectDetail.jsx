@@ -23,6 +23,7 @@ import SubmittalsTab from '../components/projects/SubmittalsTab';
 import RFITab from '../components/projects/RFITab';
 import PunchListTab from '../components/projects/PunchListTab';
 import DocumentsTab from '../components/projects/DocumentsTab';
+import AppendixFormsTab from '../components/projects/AppendixFormsTab';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -421,6 +422,7 @@ export default function ProjectDetail() {
           <TabsTrigger value="rfis">RFIs</TabsTrigger>
           <TabsTrigger value="punchlist">Punch List</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="forms">Forms</TabsTrigger>
           <TabsTrigger value="changeorders">Change Orders</TabsTrigger>
           <TabsTrigger value="safety">Safety</TabsTrigger>
           <TabsTrigger value="decisions">Decisions</TabsTrigger>
@@ -473,6 +475,10 @@ export default function ProjectDetail() {
 
         <TabsContent value="documents" className="mt-6">
           <DocumentsTab projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="forms" className="mt-6">
+          <AppendixFormsTab projectId={projectId} />
         </TabsContent>
 
         <TabsContent value="changeorders" className="mt-6">
