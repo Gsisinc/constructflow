@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useCompanyStandards, computeFloorCheck } from '@/lib/companyStandards';
 import { BidListSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -182,6 +183,36 @@ export default function Bids() {
       return (res?.items || res || [])[0] || null;
     },
   });
+
+  const { standards } = useCompanyStandards();
+
+  const { data: bidEstimates = [] } = useQuery({
+    queryKey: ['bid-estimates-all', user?.organization_id],
+    queryFn: async () => {
+      const orgId = user?.organization_id;
+      const query = orgId ? { organization_id: orgId } : {};
+      const page = await base44.entities.BidEstimate.filter(query, { limit: 500 });
+      return page?.items || page || [];
+    },
+    enabled: !!user,
+  });
+
+  // Map bid_id -> belowFloor (latest estimate version per bid).
+  const belowFloorByBid = useMemo(() => {
+    const latest = {};
+    (bidEstimates || []).forEach((est) => {
+      const bidId = est.bid_opportunity_id;
+      if (!bidId) return;
+      if (!latest[bidId] || (est.version || 0) > (latest[bidId].version || 0)) {
+        latest[bidId] = est;
+      }
+    });
+    const result = {};
+    Object.entries(latest).forEach(([bidId, est]) => {
+      result[bidId] = computeFloorCheck(est, standards).belowFloor;
+    });
+    return result;
+  }, [bidEstimates, standards]);
 
   const runScraperMutation = useMutation({
     mutationFn: () => base44.functions.invoke('runScheduledBidScrape', { workType: 'fire_alarm', state: 'California', organization_id: user?.organization_id }),
@@ -436,6 +467,11 @@ export default function Bids() {
                         <Badge className={`${statusColors[bid.status]} px-3 py-1 rounded-lg font-semibold uppercase text-[10px] tracking-wider`}>
                           {bid.status.replace('_', ' ')}
                         </Badge>
+                        {belowFloorByBid[bid.id] && (
+                          <Badge className="bg-amber-100 text-amber-800 border border-amber-200 px-3 py-1 rounded-lg font-semibold uppercase text-[10px] tracking-wider flex items-center gap-1">
+                            <AlertTriangle className="h-3 w-3" /> Below floor
+                          </Badge>
+                        )}
                         {bid.estimated_value && (
                           <div className="flex items-center gap-1.5 text-sm font-bold text-slate-700 bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
                             <DollarSign className="h-4 w-4 text-slate-400" />

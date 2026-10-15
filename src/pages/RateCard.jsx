@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, Search, Loader2, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
+import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
 
 const CATEGORIES = ['labor', 'material', 'equipment', 'subcontractor', 'other'];
 const DIVISIONS = ['fire_alarm', 'low_voltage', 'drone', 'software', 'other', ''];
@@ -95,6 +96,8 @@ export default function RateCard() {
           )}
         </CardContent>
       </Card>
+
+      <CompanyStandardsFloors />
 
       <RateDialog open={showCreate} onOpenChange={setShowCreate} editing={editing} onSaved={() => qc.invalidateQueries({ queryKey: ['ratecard-list'] })} />
     </div>

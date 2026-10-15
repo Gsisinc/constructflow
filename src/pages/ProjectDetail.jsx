@@ -27,6 +27,7 @@ import AppendixFormsTab from '../components/projects/AppendixFormsTab';
 import ScheduleOfValuesTab from '../components/projects/ScheduleOfValuesTab';
 import OpsDocsTab from '../components/projects/OpsDocsTab';
 import OpsDocsOverview from '../components/projects/OpsDocsOverview';
+import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -418,6 +419,9 @@ export default function ProjectDetail() {
           </div>
         </div>
       </div>
+
+      {/* Company Standards (read-only floors) */}
+      <CompanyStandardsFloors />
 
       {/* Latest Ops / Field Docs */}
       <OpsDocsOverview projectId={projectId} customPhases={customPhases} />

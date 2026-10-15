@@ -20,6 +20,7 @@ import DrawingAnalysisTab from '@/components/bids/DrawingAnalysisTab';
 import DrawingDesignerTab from '@/components/bids/DrawingDesignerTab';
 import BidDetailsEditor from '@/components/bids/BidDetailsEditor';
 import BidDrawings from '@/components/bids/BidDrawings';
+import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
 
 const statusColors = {
   review: 'bg-blue-100 text-blue-800',
@@ -155,6 +156,7 @@ export default function BidDetail() {
 
         <TabsContent value="overview" className="space-y-4">
           <BidDetailsEditor bid={bid} />
+          <CompanyStandardsFloors />
           <Card>
             <CardHeader><CardTitle>Bid Overview</CardTitle></CardHeader>
             <CardContent className="space-y-3">

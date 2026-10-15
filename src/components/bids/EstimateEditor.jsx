@@ -5,8 +5,9 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, Save, Calculator, Edit, Download, Mail } from 'lucide-react';
+import { Plus, Trash2, Save, Calculator, Edit, Download, Mail, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCompanyStandards, computeFloorCheck } from '@/lib/companyStandards';
 
 export default function EstimateEditor({ bidId, organizationId, bidTitle }) {
   const queryClient = useQueryClient();
@@ -124,12 +125,18 @@ export default function EstimateEditor({ bidId, organizationId, bidTitle }) {
 }
 
 function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave, onDelete, isSaving }) {
+  const { standards } = useCompanyStandards();
+
   const [formData, setFormData] = useState(estimate || {
     line_items: [],
     labor_hours: 0,
     labor_rate: 65,
     equipment_cost: 0,
     subcontractor_cost: 0,
+    crews: 1,
+    weeks: 1,
+    supervision_hr_per_week_per_crew: standards.supervision_min_hr_per_week_per_crew,
+    contingency_percent: standards.contingency_target_pct,
     overhead_percent: 15,
     profit_margin_percent: 20,
     notes: ''
@@ -170,14 +177,16 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
       .reduce((sum, item) => sum + (parseFloat(item.total_cost) || 0), 0);
     
     const subtotal = laborCost + materialCost + (parseFloat(formData.equipment_cost) || 0) + (parseFloat(formData.subcontractor_cost) || 0);
+    const contingencyAmount = subtotal * ((parseFloat(formData.contingency_percent) || 0) / 100);
     const overhead = subtotal * ((parseFloat(formData.overhead_percent) || 0) / 100);
     const profit = subtotal * ((parseFloat(formData.profit_margin_percent) || 0) / 100);
-    const total = subtotal + overhead + profit;
+    const total = subtotal + overhead + profit + contingencyAmount;
 
     return {
       labor_cost: laborCost,
       material_cost: materialCost,
       subtotal,
+      contingency_amount: contingencyAmount,
       total_bid_amount: total
     };
   };
@@ -192,6 +201,10 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
   };
 
   const totals = calculateTotals();
+  const floor = computeFloorCheck(
+    { ...formData, subtotal: totals.subtotal },
+    standards
+  );
 
   const downloadPDF = () => {
     const doc = new jsPDF();
@@ -405,6 +418,76 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
               />
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Contingency & Supervision (company floors) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Contingency & Supervision</CardTitle>
+          <p className="text-xs text-slate-500">
+            Floors: contingency min {standards.contingency_min_pct}% · target {standards.contingency_target_pct}% · supervision {standards.supervision_min_hr_per_week_per_crew} hr/wk/crew
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="text-xs text-slate-600 block mb-1">Contingency %</label>
+              <Input
+                type="number"
+                value={formData.contingency_percent ?? 0}
+                onChange={(e) => setFormData({ ...formData, contingency_percent: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-600 block mb-1">Active Crews</label>
+              <Input
+                type="number"
+                value={formData.crews ?? 1}
+                onChange={(e) => setFormData({ ...formData, crews: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-600 block mb-1">Weeks</label>
+              <Input
+                type="number"
+                value={formData.weeks ?? 1}
+                onChange={(e) => setFormData({ ...formData, weeks: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-600 block mb-1">Supervision hr/wk/crew</label>
+              <Input
+                type="number"
+                value={formData.supervision_hr_per_week_per_crew ?? standards.supervision_min_hr_per_week_per_crew}
+                onChange={(e) => setFormData({ ...formData, supervision_hr_per_week_per_crew: parseFloat(e.target.value) || 0 })}
+                disabled={!isEditing}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-600 block mb-1">Contingency $</label>
+              <Input value={`$${(totals.contingency_amount || 0).toLocaleString()}`} disabled />
+            </div>
+            <div>
+              <label className="text-xs text-slate-600 block mb-1">Supervision hrs</label>
+              <Input value={floor.supervisionHours.toFixed(1)} disabled />
+            </div>
+          </div>
+
+          {floor.belowFloor && (
+            <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+              <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-semibold">Below company floor</p>
+                <ul className="list-disc ml-5 mt-1 space-y-0.5">
+                  {floor.reasons.map((r, i) => <li key={i}>{r}</li>)}
+                </ul>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

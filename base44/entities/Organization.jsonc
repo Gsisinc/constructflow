@@ -73,6 +73,21 @@
     "work_hours_end": {
       "type": "string",
       "default": "17:00"
+    },
+    "contingency_min_pct": {
+      "type": "number",
+      "default": 5,
+      "description": "Owner-set contingency floor (% of direct cost). Estimates below this trigger an amber warning."
+    },
+    "contingency_target_pct": {
+      "type": "number",
+      "default": 10,
+      "description": "Owner-set target contingency % used as the default on new estimates."
+    },
+    "supervision_min_hr_per_week_per_crew": {
+      "type": "number",
+      "default": 1,
+      "description": "Owner-set minimum supervision hours per week per active crew."
     }
   },
   "required": [

@@ -55,6 +55,31 @@
     "subcontractor_cost": {
       "type": "number"
     },
+    "crews": {
+      "type": "number",
+      "default": 1,
+      "description": "Number of active crews for supervision calc"
+    },
+    "weeks": {
+      "type": "number",
+      "default": 1,
+      "description": "Project duration in weeks for supervision calc"
+    },
+    "supervision_hr_per_week_per_crew": {
+      "type": "number",
+      "default": 1,
+      "description": "Planned supervision hours per week per crew"
+    },
+    "contingency_percent": {
+      "type": "number",
+      "default": 10,
+      "description": "Contingency % applied to direct cost"
+    },
+    "contingency_amount": {
+      "type": "number",
+      "default": 0,
+      "description": "Calculated contingency $ (direct cost x contingency %)"
+    },
     "overhead_percent": {
       "type": "number",
       "default": 15
