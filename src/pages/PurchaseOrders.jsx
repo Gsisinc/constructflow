@@ -6,13 +6,15 @@ import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Upload, FileText, Download, Trash2, Edit2, Loader2 } from 'lucide-react';
+import { Plus, Upload, FileText, Download, Trash2, Ban, Edit2, Loader2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
 import { fmtDate } from '@/lib/dates';
 import { cn } from '@/lib/utils';
+import { fmtMoney, roundCents } from '@/lib/money';
+import { Textarea } from '@/components/ui/textarea';
 import EmptyState from '../components/ui/EmptyState';
 
 const APPROVAL_THRESHOLD = 5000;
@@ -61,8 +63,8 @@ export default function PurchaseOrders() {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.PurchaseOrder.delete(id),
+  const voidMutation = useMutation({
+    mutationFn: (id) => base44.entities.PurchaseOrder.update(id, { status: 'cancelled' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['purchaseOrders'] });
     },
@@ -95,7 +97,7 @@ export default function PurchaseOrders() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs sm:text-sm text-slate-600">Total PO Value</p>
-            <p className="text-lg sm:text-lg sm:text-xl md:text-2xl font-semibold mt-0.5">${totalValue.toLocaleString()}</p>
+            <p className="text-lg sm:text-lg sm:text-xl md:text-2xl font-semibold mt-0.5">{fmtMoney(totalValue)}</p>
           </div>
           <div className="text-right text-xs sm:text-sm text-slate-600">
             <p className="font-medium">{pos.length} orders</p>
@@ -132,7 +134,7 @@ export default function PurchaseOrders() {
                 </Badge>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-2 text-xs">
-                <div><p className="text-slate-500">Total</p><p className="font-semibold">${(po.total || 0).toLocaleString()}</p></div>
+                <div><p className="text-slate-500">Total</p><p className="font-semibold">{fmtMoney(po.total || 0)}</p></div>
                 <div><p className="text-slate-500">Date</p><p className="font-semibold">{po.po_date ? fmtDate(po.po_date, 'MMM d') : '-'}</p></div>
               </div>
               <div className="flex gap-1 pt-1 border-t border-slate-100 flex-wrap">
@@ -151,9 +153,11 @@ export default function PurchaseOrders() {
                 <Button size="sm" variant="ghost" onClick={() => generatePDF(po)} className="flex-1">
                   <Download className="h-3 w-3 mr-1" /> PDF
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => deleteMutation.mutate(po.id)} className="flex-1 text-red-600">
-                  <Trash2 className="h-3 w-3 mr-1" />
-                </Button>
+                {po.status === 'draft' && (
+                  <Button size="sm" variant="ghost" onClick={() => voidMutation.mutate(po.id)} className="flex-1 text-red-600">
+                    <Ban className="h-3 w-3 mr-1" /> Void
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -181,7 +185,7 @@ export default function PurchaseOrders() {
                     <td className="p-4 font-medium text-slate-900 break-words">{po.po_number || '-'}</td>
                     <td className="p-4 text-slate-600">{po.vendor}</td>
                     <td className="p-4 text-slate-600">{po.po_date ? fmtDate(po.po_date, 'MMM d, yyyy') : '-'}</td>
-                    <td className="p-4 font-semibold">${(po.total || 0).toLocaleString()}</td>
+                    <td className="p-4 font-semibold">{fmtMoney(po.total || 0)}</td>
                     <td className="p-4"><Badge className={cn("border text-xs", statusColors[po.status])}>{po.status?.replace('_', ' ')}</Badge></td>
                     <td className="p-4 text-right space-x-1">
                       {po.status === 'pending_approval' && (
@@ -199,9 +203,11 @@ export default function PurchaseOrders() {
                       <Button size="sm" variant="ghost" onClick={() => generatePDF(po)}>
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => deleteMutation.mutate(po.id)} className="text-red-600">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {po.status === 'draft' && (
+                        <Button size="sm" variant="ghost" onClick={() => voidMutation.mutate(po.id)} className="text-red-600">
+                          <Ban className="h-4 w-4" />
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -279,40 +285,43 @@ function generatePDF(po) {
 
   // Totals
   doc.setFontSize(10);
-  doc.text(`Subtotal: $${(po.subtotal || 0).toLocaleString()}`, 20, yPos);
+  doc.text(`Subtotal: ${fmtMoney(po.subtotal || 0)}`, 20, yPos);
   yPos += 6;
   if (po.tax) {
-    doc.text(`Tax: $${(po.tax || 0).toLocaleString()}`, 20, yPos);
+    doc.text(`Tax: ${fmtMoney(po.tax || 0)}`, 20, yPos);
     yPos += 6;
   }
   if (po.shipping) {
-    doc.text(`Shipping: $${(po.shipping || 0).toLocaleString()}`, 20, yPos);
+    doc.text(`Shipping: ${fmtMoney(po.shipping || 0)}`, 20, yPos);
     yPos += 6;
   }
   doc.setFontSize(12);
-  doc.text(`Total: $${(po.total || 0).toLocaleString()}`, 20, yPos);
+  doc.text(`Total: ${fmtMoney(po.total || 0)}`, 20, yPos);
 
   doc.save(`PO-${po.po_number || 'export'}.pdf`);
 }
 
 function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
+  const { data: suppliers = [] } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: () => base44.entities.Supplier.list(),
+  });
+
   const [formData, setFormData] = React.useState(po || {
     project_id: '',
     po_number: '',
     vendor: '',
     po_date: format(new Date(), 'yyyy-MM-dd'),
     status: 'draft',
-    subtotal: '',
     tax: '',
     shipping: '',
-    total: '',
     line_items: [],
+    notes: '',
   });
-  const [newItem, setNewItem] = React.useState({});
 
   React.useEffect(() => {
     if (po) {
-      setFormData(po);
+      setFormData({ tax: '', shipping: '', line_items: [], notes: '', ...po });
     } else {
       setFormData({
         project_id: '',
@@ -320,37 +329,52 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
         vendor: '',
         po_date: format(new Date(), 'yyyy-MM-dd'),
         status: 'draft',
-        subtotal: '',
         tax: '',
         shipping: '',
-        total: '',
         line_items: [],
+        notes: '',
       });
     }
   }, [po]);
 
+  const lineItems = formData.line_items || [];
+  const updateItem = (idx, field, value) => {
+    const items = lineItems.map((it, i) => (i === idx ? { ...it, [field]: value } : it));
+    items[idx].total = roundCents((Number(items[idx].quantity) || 0) * (Number(items[idx].unit_price) || 0));
+    setFormData({ ...formData, line_items: items });
+  };
+  const addItem = () => setFormData({ ...formData, line_items: [...lineItems, { description: '', quantity: 1, unit: 'ea', unit_price: 0, total: 0 }] });
+  const removeItem = (idx) => setFormData({ ...formData, line_items: lineItems.filter((_, i) => i !== idx) });
+  const subtotal = roundCents(lineItems.reduce((s, it) => s + (Number(it.total) || 0), 0));
+  const tax = roundCents(Number(formData.tax) || 0);
+  const shipping = roundCents(Number(formData.shipping) || 0);
+  const total = roundCents(subtotal + tax + shipping);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const subtotal = parseFloat(formData.subtotal) || 0;
-    const tax = parseFloat(formData.tax) || 0;
-    const shipping = parseFloat(formData.shipping) || 0;
-    const total = subtotal + tax + shipping;
     const requiresApproval = total >= APPROVAL_THRESHOLD && !po;
     const status = requiresApproval ? 'pending_approval' : (formData.status || 'draft');
-
     onSubmit({
       ...formData,
+      line_items: lineItems.map((it) => ({
+        description: it.description || '',
+        quantity: Number(it.quantity) || 0,
+        unit: it.unit || '',
+        unit_price: roundCents(Number(it.unit_price) || 0),
+        total: roundCents(Number(it.total) || 0),
+      })),
       subtotal,
       tax,
       shipping,
       total,
       status,
+      notes: formData.notes || '',
     });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{po ? 'Edit PO' : 'Create Purchase Order'}</DialogTitle>
         </DialogHeader>
@@ -397,11 +421,17 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
           <div className="space-y-2">
             <Label>Vendor *</Label>
             <Input
+              list="po-suppliers"
               value={formData.vendor}
               onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
-              placeholder="Vendor name"
+              placeholder="Pick a supplier or type a new vendor"
               required
             />
+            <datalist id="po-suppliers">
+              {suppliers.map((s) => (
+                <option key={s.id} value={s.name} />
+              ))}
+            </datalist>
           </div>
 
           <div className="space-y-2">
@@ -409,23 +439,71 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
             <Input type="date" value={formData.po_date} onChange={(e) => setFormData({ ...formData, po_date: e.target.value })} />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            <div className="space-y-2">
-              <Label>Subtotal</Label>
-              <Input type="number" value={formData.subtotal} onChange={(e) => setFormData({ ...formData, subtotal: e.target.value })} placeholder="0.00" />
+          {/* Line items */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>Line Items</Label>
+              <Button type="button" size="sm" variant="outline" onClick={addItem}>
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Item
+              </Button>
             </div>
+            {lineItems.length === 0 ? (
+              <p className="text-xs text-slate-500 border border-dashed border-slate-200 rounded-md p-3 text-center">No line items yet — add the items being ordered.</p>
+            ) : (
+              <div className="border border-slate-200 rounded-md overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead className="bg-slate-50 text-slate-600">
+                    <tr>
+                      <th className="text-left p-2 font-semibold">Item</th>
+                      <th className="text-left p-2 font-semibold w-16">Qty</th>
+                      <th className="text-left p-2 font-semibold w-20">Unit</th>
+                      <th className="text-left p-2 font-semibold w-24">Unit Cost</th>
+                      <th className="text-right p-2 font-semibold w-28">Extended</th>
+                      <th className="w-8"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {lineItems.map((it, idx) => (
+                      <tr key={idx} className="border-t border-slate-100">
+                        <td className="p-1.5"><Input value={it.description || ''} onChange={(e) => updateItem(idx, 'description', e.target.value)} placeholder="Item description" className="h-8 text-xs" /></td>
+                        <td className="p-1.5"><Input type="number" value={it.quantity ?? ''} onChange={(e) => updateItem(idx, 'quantity', e.target.value)} className="h-8 text-xs" /></td>
+                        <td className="p-1.5"><Input value={it.unit || ''} onChange={(e) => updateItem(idx, 'unit', e.target.value)} placeholder="ea" className="h-8 text-xs" /></td>
+                        <td className="p-1.5"><Input type="number" step="0.01" value={it.unit_price ?? ''} onChange={(e) => updateItem(idx, 'unit_price', e.target.value)} className="h-8 text-xs" /></td>
+                        <td className="p-1.5 text-right font-semibold tabular-nums">{fmtMoney(it.total || 0)}</td>
+                        <td className="p-1.5 text-center"><button type="button" onClick={() => removeItem(idx)} className="text-slate-300 hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Tax</Label>
-              <Input type="number" value={formData.tax} onChange={(e) => setFormData({ ...formData, tax: e.target.value })} placeholder="0.00" />
+              <Input type="number" step="0.01" value={formData.tax ?? ''} onChange={(e) => setFormData({ ...formData, tax: e.target.value })} placeholder="0.00" />
             </div>
             <div className="space-y-2">
               <Label>Shipping</Label>
-              <Input type="number" value={formData.shipping} onChange={(e) => setFormData({ ...formData, shipping: e.target.value })} placeholder="0.00" />
+              <Input type="number" step="0.01" value={formData.shipping ?? ''} onChange={(e) => setFormData({ ...formData, shipping: e.target.value })} placeholder="0.00" />
             </div>
+          </div>
+
+          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 space-y-1 text-sm">
+            <div className="flex justify-between"><span className="text-slate-600">Subtotal</span><span className="font-semibold tabular-nums">{fmtMoney(subtotal)}</span></div>
+            <div className="flex justify-between"><span className="text-slate-600">Tax</span><span className="font-semibold tabular-nums">{fmtMoney(tax)}</span></div>
+            <div className="flex justify-between"><span className="text-slate-600">Shipping</span><span className="font-semibold tabular-nums">{fmtMoney(shipping)}</span></div>
+            <div className="flex justify-between border-t border-slate-200 pt-1"><span className="font-semibold text-slate-900">Total</span><span className="font-bold tabular-nums">{fmtMoney(total)}</span></div>
           </div>
           <p className="text-xs text-amber-700 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 rounded px-2 py-1.5">
             POs of $5,000 or more are set to &quot;Pending approval&quot;; use the Approve action to send.
           </p>
+
+          <div className="space-y-2">
+            <Label>Notes</Label>
+            <Textarea value={formData.notes || ''} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder="Internal notes, delivery instructions, etc." className="h-20" />
+          </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
