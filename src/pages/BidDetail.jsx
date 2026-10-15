@@ -1,15 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Calendar, DollarSign, FileText, MoreHorizontal, Trash2, TrendingUp, Send } from 'lucide-react';
+import { ArrowLeft, Calendar, DollarSign, FileText, MoreHorizontal, Trash2, TrendingUp, Send, Upload, ArrowDownToLine, Copy, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -27,6 +27,8 @@ import BidPhaseWorkspace from '@/components/bids/BidPhaseWorkspace';
 import BidStatusSelect from '@/components/bids/BidStatusSelect';
 import EstimateEditor from '@/components/bids/EstimateEditor';
 import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
+import { Input } from '@/components/ui/input';
+import { stampUpdate } from '@/lib/audit';
 import { convertBidToProject } from '@/lib/bidConversion';
 
 const statusColors = {
@@ -198,6 +200,9 @@ export default function BidDetail() {
           <TabsTrigger value="phases" className="flex-shrink-0">Phases/Stages</TabsTrigger>
           <TabsTrigger value="boq" className="flex-shrink-0">BOQ</TabsTrigger>
           <TabsTrigger value="estimate" className="flex-shrink-0">Estimate</TabsTrigger>
+          {typeof window !== 'undefined' && !window.location.hostname.includes('mygsis.com') && (
+            <TabsTrigger value="procurement" className="flex-shrink-0">Procurement</TabsTrigger>
+          )}
           <TabsTrigger value="requirements" className="flex-shrink-0">Requirements</TabsTrigger>
           <TabsTrigger value="documents" className="flex-shrink-0">Documents</TabsTrigger>
           <TabsTrigger value="bid-drawings" className="flex-shrink-0">Drawings</TabsTrigger>
@@ -286,6 +291,11 @@ export default function BidDetail() {
         <TabsContent value="estimate" className="space-y-4">
           <EstimateEditor bidId={bid.id} organizationId={user.organization_id} bidTitle={bid.title || bid.project_name || 'Bid'} />
         </TabsContent>
+        {typeof window !== 'undefined' && !window.location.hostname.includes('mygsis.com') && (
+          <TabsContent value="procurement" className="space-y-4">
+            <ProcurementTab bidId={bid.id} bidTitle={bid.title || bid.project_name || 'Bid'} />
+          </TabsContent>
+        )}
 
         <TabsContent value="requirements" className="space-y-4">
           <BidRequirements bidId={bid.id} organizationId={user.organization_id} />
@@ -559,5 +569,512 @@ function StatCard({ icon, label, value }) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// ===== Procurement tab (v2, additions only; dev/preview only — hidden on mygsis.com) =====
+// Draft only — Kemar sends. Nothing is emailed from the app. No new entity: quote info lives on
+// BidEstimate.line_items[] (price_source, quote_ref, supplier_name). No deletes.
+
+// Verbatim copy of EstimateEditor.jsx lines 176-200 (calculateTotals + its effective % inputs),
+// wrapped so it runs on a plain estimate object instead of EstimateForm state.
+function procCalculateTotals(formData) {
+  const hasDollarLines = (formData.line_items || []).some((i) => i.pricing_type === 'dollar');
+  const effectiveOverheadPct = hasDollarLines ? 0 : (parseFloat(formData.overhead_percent) || 0);
+  const effectiveProfitPct = hasDollarLines ? 0 : (parseFloat(formData.profit_margin_percent) || 0);
+
+  const calculateTotals = () => {
+    const laborCost = (parseFloat(formData.labor_hours) || 0) * (parseFloat(formData.labor_rate) || 0);
+    const materialCost = (formData.line_items || [])
+      .reduce((sum, item) => sum + (parseFloat(item.total_cost) || 0), 0);
+    
+    const subtotal = laborCost + materialCost + (parseFloat(formData.equipment_cost) || 0) + (parseFloat(formData.subcontractor_cost) || 0);
+    const contingencyAmount = subtotal * ((parseFloat(formData.contingency_percent) || 0) / 100);
+    const overhead = subtotal * (effectiveOverheadPct / 100);
+    const profit = subtotal * (effectiveProfitPct / 100);
+    const total = subtotal + overhead + profit + contingencyAmount;
+
+    return {
+      labor_cost: laborCost,
+      material_cost: materialCost,
+      subtotal,
+      contingency_amount: contingencyAmount,
+      overhead_percent: effectiveOverheadPct,
+      profit_margin_percent: effectiveProfitPct,
+      total_bid_amount: total
+    };
+  };
+
+  return calculateTotals();
+}
+
+const PROC_SIGNATURE = 'Thank you,\n\nKemar McKenzie, President/CEO\nGolden State Integrated Systems | CA License #1150625 (C7, C10)\n601 Brannan Island Road, Isleton, CA 95641 | 209-200-1073 | gsistech.com | {{GSIS_EMAIL}}';
+const PROC_TAP = 'min-h-[44px] md:min-h-0';
+const PROC_FIELD = 'h-9 w-full rounded-md border border-border bg-background text-foreground text-sm px-2';
+
+// Stable line key for Insert mapping (NOT array index).
+// Evidence: EstimateEditor.addLineItem (L147-154) creates lines with no `id`; BidEstimate.jsonc
+// line_items.items.properties has no `id`. Prefer `id` if present; else name + cost_code; else description.
+function procLineKey(line) {
+  if (line?.id != null && String(line.id).trim() !== '') return `id:${String(line.id).trim()}`;
+  const name = String(line?.name ?? '').trim();
+  const costCode = String(line?.cost_code ?? '').trim();
+  if (name || costCode) return `nc:${name}\u0000${costCode}`;
+  return `d:${String(line?.description ?? '').trim()}`;
+}
+
+function procLineLabel(line) {
+  if (!line) return '(unknown line)';
+  return line.description || line.name || line.cost_code || '(unnamed line)';
+}
+
+function procFindKeyMatches(items, key) {
+  const matches = [];
+  (items || []).forEach((item, idx) => {
+    if (procLineKey(item) === key) matches.push({ item, idx });
+  });
+  return matches;
+}
+
+function procBuildDraft({ template, supplierName, bidTitle, lines }) {
+  const rep = '{{REP_NAME}}';
+  const header = 'Line | Item / description | Qty | Unit';
+  const table = lines.map((l) => `${l._idx + 1} | ${l.description || l.name || ''} | ${l.quantity ?? ''} | ${l.unit || 'ea'}`).join('\n');
+  let subject; let body;
+  if (template === 'follow_up') {
+    subject = `Follow-up: RFQ ${bidTitle} - quote needed by {{QUOTE_NEEDED_BY}}`;
+    body = `Hi ${rep},\n\nFollowing up on our request for quote for ${bidTitle}. Our bid is due {{BID_DUE_DATE}}, so we need your quote by {{QUOTE_NEEDED_BY}}.\n\nStill open:\n${header}\n${table}`;
+  } else {
+    subject = `RFQ - ${bidTitle} - materials - bid due {{BID_DUE_DATE}}`;
+    body = `Hi ${rep},\n\nGolden State Integrated Systems requests a quote from ${supplierName} for the materials below.\n\n- Job: ${bidTitle}\n- Our account #: {{KEMAR_ACCOUNT_NO}}\n- Quote needed by: {{QUOTE_NEEDED_BY}}\n- Deliver to: {{DELIVERY_ADDRESS}}\n\n${header}\n${table}\n\nFor each line please give: unit price, extended price, lead time, freight, and quote validity date. Please note any substitutions clearly.`;
+  }
+  return { subject, text: `To: ${supplierName}\nSubject: ${subject}\n\n${body}\n\n${PROC_SIGNATURE}\n` };
+}
+
+function ProcurementTab({ bidId, bidTitle }) {
+  const queryClient = useQueryClient();
+  const submitting = useRef(false);
+  const [busy, setBusy] = useState(false);
+
+  // Same query key as EstimateEditor, so caches stay shared.
+  const { data: estimates = [], isLoading } = useQuery({
+    queryKey: ['bidEstimates', bidId],
+    queryFn: () => base44.entities.BidEstimate.filter({ bid_opportunity_id: bidId }),
+    enabled: !!bidId
+  });
+  const { data: suppliers = [] } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: () => base44.entities.Supplier.list()
+  });
+
+  // EstimateEditor edits estimates[0] (EstimateEditor.jsx line 87) — target the same record.
+  const estimate = estimates[0] || null;
+  const allLines = useMemo(() => (estimate?.line_items || []).map((l, idx) => ({ ...l, _idx: idx, _key: procLineKey(l) })), [estimate]);
+  const anyTagged = allLines.some((l) => String(l.category || '').toLowerCase() === 'material');
+  const matLines = anyTagged ? allLines.filter((l) => String(l.category || '').toLowerCase() === 'material') : allLines;
+
+  // ---------- Request Quote (draft only) ----------
+  const [rfqOpen, setRfqOpen] = useState(false);
+  const [rfqSupplier, setRfqSupplier] = useState('');
+  const [rfqTemplate, setRfqTemplate] = useState('rfq');
+  const [rfqLines, setRfqLines] = useState([]);
+  const draft = useMemo(() => procBuildDraft({
+    template: rfqTemplate,
+    supplierName: rfqSupplier || '{{SUPPLIER_NAME}}',
+    bidTitle: bidTitle || 'Bid',
+    lines: matLines.filter((l) => rfqLines.includes(l._idx))
+  }), [rfqTemplate, rfqSupplier, bidTitle, matLines, rfqLines]);
+
+  const copyDraft = async () => {
+    try {
+      await navigator.clipboard.writeText(draft.text);
+      toast.success('Draft copied — Kemar sends');
+    } catch (e) {
+      toast.error('Copy failed: ' + (e?.message || ''));
+    }
+  };
+  const downloadDraft = () => {
+    const blob = new Blob([draft.text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rfq-${(bidTitle || 'bid').replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${(rfqSupplier || 'supplier').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast.success('Draft downloaded — Kemar sends');
+  };
+
+  // ---------- Supplier quote upload + manual mapping (local state until Insert) ----------
+  const [quoteFile, setQuoteFile] = useState(null);
+  const [fileUrl, setFileUrl] = useState('');
+  const [mapSupplier, setMapSupplier] = useState('');
+  const [mapRef, setMapRef] = useState('');
+  const [mapSource, setMapSource] = useState('rep_quote');
+  const [mapCosts, setMapCosts] = useState({}); // stable line key -> new unit_cost (string)
+  const fileInputRef = useRef(null);
+
+  const uploadQuote = async () => {
+    if (submitting.current || !quoteFile) return;
+    submitting.current = true; setBusy(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: quoteFile });
+      setFileUrl(file_url);
+      toast.success('Quote file uploaded — map prices below');
+    } catch (e) {
+      toast.error('Upload failed: ' + (e?.message || ''));
+    } finally {
+      submitting.current = false; setBusy(false);
+    }
+  };
+
+  // quote_ref storage choice: "REF | file_url" when a file was uploaded, else just REF.
+  const quoteRefValue = fileUrl ? `${mapRef.trim()} | ${fileUrl}` : mapRef.trim();
+
+  // Resolve mapped keys against the current estimate (preview). Exact unique key match only.
+  const { appliedChanges, skippedChanges, pendingCount } = useMemo(() => {
+    const items = estimate?.line_items || [];
+    const applied = [];
+    const skipped = [];
+    let pending = 0;
+    Object.entries(mapCosts).forEach(([key, v]) => {
+      if (v === '' || v == null || !Number.isFinite(parseFloat(v))) return;
+      pending += 1;
+      const newCost = parseFloat(v);
+      const matches = procFindKeyMatches(items, key);
+      const fromUi = allLines.find((l) => l._key === key);
+      const label = procLineLabel(fromUi || matches[0]?.item);
+      if (matches.length === 1) {
+        const { item: line, idx } = matches[0];
+        applied.push({ key, idx, line, oldCost: line.unit_cost, newCost, label });
+      } else {
+        skipped.push({
+          key,
+          label,
+          reason: matches.length === 0 ? 'no matching line' : 'multiple matching lines'
+        });
+      }
+    });
+    return { appliedChanges: applied, skippedChanges: skipped, pendingCount: pending };
+  }, [mapCosts, estimate, allLines]);
+
+  // Build new line_items for preview; total_cost as EstimateEditor.updateLineItem (lines 161-165).
+  // Never reorder, add, or delete — only overwrite fields on exact matches.
+  const newLineItems = useMemo(() => {
+    const items = [...(estimate?.line_items || [])];
+    appliedChanges.forEach((c) => {
+      items[c.idx] = {
+        ...items[c.idx],
+        unit_cost: c.newCost,
+        price_source: mapSource,
+        quote_ref: quoteRefValue,
+        supplier_name: mapSupplier.trim()
+      };
+      const qty = parseFloat(items[c.idx].quantity) || 0;
+      const cost = parseFloat(items[c.idx].unit_cost) || 0;
+      items[c.idx].total_cost = qty * cost;
+    });
+    return items;
+  }, [estimate, appliedChanges, mapSource, quoteRefValue, mapSupplier]);
+
+  const oldTotals = estimate ? procCalculateTotals(estimate) : null;
+  const newTotals = estimate ? procCalculateTotals({ ...estimate, line_items: newLineItems }) : null;
+
+  // ---------- Insert Procurement Prices ----------
+  const [applyOpen, setApplyOpen] = useState(false);
+  const insertPrices = async () => {
+    if (submitting.current || !estimate || pendingCount === 0) return;
+    submitting.current = true; setBusy(true);
+    try {
+      // Re-read the current estimate; resolve each mapped key against fresh line_items.
+      const freshList = await base44.entities.BidEstimate.filter({ bid_opportunity_id: bidId });
+      const fresh = freshList?.[0] || null;
+      if (!fresh?.id) {
+        toast.error('Insert failed: estimate not found');
+        return;
+      }
+      const items = [...(fresh.line_items || [])];
+      const applied = [];
+      const skipped = [];
+      Object.entries(mapCosts).forEach(([key, v]) => {
+        if (v === '' || v == null || !Number.isFinite(parseFloat(v))) return;
+        const newCost = parseFloat(v);
+        const matches = procFindKeyMatches(items, key);
+        const fromUi = allLines.find((l) => l._key === key);
+        const label = procLineLabel(fromUi || matches[0]?.item);
+        if (matches.length !== 1) {
+          skipped.push({
+            key,
+            label,
+            reason: matches.length === 0 ? 'no matching line' : 'multiple matching lines'
+          });
+          return;
+        }
+        const idx = matches[0].idx;
+        items[idx] = {
+          ...items[idx],
+          unit_cost: newCost,
+          price_source: mapSource,
+          quote_ref: quoteRefValue,
+          supplier_name: mapSupplier.trim()
+        };
+        const qty = parseFloat(items[idx].quantity) || 0;
+        const cost = parseFloat(items[idx].unit_cost) || 0;
+        items[idx].total_cost = qty * cost;
+        applied.push({ key, idx, label, newCost });
+      });
+
+      const skippedSummary = skipped.length
+        ? ` Skipped ${skipped.length}: ${skipped.map((s) => `${s.label} (${s.reason})`).join('; ')}`
+        : '';
+
+      if (applied.length === 0) {
+        toast.error(`No lines updated.${skippedSummary}`);
+        return;
+      }
+
+      // Same payload shape as EstimateEditor.handleSave (lines 202-209).
+      const formData = { ...fresh, line_items: items };
+      const totals = procCalculateTotals(formData);
+      const data = {
+        ...formData,
+        ...totals,
+        version: (formData.version || 0) + (formData.id ? 1 : 0)
+      };
+      // Same as EstimateEditor updateMutation.mutationFn (lines 53-62).
+      const bidIdForSync = bidId;
+      await base44.entities.BidEstimate.update(data.id, await stampUpdate(data));
+      if (Number.isFinite(data.total_bid_amount)) {
+        await base44.entities.BidOpportunity.update(bidIdForSync, { estimated_value: data.total_bid_amount });
+        const bids = await base44.entities.BidOpportunity.filter({ id: bidIdForSync }, { fields: ['linked_project_id'] });
+        const pid = bids?.[0]?.linked_project_id;
+        if (pid) await base44.entities.Project.update(pid, { budget: data.total_bid_amount });
+      }
+      // Same invalidations as EstimateEditor updateMutation.onSuccess (lines 65-69).
+      queryClient.invalidateQueries({ queryKey: ['bidEstimates', bidId] });
+      queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+      queryClient.invalidateQueries({ queryKey: ['dash-bids-list'] });
+      queryClient.invalidateQueries({ queryKey: ['org-projects'] });
+      toast.success(`Inserted ${applied.length} procurement price(s) into the estimate.${skippedSummary}`);
+      setApplyOpen(false);
+      setMapCosts({});
+    } catch (e) {
+      toast.error('Insert failed: ' + (e?.message || ''));
+    } finally {
+      submitting.current = false; setBusy(false);
+    }
+  };
+
+  if (isLoading) return <p className="text-sm text-muted-foreground">Loading estimate…</p>;
+
+  if (!estimate) {
+    return (
+      <Card className="bg-card border-border rounded-xl">
+        <CardContent className="py-8 text-sm text-muted-foreground">No estimate for this bid yet. Create one on the Estimate tab.</CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <Card className="bg-card border-border rounded-xl">
+        <CardHeader>
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+            <div>
+              <CardTitle className="text-foreground">Procurement — Material lines</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">Estimate version {estimate.version ?? 1}</p>
+            </div>
+            <div className="text-left md:text-right text-sm">
+              <div className="text-muted-foreground">Subtotal {fmtDollars(estimate.subtotal || 0)}</div>
+              <div className="font-semibold text-foreground">Total bid {fmtDollars(estimate.total_bid_amount || 0)}</div>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row gap-2 pt-2">
+            <Button className={PROC_TAP} disabled={matLines.length === 0} onClick={() => setRfqOpen(true)}>
+              <FileText className="h-4 w-4 mr-2" />Request Quote
+            </Button>
+            <Button variant="outline" className={PROC_TAP} disabled={busy || pendingCount === 0} onClick={() => setApplyOpen(true)}>
+              <ArrowDownToLine className="h-4 w-4 mr-2" />Insert Procurement Prices
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th className="text-left p-2">#</th>
+                <th className="text-left p-2">Description</th>
+                <th className="text-right p-2">Qty</th>
+                <th className="text-left p-2">Unit</th>
+                <th className="text-right p-2">Unit cost</th>
+                <th className="text-left p-2">Supplier</th>
+                <th className="text-left p-2">Source</th>
+                <th className="text-left p-2">Quote ref</th>
+                <th className="text-right p-2">New unit cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {matLines.map((l) => (
+                <tr key={l._idx} className="border-b border-border">
+                  <td className="p-2 text-muted-foreground">{l._idx + 1}</td>
+                  <td className="p-2 text-foreground">{l.description || l.name}</td>
+                  <td className="p-2 text-right">{l.quantity}</td>
+                  <td className="p-2">{l.unit || 'ea'}</td>
+                  <td className="p-2 text-right">{l.unit_cost ? fmtDollars(l.unit_cost) : <Badge variant="destructive">MISSING</Badge>}</td>
+                  <td className="p-2">{l.supplier_name || '—'}</td>
+                  <td className="p-2">{l.price_source ? <Badge variant="outline">{l.price_source}</Badge> : '—'}</td>
+                  <td className="p-2 max-w-[200px] truncate" title={l.quote_ref || ''}>{l.quote_ref || '—'}</td>
+                  <td className="p-2 text-right">
+                    <Input
+                      type="number"
+                      step="0.01"
+                      className={`w-28 ml-auto ${PROC_TAP}`}
+                      placeholder="—"
+                      value={mapCosts[l._key] ?? ''}
+                      onChange={(e) => setMapCosts((m) => ({ ...m, [l._key]: e.target.value }))}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-card border-border rounded-xl">
+        <CardHeader><CardTitle className="text-foreground">Supplier quote → mapping</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+            <div className="md:col-span-2">
+              <Label>Quote file (PDF/XLSX/CSV, optional)</Label>
+              <Input ref={fileInputRef} type="file" accept=".pdf,.xlsx,.csv" className={PROC_TAP} onChange={(e) => { setQuoteFile(e.target.files?.[0] || null); setFileUrl(''); }} />
+            </div>
+            <Button variant="outline" className={PROC_TAP} disabled={busy || !quoteFile} onClick={uploadQuote}>
+              <Upload className="h-4 w-4 mr-2" />{fileUrl ? 'Uploaded' : 'Upload file'}
+            </Button>
+          </div>
+          {fileUrl && (
+            <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm underline text-foreground">Open uploaded quote</a>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <Label>Supplier name</Label>
+              <Input list="proc-suppliers" className={PROC_TAP} value={mapSupplier} onChange={(e) => setMapSupplier(e.target.value)} />
+              <datalist id="proc-suppliers">{suppliers.map((s) => <option key={s.id} value={s.name} />)}</datalist>
+            </div>
+            <div>
+              <Label>Quote ref</Label>
+              <Input className={PROC_TAP} value={mapRef} onChange={(e) => setMapRef(e.target.value)} />
+            </div>
+            <div>
+              <Label>Price source</Label>
+              <select className={`${PROC_FIELD} ${PROC_TAP}`} value={mapSource} onChange={(e) => setMapSource(e.target.value)}>
+                <option value="rep_quote">rep_quote</option>
+                <option value="web_store">web_store</option>
+              </select>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">Enter the new unit cost on each line in the table above. Supplier, quote ref and source apply to every line you price. Nothing is saved until Insert Procurement Prices is confirmed. Lines are matched by stable key (name + cost_code, or description), not array index.</p>
+        </CardContent>
+      </Card>
+
+      <Dialog open={rfqOpen} onOpenChange={setRfqOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card">
+          <DialogHeader>
+            <DialogTitle>Request Quote</DialogTitle>
+            <DialogDescription>Draft only — Kemar sends. Nothing is emailed or saved by the app.</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <Label>Supplier</Label>
+              <Input list="proc-suppliers" className={PROC_TAP} value={rfqSupplier} onChange={(e) => setRfqSupplier(e.target.value)} />
+            </div>
+            <div>
+              <Label>Template</Label>
+              <select className={`${PROC_FIELD} ${PROC_TAP}`} value={rfqTemplate} onChange={(e) => setRfqTemplate(e.target.value)}>
+                <option value="rfq">RFQ</option>
+                <option value="follow_up">Follow-up</option>
+              </select>
+            </div>
+          </div>
+          <div className="space-y-1 max-h-48 overflow-y-auto border border-border rounded-md p-2">
+            {matLines.map((l) => (
+              <label key={l._idx} className={`flex items-center gap-2 text-sm text-foreground ${PROC_TAP}`}>
+                <input
+                  type="checkbox"
+                  checked={rfqLines.includes(l._idx)}
+                  onChange={(e) => setRfqLines((s) => (e.target.checked ? [...s, l._idx] : s.filter((x) => x !== l._idx)))}
+                />
+                {l._idx + 1}. {l.description || l.name} — {l.quantity} {l.unit || 'ea'}
+              </label>
+            ))}
+          </div>
+          <Label>Preview</Label>
+          <Textarea readOnly rows={14} className="font-mono text-xs bg-background" value={draft.text} />
+          <DialogFooter className="flex flex-col md:flex-row gap-2 md:items-center">
+            <span className="text-xs text-muted-foreground md:mr-auto">Draft only — Kemar sends</span>
+            <Button variant="outline" className={PROC_TAP} disabled={rfqLines.length === 0} onClick={copyDraft}>
+              <Copy className="h-4 w-4 mr-2" />Copy to clipboard
+            </Button>
+            <Button variant="outline" className={PROC_TAP} disabled={rfqLines.length === 0} onClick={downloadDraft}>
+              <Download className="h-4 w-4 mr-2" />Download .txt
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={applyOpen} onOpenChange={setApplyOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card">
+          <DialogHeader>
+            <DialogTitle>Insert Procurement Prices</DialogTitle>
+            <DialogDescription>Updates the estimate lines below and recomputes totals the same way the Estimate tab does. Nothing is deleted. Lines are matched by stable key; unmatched or ambiguous keys are skipped.</DialogDescription>
+          </DialogHeader>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th className="text-left p-2">Line</th>
+                <th className="text-right p-2">Old unit cost</th>
+                <th className="text-right p-2">New unit cost</th>
+                <th className="text-right p-2">Old ext.</th>
+                <th className="text-right p-2">New ext.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {appliedChanges.map((c) => (
+                <tr key={c.key} className="border-b border-border">
+                  <td className="p-2">{c.idx + 1}. {c.line.description || c.line.name}</td>
+                  <td className="p-2 text-right">{c.oldCost ? fmtDollars(c.oldCost) : 'MISSING'}</td>
+                  <td className="p-2 text-right font-medium">{fmtDollars(c.newCost)}</td>
+                  <td className="p-2 text-right">{fmtDollars(c.line.total_cost || 0)}</td>
+                  <td className="p-2 text-right font-medium">{fmtDollars(newLineItems[c.idx]?.total_cost || 0)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {skippedChanges.length > 0 && (
+            <div className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md p-3 space-y-1">
+              <div className="font-medium">Skipped {skippedChanges.length} line(s) — no unique key match:</div>
+              <ul className="list-disc pl-5">
+                {skippedChanges.map((s) => (
+                  <li key={s.key}>{s.label} — {s.reason}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <div className="text-sm text-foreground space-y-1">
+            <div>Supplier: {mapSupplier || '—'} · Source: {mapSource} · Quote ref: {quoteRefValue || '—'}</div>
+            <div>Subtotal: {fmtDollars(oldTotals?.subtotal || 0)} → <span className="font-semibold">{fmtDollars(newTotals?.subtotal || 0)}</span></div>
+            <div>Total bid: {fmtDollars(oldTotals?.total_bid_amount || 0)} → <span className="font-semibold">{fmtDollars(newTotals?.total_bid_amount || 0)}</span></div>
+            <div className="text-xs text-muted-foreground">Old values are recomputed from the saved estimate. Saving also updates the bid's Estimated Value and, if linked, the project budget (same as the Estimate tab Save). Insert re-reads the estimate and updates only exact unique key matches; it never reorders, adds, or deletes lines.</div>
+          </div>
+          <DialogFooter className="flex flex-col md:flex-row gap-2">
+            <Button variant="outline" className={PROC_TAP} onClick={() => setApplyOpen(false)}>Cancel</Button>
+            <Button className={PROC_TAP} disabled={busy || appliedChanges.length === 0} onClick={insertPrices}>{busy ? 'Saving...' : 'Confirm insert'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
