@@ -203,7 +203,7 @@ export default function CostCodeBudgetBoard({ projectId }) {
                           value={d.cost_code || ''}
                           onChange={(e) => setField(l.id, 'cost_code', e.target.value)}
                           placeholder="FA-100"
-                          className="h-8 text-xs w-24"
+                          className="h-8 text-xs w-32 min-w-[8rem]"
                         />
                       </td>
                       <td className="p-1.5">
