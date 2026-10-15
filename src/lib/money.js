@@ -8,7 +8,8 @@ export const roundCents = (n) => {
 
 export const fmtMoney = (n) => {
   const cents = roundCents(n);
-  return '$' + cents.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const str = '$' + Math.abs(cents).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return cents < 0 ? '(' + str + ')' : str;
 };
 
 export const signedMoney = (n) => {
@@ -21,5 +22,6 @@ export const signedMoney = (n) => {
 // dashboard budget card, accounts) where cents aren't meaningful.
 export const fmtDollars = (n) => {
   const cents = roundCents(n);
-  return '$' + Math.round(cents).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  const str = '$' + Math.round(Math.abs(cents)).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  return cents < 0 ? '(' + str + ')' : str;
 };

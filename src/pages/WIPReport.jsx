@@ -62,6 +62,18 @@ export default function WIPReport() {
     return m;
   }, [invoices]);
 
+  // Retention held to date per project — cumulative across pay apps. Added to
+  // net billed so over/under compares earned against GROSS billed: a project
+  // billed exactly to its earned value shows $0.00 (retention isn't under-billing).
+  const retentionByProject = React.useMemo(() => {
+    const m = {};
+    payApps.forEach((pa) => {
+      if (!pa.project_id || pa.status === 'draft') return;
+      m[pa.project_id] = safe(m[pa.project_id]) + safe(pa.retention_amount);
+    });
+    return m;
+  }, [payApps]);
+
   const rows = projects.map((p) => {
     const contract = safe(p.budget);
     const costToDate = safe(p.spent);
@@ -72,7 +84,7 @@ export default function WIPReport() {
       : safe(p.progress);
     const sovEarned = roundCents(contract * (pctComplete / 100));
     const earned = roundCents(earnedByProject[p.id] ?? sovEarned);
-    const billed = roundCents(safe(billedByProject[p.id]));
+    const billed = roundCents(safe(billedByProject[p.id]) + safe(retentionByProject[p.id])); // GROSS billed = net + retention held
     const overUnder = roundCents(billed - earned);
     const eac = costToDate + safe(p.committed_costs) + safe(p.cost_to_complete);
     return { id: p.id, name: p.name, client: p.client_name, contract, costToDate, pctComplete, earned, billed, overUnder, eac };
@@ -93,14 +105,14 @@ export default function WIPReport() {
     <div className="space-y-6 p-4 sm:p-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-slate-900">WIP Report</h1>
-        <p className="text-sm text-slate-500 mt-1">Work-in-progress: contract, cost, earned revenue, billed, over/under billing</p>
+        <p className="text-sm text-slate-500 mt-1">Work-in-progress: contract, cost, earned revenue, gross billed (net + retention held), over/under billing</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <KPI label="Total Contract" value={money(totals.contract)} />
         <KPI label="Cost to Date" value={money(totals.costToDate)} />
         <KPI label="Earned Revenue" value={money(totals.earned)} />
-        <KPI label="Billed" value={money(totals.billed)} />
+        <KPI label="Gross Billed" value={money(totals.billed)} />
         <KPI label="Over/(Under) Billing" value={signedMoney(totals.overUnder)} tone={totals.overUnder < 0 ? 'red' : totals.overUnder > 0 ? 'amber' : 'green'} />
       </div>
 
@@ -121,7 +133,7 @@ export default function WIPReport() {
                     <th className="pb-2 font-semibold text-right">Cost to Date</th>
                     <th className="pb-2 font-semibold text-right">% Complete</th>
                     <th className="pb-2 font-semibold text-right">Earned</th>
-                    <th className="pb-2 font-semibold text-right">Billed</th>
+                    <th className="pb-2 font-semibold text-right">Gross Billed</th>
                     <th className="pb-2 font-semibold text-right">Over/(Under)</th>
                     <th className="pb-2 font-semibold text-right">EAC</th>
                   </tr>
