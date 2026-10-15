@@ -18,6 +18,7 @@ import BidRequirements from '@/components/bids/BidRequirements';
 import BidToProject from '@/components/bids/BidToProject';
 import DrawingAnalysisTab from '@/components/bids/DrawingAnalysisTab';
 import DrawingDesignerTab from '@/components/bids/DrawingDesignerTab';
+import BidDetailsEditor from '@/components/bids/BidDetailsEditor';
 
 const statusColors = {
   review: 'bg-blue-100 text-blue-800',
@@ -151,6 +152,7 @@ export default function BidDetail() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
+          <BidDetailsEditor bid={bid} />
           <Card>
             <CardHeader><CardTitle>Bid Overview</CardTitle></CardHeader>
             <CardContent className="space-y-3">

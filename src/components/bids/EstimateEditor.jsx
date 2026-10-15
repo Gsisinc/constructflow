@@ -19,22 +19,42 @@ export default function EstimateEditor({ bidId, organizationId, bidTitle }) {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.BidEstimate.create({
-      ...data,
-      bid_opportunity_id: bidId,
-      organization_id: organizationId
-    }),
+    mutationFn: async (data) => {
+      const created = await base44.entities.BidEstimate.create({
+        ...data,
+        bid_opportunity_id: bidId,
+        organization_id: organizationId
+      });
+      // Sync the estimate total back to the bid's Estimated Value
+      if (Number.isFinite(data.total_bid_amount)) {
+        await base44.entities.BidOpportunity.update(bidId, { estimated_value: data.total_bid_amount });
+      }
+      return created;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidEstimates', bidId] });
+      queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+      queryClient.invalidateQueries({ queryKey: ['dash-bids-list'] });
       toast.success('Estimate created');
       setIsEditing(false);
     }
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.BidEstimate.update(id, data),
+    mutationFn: async ({ id, data }) => {
+      const updated = await base44.entities.BidEstimate.update(id, data);
+      // Sync the estimate total back to the bid's Estimated Value
+      if (Number.isFinite(data.total_bid_amount)) {
+        await base44.entities.BidOpportunity.update(bidId, { estimated_value: data.total_bid_amount });
+      }
+      return updated;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bidEstimates', bidId] });
+      queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+      queryClient.invalidateQueries({ queryKey: ['dash-bids-list'] });
       toast.success('Estimate saved');
       setIsEditing(false);
     }
