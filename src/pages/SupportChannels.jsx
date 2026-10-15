@@ -12,7 +12,8 @@ import { Hash, Plus, Send, MessageSquare, ArrowLeft, UserCircle2, Loader2 } from
  */
 const ENTITY = () => base44.entities.ExamResult;
 const NAME_KEY = 'gsis_chat_display_name';
-const POLL_MS = 3000;
+const POLL_MS = 1000; // Kemar: 1s while visible, never lower
+const ROOMS_POLL_MS = 5000;
 const ENTERED_BY = 'Entered by: Ops Manager';
 
 function initials(name) {
@@ -62,7 +63,10 @@ export default function SupportChannels() {
     queryKey: ['chat-rooms', orgId],
     enabled: !!orgId,
     queryFn: () => ENTITY().filter({ organization_id: orgId, chat_kind: 'room' }, 'created_date'),
-    refetchInterval: 10000,
+    refetchInterval: ROOMS_POLL_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const activeRoom = useMemo(() => rooms.find((r) => r.id === activeRoomId) || null, [rooms, activeRoomId]);
@@ -73,15 +77,42 @@ export default function SupportChannels() {
     }
   }, [rooms, activeRoomId]);
 
-  const { data: messages = [], isLoading: msgsLoading } = useQuery({
+  const { data: messages = [], isLoading: msgsLoading, refetch: refetchMessages } = useQuery({
     queryKey: ['chat-messages', orgId, activeRoomId],
     enabled: !!orgId && !!activeRoomId,
-    queryFn: () => ENTITY().filter(
-      { organization_id: orgId, chat_kind: 'message', chat_room_id: activeRoomId }, 'created_date', 500
-    ),
-    refetchInterval: POLL_MS,
-    refetchIntervalInBackground: false,
+    // Newest 500 first from the server, then oldest-to-newest for display.
+    queryFn: async () => {
+      const rows = await ENTITY().filter(
+        { organization_id: orgId, chat_kind: 'message', chat_room_id: activeRoomId }, '-created_date', 500
+      );
+      return (rows || []).slice().reverse();
+    },
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
+
+  // Belt-and-braces poll: the app's global query defaults turn off focus refetch,
+  // so run our own timer and refetch right away when the tab or window regains focus.
+  const { refetch: refetchRooms } = { refetch: () => qc.invalidateQueries({ queryKey: ['chat-rooms'] }) };
+  useEffect(() => {
+    if (!orgId || !activeRoomId) return undefined;
+    const tick = () => {
+      // Skip while hidden, and never start a new request while one is still in flight.
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
+      if (qc.isFetching({ queryKey: ['chat-messages', orgId, activeRoomId] }) > 0) return;
+      refetchMessages({ cancelRefetch: false });
+    };
+    const id = setInterval(tick, POLL_MS);
+    const onFocus = () => { refetchMessages({ cancelRefetch: false }); refetchRooms(); };
+    const onVis = () => { if (document.visibilityState === 'visible') onFocus(); };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [orgId, activeRoomId, refetchMessages]);
 
   // Defensive client-side filter: only our own chat records.
   const safeMessages = useMemo(
@@ -92,7 +123,7 @@ export default function SupportChannels() {
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [safeMessages.length, activeRoomId]);
+  }, [safeMessages.length, safeMessages[safeMessages.length - 1]?.id, activeRoomId]);
 
   const createRoom = useMutation({
     mutationFn: (name) => ENTITY().create({
