@@ -88,6 +88,21 @@
     "budget": {
       "type": "number"
     },
+    "labor_hours": {
+      "type": "number",
+      "default": 0,
+      "description": "Estimated labor hours, carried over from the bid estimate on conversion"
+    },
+    "labor_rate": {
+      "type": "number",
+      "default": 0,
+      "description": "Blended labor rate ($/hr), carried over from the bid estimate on conversion"
+    },
+    "equipment_cost": {
+      "type": "number",
+      "default": 0,
+      "description": "Estimated equipment cost, carried over from the bid estimate on conversion"
+    },
     "committed_costs": {
       "type": "number",
       "default": 0
