@@ -19,6 +19,7 @@ import BidToProject from '@/components/bids/BidToProject';
 import DrawingAnalysisTab from '@/components/bids/DrawingAnalysisTab';
 import DrawingDesignerTab from '@/components/bids/DrawingDesignerTab';
 import BidDetailsEditor from '@/components/bids/BidDetailsEditor';
+import BidDrawings from '@/components/bids/BidDrawings';
 
 const statusColors = {
   review: 'bg-blue-100 text-blue-800',
@@ -146,6 +147,7 @@ export default function BidDetail() {
           <TabsTrigger value="boq" className="flex-shrink-0">BOQ</TabsTrigger>
           <TabsTrigger value="requirements" className="flex-shrink-0">Requirements</TabsTrigger>
           <TabsTrigger value="documents" className="flex-shrink-0">Documents</TabsTrigger>
+          <TabsTrigger value="bid-drawings" className="flex-shrink-0">Drawings</TabsTrigger>
           <TabsTrigger value="drawings" className="flex-shrink-0">Drawing Analysis</TabsTrigger>
           <TabsTrigger value="designer" className="flex-shrink-0">Designer</TabsTrigger>
           <TabsTrigger value="analysis" className="flex-shrink-0">AI Analysis</TabsTrigger>
@@ -264,6 +266,15 @@ export default function BidDetail() {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="bid-drawings" className="space-y-4">
+          <Card>
+            <CardHeader><CardTitle>Drawings</CardTitle></CardHeader>
+            <CardContent>
+              <BidDrawings bidId={bid.id} organizationId={user.organization_id} />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="drawings" className="space-y-4">

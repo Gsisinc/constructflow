@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Plus, Loader2, FileText, Download, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import ProjectDrawings from './ProjectDrawings';
 
 export const DOC_TYPES = ['drawing', 'specification', 'contract', 'permit', 'report', 'photo', 'invoice', 'log', 'submittal', 'test_report', 'other'];
 export const typeColor = {
@@ -51,6 +52,7 @@ export default function DocumentsTab({ projectId }) {
             {docs.map(d => <DocRow key={d.id} doc={d} onDelete={remove} />)}
           </div>
         )}
+      <ProjectDrawings projectId={projectId} />
       <DocumentDialog open={showCreate} onOpenChange={setShowCreate} projectId={projectId} onSaved={() => qc.invalidateQueries({ queryKey: ['project-documents', projectId] })} />
     </div>
   );

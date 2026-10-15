@@ -1,0 +1,93 @@
+{
+  "name": "Drawing",
+  "type": "object",
+  "description": "Drawing (file or link) attached to a bid and carried over to its converted project \u2014 no re-upload",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "bid_id": {
+      "type": "string",
+      "description": "Originating bid"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Set when the bid is converted to a project"
+    },
+    "title": {
+      "type": "string",
+      "description": "Drawing title"
+    },
+    "revision": {
+      "type": "string",
+      "description": "Revision label (e.g. A, B, 01)"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Drawing date"
+    },
+    "entered_by": {
+      "type": "string",
+      "description": "User who entered this drawing"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "file",
+        "link"
+      ],
+      "default": "file",
+      "description": "file = uploaded PDF/DWG/image; link = URL to bidding site / shared drive"
+    },
+    "file_uri": {
+      "type": "string",
+      "description": "Private storage URI (when kind=file)"
+    },
+    "filename": {
+      "type": "string",
+      "description": "Original file name (when kind=file)"
+    },
+    "link_url": {
+      "type": "string",
+      "description": "URL to drawing on a bidding site / shared drive (when kind=link)"
+    },
+    "link_label": {
+      "type": "string",
+      "description": "Optional label for the link"
+    }
+  },
+  "required": [
+    "bid_id",
+    "title",
+    "kind"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

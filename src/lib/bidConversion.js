@@ -106,6 +106,13 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
     linked_project_id: project.id,
   });
 
+  // Carry drawings over to the project — same records, no re-upload.
+  try {
+    await base44Client.entities.Drawing.updateMany({ bid_id: bid.id }, { $set: { project_id: project.id } });
+  } catch (e) {
+    console.warn('drawing carry-over failed', e);
+  }
+
   return { id: project.id, already_exists: false };
 }
 
