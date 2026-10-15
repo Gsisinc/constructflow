@@ -5,6 +5,10 @@
     "project_id": {
       "type": "string"
     },
+    "cost_code": {
+      "type": "string",
+      "description": "Cost code this expense is tagged to (matches CostCodeBudgetLine.cost_code)"
+    },
     "category": {
       "type": "string",
       "enum": [

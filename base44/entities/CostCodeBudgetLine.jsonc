@@ -1,0 +1,70 @@
+{
+  "name": "CostCodeBudgetLine",
+  "type": "object",
+  "description": "Budget line by cost code for a project. Labor $, material $ and equipment $ sum to the line total; the project total budget sums all lines.",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Project this budget line belongs to"
+    },
+    "cost_code": {
+      "type": "string",
+      "description": "Cost code identifier (e.g. FA-100 ... FA-900)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Line description / scope"
+    },
+    "labor_hours": {
+      "type": "number",
+      "default": 0
+    },
+    "labor_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "material_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "equipment_amount": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "project_id",
+    "cost_code"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
