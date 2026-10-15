@@ -195,9 +195,13 @@ export const AuthProvider = ({ children }) => {
         const base = (typeof appParams.basePath === 'string' ? appParams.basePath : '').replace(/\/$/, '') || '';
         const path = (typeof window !== 'undefined' && window.location.pathname).replace(new RegExp('^' + (base || '')), '') || '/';
         const segment = path.replace(/^\/+/, '').split('/')[0] || 'Home';
-        if (role === 'technician' && segment !== 'TechnicianPortal') {
+        // FIX (tech loop): only send techs/clients to their portal from the landing entry points.
+        // Previously any non-portal URL (e.g. /Calendar, /TimeCards, /Onboarding) triggered a full reload,
+        // which re-ran checkUserAuth and fed the reload loop. RoleGuard handles disallowed pages client-side.
+        const isEntry = segment === 'Home' || segment === 'Login' || segment === 'Landing';
+        if (isEntry && role === 'technician') {
           window.location.replace(`${window.location.origin}${base}/TechnicianPortal`);
-        } else if (role === 'client' && segment !== 'ClientPortal') {
+        } else if (isEntry && role === 'client') {
           window.location.replace(`${window.location.origin}${base}/ClientPortal`);
         }
       } catch (_) {}
