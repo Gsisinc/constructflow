@@ -583,6 +583,9 @@ function BidForm({ bid, onSubmit }) {
       else if (llmResponse?.output) { parsed = typeof llmResponse.output === 'string' ? JSON.parse(llmResponse.output) : llmResponse.output; }
       else if (llmResponse?.result) { parsed = typeof llmResponse.result === 'string' ? JSON.parse(llmResponse.result) : llmResponse.result; }
       setAiPreview(parsed);
+      const merged = { ...formData, ...parsed, title: parsed.title || parsed.project_name || formData.title, source_files: uploadedList };
+      delete merged.project_type;
+      if (merged.title) onSubmit(merged);
       toast.success('AI extraction ready. Click Apply to fill form.');
     } catch (err) {
       toast.error('AI analysis failed: ' + (err.message || 'Unknown error'));
