@@ -31,7 +31,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
   const [selectedGate, setSelectedGate] = useState(null);
   const [showGateChecklist, setShowGateChecklist] = useState(false);
 
-  const { data: customPhases = [] } = useQuery({
+  const { data: customPhases = [], isFetched: phasesFetched } = useQuery({
     queryKey: ['customPhases', bidId],
     queryFn: () => base44.entities.CustomPhase.filter({ project_id: bidId }, 'order'),
     enabled: !!bidId,
@@ -46,7 +46,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
   // Lazy-seed the default phase template for this bid (mirrors a new project).
   // The DualTrack 12 stages / 3 phases auto-seed themselves inside DualTrackTracker.
   useEffect(() => {
-    if (seeding || !bidId || customPhases === undefined) return;
+    if (seeding || !bidId || !phasesFetched) return;
     if (customPhases.length > 0) return;
     setSeeding(true);
     (async () => {
@@ -67,7 +67,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
       }
       setSeeding(false);
     })();
-  }, [bidId, projectType, customPhases, seeding, qc]);
+  }, [bidId, projectType, customPhases, seeding, qc, phasesFetched]);
 
   const createGateMutation = useMutation({
     mutationFn: (data) => base44.entities.PhaseGate.create(data),
