@@ -5,6 +5,9 @@
     "project_id": {
       "type": "string"
     },
+    "organization_id": {
+      "type": "string"
+    },
     "change_order_number": {
       "type": "string"
     },
@@ -50,6 +53,23 @@
       "type": "string",
       "description": "Impact on project scope"
     },
+    "phase_id": {
+      "type": "string",
+      "description": "Linked CustomPhase this change order affects"
+    },
+    "phase_name": {
+      "type": "string",
+      "description": "Display name of the linked phase (denormalized for lists)"
+    },
+    "entered_by": {
+      "type": "string",
+      "description": "User who created this change order (email)"
+    },
+    "entered_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the change order was entered"
+    },
     "submitted_date": {
       "type": "string",
       "format": "date"
@@ -74,5 +94,22 @@
   "required": [
     "project_id",
     "title"
-  ]
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {},
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,11 +27,29 @@ export default function ChangeOrderManager({ projectId }) {
   const [editingOrder, setEditingOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const queryClient = useQueryClient();
-  const user = base44.auth.me();
+  const { user } = useAuth();
 
   const { data: changeOrders = [] } = useQuery({
     queryKey: ['changeOrders', projectId],
     queryFn: () => base44.entities.ChangeOrder.filter({ project_id: projectId }, '-created_date')
+  });
+
+  const { data: customPhases = [] } = useQuery({
+    queryKey: ['customPhases', projectId],
+    queryFn: async () => {
+      const res = await base44.entities.CustomPhase.filter({ project_id: projectId }, { sort: 'order', limit: 200 });
+      return res?.items || res || [];
+    },
+    enabled: !!projectId,
+  });
+
+  const { data: project } = useQuery({
+    queryKey: ['project', projectId],
+    queryFn: async () => {
+      const res = await base44.entities.Project.filter({ id: projectId });
+      return res?.[0] || null;
+    },
+    enabled: !!projectId,
   });
 
   const createMutation = useMutation({
@@ -53,11 +72,19 @@ export default function ChangeOrderManager({ projectId }) {
 
   const handleSubmit = (formData) => {
     const changeOrderNumber = editingOrder?.change_order_number || `CO-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    
+    const today = new Date().toISOString().slice(0, 10);
+    const linkedPhase = customPhases.find(p => p.id === formData.phase_id);
+
     const payload = {
       project_id: projectId,
+      organization_id: project?.organization_id,
       change_order_number: changeOrderNumber,
-      ...formData
+      entered_by: editingOrder?.entered_by || user?.email || '—',
+      entered_date: editingOrder?.entered_date || today,
+      submitted_date: editingOrder?.submitted_date || today,
+      phase_id: formData.phase_id || null,
+      phase_name: linkedPhase?.display_name || linkedPhase?.phase_name || '',
+      ...formData,
     };
 
     if (editingOrder) {
@@ -67,23 +94,60 @@ export default function ChangeOrderManager({ projectId }) {
     }
   };
 
-  const handleApprove = (order) => {
-    updateMutation.mutate({
-      id: order.id,
-      data: {
-        status: 'approved',
-        approved_date: new Date().toISOString().split('T')[0],
-        approved_by: user.email
-      }
-    });
-  };
-
   const handleReject = (order) => {
     updateMutation.mutate({
       id: order.id,
       data: { status: 'rejected' }
     });
   };
+
+  // Approve: mark approved, then adjust budget, add an SOV line, update contract value.
+  const approveMutation = useMutation({
+    mutationFn: async (order) => {
+      const today = new Date().toISOString().slice(0, 10);
+      const impact = Number(order.cost_impact) || 0;
+
+      // 1. Mark the change order approved.
+      await base44.entities.ChangeOrder.update(order.id, {
+        status: 'approved',
+        approved_date: today,
+        approved_by: user?.email || '—',
+      });
+
+      // 2. Adjust the project budget (contract value) by the cost impact.
+      const cur = (await base44.entities.Project.filter({ id: projectId }))[0];
+      const newBudget = (cur?.budget || 0) + impact;
+      await base44.entities.Project.update(projectId, { budget: newBudget });
+
+      // 3. Add an SOV line for this change order so the SOV sums to the new contract.
+      if (impact !== 0) {
+        const sovRes = await base44.entities.ScheduleOfValues.filter({ project_id: projectId }, { limit: 10 });
+        const sov = (sovRes?.items || sovRes || [])[0] || null;
+        const line = {
+          description: `Change Order: ${order.title}`,
+          cost_code: order.change_order_number || '',
+          scheduled_value: impact,
+          percent_complete: 0,
+          billed_to_date: 0,
+        };
+        const line_items = [...(sov?.line_items || []), line];
+        const payload = { project_id: projectId, organization_id: cur?.organization_id, line_items, retention_percent: sov?.retention_percent || 10 };
+        if (sov?.id) await base44.entities.ScheduleOfValues.update(sov.id, payload);
+        else await base44.entities.ScheduleOfValues.create(payload);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['changeOrders', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['sov', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['org-projects'] });
+      queryClient.invalidateQueries({ queryKey: ['org-invoices'] });
+      toast.success('Change order approved — budget, SOV & contract value updated');
+    },
+    onError: (e) => toast.error('Approve failed: ' + (e.message || '')),
+  });
+
+  const handleApprove = (order) => approveMutation.mutate(order);
 
   const filteredOrders = filterStatus === 'all' 
     ? changeOrders 
@@ -177,6 +241,7 @@ export default function ChangeOrderManager({ projectId }) {
             </DialogHeader>
             <ChangeOrderForm
               order={editingOrder}
+              phases={customPhases}
               onSubmit={handleSubmit}
               onCancel={() => {
                 setShowForm(false);
@@ -258,6 +323,14 @@ export default function ChangeOrderManager({ projectId }) {
                       <span className="text-slate-600">Reason:</span>
                       <Badge variant="outline">{order.reason?.replace(/_/g, ' ')}</Badge>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-600">Phase:</span>
+                      <Badge variant="outline">{order.phase_name || '—'}</Badge>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                    <span>Entered by <span className="font-medium text-slate-700">{order.entered_by || '—'}</span>{order.entered_date && <> · {order.entered_date}</>}</span>
+                    {order.approved_by && <span>Approved by <span className="font-medium text-slate-700">{order.approved_by}</span>{order.approved_date && <> · {order.approved_date}</>}</span>}
                   </div>
                 </CardContent>
               </Card>
@@ -269,7 +342,7 @@ export default function ChangeOrderManager({ projectId }) {
   );
 }
 
-function ChangeOrderForm({ order, onSubmit, onCancel }) {
+function ChangeOrderForm({ order, phases, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
     title: order?.title || '',
     description: order?.description || '',
@@ -277,7 +350,8 @@ function ChangeOrderForm({ order, onSubmit, onCancel }) {
     status: order?.status || 'draft',
     cost_impact: order?.cost_impact || 0,
     schedule_impact_days: order?.schedule_impact_days || 0,
-    scope_description: order?.scope_description || ''
+    scope_description: order?.scope_description || '',
+    phase_id: order?.phase_id || ''
   });
 
   const handleSubmit = (e) => {
@@ -305,6 +379,21 @@ function ChangeOrderForm({ order, onSubmit, onCancel }) {
           placeholder="Detailed description of the change"
           className="h-24"
         />
+      </div>
+
+      <div>
+        <Label>Linked Phase</Label>
+        <Select value={formData.phase_id} onValueChange={(value) => setFormData({ ...formData, phase_id: value })}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a phase (optional)" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={null}>— None —</SelectItem>
+            {(phases || []).map((p) => (
+              <SelectItem key={p.id} value={p.id}>{p.display_name || p.phase_name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

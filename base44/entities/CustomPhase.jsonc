@@ -47,11 +47,88 @@
     "completed_date": {
       "type": "string",
       "format": "date"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Phase planned start date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Phase planned end date (shifts when delays are logged)"
+    },
+    "delays": {
+      "type": "array",
+      "description": "Logged delays for this phase. Each entry shifts phase dates and the project countdown.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cause": {
+            "type": "string"
+          },
+          "days": {
+            "type": "number"
+          },
+          "logged_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "logged_by": {
+            "type": "string"
+          },
+          "old_end": {
+            "type": "string",
+            "format": "date"
+          },
+          "new_end": {
+            "type": "string",
+            "format": "date"
+          },
+          "old_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "new_start": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "default": []
     }
   },
   "required": [
     "project_id",
     "phase_name",
     "display_name"
-  ]
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }

@@ -1,21 +1,37 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/lib/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
+} from '@/components/ui/dialog';
 import {
   TrendingUp, TrendingDown, Target, Timer, Package, DollarSign,
-  ChevronDown, ChevronRight, CheckCircle2, Circle, ListChecks, Layers
+  ChevronDown, ChevronRight, CheckCircle2, Circle, ListChecks, Layers, AlarmClock, Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const NAVY = '#0B1F3A';
 const GOLD = '#C9A227';
 
 const money = (n) => (n || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+const addDays = (dateStr, days) => {
+  if (!dateStr) return null;
+  const d = new Date(String(dateStr).slice(0, 10) + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+};
+const fmtDate = (s) => s ? new Date(String(s).slice(0,10)+'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 
 /* ---------- Animated live countdown to end date ---------- */
 function LiveCountdown({ endDate }) {
@@ -102,11 +118,101 @@ function ForecastBadge({ eac, budget }) {
   );
 }
 
-/* ---------- Phases + gates + requirements in one toggleable view ---------- */
-function PhasesOverview({ projectId, customPhases, phaseGates }) {
+/* ---------- Log Delay dialog ---------- */
+function PhaseDelayDialog({ phase, project, onClose }) {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  const [cause, setCause] = useState('');
+  const [days, setDays] = useState(1);
+
+  const oldEnd = phase?.end_date || null;
+  const oldStart = phase?.start_date || null;
+  const newEnd = addDays(oldEnd, days);
+  const newStart = addDays(oldStart, days);
+  const newProjectEnd = project?.end_date ? addDays(project.end_date, days) : null;
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const delay = {
+        cause: cause || '—',
+        days: Number(days),
+        logged_date: new Date().toISOString().slice(0, 10),
+        logged_by: user?.email || '—',
+        old_end: oldEnd, new_end: newEnd,
+        old_start: oldStart, new_start: newStart,
+      };
+      const delays = [...(phase.delays || []), delay];
+      const phasePatch = { delays };
+      if (newEnd) phasePatch.end_date = newEnd;
+      if (newStart) phasePatch.start_date = newStart;
+      await base44.entities.CustomPhase.update(phase.id, phasePatch);
+      if (newProjectEnd) {
+        await base44.entities.Project.update(project.id, { end_date: newProjectEnd });
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['customPhases', phase.project_id] });
+      qc.invalidateQueries({ queryKey: ['project', phase.project_id] });
+      qc.invalidateQueries({ queryKey: ['org-projects'] });
+      toast.success(`${days}-day delay logged — phase & project dates shifted`);
+      onClose();
+    },
+    onError: (e) => toast.error('Could not log delay: ' + (e.message || '')),
+  });
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <AlarmClock className="h-5 w-5" style={{ color: GOLD }} />
+            Log Delay — {phase?.display_name || phase?.phase_name}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label>Cause</Label>
+            <Textarea value={cause} onChange={(e) => setCause(e.target.value)} placeholder="Reason for the delay (weather, RFI, material, etc.)" className="h-20" />
+          </div>
+          <div>
+            <Label>Delay (days)</Label>
+            <Input type="number" min="1" value={days} onChange={(e) => setDays(parseInt(e.target.value) || 0)} />
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs space-y-1">
+            <Row label="Phase end" from={oldEnd} to={newEnd} />
+            {oldStart && <Row label="Phase start" from={oldStart} to={newStart} />}
+            {project?.end_date && <Row label="Project completion" from={project.end_date} to={newProjectEnd} />}
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={() => mutation.mutate()} disabled={mutation.isPending || days <= 0} loading={mutation.isPending}>
+            Log Delay
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function Row({ label, from, to }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-slate-500">{label}</span>
+      <span className="font-medium text-slate-700">
+        {fmtDate(from)} {to && to !== from && <>→ <span className="text-red-600">{fmtDate(to)}</span></>}
+      </span>
+    </div>
+  );
+}
+
+/* ---------- Phases + gates + requirements + delays in one toggleable view ---------- */
+function PhasesOverview({ projectId, project, customPhases, phaseGates }) {
   const [open, setOpen] = useState(true);
   const [showGates, setShowGates] = useState(true);
   const [showReqs, setShowReqs] = useState(true);
+  const [showDelays, setShowDelays] = useState(true);
+  const [delayPhase, setDelayPhase] = useState(null);
 
   const { data: requirements = [] } = useQuery({
     queryKey: ['phaseRequirements', projectId],
@@ -123,8 +229,9 @@ function PhasesOverview({ projectId, customPhases, phaseGates }) {
       const doneReqs = reqs.filter(r => r.status === 'completed').length;
       const gates = phaseGates.filter(g => g.from_phase === p.phase_name || g.to_phase === p.phase_name);
       const passedGates = gates.filter(g => g.status === 'approved' || g.status === 'passed').length;
-      const pct = reqs.length ? Math.round((doneReqs / reqs.length) * 100) : 0;
-      return { ...p, reqs, doneReqs, gates, passedGates, pct };
+      const pct = reqs.length ? Math.round((doneReqs / reqs.length) * 100) : (p.progress_percent || 0);
+      const totalDelay = (p.delays || []).reduce((s, d) => s + (d.days || 0), 0);
+      return { ...p, reqs, doneReqs, gates, passedGates, pct, totalDelay };
     });
   }, [customPhases, requirements, phaseGates]);
 
@@ -140,7 +247,7 @@ function PhasesOverview({ projectId, customPhases, phaseGates }) {
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100" style={{ background: `${NAVY}` }}>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100" style={{ background: NAVY }}>
         <button onClick={() => setOpen(o => !o)} className="flex items-center gap-2 text-white font-semibold text-sm">
           {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           <Layers className="h-4 w-4" style={{ color: GOLD }} />
@@ -148,12 +255,9 @@ function PhasesOverview({ projectId, customPhases, phaseGates }) {
           <span className="text-xs font-normal opacity-70">({phases.length})</span>
         </button>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowGates(v => !v)} className={cn('text-xs px-2.5 py-1 rounded-full border', showGates ? 'text-white border-white/30' : 'text-white/50 border-white/10')}>
-            Gates
-          </button>
-          <button onClick={() => setShowReqs(v => !v)} className={cn('text-xs px-2.5 py-1 rounded-full border', showReqs ? 'text-white border-white/30' : 'text-white/50 border-white/10')}>
-            Requirements
-          </button>
+          <button onClick={() => setShowGates(v => !v)} className={cn('text-xs px-2.5 py-1 rounded-full border', showGates ? 'text-white border-white/30' : 'text-white/50 border-white/10')}>Gates</button>
+          <button onClick={() => setShowReqs(v => !v)} className={cn('text-xs px-2.5 py-1 rounded-full border', showReqs ? 'text-white border-white/30' : 'text-white/50 border-white/10')}>Requirements</button>
+          <button onClick={() => setShowDelays(v => !v)} className={cn('text-xs px-2.5 py-1 rounded-full border', showDelays ? 'text-white border-white/30' : 'text-white/50 border-white/10')}>Delays</button>
         </div>
       </div>
       <AnimatePresence initial={false}>
@@ -169,18 +273,44 @@ function PhasesOverview({ projectId, customPhases, phaseGates }) {
               <div key={p.id} className="px-4 py-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-semibold text-slate-900 text-sm truncate">{p.display_name || p.phase_name}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-semibold text-slate-900 text-sm truncate">{p.display_name || p.phase_name}</p>
+                      {p.totalDelay > 0 && (
+                        <Badge className="bg-red-50 text-red-700 border border-red-200 text-[10px] gap-1">
+                          <AlarmClock className="h-3 w-3" /> +{p.totalDelay}d delay
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-500">
                       {p.status || 'pending'}
+                      {p.end_date && <> · ends {fmtDate(p.end_date)}</>}
                       {showGates && p.gates.length > 0 && <> · {p.passedGates}/{p.gates.length} gates passed</>}
                       {showReqs && p.reqs.length > 0 && <> · {p.doneReqs}/{p.reqs.length} reqs done</>}
                     </p>
                   </div>
-                  <div className="w-28 sm:w-40 shrink-0">
-                    <Progress value={p.pct} className="h-2" />
-                    <p className="text-[10px] text-right text-slate-400 mt-0.5 tabular-nums">{p.pct}%</p>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="w-24 sm:w-36">
+                      <Progress value={p.pct} className="h-2" />
+                      <p className="text-[10px] text-right text-slate-400 mt-0.5 tabular-nums">{p.pct}%</p>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => setDelayPhase(p)} className="h-7 text-xs">
+                      <AlarmClock className="h-3.5 w-3.5 mr-1" /> Log Delay
+                    </Button>
                   </div>
                 </div>
+
+                {showDelays && (p.delays || []).length > 0 && (
+                  <div className="mt-2 rounded-lg bg-red-50/40 border border-red-100 p-2 space-y-1">
+                    {(p.delays || []).map((d, i) => (
+                      <div key={i} className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-600">
+                        <Badge className="bg-red-100 text-red-700 text-[10px]">+{d.days}d</Badge>
+                        <span className="font-medium text-slate-700">{d.cause}</span>
+                        <span className="text-slate-400">· {fmtDate(d.logged_date)} · by {d.logged_by}</span>
+                        {d.new_end && <span className="text-slate-400">· new end {fmtDate(d.new_end)}</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {showGates && p.gates.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
@@ -209,6 +339,10 @@ function PhasesOverview({ projectId, customPhases, phaseGates }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {delayPhase && (
+        <PhaseDelayDialog phase={delayPhase} project={project} onClose={() => setDelayPhase(null)} />
+      )}
     </div>
   );
 }
@@ -279,7 +413,7 @@ function CostPanel({ project, expenses }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        <Row label="Budget" value={budget} accent="text-slate-900" />
+        <Row label="Budget (contract)" value={budget} accent="text-slate-900" />
         <Row label="Actual (expenses)" value={actual} accent="text-emerald-700" />
         <Row label="Committed" value={committed} accent="text-amber-700" />
         <Row label="Recorded spent" value={spent} accent="text-slate-700" />
@@ -361,8 +495,8 @@ export default function ProjectDashboard({ project, projectId, customPhases, pha
         </div>
       </div>
 
-      {/* Phases / Gates / Requirements toggleable */}
-      <PhasesOverview projectId={projectId} customPhases={customPhases} phaseGates={phaseGates} />
+      {/* Phases / Gates / Requirements / Delays toggleable */}
+      <PhasesOverview projectId={projectId} project={project} customPhases={customPhases} phaseGates={phaseGates} />
 
       {/* Three tracking panels */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
