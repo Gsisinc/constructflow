@@ -42,6 +42,7 @@ import {
   BarChart3,
   ChevronUp as FooterChevronUp,
   HelpCircle as FooterHelpCircle,
+  MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -63,6 +64,7 @@ const navGroups = [
     { name: 'Schedule', icon: Calendar, page: 'Calendar' },
     { name: 'Ops Dashboard', icon: BarChart3, page: 'OpsDashboard' },
     { name: 'Resource Board', icon: CalendarRange, page: 'ResourceBoard' },
+    { name: 'Chats', icon: MessageSquare, page: 'SupportChannels' },
   ]},
   { label: 'Sales & Estimating', items: [
     { name: 'Bids', icon: FileText, page: 'Bids' },
