@@ -58,7 +58,7 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
     client_email: bid.client_email || '',
     project_type: projectType,
     address: bid.location || '',
-    budget: bid.estimated_value || 0,
+    budget: Number(estimate?.total_bid_amount) || Number(estimate?.subtotal) || bid.estimated_value || 0, // B14-9 Sales: contract = estimate total
     labor_hours: estimate?.labor_hours || 0,
     labor_rate: estimate?.labor_rate || 0,
     equipment_cost: estimate?.equipment_cost || 0,
