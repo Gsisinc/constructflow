@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Save, X, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
-export default function InvoiceForm({ invoice, products, company, onSave, onCancel }) {
+export default function InvoiceForm({ invoice, products, company, projects = [], onSave, onCancel }) {
     const [formData, setFormData] = useState({
         invoice_number: '',
         invoice_date: format(new Date(), 'yyyy-MM-dd'),
@@ -18,6 +18,7 @@ export default function InvoiceForm({ invoice, products, company, onSave, onCanc
         customer_email: '',
         customer_phone: '',
         customer_address: { street: '', city: '', state: '', postal_code: '', country: '' },
+        project_id: '',
         line_items: [],
         subtotal: 0,
         tax_amount: 0,
@@ -125,6 +126,23 @@ export default function InvoiceForm({ invoice, products, company, onSave, onCanc
                     <div>
                         <Label>Due Date</Label>
                         <Input type="date" name="due_date" value={formData.due_date} onChange={handleInputChange} required />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <Label>Project (for billing)</Label>
+                        <Select
+                            value={formData.project_id || 'none'}
+                            onValueChange={(val) => setFormData(prev => ({ ...prev, project_id: val === 'none' ? '' : val }))}
+                        >
+                            <SelectTrigger><SelectValue placeholder="No project link" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">No project link</SelectItem>
+                                {projects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                        <p className="text-xs text-slate-400 mt-1">Linking a project counts this invoice in Billing and on the Dashboard.</p>
                     </div>
                 </div>
 

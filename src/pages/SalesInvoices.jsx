@@ -16,13 +16,17 @@ import { toast } from 'sonner';
 import InvoiceForm from '@/components/invoices/InvoiceForm';
 import InvoiceList from '@/components/invoices/InvoiceList';
 import InvoiceStats from '@/components/invoices/InvoiceStats';
+import { useAuth } from '@/lib/AuthContext';
+import { useOrgProjects } from '@/hooks/useProjectData';
 
 export default function SalesInvoices() {
+  const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const queryClient = useQueryClient();
+  const { data: projects = [] } = useOrgProjects(user?.organization_id);
 
   // Fetch invoices
   const { data: invoices = [], isLoading } = useQuery({
@@ -151,6 +155,7 @@ export default function SalesInvoices() {
               invoice={editingInvoice}
               products={products}
               company={selectedProject}
+              projects={projects}
               onSave={handleSave}
               onCancel={() => { setShowForm(false); setEditingInvoice(null); }}
             />
