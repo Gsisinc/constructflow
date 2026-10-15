@@ -354,6 +354,23 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
           <DialogTitle>{po ? 'Edit PO' : 'Create Purchase Order'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label>Project *</Label>
+            <Select
+              value={formData.project_id || 'none'}
+              onValueChange={(v) => setFormData({ ...formData, project_id: v === 'none' ? '' : v })}
+            >
+              <SelectTrigger><SelectValue placeholder="Select a project" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No project</SelectItem>
+                {projects.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {projects.length === 0 && <p className="text-xs text-amber-600">No projects available — create a project first.</p>}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>PO Number</Label>
@@ -411,7 +428,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
 
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={loading || !formData.vendor} className="bg-slate-900 hover:bg-slate-800">
+            <Button type="submit" disabled={loading || !formData.vendor || !formData.project_id} className="bg-slate-900 hover:bg-slate-800">
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {po ? 'Update' : 'Create'}
             </Button>
