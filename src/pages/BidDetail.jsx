@@ -200,7 +200,7 @@ export default function BidDetail() {
           <TabsTrigger value="phases" className="flex-shrink-0">Phases/Stages</TabsTrigger>
           <TabsTrigger value="boq" className="flex-shrink-0">BOQ</TabsTrigger>
           <TabsTrigger value="estimate" className="flex-shrink-0">Estimate</TabsTrigger>
-          {typeof window !== 'undefined' && !window.location.hostname.includes('mygsis.com') && (
+          {typeof window !== 'undefined' && true && (
             <TabsTrigger value="procurement" className="flex-shrink-0">Procurement</TabsTrigger>
           )}
           <TabsTrigger value="requirements" className="flex-shrink-0">Requirements</TabsTrigger>
@@ -291,7 +291,7 @@ export default function BidDetail() {
         <TabsContent value="estimate" className="space-y-4">
           <EstimateEditor bidId={bid.id} organizationId={user.organization_id} bidTitle={bid.title || bid.project_name || 'Bid'} />
         </TabsContent>
-        {typeof window !== 'undefined' && !window.location.hostname.includes('mygsis.com') && (
+        {typeof window !== 'undefined' && true && (
           <TabsContent value="procurement" className="space-y-4">
             <ProcurementTab bidId={bid.id} bidTitle={bid.title || bid.project_name || 'Bid'} />
           </TabsContent>
