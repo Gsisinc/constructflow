@@ -410,10 +410,17 @@ export default function ProjectDetail() {
           <TabsTrigger value="materials">Materials</TabsTrigger>
           <TabsTrigger value="financials">Financials</TabsTrigger>
           <TabsTrigger value="opsdocs">Ops / Field Docs</TabsTrigger>
+          <TabsTrigger value="logistics">Logistics</TabsTrigger>
           <TabsTrigger value="fieldlogs">Field Logs</TabsTrigger>
           <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="sov">SOV & Pay Apps</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
+          {project.linked_bid_id && (
+            <Link to={createPageUrl('BidDetail') + `?id=${project.linked_bid_id}&tab=estimate`} className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 underline decoration-dotted">Estimate ↗</Link>
+          )}
+          {project.linked_bid_id && (
+            <Link to={createPageUrl('BidDetail') + `?id=${project.linked_bid_id}&tab=procurement`} className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 underline decoration-dotted">Procurement ↗</Link>
+          )}
         </TabsList>
 
         <TabsContent value="tracker" className="mt-6">
@@ -542,6 +549,9 @@ export default function ProjectDetail() {
         <TabsContent value="opsdocs" className="mt-6">
           <OpsDocsTab projectId={projectId} project={project} customPhases={customPhases} />
         </TabsContent>
+        <TabsContent value="logistics" className="mt-6">
+          <LogisticsTab project={project} />
+        </TabsContent>
 
         <TabsContent value="fieldlogs" className="mt-6">
           <FieldLogsTab projectId={projectId} />
@@ -611,6 +621,15 @@ export default function ProjectDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+function LogisticsTab({ project }) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <h3 className="text-lg font-semibold text-slate-900">Logistics</h3>
+      <p className="text-sm text-slate-500 mt-1">Site access, parking, staging, deliveries, lifts and site rules for this project. Coming next.</p>
     </div>
   );
 }
