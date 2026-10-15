@@ -13,6 +13,14 @@
       "items": {
         "type": "object",
         "properties": {
+          "cost_code": {
+            "type": "string",
+            "description": "Cost code this line is tagged to (maps to project cost codes)"
+          },
+          "name": {
+            "type": "string",
+            "description": "Short line name / label"
+          },
           "description": {
             "type": "string"
           },
@@ -33,6 +41,15 @@
           },
           "material_id": {
             "type": "string"
+          },
+          "pricing_type": {
+            "type": "string",
+            "enum": [
+              "cost",
+              "dollar"
+            ],
+            "default": "cost",
+            "description": "cost = raw cost (overhead/profit applied on top); dollar = sell price with margin already included (overhead/profit forced to 0 to avoid double counting)"
           }
         }
       }

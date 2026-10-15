@@ -147,7 +147,7 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
       ...formData,
       line_items: [
         ...(formData.line_items || []),
-        { description: '', quantity: 1, unit: 'ea', unit_cost: 0, total_cost: 0, category: 'material' }
+        { cost_code: '', name: '', description: '', quantity: 1, unit: 'ea', unit_cost: 0, total_cost: 0, category: 'material', pricing_type: 'cost' }
       ]
     });
   };
@@ -171,6 +171,10 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
     setFormData({ ...formData, line_items: items });
   };
 
+  const hasDollarLines = (formData.line_items || []).some((i) => i.pricing_type === 'dollar');
+  const effectiveOverheadPct = hasDollarLines ? 0 : (parseFloat(formData.overhead_percent) || 0);
+  const effectiveProfitPct = hasDollarLines ? 0 : (parseFloat(formData.profit_margin_percent) || 0);
+
   const calculateTotals = () => {
     const laborCost = (parseFloat(formData.labor_hours) || 0) * (parseFloat(formData.labor_rate) || 0);
     const materialCost = (formData.line_items || [])
@@ -178,8 +182,8 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
     
     const subtotal = laborCost + materialCost + (parseFloat(formData.equipment_cost) || 0) + (parseFloat(formData.subcontractor_cost) || 0);
     const contingencyAmount = subtotal * ((parseFloat(formData.contingency_percent) || 0) / 100);
-    const overhead = subtotal * ((parseFloat(formData.overhead_percent) || 0) / 100);
-    const profit = subtotal * ((parseFloat(formData.profit_margin_percent) || 0) / 100);
+    const overhead = subtotal * (effectiveOverheadPct / 100);
+    const profit = subtotal * (effectiveProfitPct / 100);
     const total = subtotal + overhead + profit + contingencyAmount;
 
     return {
@@ -187,6 +191,8 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
       material_cost: materialCost,
       subtotal,
       contingency_amount: contingencyAmount,
+      overhead_percent: effectiveOverheadPct,
+      profit_margin_percent: effectiveProfitPct,
       total_bid_amount: total
     };
   };
@@ -206,6 +212,10 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
     standards
   );
 
+  const totalCost = totals.subtotal + totals.contingency_amount;
+  const sellPrice = totals.total_bid_amount;
+  const marginPct = sellPrice > 0 ? ((sellPrice - totalCost) / sellPrice) * 100 : 0;
+
   const downloadPDF = () => {
     const doc = new jsPDF();
     const title = bidTitle || 'Estimate';
@@ -216,11 +226,13 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
     doc.text(`Labor: ${formData.labor_hours || 0} hrs @ $${(formData.labor_rate || 0).toLocaleString()}/hr = $${totals.labor_cost.toLocaleString()}`, 14, y); y += 7;
     doc.text(`Materials & line items:`, 14, y); y += 6;
     (formData.line_items || []).forEach((item, i) => {
-      doc.text(`  ${i + 1}. ${(item.description || '').slice(0, 50)} — ${item.quantity} ${item.unit} @ $${(item.unit_cost || 0).toLocaleString()} = $${(item.total_cost || 0).toLocaleString()}`, 14, y); y += 6;
+      const label = [item.cost_code, item.name, item.description].filter(Boolean).join(' — ');
+      doc.text(`  ${i + 1}. ${(label || '').slice(0, 60)} — ${item.quantity} ${item.unit} @ $${(item.unit_cost || 0).toLocaleString()} = $${(item.total_cost || 0).toLocaleString()}${item.pricing_type === 'dollar' ? ' (dollar)' : ''}`, 14, y); y += 6;
     });
     y += 4;
     doc.text(`Equipment: $${(formData.equipment_cost || 0).toLocaleString()} | Subcontractor: $${(formData.subcontractor_cost || 0).toLocaleString()}`, 14, y); y += 7;
-    doc.text(`Subtotal: $${totals.subtotal.toLocaleString()} | Overhead: ${formData.overhead_percent || 0}% | Profit: ${formData.profit_margin_percent || 0}%`, 14, y); y += 7;
+    doc.text(`Subtotal: $${totals.subtotal.toLocaleString()} | Overhead: ${effectiveOverheadPct}% | Profit: ${effectiveProfitPct}%`, 14, y); y += 7;
+    doc.text(`Margin on sell: ${marginPct.toFixed(1)}% (target 25-30%, floor 20%)`, 14, y); y += 7;
     doc.setFontSize(12);
     doc.text(`Total Bid Amount: $${totals.total_bid_amount.toLocaleString()}`, 14, y);
     if ((formData.notes || '').trim()) {
@@ -339,52 +351,80 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
           ) : (
             <div className="space-y-2">
               {formData.line_items.map((item, idx) => (
-                <div key={idx} className="grid grid-cols-12 gap-2 items-start p-2 border rounded">
-                  <Input
-                    placeholder="Description"
-                    value={item.description}
-                    onChange={(e) => updateLineItem(idx, 'description', e.target.value)}
-                    disabled={!isEditing}
-                    className="col-span-4"
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Qty"
-                    value={item.quantity}
-                    onChange={(e) => updateLineItem(idx, 'quantity', e.target.value)}
-                    disabled={!isEditing}
-                    className="col-span-2"
-                  />
-                  <Input
-                    placeholder="Unit"
-                    value={item.unit}
-                    onChange={(e) => updateLineItem(idx, 'unit', e.target.value)}
-                    disabled={!isEditing}
-                    className="col-span-1"
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Unit $"
-                    value={item.unit_cost}
-                    onChange={(e) => updateLineItem(idx, 'unit_cost', e.target.value)}
-                    disabled={!isEditing}
-                    className="col-span-2"
-                  />
-                  <Input
-                    value={`$${(item.total_cost || 0).toLocaleString()}`}
-                    disabled
-                    className="col-span-2"
-                  />
-                  {isEditing && (
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => removeLineItem(idx)}
-                      className="col-span-1 text-red-600"
+                <div key={idx} className="border rounded p-2 space-y-2 bg-white">
+                  <div className="grid grid-cols-12 gap-2">
+                    <Input
+                      placeholder="Cost Code"
+                      value={item.cost_code || ''}
+                      onChange={(e) => updateLineItem(idx, 'cost_code', e.target.value)}
+                      disabled={!isEditing}
+                      className="col-span-3"
+                    />
+                    <Input
+                      placeholder="Name"
+                      value={item.name || ''}
+                      onChange={(e) => updateLineItem(idx, 'name', e.target.value)}
+                      disabled={!isEditing}
+                      className="col-span-4"
+                    />
+                    <Input
+                      placeholder="Description"
+                      value={item.description || ''}
+                      onChange={(e) => updateLineItem(idx, 'description', e.target.value)}
+                      disabled={!isEditing}
+                      className="col-span-5"
+                    />
+                  </div>
+                  <div className="grid grid-cols-12 gap-2 items-center">
+                    <Input
+                      type="number"
+                      placeholder="Qty"
+                      value={item.quantity}
+                      onChange={(e) => updateLineItem(idx, 'quantity', e.target.value)}
+                      disabled={!isEditing}
+                      className="col-span-2"
+                    />
+                    <Input
+                      placeholder="Unit"
+                      value={item.unit}
+                      onChange={(e) => updateLineItem(idx, 'unit', e.target.value)}
+                      disabled={!isEditing}
+                      className="col-span-2"
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Unit $"
+                      value={item.unit_cost}
+                      onChange={(e) => updateLineItem(idx, 'unit_cost', e.target.value)}
+                      disabled={!isEditing}
+                      className="col-span-2"
+                    />
+                    <Input
+                      value={`$${(item.total_cost || 0).toLocaleString()}`}
+                      disabled
+                      className="col-span-2"
+                    />
+                    <select
+                      value={item.pricing_type || 'cost'}
+                      onChange={(e) => updateLineItem(idx, 'pricing_type', e.target.value)}
+                      disabled={!isEditing}
+                      className="col-span-3 h-9 rounded-md border border-slate-200 bg-white text-sm px-2 disabled:bg-slate-50"
+                      title="Cost = raw cost (overhead/profit applied on top). Dollar = sell price with margin already included (overhead/profit forced to 0)."
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
+                      <option value="cost">Cost line</option>
+                      <option value="dollar">Dollar (sell) line</option>
+                    </select>
+                    {isEditing && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => removeLineItem(idx)}
+                        className="col-span-1 text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -400,7 +440,7 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-slate-600 block mb-1">Equipment Cost</label>
+              <label className="text-xs text-slate-600 block mb-1">Equipment Cost ($)</label>
               <Input
                 type="number"
                 value={formData.equipment_cost || 0}
@@ -499,33 +539,77 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-slate-600 block mb-1">Overhead %</label>
+              <label className="text-xs text-slate-600 block mb-1">Overhead %{hasDollarLines ? ' (0 — dollar lines)' : ''}</label>
               <Input
                 type="number"
-                value={formData.overhead_percent || 0}
+                value={effectiveOverheadPct}
                 onChange={(e) => setFormData({ ...formData, overhead_percent: parseFloat(e.target.value) || 0 })}
-                disabled={!isEditing}
+                disabled={!isEditing || hasDollarLines}
               />
             </div>
             <div>
-              <label className="text-xs text-slate-600 block mb-1">Profit Margin %</label>
+              <label className="text-xs text-slate-600 block mb-1">Profit Margin %{hasDollarLines ? ' (0 — dollar lines)' : ''}</label>
               <Input
                 type="number"
-                value={formData.profit_margin_percent || 0}
+                value={effectiveProfitPct}
                 onChange={(e) => setFormData({ ...formData, profit_margin_percent: parseFloat(e.target.value) || 0 })}
-                disabled={!isEditing}
+                disabled={!isEditing || hasDollarLines}
               />
             </div>
           </div>
 
+          {hasDollarLines && (
+            <div className="flex items-start gap-2 rounded-lg border border-blue-300 bg-blue-50 p-3 text-sm text-blue-800">
+              <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <p>Overhead and Profit set to 0 — dollar (sell) lines already include margin, so adding overhead/profit would double-count.</p>
+            </div>
+          )}
+
           <div className="border-t pt-3 space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Subtotal:</span>
+              <span className="text-slate-600">Subtotal (direct cost):</span>
               <span className="font-semibold">${totals.subtotal.toLocaleString()}</span>
             </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-600">Contingency:</span>
+              <span className="font-semibold">${(totals.contingency_amount || 0).toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-600">Overhead ({effectiveOverheadPct}%):</span>
+              <span className="font-semibold">${(totals.subtotal * effectiveOverheadPct / 100).toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-600">Profit ({effectiveProfitPct}%):</span>
+              <span className="font-semibold">${(totals.subtotal * effectiveProfitPct / 100).toLocaleString()}</span>
+            </div>
             <div className="flex justify-between text-lg font-bold">
-              <span>Total Bid Amount:</span>
+              <span>Total Bid Amount (sell):</span>
               <span className="text-green-600">${totals.total_bid_amount.toLocaleString()}</span>
+            </div>
+
+            {/* Margin on sell price vs target/floor */}
+            <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-700">Margin on sell price</span>
+                <span className={`text-sm font-bold ${
+                  marginPct < 20 ? 'text-red-600' : marginPct < 25 ? 'text-amber-600' : 'text-green-600'
+                }`}>
+                  {marginPct.toFixed(1)}%
+                </span>
+              </div>
+              <div className="mt-2 h-2 rounded-full bg-slate-200 overflow-hidden">
+                <div
+                  className={`h-full ${marginPct < 20 ? 'bg-red-500' : marginPct < 25 ? 'bg-amber-500' : 'bg-green-500'}`}
+                  style={{ width: `${Math.min(Math.max(marginPct, 0), 100)}%` }}
+                />
+              </div>
+              <p className="text-xs text-slate-500 mt-2">
+                Target <span className="font-semibold">25–30%</span> · Floor <span className="font-semibold">20%</span>
+                {marginPct < 20 ? ' · Below floor' : marginPct < 25 ? ' · Above floor, below target' : marginPct <= 30 ? ' · On target' : ' · Above target'}
+              </p>
+              {hasDollarLines && (
+                <p className="text-xs text-blue-700 mt-1">Margin embedded in dollar lines is not reflected in this figure.</p>
+              )}
             </div>
           </div>
         </CardContent>
