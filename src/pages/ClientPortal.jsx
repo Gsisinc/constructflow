@@ -17,6 +17,21 @@ import { toast } from 'sonner';
 import ProjectDeadlines from '../components/calendar/ProjectDeadlines';
 import { buildSlaTag, sortTicketsByUrgency } from '@/lib/serviceDesk';
 
+const updateTypeLabels = {
+  daily_log: 'Daily Log',
+  milestone: 'Milestone',
+  photo_update: 'Photo Update',
+  video_update: 'Video Update',
+  announcement: 'Announcement',
+  report: 'Report',
+  progress: 'Progress Update',
+  issue: 'Issue Alert',
+  schedule: 'Schedule Update',
+  comment: 'General Comment',
+};
+const friendlyUpdateType = (t) =>
+  updateTypeLabels[t] || (t ? t.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) : '');
+
 export default function ClientPortal() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [showCommentDialog, setShowCommentDialog] = useState(false);
@@ -211,7 +226,7 @@ export default function ClientPortal() {
                     <p className="text-sm font-medium text-slate-700 mb-2">Recent updates</p>
                     <ul className="space-y-1 max-h-32 overflow-y-auto text-sm text-slate-600">
                       {updates.slice(0, 5).map((u) => (
-                        <li key={u.id}><span className="font-medium">{u.title || u.update_type}:</span> {u.content || u.message} — {u.created_date ? fmtDate(u.created_date, 'MMM d') : ''}</li>
+                        <li key={u.id}><span className="font-medium">{u.title || friendlyUpdateType(u.update_type)}:</span> {u.content || u.message} — {u.created_date ? fmtDate(u.created_date, 'MMM d') : ''}</li>
                       ))}
                     </ul>
                   </div>
@@ -434,7 +449,7 @@ export default function ClientPortal() {
                             <div className="flex items-start justify-between mb-2">
                               <div>
                                 <Badge variant={update.update_type === 'milestone' ? 'default' : 'outline'}>
-                                  {update.update_type}
+                                  {friendlyUpdateType(update.update_type)}
                                 </Badge>
                                 {update.milestone_name && (
                                   <span className="ml-2 font-semibold">{update.milestone_name}</span>
@@ -444,7 +459,7 @@ export default function ClientPortal() {
                                 {fmtDate(update.created_date, 'MMM dd, yyyy')}
                               </span>
                             </div>
-                            {update.title && <p className="font-semibold text-slate-900 mb-1">{update.title}</p>}
+                            <p className="font-semibold text-slate-900 mb-1">{update.title || friendlyUpdateType(update.update_type)}</p>
                             <p className="text-slate-700 break-words">{update.content || update.message}</p>
                             {update.media_urls && update.media_urls.length > 0 && (
                               <div className="flex gap-2 mt-3">

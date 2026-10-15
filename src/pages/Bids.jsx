@@ -38,6 +38,19 @@ const statusColors = {
 };
 
 const bidStatuses = ['All', 'review', 'intake', 'off_pricing', 'user_analyzing', 'estimated', 'submitted', 'won', 'lost', 'no_bid', 'closed'];
+const bidStatusLabels = {
+  All: 'All',
+  review: 'Review',
+  intake: 'Intake',
+  off_pricing: 'Off Pricing',
+  user_analyzing: 'User Analyzing',
+  estimated: 'Estimated',
+  submitted: 'Submitted',
+  won: 'Won',
+  lost: 'Lost',
+  no_bid: 'No Bid',
+  closed: 'Closed',
+};
 
 const DIVISIONS = [
   { value: 'fire_alarm', label: 'Fire Alarm' },
@@ -349,13 +362,13 @@ export default function Bids() {
                   key={status}
                   variant={statusFilter === status ? 'default' : 'ghost'}
                   onClick={() => setStatusFilter(status)}
-                  className={`h-10 px-4 rounded-xl capitalize font-medium transition-all ${
+                  className={`h-10 px-4 rounded-xl font-medium transition-all ${
                     statusFilter === status 
                       ? 'bg-slate-900 text-white shadow-md' 
                       : 'text-slate-500 hover:bg-slate-100'
                   }`}
                 >
-                  {status}
+                  {bidStatusLabels[status] || status}
                 </Button>
               ))}
             </div>
