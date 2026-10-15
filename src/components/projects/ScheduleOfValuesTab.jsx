@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Save, FilePlus2, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Save, FilePlus2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { fmtDate } from '@/lib/dates';
 
 const safe = (n) => (Number.isFinite(n) ? Number(n) : 0);
-const money = (n) => `$${safe(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+const money = (n) => `$${safe(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
 const emptyLine = () => ({ description: '', cost_code: '', scheduled_value: 0, percent_complete: 0, billed_to_date: 0 });
 
@@ -68,6 +68,8 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
   const eac = actual + committed + ctc;
   const remaining = contract - actual - committed;
   const fade = ctc - remaining;
+  // WIP over/under billing — same sign convention as the WIP Report
+  const wipOverUnder = totals.billed - totals.earned;
 
   const updateLine = (idx, field, value) => {
     setLines((prev) => {
@@ -78,6 +80,46 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
   };
   const addLine = () => setLines((prev) => [...(prev || []), emptyLine()]);
   const removeLine = (idx) => setLines((prev) => prev.filter((_, i) => i !== idx));
+
+  // Seed 8 milestone rows that sum exactly to the contract value.
+  const seedMilestones = () => {
+    const n = 8;
+    const each = Math.round((contract / n) * 100) / 100;
+    const rows = Array.from({ length: n - 1 }, (_, i) => ({
+      description: `Milestone ${i + 1}`,
+      cost_code: '',
+      scheduled_value: each,
+      percent_complete: 0,
+      billed_to_date: 0,
+    }));
+    rows.push({
+      description: `Milestone ${n}`,
+      cost_code: '',
+      scheduled_value: Math.round((contract - each * (n - 1)) * 100) / 100,
+      percent_complete: 0,
+      billed_to_date: 0,
+    });
+    setLines(rows);
+    toast.success('8 milestone lines seeded to the contract value');
+  };
+
+  // Pull the contract value from the linked bid's estimated_value.
+  const syncFromBid = useMutation({
+    mutationFn: async () => {
+      if (!project?.linked_bid_id) throw new Error('This project has no linked bid');
+      const bids = await base44.entities.BidOpportunity.filter({ id: project.linked_bid_id });
+      const bidVal = bids?.[0]?.estimated_value;
+      if (!Number.isFinite(bidVal)) throw new Error('Linked bid has no estimated value');
+      await base44.entities.Project.update(projectId, { budget: bidVal });
+      return bidVal;
+    },
+    onSuccess: (v) => {
+      qc.invalidateQueries({ queryKey: ['project', projectId] });
+      qc.invalidateQueries({ queryKey: ['org-projects'] });
+      toast.success(`Contract synced from bid (${money(v)})`);
+    },
+    onError: (e) => toast.error('Sync failed: ' + (e.message || '')),
+  });
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -100,8 +142,8 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
   const generatePayApp = async () => {
     const thisPeriod = totals.earned - totals.billed;
     if (thisPeriod <= 0) { toast.error('Nothing new to bill (earned ≤ billed to date)'); return; }
-    const retentionAmount = Math.round(thisPeriod * (retentionPct / 100));
-    const netDue = thisPeriod - retentionAmount;
+    const retentionAmount = Math.round(thisPeriod * (retentionPct / 100) * 100) / 100;
+    const netDue = Math.round((thisPeriod - retentionAmount) * 100) / 100;
     const today = new Date().toISOString().slice(0, 10);
     try {
       const inv = await base44.entities.SalesInvoice.create({
@@ -133,7 +175,7 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
         status: 'submitted',
       });
       // Update SOV billed_to_date to cumulative earned
-      const updatedLines = lines.map((l) => ({ ...l, billed_to_date: safe(l.scheduled_value) * (safe(l.percent_complete) / 100) }));
+      const updatedLines = lines.map((l) => ({ ...l, billed_to_date: Math.round(safe(l.scheduled_value) * (safe(l.percent_complete) / 100) * 100) / 100 }));
       setLines(updatedLines);
       const payload = { project_id: projectId, organization_id: project?.organization_id, line_items: updatedLines, retention_percent: retentionPct };
       if (sov?.id) await base44.entities.ScheduleOfValues.update(sov.id, payload);
@@ -141,6 +183,9 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
       qc.invalidateQueries({ queryKey: ['sov', projectId] });
       qc.invalidateQueries({ queryKey: ['payApps', projectId] });
       qc.invalidateQueries({ queryKey: ['org-invoices'] });
+      qc.invalidateQueries({ queryKey: ['org-payapps'] });
+      qc.invalidateQueries({ queryKey: ['org-projects'] });
+      qc.invalidateQueries({ queryKey: ['project', projectId] });
       toast.success(`Pay application generated — ${money(netDue)} net due (retention ${money(retentionAmount)})`);
     } catch (e) {
       toast.error('Pay app failed: ' + (e.message || ''));
@@ -165,6 +210,7 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
             <Metric label="EAC = Actual + Committed + CTC" value={money(eac)} tone={eac > contract ? 'red' : 'green'} />
             <Metric label="Remaining = Budget − Actual − Committed" value={money(remaining)} />
             <Metric label="Fade = CTC − Remaining" value={money(fade)} tone={fade > 0 ? 'red' : 'green'} />
+            <Metric label="WIP Over/(Under) = Billed − Earned" value={money(wipOverUnder)} tone={wipOverUnder < 0 ? 'red' : wipOverUnder > 0 ? 'amber' : 'green'} />
             <Metric label="% Complete (project)" value={`${safe(project?.progress)}%`} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">
@@ -202,6 +248,15 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
               <AlertTriangle className="h-4 w-4" /> Scheduled value total ({money(totals.scheduled)}) does not equal contract value ({money(contract)}). Adjust line items so they sum to the contract.
             </div>
           )}
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <Button size="sm" variant="outline" onClick={() => syncFromBid.mutate()} disabled={syncFromBid.isPending || !project?.linked_bid_id}>
+              <RefreshCw className="h-4 w-4 mr-1" /> Sync contract from bid
+            </Button>
+            <Button size="sm" variant="outline" onClick={seedMilestones} disabled={contract <= 0}>
+              <Plus className="h-4 w-4 mr-1" /> Seed 8 milestone lines
+            </Button>
+            <span className="text-xs text-slate-500">Contract: {money(contract)} · Retention at full billing: {money(contract * (retentionPct / 100))}</span>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-slate-500 text-left">

@@ -25,11 +25,22 @@ export default function BidDetailsEditor({ bid }) {
   };
 
   const saveMutation = useMutation({
-    mutationFn: (data) => base44.entities.BidOpportunity.update(bid.id, data),
+    mutationFn: async (data) => {
+      const updated = await base44.entities.BidOpportunity.update(bid.id, data);
+      // Keep the linked project's contract (budget) in sync with the bid's estimated value.
+      if (bid.linked_project_id && Number.isFinite(data.estimated_value)) {
+        await base44.entities.Project.update(bid.linked_project_id, { budget: Number(data.estimated_value) });
+      }
+      return updated;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bid', bid.id] });
       queryClient.invalidateQueries({ queryKey: ['bids-all'] });
       queryClient.invalidateQueries({ queryKey: ['dash-bids-list'] });
+      if (bid.linked_project_id) {
+        queryClient.invalidateQueries({ queryKey: ['project', bid.linked_project_id] });
+        queryClient.invalidateQueries({ queryKey: ['org-projects'] });
+      }
       toast.success('Bid details updated');
       setEditing(false);
     },

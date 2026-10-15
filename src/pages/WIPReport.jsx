@@ -9,10 +9,10 @@ import { createPageUrl } from '@/utils';
 import { useNavigate } from 'react-router-dom';
 
 const safe = (n) => (Number.isFinite(n) ? Number(n) : 0);
-const money = (n) => '$' + safe(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+const money = (n) => '$' + safe(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 const signedMoney = (n) => {
   const v = safe(n);
-  return v < 0 ? '($' + Math.abs(v).toLocaleString(undefined, { maximumFractionDigits: 0 }) + ')' : money(v);
+  return v < 0 ? '($' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ')' : money(v);
 };
 
 export default function WIPReport() {

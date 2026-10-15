@@ -28,6 +28,10 @@ export default function EstimateEditor({ bidId, organizationId, bidTitle }) {
       // Sync the estimate total back to the bid's Estimated Value
       if (Number.isFinite(data.total_bid_amount)) {
         await base44.entities.BidOpportunity.update(bidId, { estimated_value: data.total_bid_amount });
+        // And keep the linked project's contract in sync
+        const bids = await base44.entities.BidOpportunity.filter({ id: bidId }, { fields: ['linked_project_id'] });
+        const pid = bids?.[0]?.linked_project_id;
+        if (pid) await base44.entities.Project.update(pid, { budget: data.total_bid_amount });
       }
       return created;
     },
@@ -36,6 +40,7 @@ export default function EstimateEditor({ bidId, organizationId, bidTitle }) {
       queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
       queryClient.invalidateQueries({ queryKey: ['bids-all'] });
       queryClient.invalidateQueries({ queryKey: ['dash-bids-list'] });
+      queryClient.invalidateQueries({ queryKey: ['org-projects'] });
       toast.success('Estimate created');
       setIsEditing(false);
     }
@@ -47,6 +52,9 @@ export default function EstimateEditor({ bidId, organizationId, bidTitle }) {
       // Sync the estimate total back to the bid's Estimated Value
       if (Number.isFinite(data.total_bid_amount)) {
         await base44.entities.BidOpportunity.update(bidId, { estimated_value: data.total_bid_amount });
+        const bids = await base44.entities.BidOpportunity.filter({ id: bidId }, { fields: ['linked_project_id'] });
+        const pid = bids?.[0]?.linked_project_id;
+        if (pid) await base44.entities.Project.update(pid, { budget: data.total_bid_amount });
       }
       return updated;
     },
@@ -55,6 +63,7 @@ export default function EstimateEditor({ bidId, organizationId, bidTitle }) {
       queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
       queryClient.invalidateQueries({ queryKey: ['bids-all'] });
       queryClient.invalidateQueries({ queryKey: ['dash-bids-list'] });
+      queryClient.invalidateQueries({ queryKey: ['org-projects'] });
       toast.success('Estimate saved');
       setIsEditing(false);
     }
