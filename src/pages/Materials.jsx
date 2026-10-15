@@ -37,6 +37,8 @@ import {
   Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
+import { stampCreate, stampUpdate } from '@/lib/audit';
 
 const CATEGORIES = [
   { value: 'concrete', label: 'Concrete' },
@@ -260,11 +262,11 @@ export default function Materials() {
         open={showForm}
         onOpenChange={(open) => { setShowForm(open); if (!open) setEditingMaterial(null); }}
         material={editingMaterial}
-        onSubmit={(data) => {
+        onSubmit={async (data) => {
           if (editingMaterial) {
-            updateMutation.mutate({ id: editingMaterial.id, data });
+            updateMutation.mutate({ id: editingMaterial.id, data: await stampUpdate(data) });
           } else {
-            createMutation.mutate(data);
+            createMutation.mutate(await stampCreate(data));
           }
         }}
         loading={createMutation.isPending || updateMutation.isPending}
@@ -315,6 +317,7 @@ function MaterialFormDialog({ open, onOpenChange, material, onSubmit, loading })
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{material ? 'Edit Material' : 'Add Material'}</DialogTitle>
+          {material && <RecordAuditInfo record={material} className="pt-1" />}
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">

@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Plus, Calendar, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { format } from 'date-fns';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
+import { stampCreate } from '@/lib/audit';
 
 export default function DailyLog() {
   const queryClient = useQueryClient();
@@ -47,13 +49,13 @@ export default function DailyLog() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.DailyLog.create({
+    mutationFn: async (data) => base44.entities.DailyLog.create(await stampCreate({
       ...data,
       project_id: selectedProject,
       organization_id: user?.organization_id,
       log_date: format(new Date(), 'yyyy-MM-dd'),
       submitted_by: user?.email
-    }),
+    })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dailyLogs'] });
       setFormData({ work_performed: '', weather: { conditions: '', temperature: 0 }, safety_issues: '', delays: '', notes: '' });
@@ -174,6 +176,7 @@ export default function DailyLog() {
                     {log.delays && <p><strong>Delays:</strong> {log.delays}</p>}
                     {log.notes && <p><strong>Notes:</strong> {log.notes}</p>}
                   </div>
+                  <RecordAuditInfo record={log} className="mt-2" />
                 </div>
               ))}
             </div>

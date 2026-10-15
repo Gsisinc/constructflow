@@ -11,6 +11,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
+import { stampCreate } from '@/lib/audit';
 
 export default function VehicleLogs() {
   const queryClient = useQueryClient();
@@ -76,13 +78,13 @@ export default function VehicleLogs() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.VehicleLog.create({
+    mutationFn: async (data) => base44.entities.VehicleLog.create(await stampCreate({
       ...data,
       organization_id: user?.organization_id,
       log_date: format(new Date(), 'yyyy-MM-dd'),
       total_miles: data.ending_mileage - data.starting_mileage,
       created_by: user?.id
-    }),
+    })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vehicleLogs'] });
       setFormData({
@@ -114,11 +116,11 @@ export default function VehicleLogs() {
 
   // Create expense from vehicle log
   const createExpenseMutation = useMutation({
-    mutationFn: ({ logId, projectId }) => {
+    mutationFn: async ({ logId, projectId }) => {
       const log = logs.find(l => l.id === logId);
       const totalCost = (log?.fuel_cost || 0) + (log?.maintenance_cost || 0);
-      
-      return base44.entities.Expense.create({
+
+      return base44.entities.Expense.create(await stampCreate({
         project_id: projectId,
         organization_id: user?.organization_id,
         description: `Vehicle Log - ${log?.vehicle_name} (${log?.driver})`,
@@ -127,7 +129,7 @@ export default function VehicleLogs() {
         category: 'vehicle',
         notes: `Fuel: $${log?.fuel_cost} | Maintenance: $${log?.maintenance_cost}`,
         created_by: user?.id
-      });
+      }));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
@@ -369,6 +371,7 @@ export default function VehicleLogs() {
                     <p className="text-xs md:text-sm text-slate-600 mt-1 break-words">
                       {log.driver} • {format(new Date(log.log_date), 'MMM d, yyyy')}
                     </p>
+                    <RecordAuditInfo record={log} className="mt-1" />
                     {log.technician_id && (
                       <p className="text-xs text-slate-500 mt-1">Technician assigned</p>
                     )}

@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
+import { stampCreate, stampUpdate } from '@/lib/audit';
 
 export default function ProjectMaterials({ projectId, organizationId }) {
   const queryClient = useQueryClient();
@@ -103,16 +105,16 @@ export default function ProjectMaterials({ projectId, organizationId }) {
     onError: (e) => toast.error('Failed to delete material: ' + (e.message || ''))
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name.trim()) {
       toast.error('Material name is required');
       return;
     }
 
     if (editingMaterial) {
-      updateMutation.mutate({ id: editingMaterial.id, data: formData });
+      updateMutation.mutate({ id: editingMaterial.id, data: await stampUpdate(formData) });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(await stampCreate(formData));
     }
   };
 
@@ -316,6 +318,7 @@ export default function ProjectMaterials({ projectId, organizationId }) {
                       {material.notes && (
                         <p className="text-sm text-slate-500 mt-2 italic">Note: {material.notes}</p>
                       )}
+                      <RecordAuditInfo record={material} className="mt-2" />
                     </div>
                     <div className="flex gap-2 ml-4">
                       <Button

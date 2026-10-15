@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils';
 import { fmtMoney, roundCents } from '@/lib/money';
 import { Textarea } from '@/components/ui/textarea';
 import EmptyState from '../components/ui/EmptyState';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
+import { stampCreate, stampUpdate } from '@/lib/audit';
 
 const APPROVAL_THRESHOLD = 5000;
 
@@ -223,11 +225,11 @@ export default function PurchaseOrders() {
         onOpenChange={(open) => { setShowForm(open); if (!open) setEditingPO(null); }}
         po={editingPO}
         projects={projects}
-        onSubmit={(data) => {
+        onSubmit={async (data) => {
           if (editingPO) {
-            updateMutation.mutate({ id: editingPO.id, data });
+            updateMutation.mutate({ id: editingPO.id, data: await stampUpdate(data) });
           } else {
-            createMutation.mutate(data);
+            createMutation.mutate(await stampCreate(data));
           }
         }}
         loading={createMutation.isPending || updateMutation.isPending}
@@ -384,6 +386,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{po ? 'Edit PO' : 'Create Purchase Order'}</DialogTitle>
+          {po && <RecordAuditInfo record={po} className="pt-1" />}
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">

@@ -10,6 +10,8 @@ import { Plus, Trash2, Save, FilePlus2, AlertTriangle, RefreshCw } from 'lucide-
 import { toast } from 'sonner';
 import { fmtDate } from '@/lib/dates';
 import { fmtMoney as money, signedMoney, roundCents } from '@/lib/money';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
+import { stampCreate } from '@/lib/audit';
 
 const safe = (n) => (Number.isFinite(n) ? Number(n) : 0);
 
@@ -153,7 +155,7 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
         const fresh = (await base44.entities.Project.filter({ id: projectId }))[0];
         orgId = fresh?.organization_id;
       }
-      const inv = await base44.entities.SalesInvoice.create({
+      const inv = await base44.entities.SalesInvoice.create(await stampCreate({
         organization_id: orgId,
         invoice_number: `PA-${Date.now().toString().slice(-6)}`,
         invoice_date: today,
@@ -167,8 +169,8 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
         total_amount: netDue,
         status: 'sent',
         payment_terms: 'Net 30',
-      });
-      await base44.entities.PayApplication.create({
+      }));
+      await base44.entities.PayApplication.create(await stampCreate({
         organization_id: orgId,
         project_id: projectId,
         application_number: `PA-${Date.now().toString().slice(-6)}`,
@@ -180,7 +182,7 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
         sov_snapshot: { lines, totals },
         linked_invoice_id: inv.id,
         status: 'submitted',
-      });
+      }));
       // Update SOV billed_to_date to cumulative earned
       const updatedLines = lines.map((l) => ({ ...l, billed_to_date: Math.round(safe(l.scheduled_value) * (safe(l.percent_complete) / 100) * 100) / 100 }));
       setLines(updatedLines);
@@ -250,6 +252,7 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
           </div>
         </CardHeader>
         <CardContent>
+          {sov && <div className="mb-3"><RecordAuditInfo record={sov} /></div>}
           {!sumMatches && (
             <div className="flex items-center gap-2 mb-3 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
               <AlertTriangle className="h-4 w-4" /> Scheduled value total ({money(totals.scheduled)}) does not equal contract value ({money(contract)}). Adjust line items so they sum to the contract.
@@ -310,6 +313,11 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
       <Card>
         <CardHeader><CardTitle className="text-base">Pay Applications</CardTitle></CardHeader>
         <CardContent>
+          {(payAppsQuery.data || []).length > 0 && (
+            <div className="mb-3">
+              <RecordAuditInfo record={(payAppsQuery.data || [])[0]} />
+            </div>
+          )}
           {(payAppsQuery.data || []).length === 0 ? (
             <p className="text-sm text-slate-400 py-4 text-center">No pay applications generated yet. Click "Generate Pay App" above.</p>
           ) : (

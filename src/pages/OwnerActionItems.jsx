@@ -13,6 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, ListChecks, Filter } from 'lucide-react';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
+import { stampCreate, stampUpdate } from '@/lib/audit';
 
 const NAVY = '#0F1B2D';
 const GOLD = '#E8B547';
@@ -86,10 +88,10 @@ export default function OwnerActionItems() {
     try {
       const payload = { ...form, organization_id: orgId };
       if (editing) {
-        await base44.entities.OwnerActionItem.update(editing.id, payload);
+        await base44.entities.OwnerActionItem.update(editing.id, await stampUpdate(payload));
         toast.success('Action item updated');
       } else {
-        await base44.entities.OwnerActionItem.create(payload);
+        await base44.entities.OwnerActionItem.create(await stampCreate(payload));
         toast.success('Action item added');
       }
       setDialogOpen(false);
@@ -209,6 +211,7 @@ export default function OwnerActionItems() {
                         {item.owner && <span>Owner: {item.owner}</span>}
                         {item.due_date && <span>Due: {item.due_date}</span>}
                       </div>
+                      <RecordAuditInfo record={item} className="mt-1" />
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <Select value={item.status} onValueChange={(v) => changeStatus(item, v)}>
