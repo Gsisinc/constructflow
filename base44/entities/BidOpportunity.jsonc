@@ -160,6 +160,18 @@
           "items": {
             "type": "string"
           }
+        },
+        "drawing_analysis": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "drawing_analysis_meta": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "drawing_designer_layout": {
+          "type": "object",
+          "additionalProperties": true
         }
       }
     }
