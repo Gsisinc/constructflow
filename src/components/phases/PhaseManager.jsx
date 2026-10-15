@@ -1035,7 +1035,8 @@ function NotesTab({ projectId, phaseName, notes }) {
       setShowForm(false);
       setFormData({ title: '', content: '' });
       toast.success('Note added');
-    }
+    },
+    onError: (err) => toast.error('Could not save note: ' + (err?.message || 'unknown error'))
   });
 
   return (
