@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 import { differenceInDays, format } from 'date-fns';
+import { fmtDate, parseLocalDate } from '@/lib/dates';
 
 export default function ProjectDeadlines({ projectId }) {
   const { data: project } = useQuery({
@@ -37,7 +38,7 @@ export default function ProjectDeadlines({ projectId }) {
               <div>
                 <p className="text-sm text-slate-500 mb-1">Target Date</p>
                 <p className="text-2xl font-bold text-slate-900">
-                  {format(new Date(project.end_date), 'MMM dd, yyyy')}
+                  {fmtDate(project.end_date, 'MMM dd, yyyy')}
                 </p>
               </div>
               <CountdownTimer targetDate={project.end_date} label="Project" />
@@ -64,7 +65,7 @@ export default function ProjectDeadlines({ projectId }) {
                 </div>
                 <p className="text-sm text-slate-500">
                   {currentPhase.completed_date ? 
-                    `Completed ${format(new Date(currentPhase.completed_date), 'MMM dd, yyyy')}` : 
+                    `Completed ${fmtDate(currentPhase.completed_date, 'MMM dd, yyyy')}` : 
                     'In Progress'
                   }
                 </p>
@@ -86,7 +87,7 @@ function CountdownTimer({ targetDate, label }) {
   useEffect(() => {
     const calculateTimeLeft = () => {
       const now = new Date();
-      const target = new Date(targetDate);
+      const target = parseLocalDate(targetDate) || new Date(targetDate);
       const diff = target - now;
 
       if (diff <= 0) {
@@ -112,7 +113,7 @@ function CountdownTimer({ targetDate, label }) {
 
   if (!timeLeft) return null;
 
-  const totalDays = differenceInDays(new Date(targetDate), new Date());
+  const totalDays = differenceInDays(parseLocalDate(targetDate) || new Date(), new Date());
   const isUrgent = totalDays < 7;
   const isWarning = totalDays < 30;
 

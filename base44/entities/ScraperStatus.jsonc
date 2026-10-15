@@ -1,0 +1,46 @@
+{
+  "name": "ScraperStatus",
+  "type": "object",
+  "description": "Last-run status for the daily bid scraper",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "default": "bid_scraper"
+    },
+    "last_run": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "records_added": {
+      "type": "number",
+      "default": 0
+    },
+    "last_error": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 6 * * *",
+      "one_time_date": null,
+      "timezone": "America/Los_Angeles",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "name": "Daily Bid Scraper",
+  "description": "Runs the bid scraper daily at 6 AM PT. Dedupes by source URL and creates new bids with status Intake.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_bid_scraper",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "scrape": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runScheduledBidScrape",
+            "args": {
+              "workType": "fire_alarm",
+              "state": "California"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Scrape bid sites",
+            "description": "Dedupe by URL, new bids as Intake"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
+import { useProjectBilling } from '@/hooks/useProjectData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -122,14 +123,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const orgId = user?.organization_id;
 
-  const { data: projects = [], isLoading: loadingProjects } = useQuery({
-    queryKey: ['dash-projects', orgId],
-    queryFn: async () => {
-      const res = await base44.entities.Project.filter({ organization_id: orgId }, { sort: '-created_date', limit: 200 });
-      return res?.items || [];
-    },
-    enabled: !!orgId,
-  });
+  const { projects, totals: billingTotals, isLoading: loadingProjects } = useProjectBilling(orgId);
 
   const { data: openPOs = [], isLoading: loadingPOs } = useQuery({
     queryKey: ['dash-open-pos', orgId],
@@ -185,9 +179,8 @@ export default function Dashboard() {
   const pipelineBids = bidList.filter((b) => PIPELINE_STATUSES.includes(b.status));
   const pipelineCount = pipelineBids.length;
   const pipelineValue = pipelineBids.reduce((s, b) => s + (b.estimated_value || 0), 0);
-  // Billing Outstanding — matches the Billing page (contract − billed for awarded/in_progress/completed)
-  const billingProjects = projects.filter((p) => ['awarded', 'in_progress', 'completed'].includes(p.status));
-  const billingOutstanding = billingProjects.reduce((s, p) => s + Math.max(0, (p.budget || 0) - (p.spent || 0)), 0);
+  // Billing Outstanding — from actual invoices (shared with Billing page)
+  const billingOutstanding = billingTotals?.outstanding || 0;
   const costPct = sumBudgetActive ? (sumSpentActive / sumBudgetActive) * 100 : 0;
 
   // DualTrack red flags — a project is flagged if any of its stages has a fade or a blocked track

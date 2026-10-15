@@ -15,9 +15,11 @@ import EmptyState from '@/components/ui/EmptyState';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
+import { fmtDate } from '@/lib/dates';
 import { normalizeBidAnalysis } from '@/lib/bidAnalysis';
 import { getPhaseTemplate } from '../components/projects/projectTemplates';
 import { convertBidToProject } from '@/lib/bidConversion';
+import BidStatusSelect from '@/components/bids/BidStatusSelect';
 
 // Owner's bid status list (replaces the spec's): Review, Intake, Off Pricing,
 // No Bid, User Analyzing, Estimated — plus Submitted, Won, Lost, Closed so the
@@ -160,6 +162,24 @@ export default function Bids() {
     onError: (e) => toast.error('Delete failed: ' + (e.message || ''))
   });
 
+  const { data: scraperStatus } = useQuery({
+    queryKey: ['scraper-status'],
+    queryFn: async () => {
+      const res = await base44.entities.ScraperStatus.filter({ name: 'bid_scraper' }, { limit: 5 });
+      return (res?.items || res || [])[0] || null;
+    },
+  });
+
+  const runScraperMutation = useMutation({
+    mutationFn: () => base44.functions.invoke('runScheduledBidScrape', { workType: 'fire_alarm', state: 'California', organization_id: user?.organization_id }),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['scraper-status'] });
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+      toast.success(`Scrape complete — ${res?.added ?? 0} new bid(s) added`);
+    },
+    onError: (e) => toast.error('Scrape failed: ' + (e.message || '')),
+  });
+
   const tagBidMutation = useMutation({
     mutationFn: ({ id, status }) => base44.entities.BidOpportunity.update(id, { status }),
     onSuccess: () => {
@@ -288,6 +308,27 @@ export default function Bids() {
         ))}
       </div>
 
+      {/* Daily scraper status */}
+      <Card className="premium-card border-none">
+        <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600"><Calendar className="h-5 w-5" /></div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Daily Bid Scraper</p>
+              <p className="text-xs text-slate-500">
+                {scraperStatus?.last_run
+                  ? `Last run ${fmtDate((scraperStatus.last_run || '').slice(0, 10))} · ${scraperStatus.records_added ?? 0} records added`
+                  : 'Never run · scheduled daily at 6 AM PT'}
+              </p>
+            </div>
+          </div>
+          <Button size="sm" variant="outline" disabled={runScraperMutation.isPending} onClick={() => runScraperMutation.mutate()}>
+            {runScraperMutation.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Calendar className="h-4 w-4 mr-1" />}
+            Run scraper now
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Search and Filters */}
       <Card className="premium-card border-none shadow-sm">
         <CardContent className="p-4">
@@ -382,29 +423,20 @@ export default function Bids() {
                         {bid.due_date && (
                           <div className="flex items-center gap-1.5 text-sm font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
                             <Calendar className="h-4 w-4 text-slate-400" />
-                            Due {format(new Date(bid.due_date), 'MMM d, yyyy')}
+                            Due {fmtDate(bid.due_date)}
                           </div>
                         )}
                       </div>
                     </div>
                   </div>
                   <div className="flex flex-col items-stretch gap-2 border-t md:border-t-0 pt-4 md:pt-0 md:items-end">
-                    <div className="flex flex-wrap gap-1.5">
-                      <Button size="sm" variant={bid.status === 'submitted' ? 'default' : 'outline'}
-                        className={bid.status === 'submitted' ? 'bg-green-600 hover:bg-green-700 h-8 px-3 text-xs' : 'h-8 px-3 text-xs'}
-                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'submitted' }); }}>
-                        Submitted
-                      </Button>
-                      <Button size="sm" variant={bid.status === 'won' ? 'default' : 'outline'}
-                        className={bid.status === 'won' ? 'bg-emerald-600 hover:bg-emerald-700 h-8 px-3 text-xs' : 'h-8 px-3 text-xs'}
-                        onClick={(e) => { e.stopPropagation(); handleMarkWon(bid); }}>
-                        Awarded
-                      </Button>
-                      <Button size="sm" variant={bid.status === 'lost' ? 'default' : 'outline'}
-                        className={bid.status === 'lost' ? 'bg-red-600 hover:bg-red-700 h-8 px-3 text-xs' : 'h-8 px-3 text-xs'}
-                        onClick={(e) => { e.stopPropagation(); tagBidMutation.mutate({ id: bid.id, status: 'lost' }); }}>
-                        Lost
-                      </Button>
+                    <div className="flex items-center gap-1.5" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                      <label className="text-[10px] uppercase tracking-wide text-slate-400">Status</label>
+                      <BidStatusSelect
+                        value={bid.status}
+                        onChange={(v) => { if (v === 'won') handleMarkWon(bid); else tagBidMutation.mutate({ id: bid.id, status: v }); }}
+                        className="h-8 w-[150px]"
+                      />
                     </div>
                     {bid.status === 'won' && !bid.linked_project_id && (
                       <Button size="sm"

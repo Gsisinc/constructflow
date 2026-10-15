@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, MessageSquare, Image as ImageIcon, FileText, Send, Clock, Home, Loader2, Wrench } from 'lucide-react';
 import { format } from 'date-fns';
+import { fmtDate } from '@/lib/dates';
 import { toast } from 'sonner';
 import ProjectDeadlines from '../components/calendar/ProjectDeadlines';
 import { buildSlaTag, sortTicketsByUrgency } from '@/lib/serviceDesk';
@@ -29,9 +30,12 @@ export default function ClientPortal() {
     queryFn: () => base44.auth.me()
   });
 
+  const isAdmin = user?.role === 'admin' || user?.role === 'user';
   const { data: projects = [] } = useQuery({
-    queryKey: ['clientProjects', user?.email],
-    queryFn: () => base44.entities.Project.filter({ client_email: user?.email }),
+    queryKey: ['clientProjects', user?.email, user?.organization_id, isAdmin],
+    queryFn: () => isAdmin
+      ? base44.entities.Project.filter({ organization_id: user?.organization_id }, '-created_date')
+      : base44.entities.Project.filter({ client_email: user?.email }),
     enabled: !!user?.email
   });
 
@@ -160,18 +164,21 @@ export default function ClientPortal() {
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Client Portal</h1>
             <p className="text-slate-500 mt-1">View progress reports, updates, and project communications</p>
           </div>
-          {projects.length > 1 && (
-            <Select value={selectedProject?.id} onValueChange={(id) => setSelectedProject(projects.find(p => p.id === id))}>
-              <SelectTrigger className="w-72">
-                <SelectValue placeholder="Select project" />
-              </SelectTrigger>
-              <SelectContent>
-                {projects.map(p => (
-                  <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          <div className="flex flex-col items-end gap-1">
+            {(projects.length > 1 || isAdmin) && (
+              <Select value={selectedProject?.id} onValueChange={(id) => setSelectedProject(projects.find(p => p.id === id))}>
+                <SelectTrigger className="w-72">
+                  <SelectValue placeholder="Select project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {isAdmin && <span className="text-xs text-slate-400">Admin preview — viewing as client</span>}
+          </div>
         </div>
 
         {selectedProject && (
@@ -193,11 +200,11 @@ export default function ClientPortal() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-slate-500">Start</p>
-                    <p className="font-medium">{selectedProject.start_date ? format(new Date(selectedProject.start_date), 'MMM d, yyyy') : '—'}</p>
+                    <p className="font-medium">{selectedProject.start_date ? fmtDate(selectedProject.start_date, 'MMM d, yyyy') : '—'}</p>
                   </div>
                   <div>
                     <p className="text-slate-500">Target completion</p>
-                    <p className="font-medium">{selectedProject.end_date ? format(new Date(selectedProject.end_date), 'MMM d, yyyy') : '—'}</p>
+                    <p className="font-medium">{selectedProject.end_date ? fmtDate(selectedProject.end_date, 'MMM d, yyyy') : '—'}</p>
                   </div>
                 </div>
                 {updates.length > 0 && (
@@ -205,7 +212,7 @@ export default function ClientPortal() {
                     <p className="text-sm font-medium text-slate-700 mb-2">Recent updates</p>
                     <ul className="space-y-1 max-h-32 overflow-y-auto text-sm text-slate-600">
                       {updates.slice(0, 5).map((u) => (
-                        <li key={u.id}>• {u.message || u.update_type} — {u.created_date ? format(new Date(u.created_date), 'MMM d') : ''}</li>
+                        <li key={u.id}><span className="font-medium">{u.title || u.update_type}:</span> {u.content || u.message} — {u.created_date ? format(new Date(u.created_date), 'MMM d') : ''}</li>
                       ))}
                     </ul>
                   </div>
@@ -236,11 +243,11 @@ export default function ClientPortal() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4 pt-4 border-t">
                     <div>
                       <p className="text-sm text-slate-500">Start Date</p>
-                      <p className="font-semibold">{selectedProject.start_date ? format(new Date(selectedProject.start_date), 'MMM dd, yyyy') : 'Not set'}</p>
+                      <p className="font-semibold">{selectedProject.start_date ? fmtDate(selectedProject.start_date, 'MMM dd, yyyy') : 'Not set'}</p>
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Target Completion</p>
-                      <p className="font-semibold">{selectedProject.end_date ? format(new Date(selectedProject.end_date), 'MMM dd, yyyy') : 'Not set'}</p>
+                      <p className="font-semibold">{selectedProject.end_date ? fmtDate(selectedProject.end_date, 'MMM dd, yyyy') : 'Not set'}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -438,10 +445,11 @@ export default function ClientPortal() {
                                 {format(new Date(update.created_date), 'MMM dd, yyyy')}
                               </span>
                             </div>
-                            <p className="text-slate-700 break-words">{update.message}</p>
-                            {update.photo_urls && update.photo_urls.length > 0 && (
+                            {update.title && <p className="font-semibold text-slate-900 mb-1">{update.title}</p>}
+                            <p className="text-slate-700 break-words">{update.content || update.message}</p>
+                            {update.media_urls && update.media_urls.length > 0 && (
                               <div className="flex gap-2 mt-3">
-                                {update.photo_urls.map((url, idx) => (
+                                {update.media_urls.map((url, idx) => (
                                   <img key={idx} src={url} alt="Update" className="w-24 h-24 object-cover rounded-lg" />
                                 ))}
                               </div>
@@ -460,7 +468,7 @@ export default function ClientPortal() {
                     <CardTitle>Project Photos & 3D Models</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {updates.filter(u => u.photo_urls?.length > 0).length === 0 ? (
+                    {updates.filter(u => u.media_urls?.length > 0).length === 0 ? (
                       <div className="text-center py-12 text-slate-500">
                         <ImageIcon className="h-12 w-12 mx-auto mb-3 text-slate-300" />
                         <p>No photos uploaded yet</p>
@@ -468,8 +476,8 @@ export default function ClientPortal() {
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         {updates
-                          .filter(u => u.photo_urls?.length > 0)
-                          .flatMap(u => u.photo_urls)
+                          .filter(u => u.media_urls?.length > 0)
+                          .flatMap(u => u.media_urls)
                           .map((url, idx) => (
                             <div key={idx} className="relative group cursor-pointer">
                               <img src={url} alt="Project" className="w-full sm:w-auto h-48 object-cover rounded-lg" />
@@ -503,10 +511,10 @@ export default function ClientPortal() {
                           <div key={event.id} className="flex items-start gap-4 p-4 border rounded-lg hover:bg-slate-50">
                             <div className="bg-blue-100 rounded-lg p-3 text-center min-w-16">
                               <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
-                                {format(new Date(event.start_date), 'd')}
+                                {fmtDate(event.start_date, 'd')}
                               </p>
                               <p className="text-xs text-slate-500">
-                                {format(new Date(event.start_date), 'MMM')}
+                                {fmtDate(event.start_date, 'MMM')}
                               </p>
                             </div>
                             <div className="flex-1">
@@ -568,7 +576,7 @@ export default function ClientPortal() {
                             </div>
                             <p className="text-sm text-slate-700 break-words">{co.description}</p>
                             <p className="text-xs text-slate-500 mt-2">
-                              Submitted {co.submitted_date && format(new Date(co.submitted_date), 'MMM dd, yyyy')}
+                              Submitted {co.submitted_date && fmtDate(co.submitted_date, 'MMM dd, yyyy')}
                             </p>
                           </div>
                         ))}
@@ -607,7 +615,7 @@ export default function ClientPortal() {
                                 </div>
                                 <div className="text-right text-xs text-slate-500">
                                   <p>Priority: {(ticket.priority || ticket.severity || 'medium').toUpperCase()}</p>
-                                  {(ticket.target_date || ticket.due_date) && <p>Target: {format(new Date(ticket.target_date || ticket.due_date), 'MMM dd, yyyy')}</p>}
+                                  {(ticket.target_date || ticket.due_date) && <p>Target: {fmtDate(ticket.target_date || ticket.due_date, 'MMM dd, yyyy')}</p>}
                                 </div>
                               </div>
                             </div>

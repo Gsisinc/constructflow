@@ -10,6 +10,9 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { fmtDate } from '@/lib/dates';
+import BidStatusSelect from '@/components/bids/BidStatusSelect';
+import { convertBidToProject } from '@/lib/bidConversion';
 import BidUploader from '@/components/bids/BidUploader';
 import BidRequirements from '@/components/bids/BidRequirements';
 import BidToProject from '@/components/bids/BidToProject';
@@ -71,6 +74,25 @@ export default function BidOpportunityDetail() {
     onError: () => toast.error('Unable to delete bid')
   });
 
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.BidOpportunity.update(id, { status }),
+    onSuccess: async (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+      toast.success('Status updated');
+      if (vars.status === 'won') {
+        const fresh = (await base44.entities.BidOpportunity.filter({ id: vars.id }))?.[0];
+        if (fresh && !fresh.linked_project_id) {
+          try {
+            const res = await convertBidToProject({ base44Client: base44, bid: fresh, organizationId: user.organization_id });
+            queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+            toast.success(res.already_exists ? 'Project already exists' : 'Awarded — project auto-created');
+          } catch (e) { toast.error('Auto-create project failed: ' + (e.message || '')); }
+        }
+      }
+    },
+    onError: (e) => toast.error('Status update failed: ' + (e.message || ''))
+  });
+
   const analysis = useMemo(() => normalizeAiAnalysis(bid?.ai_analysis, documents), [bid?.ai_analysis, documents]);
 
   if (!bid || !user) {
@@ -120,16 +142,19 @@ export default function BidOpportunityDetail() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? format(new Date(bid.due_date), 'MMM d, yyyy') : 'Not set'} />
+        <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? fmtDate(bid.due_date) : 'Not set'} />
         <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={`$${Number(bid.estimated_value || bid.value || 0).toLocaleString()}`} />
         <StatCard icon={<TrendingUp className="h-8 w-8 text-blue-600" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <FileText className="h-8 w-8 text-purple-600" />
-              <div>
-                <p className="text-xs text-slate-500">Status</p>
-                <Badge className={statusColors[bid.status] || 'bg-slate-100 text-slate-700'}>{bid.status || 'new'}</Badge>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-slate-500 mb-1">Status</p>
+                <div className="flex items-center gap-2">
+                  <Badge className={statusColors[bid.status] || 'bg-slate-100 text-slate-700'}>{(bid.status || 'new').replace('_',' ')}</Badge>
+                  <BidStatusSelect value={bid.status} onChange={(v) => statusMutation.mutate({ id: bid.id, status: v })} className="h-8 w-[150px]" />
+                </div>
               </div>
             </div>
           </CardContent>

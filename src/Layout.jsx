@@ -37,6 +37,7 @@ import {
   Truck,
   Tag,
   Mic,
+  Calculator,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -69,6 +70,7 @@ const navGroups = [
   ]},
   { label: 'Billing', items: [
     { name: 'Billing', icon: Banknote, page: 'Billing' },
+    { name: 'WIP Report', icon: Calculator, page: 'WIPReport' },
   ]},
   { label: 'Procurement', items: [
     { name: 'Suppliers', icon: Truck, page: 'Suppliers' },

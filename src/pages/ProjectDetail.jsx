@@ -24,6 +24,7 @@ import RFITab from '../components/projects/RFITab';
 import PunchListTab from '../components/projects/PunchListTab';
 import DocumentsTab from '../components/projects/DocumentsTab';
 import AppendixFormsTab from '../components/projects/AppendixFormsTab';
+import ScheduleOfValuesTab from '../components/projects/ScheduleOfValuesTab';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -286,6 +287,14 @@ export default function ProjectDetail() {
               )}
             </div>
             <div className="flex gap-2 w-full sm:w-auto flex-wrap">
+              {project.linked_bid_id && (
+                <Link to={createPageUrl('BidOpportunityDetail') + `?id=${project.linked_bid_id}`}>
+                  <Button variant="outline" className="flex-1 sm:flex-none text-sm">
+                    <FileText className="h-4 w-4 mr-1 sm:mr-2" />
+                    Source Bid
+                  </Button>
+                </Link>
+              )}
               <Link to={createPageUrl('Directory') + '?projectId=' + encodeURIComponent(projectId)}>
                 <Button variant="outline" className="flex-1 sm:flex-none text-sm">
                   <Users className="h-4 w-4 mr-1 sm:mr-2" />
@@ -431,6 +440,7 @@ export default function ProjectDetail() {
           <TabsTrigger value="permits">Permits</TabsTrigger>
           <TabsTrigger value="materials">Materials</TabsTrigger>
           <TabsTrigger value="financials">Financials</TabsTrigger>
+          <TabsTrigger value="sov">SOV & Pay Apps</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
         </TabsList>
 
@@ -554,6 +564,10 @@ export default function ProjectDetail() {
               </div>
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="sov" className="mt-6">
+          <ScheduleOfValuesTab projectId={projectId} project={project} />
         </TabsContent>
 
         <TabsContent value="client" className="mt-6">

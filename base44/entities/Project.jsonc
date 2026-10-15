@@ -100,6 +100,11 @@
       "type": "number",
       "default": 0
     },
+    "cost_to_complete": {
+      "type": "number",
+      "default": 0,
+      "description": "PM-entered estimate to complete (EAC input)"
+    },
     "projected_final_cost": {
       "type": "number"
     },

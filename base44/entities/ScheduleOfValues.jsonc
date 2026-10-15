@@ -1,0 +1,77 @@
+{
+  "name": "ScheduleOfValues",
+  "type": "object",
+  "description": "Project Schedule of Values (SOV) \u2014 line items that sum to the contract value",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "line_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "cost_code": {
+            "type": "string"
+          },
+          "scheduled_value": {
+            "type": "number",
+            "default": 0
+          },
+          "percent_complete": {
+            "type": "number",
+            "default": 0
+          },
+          "billed_to_date": {
+            "type": "number",
+            "default": 0
+          }
+        }
+      }
+    },
+    "retention_percent": {
+      "type": "number",
+      "default": 10
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

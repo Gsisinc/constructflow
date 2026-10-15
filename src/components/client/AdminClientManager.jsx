@@ -240,10 +240,10 @@ export default function AdminClientManager({ projectId }) {
                       </Button>
                     </div>
                   </div>
-                  <p className="text-slate-700 mb-2">{update.message}</p>
-                  {update.photo_urls && update.photo_urls.length > 0 && (
+                  <p className="text-slate-700 mb-2">{update.content || update.message}</p>
+                  {update.media_urls && update.media_urls.length > 0 && (
                     <div className="flex gap-2 flex-wrap">
-                      {update.photo_urls.map((url, idx) => (
+                      {update.media_urls.map((url, idx) => (
                         <img key={idx} src={url} alt="Update" className="w-20 h-20 object-cover rounded-lg" />
                       ))}
                     </div>

@@ -1,0 +1,118 @@
+{
+  "name": "PurchaseInvoice",
+  "type": "object",
+  "description": "Supplier purchase invoice (bill) for a construction project",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Construction project this bill is for"
+    },
+    "invoice_number": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "invoice_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "line_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "default": 1
+          },
+          "unit": {
+            "type": "string"
+          },
+          "unit_price": {
+            "type": "number",
+            "default": 0
+          },
+          "total": {
+            "type": "number",
+            "default": 0
+          }
+        }
+      }
+    },
+    "subtotal": {
+      "type": "number",
+      "default": 0
+    },
+    "tax_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "total_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Received",
+        "Paid"
+      ],
+      "default": "Draft"
+    },
+    "linked_po_id": {
+      "type": "string",
+      "description": "PurchaseOrder this invoice was matched to"
+    },
+    "payment_terms": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "invoice_number",
+    "supplier_name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

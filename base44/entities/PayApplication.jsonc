@@ -1,0 +1,85 @@
+{
+  "name": "PayApplication",
+  "type": "object",
+  "description": "Monthly pay application generated from the SOV; flows to a SalesInvoice",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "application_number": {
+      "type": "string"
+    },
+    "period": {
+      "type": "string",
+      "format": "date"
+    },
+    "total_completed_value": {
+      "type": "number",
+      "default": 0
+    },
+    "retention_percent": {
+      "type": "number",
+      "default": 10
+    },
+    "retention_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "net_amount_due": {
+      "type": "number",
+      "default": 0
+    },
+    "sov_snapshot": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "linked_invoice_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "submitted",
+        "paid"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "project_id",
+    "application_number"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,248 +1,219 @@
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Save, X, Plus, Trash2 } from "lucide-react";
-import { format } from "date-fns";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CardHeader, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
+import { Save, X, Plus, Trash2, Link2 } from 'lucide-react';
+import { format } from 'date-fns';
 
-export default function PurchaseInvoiceForm({ invoice, products, warehouses, company, onSave, onCancel }) {
-    const [formData, setFormData] = useState({
-        invoice_number: '',
-        invoice_date: format(new Date(), 'yyyy-MM-dd'),
-        due_date: format(new Date(Date.now() + 30*24*60*60*1000), 'yyyy-MM-dd'),
-        supplier_name: '',
-        supplier_email: '',
-        supplier_phone: '',
-        warehouse_id: '',
-        line_items: [],
-        subtotal: 0,
-        tax_amount: 0,
-        total_amount: 0,
-        payment_terms: 'Net 30',
-        notes: '',
-        status: 'Draft'
+const emptyLine = () => ({ description: '', quantity: 1, unit: 'EA', unit_price: 0, total: 0 });
+
+export default function PurchaseInvoiceForm({ invoice, rateCards = [], suppliers = [], purchaseOrders = [], onSave, onCancel }) {
+  const [formData, setFormData] = useState({
+    invoice_number: '',
+    invoice_date: format(new Date(), 'yyyy-MM-dd'),
+    due_date: format(new Date(Date.now() + 30 * 86400000), 'yyyy-MM-dd'),
+    supplier_name: '',
+    line_items: [],
+    subtotal: 0,
+    tax_amount: 0,
+    total_amount: 0,
+    status: 'Draft',
+    linked_po_id: '',
+    payment_terms: 'Net 30',
+    notes: '',
+  });
+
+  useEffect(() => {
+    if (invoice) {
+      setFormData(invoice);
+    } else {
+      setFormData((prev) => ({ ...prev, invoice_number: `PINV-${Date.now().toString().slice(-8)}` }));
+    }
+  }, [invoice]);
+
+  const recalc = (items, tax = formData.tax_amount || 0) => {
+    const subtotal = items.reduce((s, i) => s + (Number(i.quantity) || 0) * (Number(i.unit_price) || 0), 0);
+    return { subtotal, tax_amount: Number(tax) || 0, total_amount: subtotal + (Number(tax) || 0) };
+  };
+
+  const set = (patch) => setFormData((prev) => ({ ...prev, ...patch }));
+
+  const addLine = () => set({ line_items: [...formData.line_items, emptyLine()] });
+
+  const updateLine = (idx, field, value) => {
+    const items = [...formData.line_items];
+    items[idx] = { ...items[idx], [field]: value };
+    items[idx].total = (Number(items[idx].quantity) || 0) * (Number(items[idx].unit_price) || 0);
+    set({ line_items: items, ...recalc(items) });
+  };
+
+  // Pick a Rate Card item into a line (fills description, unit, unit_price)
+  const pickRateCard = (idx, itemName) => {
+    const rc = rateCards.find((r) => r.item_name === itemName);
+    const items = [...formData.line_items];
+    items[idx] = {
+      ...items[idx],
+      description: rc ? rc.item_name : items[idx].description,
+      unit: rc ? rc.unit || 'EA' : items[idx].unit,
+      unit_price: rc ? rc.unit_price || 0 : items[idx].unit_price,
+    };
+    items[idx].total = (Number(items[idx].quantity) || 0) * (Number(items[idx].unit_price) || 0);
+    set({ line_items: items, ...recalc(items) });
+  };
+
+  const removeLine = (idx) => {
+    const items = formData.line_items.filter((_, i) => i !== idx);
+    set({ line_items: items, ...recalc(items) });
+  };
+
+  // Link to PO — pre-fill lines from the PO
+  const linkToPO = (poId) => {
+    if (!poId) { set({ linked_po_id: '' }); return; }
+    const po = purchaseOrders.find((p) => p.id === poId);
+    const lines = (po?.line_items || []).map((li) => ({
+      description: li.description || '',
+      quantity: Number(li.quantity) || 0,
+      unit: li.unit || 'EA',
+      unit_price: Number(li.unit_price) || 0,
+      total: (Number(li.quantity) || 0) * (Number(li.unit_price) || 0),
+    }));
+    set({
+      linked_po_id: poId,
+      supplier_name: formData.supplier_name || po?.vendor || '',
+      line_items: lines,
+      ...recalc(lines),
     });
+  };
 
-    useEffect(() => {
-        if (invoice) {
-            setFormData(invoice);
-        } else {
-            setFormData(prev => ({ 
-                ...prev, 
-                invoice_number: `PINV-${Date.now().toString().slice(-8)}`,
-                warehouse_id: warehouses.length > 0 ? warehouses[0].id : ''
-            }));
-        }
-    }, [invoice, warehouses]);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+  return (
+    <form onSubmit={handleSubmit}>
+      <CardHeader className="bg-slate-50">
+        <CardTitle>{invoice ? 'Edit Purchase Invoice' : 'Create Purchase Invoice'}</CardTitle>
+      </CardHeader>
+      <CardContent className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label>Invoice Number</Label>
+            <Input name="invoice_number" value={formData.invoice_number} onChange={(e) => set({ invoice_number: e.target.value })} required />
+          </div>
+          <div>
+            <Label>Invoice Date</Label>
+            <Input type="date" value={formData.invoice_date} onChange={(e) => set({ invoice_date: e.target.value })} required />
+          </div>
+          <div>
+            <Label>Due Date</Label>
+            <Input type="date" value={formData.due_date} onChange={(e) => set({ due_date: e.target.value })} required />
+          </div>
+        </div>
 
-    const addLineItem = () => {
-        setFormData(prev => ({
-            ...prev,
-            line_items: [...prev.line_items, { 
-                product_id: '', 
-                product_name: '', 
-                batch_number: '', 
-                expiry_date: '', 
-                quantity: 1, 
-                unit_price: 0, 
-                tax_rate: 0, 
-                tax_amount: 0, 
-                total: 0 
-            }]
-        }));
-    };
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label>Supplier</Label>
+            <Input list="supplier-list" value={formData.supplier_name} onChange={(e) => set({ supplier_name: e.target.value })} placeholder="Type or pick a supplier" required />
+            <datalist id="supplier-list">
+              {suppliers.map((s) => <option key={s.id} value={s.name} />)}
+            </datalist>
+          </div>
+          <div>
+            <Label><Link2 className="inline h-3.5 w-3.5 mr-1" />Link to PO (pre-fill lines)</Label>
+            <Select value={formData.linked_po_id || 'none'} onValueChange={linkToPO}>
+              <SelectTrigger><SelectValue placeholder="No PO link" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No PO link</SelectItem>
+                {purchaseOrders.map((po) => (
+                  <SelectItem key={po.id} value={po.id}>{po.po_number || 'PO'} — {po.vendor || 'vendor'}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
-    const updateLineItem = (index, field, value) => {
-        const updatedItems = [...formData.line_items];
-        updatedItems[index][field] = value;
-
-        if (field === 'product_id') {
-            const product = products.find(p => p.id === value);
-            if (product) {
-                updatedItems[index].product_name = product.name;
-                updatedItems[index].unit_price = product.purchase_price;
-                updatedItems[index].tax_rate = product.tax_rate || 0;
-            }
-        }
-
-        if (field === 'quantity' || field === 'unit_price' || field === 'tax_rate') {
-            const item = updatedItems[index];
-            const subtotal = item.quantity * item.unit_price;
-            item.tax_amount = (subtotal * item.tax_rate) / 100;
-            item.total = subtotal + item.tax_amount;
-        }
-
-        const subtotal = updatedItems.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
-        const tax_amount = updatedItems.reduce((sum, item) => sum + item.tax_amount, 0);
-        const total_amount = subtotal + tax_amount;
-
-        setFormData(prev => ({
-            ...prev,
-            line_items: updatedItems,
-            subtotal,
-            tax_amount,
-            total_amount
-        }));
-    };
-
-    const removeLineItem = (index) => {
-        const updatedItems = formData.line_items.filter((_, i) => i !== index);
-        const subtotal = updatedItems.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
-        const tax_amount = updatedItems.reduce((sum, item) => sum + item.tax_amount, 0);
-        const total_amount = subtotal + tax_amount;
-        
-        setFormData(prev => ({
-            ...prev,
-            line_items: updatedItems,
-            subtotal,
-            tax_amount,
-            total_amount
-        }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSave(formData);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <CardHeader className="bg-slate-50">
-                <CardTitle>{invoice ? 'Edit Purchase Invoice' : 'Create New Purchase Invoice'}</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <Label>Invoice Number</Label>
-                        <Input name="invoice_number" value={formData.invoice_number} onChange={handleInputChange} required />
-                    </div>
-                    <div>
-                        <Label>Invoice Date</Label>
-                        <Input type="date" name="invoice_date" value={formData.invoice_date} onChange={handleInputChange} required />
-                    </div>
-                    <div>
-                        <Label>Due Date</Label>
-                        <Input type="date" name="due_date" value={formData.due_date} onChange={handleInputChange} required />
-                    </div>
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <Label>Line Items</Label>
+            <Button type="button" size="sm" onClick={addLine}><Plus className="w-4 h-4 mr-1" /> Add Item</Button>
+          </div>
+          <div className="space-y-2">
+            {formData.line_items.map((item, idx) => (
+              <div key={idx} className="grid grid-cols-12 gap-2 items-end border-b border-slate-100 pb-2">
+                <div className="col-span-12 md:col-span-4">
+                  <Label className="text-[10px]">Description</Label>
+                  <Input value={item.description} onChange={(e) => updateLine(idx, 'description', e.target.value)} placeholder="Free text or pick below" />
+                  <Input list="ratecard-list" value="" onChange={(e) => e.target.value && pickRateCard(idx, e.target.value)} placeholder="Pick from Rate Card" className="mt-1 text-xs h-8" />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <Label>Supplier Name</Label>
-                        <Input name="supplier_name" value={formData.supplier_name} onChange={handleInputChange} required />
-                    </div>
-                    <div>
-                        <Label>Supplier Email</Label>
-                        <Input type="email" name="supplier_email" value={formData.supplier_email} onChange={handleInputChange} />
-                    </div>
-                    <div>
-                        <Label>Warehouse</Label>
-                        <Select value={formData.warehouse_id} onValueChange={(val) => setFormData(prev => ({...prev, warehouse_id: val}))}>
-                            <SelectTrigger><SelectValue placeholder="Select warehouse" /></SelectTrigger>
-                            <SelectContent>
-                                {warehouses.map(w => <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                <div className="col-span-3 md:col-span-2">
+                  <Label className="text-[10px]">Qty</Label>
+                  <Input type="number" value={item.quantity} onChange={(e) => updateLine(idx, 'quantity', parseFloat(e.target.value) || 0)} />
                 </div>
-
-                <div>
-                    <div className="flex justify-between items-center mb-2">
-                        <Label>Line Items</Label>
-                        <Button type="button" size="sm" onClick={addLineItem}><Plus className="w-4 h-4 mr-1" /> Add Item</Button>
-                    </div>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Product</TableHead>
-                                <TableHead>Batch</TableHead>
-                                <TableHead>Expiry</TableHead>
-                                <TableHead>Qty</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>Tax %</TableHead>
-                                <TableHead>Total</TableHead>
-                                <TableHead></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {formData.line_items.map((item, idx) => {
-                                const product = products.find(p => p.id === item.product_id);
-                                return (
-                                    <TableRow key={idx}>
-                                        <TableCell>
-                                            <Select value={item.product_id} onValueChange={(val) => updateLineItem(idx, 'product_id', val)}>
-                                                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                                                <SelectContent>
-                                                    {products.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                                                </SelectContent>
-                                            </Select>
-                                        </TableCell>
-                                        <TableCell>
-                                            {product?.track_batches ? (
-                                                <Input placeholder="Batch #" value={item.batch_number} onChange={(e) => updateLineItem(idx, 'batch_number', e.target.value)} />
-                                            ) : '-'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {product?.track_batches ? (
-                                                <Input type="date" value={item.expiry_date} onChange={(e) => updateLineItem(idx, 'expiry_date', e.target.value)} />
-                                            ) : '-'}
-                                        </TableCell>
-                                        <TableCell><Input type="number" value={item.quantity} onChange={(e) => updateLineItem(idx, 'quantity', parseFloat(e.target.value) || 0)} /></TableCell>
-                                        <TableCell><Input type="number" step="0.01" value={item.unit_price} onChange={(e) => updateLineItem(idx, 'unit_price', parseFloat(e.target.value) || 0)} /></TableCell>
-                                        <TableCell><Input type="number" step="0.01" value={item.tax_rate} onChange={(e) => updateLineItem(idx, 'tax_rate', parseFloat(e.target.value) || 0)} /></TableCell>
-                                        <TableCell>${item.total.toFixed(2)}</TableCell>
-                                        <TableCell><Button type="button" variant="ghost" size="icon" onClick={() => removeLineItem(idx)}><Trash2 className="w-4 h-4" /></Button></TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
+                <div className="col-span-3 md:col-span-1">
+                  <Label className="text-[10px]">Unit</Label>
+                  <Input value={item.unit} onChange={(e) => updateLine(idx, 'unit', e.target.value)} />
                 </div>
-
-                <div className="flex justify-end">
-                    <div className="w-64 space-y-2">
-                        <div className="flex justify-between"><span>Subtotal:</span><span className="font-semibold">${formData.subtotal.toFixed(2)}</span></div>
-                        <div className="flex justify-between"><span>Tax:</span><span className="font-semibold">${formData.tax_amount.toFixed(2)}</span></div>
-                        <div className="flex justify-between text-lg font-bold border-t pt-2"><span>Total:</span><span>${formData.total_amount.toFixed(2)}</span></div>
-                    </div>
+                <div className="col-span-3 md:col-span-2">
+                  <Label className="text-[10px]">Price</Label>
+                  <Input type="number" step="0.01" value={item.unit_price} onChange={(e) => updateLine(idx, 'unit_price', parseFloat(e.target.value) || 0)} />
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <Label>Payment Terms</Label>
-                        <Input name="payment_terms" value={formData.payment_terms} onChange={handleInputChange} />
-                    </div>
-                    <div>
-                        <Label>Status</Label>
-                        <Select value={formData.status} onValueChange={(val) => setFormData(prev => ({...prev, status: val}))}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Draft">Draft</SelectItem>
-                                <SelectItem value="Received">Received</SelectItem>
-                                <SelectItem value="Paid">Paid</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+                <div className="col-span-2 md:col-span-2">
+                  <Label className="text-[10px]">Total</Label>
+                  <p className="text-sm font-semibold pt-2">${(item.total || 0).toFixed(2)}</p>
                 </div>
-
-                <div>
-                    <Label>Notes</Label>
-                    <Textarea name="notes" value={formData.notes} onChange={handleInputChange} />
+                <div className="col-span-1 flex justify-end">
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removeLine(idx)}><Trash2 className="w-4 h-4" /></Button>
                 </div>
-            </CardContent>
-            <CardFooter className="bg-slate-50 flex justify-end gap-3">
-                <Button type="button" variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" /> Cancel</Button>
-                <Button type="submit" className="bg-gradient-to-r from-emerald-500 to-emerald-600"><Save className="w-4 h-4 mr-2" /> Save</Button>
-            </CardFooter>
-        </form>
-    );
+              </div>
+            ))}
+            {formData.line_items.length === 0 && <p className="text-xs text-slate-400">No line items yet. Add one or link a PO.</p>}
+          </div>
+          <datalist id="ratecard-list">
+            {rateCards.map((r) => <option key={r.id} value={r.item_name} />)}
+          </datalist>
+        </div>
+
+        <div className="flex justify-end">
+          <div className="w-64 space-y-2">
+            <div className="flex justify-between items-center"><span>Subtotal:</span><span className="font-semibold">${(formData.subtotal || 0).toFixed(2)}</span></div>
+            <div className="flex justify-between items-center"><span>Tax:</span>
+              <Input type="number" step="0.01" value={formData.tax_amount || 0} onChange={(e) => set(recalc(formData.line_items, e.target.value))} className="w-24 h-8 text-right" />
+            </div>
+            <div className="flex justify-between text-lg font-bold border-t pt-2"><span>Total:</span><span>${(formData.total_amount || 0).toFixed(2)}</span></div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Payment Terms</Label>
+            <Input value={formData.payment_terms} onChange={(e) => set({ payment_terms: e.target.value })} />
+          </div>
+          <div>
+            <Label>Status</Label>
+            <Select value={formData.status} onValueChange={(v) => set({ status: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Draft">Draft</SelectItem>
+                <SelectItem value="Received">Received</SelectItem>
+                <SelectItem value="Paid">Paid</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div>
+          <Label>Notes</Label>
+          <Textarea value={formData.notes} onChange={(e) => set({ notes: e.target.value })} />
+        </div>
+      </CardContent>
+      <CardFooter className="bg-slate-50 flex justify-end gap-3">
+        <Button type="button" variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" /> Cancel</Button>
+        <Button type="submit"><Save className="w-4 h-4 mr-2" /> Save</Button>
+      </CardFooter>
+    </form>
+  );
 }
