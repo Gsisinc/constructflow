@@ -227,67 +227,59 @@ export default function MegaMenu({ isOpen, onClose, userRole }) {
 
   return (
     <>
-      {/* Overlay */}
+      {/* Click-outside catcher (light tint, no full-page modal) */}
       <div
-        className="fixed inset-0 z-40 bg-navy-900/60 backdrop-blur-[2px]"
+        className="fixed inset-0 z-40 bg-navy-900/10"
         aria-hidden="true"
         onClick={onClose}
       />
 
-      {/* Quick Access panel */}
-      <div className="fixed left-0 right-0 top-14 sm:top-16 lg:left-64 lg:right-0 z-50 bg-slate-50 border-b border-navy-100 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto shadow-2xl" role="dialog" aria-modal="true" aria-label="Quick access navigation">
-        {/* Navy header band */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-navy-900 to-navy-700 text-white shadow-md">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="h-10 w-10 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center flex-shrink-0">
-                  <LayoutGrid className="h-5 w-5 text-gold-500" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Quick Access</h2>
-                  <p className="text-sm text-navy-200 mt-0.5 truncate">{subtitle}</p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="h-10 w-10 rounded-full flex items-center justify-center text-navy-200 hover:text-white hover:bg-white/10 transition-all active:scale-95 flex-shrink-0"
-                title="Close menu"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            {/* Search / filter */}
-            <div className="relative mt-4">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-300 pointer-events-none" />
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Filter features..."
-                aria-label="Filter features"
-                className="w-full sm:max-w-md h-10 pl-9 pr-3 rounded-lg bg-white/10 text-white placeholder:text-navy-300 ring-1 ring-white/20 focus:ring-2 focus:ring-gold-500 focus:bg-white/15 outline-none text-sm transition"
-              />
-            </div>
+      {/* Quick Access dropdown panel: anchored below the top bar, right-aligned; full width on mobile */}
+      <div
+        className="fixed z-50 top-14 sm:top-16 left-0 right-0 sm:left-auto sm:right-3 sm:w-[min(960px,calc(100vw-24px))] max-h-[75vh] flex flex-col bg-slate-50 border border-navy-100 sm:rounded-b-xl sm:rounded-t-none shadow-2xl overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Quick access navigation"
+      >
+        {/* Navy header band (~44px) */}
+        <div className="flex-shrink-0 h-11 flex items-center gap-2 px-3 bg-gradient-to-r from-navy-900 to-navy-700 text-white">
+          <LayoutGrid className="h-4 w-4 text-gold-500 flex-shrink-0" />
+          <h2 className="text-[13px] font-bold tracking-tight whitespace-nowrap">Quick Access</h2>
+          <span className="hidden md:inline text-[11px] text-navy-200 truncate">{subtitle}</span>
+          <div className="relative ml-auto w-40 sm:w-56">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-navy-300 pointer-events-none" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Filter features..."
+              aria-label="Filter features"
+              className="w-full h-7 pl-7 pr-2 rounded-md bg-white/10 text-white placeholder:text-navy-300 ring-1 ring-white/20 focus:ring-2 focus:ring-gold-500 focus:bg-white/15 outline-none text-[12px] transition"
+            />
           </div>
+          <button
+            onClick={onClose}
+            className="h-7 w-7 rounded-full flex items-center justify-center text-navy-200 hover:text-white hover:bg-white/10 transition-colors flex-shrink-0"
+            title="Close menu"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
 
-        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <div className="overflow-y-auto p-2">
           {filteredSections.length === 0 ? (
-            <p className="text-sm text-slate-500 text-center py-10">No features match &ldquo;{query}&rdquo;.</p>
+            <p className="text-[13px] text-slate-500 text-center py-4">No features match &ldquo;{query}&rdquo;.</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1.5 items-start">
               {filteredSections.map((section) => {
                 const SectionIcon = section.items[0]?.icon || LayoutGrid;
                 return (
-                  <div key={section.title} className="bg-white rounded-xl border border-navy-100 border-t-4 border-t-navy-700 p-4 shadow-sm hover:shadow-lg hover:border-navy-200 transition-all">
-                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-navy-50">
-                      <div className="h-7 w-7 rounded-lg bg-navy-50 text-navy-700 flex items-center justify-center flex-shrink-0">
-                        <SectionIcon className="h-4 w-4" />
-                      </div>
-                      <h3 className="text-xs font-bold text-navy-900 uppercase tracking-wider">{section.title}</h3>
+                  <div key={section.title} className="bg-white rounded-md border border-navy-100 border-t-2 border-t-navy-700 px-1.5 py-1">
+                    <div className="flex items-center gap-1.5 px-1 pb-1 mb-0.5 border-b border-navy-50">
+                      <SectionIcon className="h-3.5 w-3.5 text-gold-500 flex-shrink-0" />
+                      <h3 className="text-[10px] font-bold text-navy-900 uppercase tracking-wider truncate">{section.title}</h3>
                     </div>
-                    <div className="space-y-0.5">
+                    <div>
                       {section.items.map((item, itemIdx) => {
                         const Icon = item.icon;
                         return (
@@ -295,11 +287,9 @@ export default function MegaMenu({ isOpen, onClose, userRole }) {
                             key={itemIdx}
                             to={createPageUrl(item.page)}
                             onClick={onClose}
-                            className="flex items-center gap-2.5 px-2 py-2 text-sm font-medium text-slate-700 hover:text-navy-900 hover:bg-navy-50 rounded-lg transition-colors group"
+                            className="flex items-center gap-1.5 px-1 py-1 text-[13px] leading-tight text-slate-700 hover:text-navy-900 hover:bg-navy-50 rounded transition-colors group"
                           >
-                            <div className="h-6 w-6 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center group-hover:bg-navy-700 group-hover:text-white transition-colors flex-shrink-0">
-                              <Icon className="h-3.5 w-3.5" />
-                            </div>
+                            <Icon className="h-3.5 w-3.5 text-slate-400 group-hover:text-navy-700 flex-shrink-0" />
                             <span className="truncate">{item.label}</span>
                           </Link>
                         );
