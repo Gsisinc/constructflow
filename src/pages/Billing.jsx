@@ -78,8 +78,8 @@ export default function Billing() {
                     <th className="pb-2 font-semibold text-right">Contract</th>
                     <th className="pb-2 font-semibold text-right">Billed</th>
                     <th className="pb-2 font-semibold text-right">Retention Held</th>
-                    <th className="pb-2 font-semibold text-right">Outstanding</th>
-                    <th className="pb-2 font-semibold">Status</th>
+                    <th className="pb-2 font-semibold text-right pr-6">Outstanding</th>
+                    <th className="pb-2 font-semibold pl-4">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -89,8 +89,8 @@ export default function Billing() {
                       <td className="py-3 text-right">{fmt(r.contract)}</td>
                       <td className="py-3 text-right">{fmt(r.billed)}</td>
                       <td className="py-3 text-right text-slate-500">{fmt(r.retention)}</td>
-                      <td className="py-3 text-right font-medium text-amber-600">{fmt(r.outstanding)}</td>
-                      <td className="py-3">
+                      <td className="py-3 text-right font-medium text-amber-600 pr-6">{fmt(r.outstanding)}</td>
+                      <td className="py-3 pl-4">
                         <Badge className={r.billStatus === 'complete' ? 'bg-green-100 text-green-700' : r.billStatus === 'partial' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}>
                           {r.billStatus}
                         </Badge>
