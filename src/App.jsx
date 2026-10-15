@@ -9,6 +9,7 @@ import PageNotFound from './lib/PageNotFound';
 import DashboardPage from './pages/DashboardImproved';
 import EstimatorWizard from './pages/EstimatorWizard';
 import WIPReport from './pages/WIPReport';
+import OwnerActionItems from './pages/OwnerActionItems';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -211,6 +212,13 @@ const AuthenticatedApp = () => {
         <RoleGuard pageName="WIPReport">
           <LayoutWrapper currentPageName="WIPReport">
             <WIPReport />
+          </LayoutWrapper>
+        </RoleGuard>
+      } />
+      <Route path="/OwnerActionItems" element={
+        <RoleGuard pageName="OwnerActionItems">
+          <LayoutWrapper currentPageName="OwnerActionItems">
+            <OwnerActionItems />
           </LayoutWrapper>
         </RoleGuard>
       } />

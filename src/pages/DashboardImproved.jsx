@@ -25,6 +25,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, isWithinInterval, addDays, startOfDay } from 'date-fns';
+import OwnerActionItemsPanel from '@/components/dashboard/OwnerActionItemsPanel';
 
 const NAVY = '#0F1B2D';
 const GOLD = '#E8B547';
@@ -249,6 +250,9 @@ export default function Dashboard() {
         <KpiCard title="Upcoming Milestones" value={upcomingTasks.length} sub="next 7 days" icon={CalendarClock} loading={loadingTasks} />
         <KpiCard title="Bids in Pipeline" value={pipelineCount} sub={`${fmtCompact(pipelineValue)} value`} icon={Briefcase} loading={loadingBids} />
       </div>
+
+      {/* Owner Action Items */}
+      <OwnerActionItemsPanel />
 
       {/* All Jobs table */}
       <Card className="bg-white border-slate-200 shadow-sm">

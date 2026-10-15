@@ -1,0 +1,78 @@
+{
+  "name": "OwnerActionItem",
+  "type": "object",
+  "description": "Owner/admin action item from Kemar's master list (accounts, setup, decisions, approvals)",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "Organization this item belongs to"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short action title"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Accounts",
+        "Licensing/NICET",
+        "Decisions",
+        "Approvals",
+        "Other"
+      ],
+      "default": "Other",
+      "description": "Accounts, Licensing/NICET, Decisions, Approvals, Other"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Open",
+        "In Progress",
+        "Waiting",
+        "Done"
+      ],
+      "default": "Open",
+      "description": "Open, In Progress, Waiting, Done"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Person responsible for this item"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Due date (optional)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Full detail / context for this item"
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0,
+      "description": "Preserves seed ordering"
+    }
+  },
+  "required": [
+    "title",
+    "category"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
