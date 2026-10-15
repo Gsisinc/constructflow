@@ -10,6 +10,10 @@ import { useNavigate } from 'react-router-dom';
 
 const safe = (n) => (Number.isFinite(n) ? Number(n) : 0);
 const money = (n) => '$' + safe(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+const signedMoney = (n) => {
+  const v = safe(n);
+  return v < 0 ? '($' + Math.abs(v).toLocaleString(undefined, { maximumFractionDigits: 0 }) + ')' : money(v);
+};
 
 export default function WIPReport() {
   const { user } = useAuth();
@@ -51,7 +55,7 @@ export default function WIPReport() {
       : safe(p.progress);
     const earned = contract * (pctComplete / 100);
     const billed = safe(billedByProject[p.id]);
-    const overUnder = earned - billed;
+    const overUnder = billed - earned;
     const eac = costToDate + safe(p.committed_costs) + safe(p.cost_to_complete);
     return { id: p.id, name: p.name, client: p.client_name, contract, costToDate, pctComplete, earned, billed, overUnder, eac };
   });
@@ -79,7 +83,7 @@ export default function WIPReport() {
         <KPI label="Cost to Date" value={money(totals.costToDate)} />
         <KPI label="Earned Revenue" value={money(totals.earned)} />
         <KPI label="Billed" value={money(totals.billed)} />
-        <KPI label="Over/(Under) Billing" value={money(totals.overUnder)} tone={totals.overUnder < 0 ? 'red' : totals.overUnder > 0 ? 'amber' : 'green'} />
+        <KPI label="Over/(Under) Billing" value={signedMoney(totals.overUnder)} tone={totals.overUnder < 0 ? 'red' : totals.overUnder > 0 ? 'amber' : 'green'} />
       </div>
 
       <Card>
@@ -116,7 +120,7 @@ export default function WIPReport() {
                       <td className="py-3 text-right">{r.pctComplete.toFixed(0)}%</td>
                       <td className="py-3 text-right">{money(r.earned)}</td>
                       <td className="py-3 text-right">{money(r.billed)}</td>
-                      <td className={'py-3 text-right font-medium ' + (r.overUnder < 0 ? 'text-red-600' : r.overUnder > 0 ? 'text-amber-600' : 'text-slate-600')}>{money(r.overUnder)}</td>
+                      <td className={'py-3 text-right font-medium ' + (r.overUnder < 0 ? 'text-red-600' : r.overUnder > 0 ? 'text-amber-600' : 'text-slate-600')}>{signedMoney(r.overUnder)}</td>
                       <td className="py-3 text-right text-slate-600">{money(r.eac)}</td>
                     </tr>
                   ))}
