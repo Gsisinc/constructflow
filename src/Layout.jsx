@@ -164,7 +164,7 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
       className={cn(
         "group flex items-center gap-3 px-4 py-2.5 rounded-r-lg text-sm font-medium transition-all duration-200 min-h-[44px] border-l-[3px]",
         isActive
-          ? "bg-[#C9A227]/10 text-white font-semibold border-[#C9A227] shadow-sm"
+          ? "bg-[#16335C] text-white font-semibold border-[#C9A227] shadow-sm"
           : "text-white/70 border-transparent hover:bg-white/5 hover:text-white"
       )}
     >

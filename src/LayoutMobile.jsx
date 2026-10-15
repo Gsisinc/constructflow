@@ -321,8 +321,8 @@ export default function Layout({ children, currentPageName }) {
                   className={cn(
                     "flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 min-h-[40px] select-none",
                     isActive
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                      : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                      ? "bg-[#16335C] text-white shadow-md border-l-[3px] border-[#C9A227]"
+                      : "text-slate-300 hover:bg-slate-700/50 hover:text-white border-l-[3px] border-transparent"
                   )}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
@@ -346,8 +346,8 @@ export default function Layout({ children, currentPageName }) {
                       className={cn(
                         "flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 min-h-[40px] select-none",
                         isActive
-                          ? "bg-purple-600 text-white shadow-md"
-                          : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                          ? "bg-[#16335C] text-white shadow-md border-l-[3px] border-[#C9A227]"
+                          : "text-slate-300 hover:bg-slate-700/50 hover:text-white border-l-[3px] border-transparent"
                       )}
                     >
                       <Icon className="h-4 w-4 flex-shrink-0" />
