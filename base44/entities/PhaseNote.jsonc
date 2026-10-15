@@ -49,7 +49,6 @@
   },
   "required": [
     "project_id",
-    "phase_name",
     "content"
   ]
 }
