@@ -22,6 +22,9 @@ import BidDetailsEditor from '@/components/bids/BidDetailsEditor';
 import BidDrawings from '@/components/bids/BidDrawings';
 import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
 import BidPhaseWorkspace from '@/components/bids/BidPhaseWorkspace';
+import BidStatusSelect from '@/components/bids/BidStatusSelect';
+import EstimateEditor from '@/components/bids/EstimateEditor';
+import { convertBidToProject } from '@/lib/bidConversion';
 
 const statusColors = {
   review: 'bg-blue-100 text-blue-800',
@@ -85,6 +88,26 @@ export default function BidDetail() {
     onError: () => toast.error('Unable to delete bid')
   });
 
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.BidOpportunity.update(id, { status }),
+    onSuccess: async (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+      toast.success('Status updated');
+      if (vars.status === 'won') {
+        const fresh = (await base44.entities.BidOpportunity.filter({ id: vars.id }))?.[0];
+        if (fresh && !fresh.linked_project_id) {
+          try {
+            const res = await convertBidToProject({ base44Client: base44, bid: fresh, organizationId: user.organization_id });
+            queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+            queryClient.invalidateQueries({ queryKey: ['projects'] });
+            toast.success(res.already_exists ? 'Project already exists' : 'Awarded — project auto-created');
+          } catch (e) { toast.error('Auto-create project failed: ' + (e.message || '')); }
+        }
+      }
+    },
+    onError: (e) => toast.error('Status update failed: ' + (e.message || ''))
+  });
+
   const analysis = useMemo(() => normalizeAiAnalysis(bid?.ai_analysis, documents), [bid?.ai_analysis, documents]);
 
   if (!bid || !user) {
@@ -112,7 +135,14 @@ export default function BidDetail() {
         </div>
 
         <div className="flex gap-2">
-          {bid.status === 'won' && <BidToProject bid={bid} organizationId={user.organization_id} />}
+          {bid.linked_project_id ? (
+            <Button onClick={() => navigate(createPageUrl('ProjectDetail') + `?id=${bid.linked_project_id}`)} className="gap-2">
+              <ArrowLeft className="h-4 w-4 rotate-180" />
+              View Project
+            </Button>
+          ) : bid.status === 'won' ? (
+            <BidToProject bid={bid} organizationId={user.organization_id} />
+          ) : null}
           <Button
             variant="outline"
             size="icon"
@@ -134,9 +164,12 @@ export default function BidDetail() {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <FileText className="h-8 w-8 text-purple-600" />
-              <div>
-                <p className="text-xs text-slate-500">Status</p>
-                <Badge className={statusColors[bid.status] || 'bg-slate-100 text-slate-700'}>{bid.status || 'new'}</Badge>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-slate-500 mb-1">Status</p>
+                <div className="flex items-center gap-2">
+                  <Badge className={statusColors[bid.status] || 'bg-slate-100 text-slate-700'}>{(bid.status || 'new').replace('_', ' ')}</Badge>
+                  <BidStatusSelect value={bid.status} onChange={(v) => statusMutation.mutate({ id: bid.id, status: v })} className="h-8 w-[150px]" />
+                </div>
               </div>
             </div>
           </CardContent>
@@ -148,6 +181,7 @@ export default function BidDetail() {
           <TabsTrigger value="overview" className="flex-shrink-0">Overview</TabsTrigger>
           <TabsTrigger value="phases" className="flex-shrink-0">Phases/Stages</TabsTrigger>
           <TabsTrigger value="boq" className="flex-shrink-0">BOQ</TabsTrigger>
+          <TabsTrigger value="estimate" className="flex-shrink-0">Estimate</TabsTrigger>
           <TabsTrigger value="requirements" className="flex-shrink-0">Requirements</TabsTrigger>
           <TabsTrigger value="documents" className="flex-shrink-0">Documents</TabsTrigger>
           <TabsTrigger value="bid-drawings" className="flex-shrink-0">Drawings</TabsTrigger>
@@ -231,6 +265,10 @@ export default function BidDetail() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="estimate" className="space-y-4">
+          <EstimateEditor bidId={bid.id} organizationId={user.organization_id} bidTitle={bid.title || bid.project_name || 'Bid'} />
         </TabsContent>
 
         <TabsContent value="requirements" className="space-y-4">

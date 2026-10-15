@@ -436,7 +436,7 @@ export default function Bids() {
             <Card 
               key={bid.id} 
               className="premium-card border-none group cursor-pointer"
-              onClick={() => navigate(createPageUrl('BidOpportunityDetail') + `?id=${bid.id}`)}
+              onClick={() => navigate(createPageUrl('BidDetail') + `?id=${bid.id}`)}
             >
               <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row md:items-center justify-between p-6 gap-6">

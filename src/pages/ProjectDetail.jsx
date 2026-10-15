@@ -294,7 +294,7 @@ export default function ProjectDetail() {
             </div>
             <div className="flex gap-2 w-full sm:w-auto flex-wrap">
               {project.linked_bid_id && (
-                <Link to={createPageUrl('BidOpportunityDetail') + `?id=${project.linked_bid_id}`}>
+                <Link to={createPageUrl('BidDetail') + `?id=${project.linked_bid_id}`}>
                   <Button variant="outline" className="flex-1 sm:flex-none text-sm">
                     <FileText className="h-4 w-4 mr-1 sm:mr-2" />
                     Source Bid

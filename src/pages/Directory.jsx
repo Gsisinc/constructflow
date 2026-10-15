@@ -993,7 +993,7 @@ export default function Directory() {
                         <ul className="space-y-1">
                           {bidsForSelectedPerson.map((bid) => (
                             <li key={bid.id}>
-                              <Link to={createPageUrl('BidOpportunityDetail') + '?id=' + bid.id} className="text-amber-600 hover:underline font-medium block truncate">
+                              <Link to={createPageUrl('BidDetail') + '?id=' + bid.id} className="text-amber-600 hover:underline font-medium block truncate">
                                 {bid.title || bid.project_name || 'Untitled bid'}
                               </Link>
                               {bid.status && <span className="text-xs text-slate-500">({bid.status})</span>}
