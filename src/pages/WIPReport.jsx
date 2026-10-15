@@ -8,12 +8,9 @@ import { Loader2 } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import { useNavigate } from 'react-router-dom';
 
+import { fmtMoney as money, signedMoney, roundCents } from '@/lib/money';
+
 const safe = (n) => (Number.isFinite(n) ? Number(n) : 0);
-const money = (n) => '$' + safe(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-const signedMoney = (n) => {
-  const v = safe(n);
-  return v < 0 ? '($' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ')' : money(v);
-};
 
 export default function WIPReport() {
   const { user } = useAuth();
@@ -53,9 +50,9 @@ export default function WIPReport() {
     const pctComplete = sovLines.length
       ? (sovLines.reduce((s, l) => s + safe(l.scheduled_value) * (safe(l.percent_complete) / 100), 0) / Math.max(1, sovScheduled)) * 100
       : safe(p.progress);
-    const earned = contract * (pctComplete / 100);
-    const billed = safe(billedByProject[p.id]);
-    const overUnder = billed - earned;
+    const earned = roundCents(contract * (pctComplete / 100));
+    const billed = roundCents(safe(billedByProject[p.id]));
+    const overUnder = roundCents(billed - earned);
     const eac = costToDate + safe(p.committed_costs) + safe(p.cost_to_complete);
     return { id: p.id, name: p.name, client: p.client_name, contract, costToDate, pctComplete, earned, billed, overUnder, eac };
   });
@@ -65,7 +62,7 @@ export default function WIPReport() {
     costToDate: rows.reduce((s, r) => s + r.costToDate, 0),
     earned: rows.reduce((s, r) => s + r.earned, 0),
     billed: rows.reduce((s, r) => s + r.billed, 0),
-    overUnder: rows.reduce((s, r) => s + r.overUnder, 0),
+    overUnder: roundCents(rows.reduce((s, r) => s + r.overUnder, 0)),
   };
 
   const isLoading = lp || li;

@@ -59,7 +59,11 @@ const ACTIVE_STATUSES = ['awarded', 'in_progress'];
 const PIPELINE_STATUSES = ['review', 'intake', 'off_pricing', 'user_analyzing', 'estimated', 'submitted'];
 const OPEN_PO_STATUSES = ['draft', 'sent', 'acknowledged', 'partially_received'];
 
-const fmtMoney = (n) => (n ? '$' + Math.round(n).toLocaleString('en-US') : '$0');
+const fmtMoney = (n) => {
+  const v = Number.isFinite(n) ? Number(n) : 0;
+  const cents = Math.round(v * 100) / 100;
+  return '$' + cents.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
 const fmtCompact = (n) => {
   if (!n) return '$0';
   if (Math.abs(n) >= 1e6) return '$' + (n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1) + 'M';

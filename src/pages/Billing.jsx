@@ -10,7 +10,11 @@ import { createPageUrl } from '@/utils';
 import { useNavigate } from 'react-router-dom';
 
 const safe = (n) => (Number.isFinite(n) ? n : 0);
-const fmt = (n) => `$${safe(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+const fmt = (n) => {
+  const v = Number.isFinite(n) ? Number(n) : 0;
+  const cents = Math.round(v * 100) / 100;
+  return '$' + cents.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
 
 export default function Billing() {
   const [search, setSearch] = useState('');
