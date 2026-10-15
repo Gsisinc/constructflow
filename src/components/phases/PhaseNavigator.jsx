@@ -59,7 +59,10 @@ export default function PhaseNavigator({
       customPhaseId: cp.id
     }));
   
-  const currentPhaseIndex = PHASES.findIndex(p => p.id === currentPhase);
+  // current_phase may be a legacy value (e.g. 'preconstruction') that isn't one of
+  // the carried custom phases. Clamp to the first carried phase so the navigator
+  // shows the carried records instead of an empty/undefined current phase.
+  const currentPhaseIndex = Math.max(0, PHASES.findIndex(p => p.id === currentPhase));
 
   const deleteCustomPhaseMutation = useMutation({
     mutationFn: (customPhaseId) => base44.entities.CustomPhase.delete(customPhaseId),
@@ -172,7 +175,7 @@ export default function PhaseNavigator({
             <span className="sm:hidden">New</span>
           </Button>
           <Badge className="bg-navy-100 text-navy-700 whitespace-nowrap">
-            Current: {PHASES.find(p => p.id === currentPhase)?.label}
+            Current: {PHASES[currentPhaseIndex]?.label}
           </Badge>
         </div>
       </div>
@@ -184,7 +187,7 @@ export default function PhaseNavigator({
           <div className="absolute top-6 left-6 right-6 h-1 bg-slate-200 rounded-full">
             <div 
               className="h-full bg-gradient-to-r from-navy-700 to-gold-500 rounded-full transition-all duration-500"
-              style={{ width: `${(currentPhaseIndex / (PHASES.length - 1)) * 100}%` }}
+              style={{ width: `${PHASES.length > 1 ? (currentPhaseIndex / (PHASES.length - 1)) * 100 : 100}%` }}
             />
           </div>
 
@@ -319,7 +322,7 @@ export default function PhaseNavigator({
           <div>
             <p className="text-sm text-navy-700 font-medium">Current Phase</p>
             <p className="text-lg font-semibold text-slate-900">
-              {PHASES.find(p => p.id === currentPhase)?.label}
+              {PHASES[currentPhaseIndex]?.label}
             </p>
           </div>
           <div className="text-right">

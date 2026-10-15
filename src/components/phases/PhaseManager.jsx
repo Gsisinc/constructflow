@@ -40,6 +40,17 @@ export default function PhaseManager({ projectId, currentPhase }) {
     if (currentPhase) return currentPhase;
     return allPhases.length > 0 ? allPhases[0].value : null;
   });
+
+  // A freshly converted project keeps current_phase = 'preconstruction', which is
+  // not one of its carried custom phases. Fall back to the first carried phase so
+  // the Phases/Requirements tabs read the same carried records the overview shows.
+  useEffect(() => {
+    if (customPhases.length > 0 && !customPhases.some(p => p.phase_name === selectedPhase && !p.is_hidden)) {
+      const first = customPhases.find(p => !p.is_hidden);
+      if (first) setSelectedPhase(first.phase_name);
+    }
+  }, [customPhases, selectedPhase]);
+
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingPhase, setEditingPhase] = useState(null);
 
