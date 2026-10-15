@@ -28,6 +28,7 @@ import ScheduleOfValuesTab from '../components/projects/ScheduleOfValuesTab';
 import OpsDocsTab from '../components/projects/OpsDocsTab';
 import OpsDocsOverview from '../components/projects/OpsDocsOverview';
 import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
+import ProjectDashboard from '@/components/projects/ProjectDashboard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -366,70 +367,20 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-navy-100">
-              <FileText className="h-5 w-5 text-navy-700" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Tasks</p>
-              <p className="text-xl font-semibold">{completedTasks}/{tasks.length}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-amber-100">
-              <AlertTriangle className="h-5 w-5 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Open Issues</p>
-              <p className="text-xl font-semibold">{openIssues}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-green-100">
-              <DollarSign className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Expenses</p>
-              <p className="text-xl font-semibold">${totalExpenses.toLocaleString()}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <div className="flex items-center gap-3">
-            <div className={cn(
-              "p-2.5 rounded-lg",
-              budgetUsed > 90 ? "bg-red-100" : budgetUsed > 75 ? "bg-amber-100" : "bg-emerald-100"
-            )}>
-              <Clock className={cn(
-                "h-5 w-5",
-                budgetUsed > 90 ? "text-red-600" : budgetUsed > 75 ? "text-amber-600" : "text-emerald-600"
-              )} />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Budget Used</p>
-              <p className="text-xl font-semibold">{budgetUsed.toFixed(0)}%</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Project Dashboard: forecast, countdown, phases view, tracking panels */}
+      <ProjectDashboard
+        project={project}
+        projectId={projectId}
+        customPhases={customPhases}
+        phaseGates={phaseGates}
+        expenses={expenses}
+      />
 
       {/* Company Standards (read-only floors) */}
       <CompanyStandardsFloors />
 
       {/* Latest Ops / Field Docs */}
       <OpsDocsOverview projectId={projectId} customPhases={customPhases} />
-
-      {/* Countdown Timers */}
-      {project.end_date && (
-        <ProjectDeadlines projectId={projectId} />
-      )}
 
       {/* Tabs for detailed views */}
       <Tabs defaultValue="phases" className="w-full sm:w-auto">
