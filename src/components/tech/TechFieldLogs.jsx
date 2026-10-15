@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 const today = () => new Date().toISOString().slice(0, 10);
 const fmtDate = (s) => s ? new Date(String(s).slice(0, 10) + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—';
 
-export default function TechFieldLogs({ user, projects }) {
+export default function TechFieldLogs({ user, projects, targetEmail, targetName, isAdmin }) {
   const qc = useQueryClient();
   const projOptions = projects || [];
 
@@ -31,30 +31,41 @@ export default function TechFieldLogs({ user, projects }) {
   const [mlVehicle, setMlVehicle] = useState('');
 
   const { data: myDailyLogs = [] } = useQuery({
-    queryKey: ['techDailyLogs', user?.email],
+    queryKey: ['techDailyLogs', targetEmail, user?.organization_id],
     queryFn: async () => {
-      if (!user?.email) return [];
-      const res = await base44.entities.DailyLog.filter({ entered_by: user.email }, { sort: '-log_date', limit: 100 });
-      return res?.items || res || [];
+      if (targetEmail) {
+        const res = await base44.entities.DailyLog.filter({ entered_by: targetEmail }, { sort: '-log_date', limit: 100 });
+        return res?.items || res || [];
+      }
+      if (user?.organization_id) {
+        const res = await base44.entities.DailyLog.filter({ organization_id: user.organization_id }, { sort: '-log_date', limit: 100 });
+        return res?.items || res || [];
+      }
+      return [];
     },
-    enabled: !!user?.email,
+    enabled: !!targetEmail || !!user?.organization_id,
   });
 
   const { data: myMileage = [] } = useQuery({
-    queryKey: ['techMileage', user?.email],
+    queryKey: ['techMileage', targetEmail, user?.organization_id],
     queryFn: async () => {
-      if (!user?.email) return [];
-      const res = await base44.entities.VehicleLog.filter({ entered_by: user.email }, { sort: '-log_date', limit: 100 });
-      return res?.items || res || [];
+      if (targetEmail) {
+        const res = await base44.entities.VehicleLog.filter({ entered_by: targetEmail }, { sort: '-log_date', limit: 100 });
+        return res?.items || res || [];
+      }
+      if (user?.organization_id) {
+        const res = await base44.entities.VehicleLog.filter({ organization_id: user.organization_id }, { sort: '-log_date', limit: 100 });
+        return res?.items || res || [];
+      }
+      return [];
     },
-    enabled: !!user?.email,
+    enabled: !!targetEmail || !!user?.organization_id,
   });
 
   const createDaily = useMutation({
     mutationFn: (data) => base44.entities.DailyLog.create(data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['techDailyLogs', user?.email] });
-      qc.invalidateQueries({ queryKey: ['projectDailyLogs'] });
+      qc.invalidateQueries({ queryKey: ['techDailyLogs'] });
       setDlWork(''); setDlNotes('');
       toast.success('Daily log saved');
     },
@@ -64,13 +75,15 @@ export default function TechFieldLogs({ user, projects }) {
   const createMileage = useMutation({
     mutationFn: (data) => base44.entities.VehicleLog.create(data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['techMileage', user?.email] });
-      qc.invalidateQueries({ queryKey: ['projectVehicleLogs'] });
+      qc.invalidateQueries({ queryKey: ['techMileage'] });
       setMlMiles(0); setMlVehicle('');
       toast.success('Mileage entry saved');
     },
     onError: (e) => toast.error('Save failed: ' + (e.message || '')),
   });
+
+  const byEmail = targetEmail || user?.email;
+  const byName = targetName || user?.full_name || user?.email;
 
   const submitDaily = () => {
     if (!dlProject) { toast.error('Select a project'); return; }
@@ -80,8 +93,8 @@ export default function TechFieldLogs({ user, projects }) {
       log_date: dlDate,
       work_performed: dlWork,
       notes: dlNotes,
-      submitted_by: user?.email,
-      entered_by: user?.email,
+      submitted_by: byEmail,
+      entered_by: byEmail,
     });
   };
 
@@ -94,8 +107,8 @@ export default function TechFieldLogs({ user, projects }) {
       log_date: mlDate,
       total_miles: Number(mlMiles) || 0,
       vehicle_name: mlVehicle,
-      driver: user?.full_name || user?.email,
-      entered_by: user?.email,
+      driver: byName,
+      entered_by: byEmail,
       purpose: 'job_site',
     });
   };
@@ -136,7 +149,7 @@ export default function TechFieldLogs({ user, projects }) {
             <Input value={dlNotes} onChange={e => setDlNotes(e.target.value)} className="bg-white/5 border-white/10 text-white" />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400">Entered by {user?.email || '—'}</span>
+            <span className="text-xs text-slate-400">Entered by {byEmail || '—'}</span>
             <Button size="sm" onClick={submitDaily} loading={createDaily.isPending} className="bg-[#CBAE63] text-[#08111F] hover:opacity-95">
               <Plus className="h-4 w-4 mr-1" /> Log
             </Button>
@@ -192,7 +205,7 @@ export default function TechFieldLogs({ user, projects }) {
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400">Entered by {user?.email || '—'}</span>
+            <span className="text-xs text-slate-400">Entered by {byEmail || '—'}</span>
             <Button size="sm" onClick={submitMileage} loading={createMileage.isPending} className="bg-[#CBAE63] text-[#08111F] hover:opacity-95">
               <Plus className="h-4 w-4 mr-1" /> Log
             </Button>

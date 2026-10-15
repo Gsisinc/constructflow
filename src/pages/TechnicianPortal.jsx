@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -35,6 +35,7 @@ import { Badge } from "@/components/ui/badge";
 import ClockIn from "@/components/dashboard/ClockIn";
 import TechFieldLogs from "@/components/tech/TechFieldLogs";
 import MyAssignments from "@/components/tech/MyAssignments";
+import TechSelector from "@/components/tech/TechSelector";
 
 function SectionTitle({ eyebrow, title, right }) {
   return (
@@ -83,6 +84,8 @@ const technicianModules = [
 export default function TechnicianPortal() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const [selectedTech, setSelectedTech] = useState("all");
 
   const { data: worker } = useQuery({
     queryKey: ["techWorker", user?.email],
@@ -110,6 +113,36 @@ export default function TechnicianPortal() {
     },
     enabled: assignedProjectIds.length > 0,
   });
+
+  // Admin/owner view: list every tech in the org and every project so the
+  // portal can show any tech's logs/assignments and populate the project
+  // dropdowns. Default selection is "all techs".
+  const { data: orgWorkers = [] } = useQuery({
+    queryKey: ["orgWorkers", user?.organization_id],
+    queryFn: async () => {
+      if (!user?.organization_id) return [];
+      const res = await base44.entities.Worker.filter({ organization_id: user.organization_id }, { sort: "name", limit: 200 });
+      return res?.items || res || [];
+    },
+    enabled: !!user?.organization_id && isAdmin,
+  });
+
+  const { data: orgProjects = [] } = useQuery({
+    queryKey: ["orgProjectsForTechPortal", user?.organization_id],
+    queryFn: async () => {
+      if (!user?.organization_id) return [];
+      const res = await base44.entities.Project.filter({ organization_id: user.organization_id }, { sort: "-created_date", limit: 200 });
+      return res?.items || res || [];
+    },
+    enabled: !!user?.organization_id && isAdmin,
+  });
+
+  const targetEmail = isAdmin ? (selectedTech === "all" ? null : selectedTech) : user?.email;
+  const targetName =
+    isAdmin && selectedTech !== "all"
+      ? orgWorkers.find((w) => w.email === selectedTech)?.name || null
+      : null;
+  const projectsForLogs = isAdmin ? orgProjects : assignedProjects;
 
   const { data: myTasksRaw = [] } = useQuery({
     queryKey: ["techTasks", worker?.id, user?.organization_id, assignedProjectIds],
@@ -235,6 +268,14 @@ export default function TechnicianPortal() {
                   </div>
                 </CardContent>
               </GlassCard>
+
+              {isAdmin && (
+                <GlassCard className="rounded-[24px]">
+                  <CardContent className="p-4 lg:p-5">
+                    <TechSelector workers={orgWorkers} value={selectedTech} onChange={setSelectedTech} />
+                  </CardContent>
+                </GlassCard>
+              )}
 
               <ClockIn />
 
@@ -409,7 +450,7 @@ export default function TechnicianPortal() {
                   <SectionTitle eyebrow="Field Reporting" title="Daily Logs & Mileage" />
                 </CardHeader>
                 <CardContent>
-                  <TechFieldLogs user={user} projects={assignedProjects} />
+                  <TechFieldLogs user={user} projects={projectsForLogs} targetEmail={targetEmail} targetName={targetName} isAdmin={isAdmin} />
                 </CardContent>
               </GlassCard>
 
@@ -418,7 +459,7 @@ export default function TechnicianPortal() {
                   <SectionTitle eyebrow="Schedule" title="My Assignments" />
                 </CardHeader>
                 <CardContent>
-                  <MyAssignments user={user} />
+                  <MyAssignments user={user} targetEmail={targetEmail} isAdmin={isAdmin} />
                 </CardContent>
               </GlassCard>
             </main>

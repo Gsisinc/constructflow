@@ -10,18 +10,23 @@ import { buildConflictMap, isConflicted } from "@/lib/resourceConflicts";
  * Loads allocations by resource_email === user.email, with org-wide conflict detection.
  * props: user
  */
-export default function MyAssignments({ user }) {
-  const email = user?.email;
+export default function MyAssignments({ user, targetEmail, isAdmin }) {
   const orgId = user?.organization_id;
 
   const { data: mine = [] } = useQuery({
-    queryKey: ["myAssignments", email],
+    queryKey: ["myAssignments", targetEmail, orgId],
     queryFn: async () => {
-      if (!email) return [];
-      const res = await base44.entities.ResourceAllocation.filter({ resource_email: email }, { sort: "start_date", limit: 100 });
-      return res?.items || res || [];
+      if (targetEmail) {
+        const res = await base44.entities.ResourceAllocation.filter({ resource_email: targetEmail }, { sort: "start_date", limit: 100 });
+        return res?.items || res || [];
+      }
+      if (orgId) {
+        const res = await base44.entities.ResourceAllocation.filter({ organization_id: orgId }, { sort: "start_date", limit: 500 });
+        return res?.items || res || [];
+      }
+      return [];
     },
-    enabled: !!email,
+    enabled: !!targetEmail || !!orgId,
   });
 
   const { data: orgAllocations = [] } = useQuery({
@@ -40,7 +45,7 @@ export default function MyAssignments({ user }) {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-sm text-slate-300">{mine.length} assignment{mine.length === 1 ? "" : "s"} on your calendar.</p>
+        <p className="text-sm text-slate-300">{mine.length} assignment{mine.length === 1 ? "" : "s"} {isAdmin ? (targetEmail ? "for this tech" : "across all techs") : "on your calendar"}.</p>
         {myConflicts.length > 0 && (
           <Badge variant="destructive" className="gap-1">
             <AlertTriangle className="h-3 w-3" /> {myConflicts.length} double-booked
