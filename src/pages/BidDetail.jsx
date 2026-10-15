@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Calendar, DollarSign, FileText, Trash2, TrendingUp, Send } from 'lucide-react';
+import { ArrowLeft, Calendar, DollarSign, FileText, MoreHorizontal, Trash2, TrendingUp, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -144,16 +145,24 @@ export default function BidDetail() {
           ) : bid.status === 'won' ? (
             <BidToProject bid={bid} organizationId={user.organization_id} />
           ) : null}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              if (confirm('Delete this bid?')) deleteMutation.mutate(bid.id);
-            }}
-            className="text-red-600"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" title="More actions">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem
+                className="text-red-600 focus:text-red-600"
+                onClick={() => {
+                  if (confirm('Delete this bid?')) deleteMutation.mutate(bid.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete bid
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
