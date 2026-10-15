@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 import CommandPalette from '@/components/layout/CommandPalette';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import {
+  Sun as SunIcon,
+  Moon as MoonIcon,
   LayoutDashboard,
   FolderKanban,
   FileText,
@@ -261,6 +263,35 @@ export default function Layout({ children, currentPageName }) {
     try { return localStorage.getItem('mygsis_sidebar_collapsed') === 'true'; } catch { return false; }
   });
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+  // Premium theme (Kemar-approved): dark default, light = html.theme-light. Stored in localStorage.
+  const [gsTheme, setGsTheme] = useState(() => {
+    try { return localStorage.getItem('mygsis_theme') === 'light' ? 'light' : 'dark'; } catch { return 'dark'; }
+  });
+  useEffect(() => {
+    const root = document.documentElement;
+    const apply = () => {
+      root.classList.toggle('theme-light', gsTheme === 'light');
+      root.classList.toggle('dark', gsTheme === 'dark'); // keeps Tailwind dark: variants in sync
+      root.classList.toggle('light', gsTheme === 'light');
+      root.style.colorScheme = gsTheme;
+      root.dataset.theme = gsTheme; // mockup spec uses [data-theme=light]
+    };
+    apply();
+    // ThemeProvider's mount effect runs after ours; re-apply on next frame so it can't override
+    const raf = requestAnimationFrame(apply);
+    try {
+      localStorage.setItem('mygsis_theme', gsTheme);
+      localStorage.setItem('constructflow-theme', gsTheme); // keep legacy ThemeContext in agreement
+    } catch {}
+    return () => cancelAnimationFrame(raf);
+  }, [gsTheme]);
+  const toggleGsTheme = () => {
+    const root = document.documentElement;
+    root.classList.add('gs-theme-switching');
+    root.dataset.theme = gsTheme === 'dark' ? 'light' : 'dark';
+    setGsTheme((t) => (t === 'dark' ? 'light' : 'dark'));
+    setTimeout(() => root.classList.remove('gs-theme-switching'), 350);
+  };
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [organization, setOrganization] = useState(null);
   const [previousPage, setPreviousPage] = useState(null);
@@ -433,7 +464,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Header */}
-      <header className={cn("fixed top-0 left-0 right-0 h-16 sm:h-16 bg-card border-b border-gray-200 shadow-sm z-40 transition-all duration-300", sidebarCollapsed ? "lg:pl-20" : "lg:pl-64")}>
+      <header className={cn("gs-topbar fixed top-0 left-0 right-0 h-16 sm:h-16 border-b shadow-sm z-40 transition-all duration-300", sidebarCollapsed ? "lg:pl-20" : "lg:pl-64")}>
         <div className="h-full flex items-center justify-between px-2 sm:px-3 md:px-4 lg:px-6">
           {/* Left section: Menu & Logo */}
           <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
@@ -463,14 +494,16 @@ export default function Layout({ children, currentPageName }) {
             {/* Logo/Org Name */}
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
               {organization?.logo_url ? (
-                <img src={organization.logo_url} alt={organization.name} className="h-8 sm:h-8 w-auto flex-shrink-0" />
+                <span className="gs-logo-plate gs-logo-plate-sm flex-shrink-0"><img src={organization.logo_url} alt={organization.name} className="h-9 sm:h-10 w-auto max-w-[160px] object-contain" /></span>
               ) : (
                 <>
-                  <img 
-                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
-                    alt="GSIS Manager" 
-                    className="h-7 sm:h-8 w-auto flex-shrink-0"
-                  />
+                  <span className="gs-logo-plate gs-logo-plate-sm flex-shrink-0">
+                    <img 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6983e2500291b5dfd8507ab1/c68ded0e2_Screenshot2026-01-20202907.png" 
+                      alt="GSIS Manager" 
+                      className="h-9 sm:h-10 w-auto max-w-[160px] object-contain"
+                    />
+                  </span>
                   <span className="font-bold text-sm sm:text-base text-slate-900 hidden sm:inline truncate">{organization?.name || 'GSIS'}</span>
                 </>
               )}
@@ -500,7 +533,16 @@ export default function Layout({ children, currentPageName }) {
               <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gold-500" />
               <span className="hidden sm:inline text-xs sm:text-sm font-semibold">Quick Access</span>
             </Button>
-            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleGsTheme}
+              className="h-8 sm:h-9 w-8 sm:w-9 p-0 text-[#B7C4DA] hover:text-white hover:bg-white/10 flex-shrink-0"
+              title={gsTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              aria-label="Toggle theme"
+            >
+              {gsTheme === 'dark' ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4 text-[#F0C75E]" />}
+            </Button>
             {user && <UserMenu user={user} onLogout={handleLogout} />}
           </div>
         </div>
@@ -519,7 +561,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Sidebar - on mobile leave room for bottom nav (4rem) so nothing is cut off */}
       <aside className={cn(
-        "fixed top-14 sm:top-16 left-0 bg-[#0B1F3A] border-r border-[#C9A227]/20 shadow-lg z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
+        "gs-sidebar fixed top-14 sm:top-16 left-0 bg-[#0B1F3A] border-r border-[#C9A227]/20 shadow-lg z-40 transition-all duration-300 lg:top-16 overflow-y-auto overscroll-contain",
         "h-[calc(100vh-3.5rem-4rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)]",
         sidebarCollapsed ? "lg:w-20" : "lg:w-64",
         sidebarOpen ? "translate-x-0" : "-translate-x-full",
@@ -527,7 +569,7 @@ export default function Layout({ children, currentPageName }) {
       )}>
         {/* Sidebar brand block (Kemar 3:52 PM PT): GSIS logo only, no text (Kemar 4:00 PM PT) */}
         <div className={cn("flex flex-col items-center px-4 pt-5 pb-4 border-b border-[#C9A227]/15", sidebarCollapsed && "lg:hidden")}>
-          <img src="/mygsis-logo.png" alt="Golden State Integrated Systems" className="h-24 w-24 rounded-xl bg-white p-1 ring-2 ring-[#C9A227] object-contain" />
+          <span className="gs-logo-plate"><img src="/mygsis-logo.png" alt="Golden State Integrated Systems" className="h-[120px] w-auto object-contain" /></span>
         </div>
         <nav className="p-3 sm:p-4 pb-6 sm:pb-4 space-y-1">
           {user?.role === 'technician' ? (
