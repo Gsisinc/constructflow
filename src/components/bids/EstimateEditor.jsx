@@ -233,8 +233,8 @@ function EstimateForm({ estimate, bidTitle, isEditing, onEdit, onCancel, onSave,
     });
     y += 4;
     doc.text(`Equipment: $${(formData.equipment_cost || 0).toLocaleString()} | Subcontractor: $${(formData.subcontractor_cost || 0).toLocaleString()}`, 14, y); y += 7;
-    doc.text(`Subtotal: $${totals.subtotal.toLocaleString()} | Overhead: ${effectiveOverheadPct}% | Profit: ${effectiveProfitPct}%`, 14, y); y += 7;
-    doc.text(`Margin on sell: ${marginPct.toFixed(1)}% (target 25-30%, floor 20%)`, 14, y); y += 7;
+    //doc.text(`Subtotal: $${totals.subtotal.toLocaleString()} | Overhead: ${effectiveOverheadPct}% | Profit: ${effectiveProfitPct}%`, 14, y); y += 7;
+    //doc.text(`Margin on sell: ${marginPct.toFixed(1)}% (target 25-30%, floor 20%)`, 14, y); y += 7;
     doc.setFontSize(12);
     doc.text(`Total Bid Amount: $${totals.total_bid_amount.toLocaleString()}`, 14, y);
     if ((formData.notes || '').trim()) {
