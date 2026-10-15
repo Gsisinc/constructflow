@@ -1026,6 +1026,7 @@ function NotesTab({ projectId, phaseName, notes }) {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ title: '', content: '' });
   const queryClient = useQueryClient();
+  const { data: me } = useQuery({ queryKey: ['currentUser'], queryFn: () => base44.auth.me()});
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.PhaseNote.create(data),
@@ -1060,7 +1061,7 @@ function NotesTab({ projectId, phaseName, notes }) {
                 placeholder="Note content"
                 className="h-32"
               />
-              <Button onClick={() => createMutation.mutate({ project_id: projectId, phase_name: phaseName, ...formData })} className="w-full">
+              <Button disabled={!formData.content?.trim()} onClick={() => createMutation.mutate({ project_id: projectId, phase_key: phaseName, author: me?.full_name || me?.email, ...(['preconstruction', 'foundation', 'superstructure', 'enclosure', 'mep_rough', 'interior_finishes', 'commissioning', 'closeout'].includes(phaseName) ? { phase_name: phaseName } : {}), ...formData })} className="w-full">
                 Add Note
               </Button>
             </div>
