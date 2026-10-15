@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TableSkeleton } from '@/components/skeleton/SkeletonComponents';
@@ -23,6 +23,51 @@ export default function TimeCards() {
     enabled: !!user?.email,
   });
 
+    const queryClient = useQueryClient();
+  const [showLog, setShowLog] = useState(false);
+  const [logForm, setLogForm] = useState({ date: format(new Date(), 'yyyy-MM-dd'), project_id: '', task_type: '', task_description: '', hours: '' });
+  const [logError, setLogError] = useState('');
+
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects', 'timecards'],
+    queryFn: () => base44.entities.Project.list().catch(() => []),
+    enabled: showLog,
+  });
+
+  const logHours = useMutation({
+    mutationFn: (data) => base44.entities.FieldHoursLog.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['fieldHoursLog'] });
+      setShowLog(false);
+      setLogForm({ date: format(new Date(), 'yyyy-MM-dd'), project_id: '', task_type: '', task_description: '', hours: '' });
+    },
+    onError: (e) => setLogError(e?.message || 'Save failed'),
+  });
+
+  const submitLog = (e) => {
+    e.preventDefault();
+    setLogError('');
+    const hrs = parseFloat(logForm.hours);
+    if (!logForm.date || !logForm.project_id || !(hrs > 0) || hrs > 24) {
+      setLogError('Date, project, and hours (0-24) are required.');
+      return;
+    }
+    const proj = projects.find((p) => p.id === logForm.project_id);
+    logHours.mutate({
+      organization_id: user?.organization_id,
+      technician_email: user?.email,
+      technician_name: user?.full_name,
+      date: logForm.date,
+      project_id: logForm.project_id,
+      project_name: proj?.name || proj?.project_name || '',
+      task_type: logForm.task_type,
+      task_description: logForm.task_description,
+      hours: hrs,
+      approved: false,
+      notes: 'TEST, Entered by: Ops Manager',
+    });
+  };
+
   const hoursThisWeek = Array.isArray(fieldHours)
     ? fieldHours
         .filter((e) => e.date) // optional: filter to current week
@@ -40,11 +85,47 @@ export default function TimeCards() {
           <Button variant="outline" size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Time Card</Button>
           <Button variant="outline" size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Crew Card</Button>
           <Button variant="outline" size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Crew Sheet</Button>
+          <Button size="sm" className="text-xs sm:text-sm h-9 sm:h-10" onClick={() => setShowLog(!showLog)}>Log Hours</Button>
           <Button size="sm" className="text-xs sm:text-sm h-9 sm:h-10">Weekly Sheet</Button>
         </div>
       </div>
 
-      <ClockIn />
+      <ClockIn />   
+         {showLog && (
+        <Card>
+          <CardHeader><CardTitle className="text-base">Log Hours</CardTitle></CardHeader>
+          <CardContent>
+            <form onSubmit={submitLog} className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <label className="flex flex-col gap-1">Date
+                <input type="date" className="border rounded-md h-9 px-2" value={logForm.date} onChange={(e) => setLogForm({ ...logForm, date: e.target.value })} />
+              </label>
+              <label className="flex flex-col gap-1">Project
+                <select className="border rounded-md h-9 px-2" value={logForm.project_id} onChange={(e) => setLogForm({ ...logForm, project_id: e.target.value })}>
+                  <option value="">Select project</option>
+                  {projects.map((p) => <option key={p.id} value={p.id}>{p.name || p.project_name || p.id}</option>)}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1">Task type
+                <select className="border rounded-md h-9 px-2" value={logForm.task_type} onChange={(e) => setLogForm({ ...logForm, task_type: e.target.value })}>
+                  <option value="">Select</option>
+                  <option>Rough-in</option><option>Trim/Device</option><option>Programming</option><option>Testing</option><option>Service</option><option>Travel</option><option>Other</option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-1">Hours
+                <input type="number" step="0.25" min="0" max="24" className="border rounded-md h-9 px-2" value={logForm.hours} onChange={(e) => setLogForm({ ...logForm, hours: e.target.value })} />
+              </label>
+              <label className="flex flex-col gap-1 sm:col-span-2">Description
+                <textarea className="border rounded-md p-2" rows={2} value={logForm.task_description} onChange={(e) => setLogForm({ ...logForm, task_description: e.target.value })} />
+              </label>
+              {logError && <p className="text-red-600 sm:col-span-2">{logError}</p>}
+              <div className="flex gap-2 sm:col-span-2">
+                <Button type="submit" size="sm" disabled={logHours.isPending}>{logHours.isPending ? 'Saving...' : 'Save Entry'}</Button>
+                <Button type="button" variant="outline" size="sm" onClick={() => setShowLog(false)}>Cancel</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {/* Calendar */}
