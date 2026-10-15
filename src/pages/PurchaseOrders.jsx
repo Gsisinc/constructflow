@@ -307,6 +307,12 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
     queryFn: () => base44.entities.Supplier.list(),
   });
 
+  const { data: costCodes = [] } = useQuery({
+    queryKey: ['poCostCodes', formData.project_id],
+    queryFn: async () => (await base44.entities.CostCodeBudgetLine.filter({ project_id: formData.project_id }, { sort: 'cost_code' }))?.items || [],
+    enabled: !!formData.project_id,
+  });
+
   const [formData, setFormData] = React.useState(po || {
     project_id: '',
     po_number: '',
@@ -343,7 +349,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
     items[idx].total = roundCents((Number(items[idx].quantity) || 0) * (Number(items[idx].unit_price) || 0));
     setFormData({ ...formData, line_items: items });
   };
-  const addItem = () => setFormData({ ...formData, line_items: [...lineItems, { description: '', quantity: 1, unit: 'ea', unit_price: 0, total: 0 }] });
+  const addItem = () => setFormData({ ...formData, line_items: [...lineItems, { description: '', quantity: 1, unit: 'ea', unit_price: 0, total: 0, cost_code: '' }] });
   const removeItem = (idx) => setFormData({ ...formData, line_items: lineItems.filter((_, i) => i !== idx) });
   const subtotal = roundCents(lineItems.reduce((s, it) => s + (Number(it.total) || 0), 0));
   const tax = roundCents(Number(formData.tax) || 0);
@@ -362,6 +368,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
         unit: it.unit || '',
         unit_price: roundCents(Number(it.unit_price) || 0),
         total: roundCents(Number(it.total) || 0),
+        cost_code: it.cost_code || '',
       })),
       subtotal,
       tax,
@@ -455,6 +462,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
                   <thead className="bg-slate-50 text-slate-600">
                     <tr>
                       <th className="text-left p-2 font-semibold">Item</th>
+                      <th className="text-left p-2 font-semibold w-20">Cost Code</th>
                       <th className="text-left p-2 font-semibold w-16">Qty</th>
                       <th className="text-left p-2 font-semibold w-20">Unit</th>
                       <th className="text-left p-2 font-semibold w-24">Unit Cost</th>
@@ -466,6 +474,7 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
                     {lineItems.map((it, idx) => (
                       <tr key={idx} className="border-t border-slate-100">
                         <td className="p-1.5"><Input value={it.description || ''} onChange={(e) => updateItem(idx, 'description', e.target.value)} placeholder="Item description" className="h-8 text-xs" /></td>
+                        <td className="p-1.5"><Input list="po-line-cost-codes" value={it.cost_code || ''} onChange={(e) => updateItem(idx, 'cost_code', e.target.value)} placeholder="FA-100" className="h-8 text-xs" /></td>
                         <td className="p-1.5"><Input type="number" value={it.quantity ?? ''} onChange={(e) => updateItem(idx, 'quantity', e.target.value)} className="h-8 text-xs" /></td>
                         <td className="p-1.5"><Input value={it.unit || ''} onChange={(e) => updateItem(idx, 'unit', e.target.value)} placeholder="ea" className="h-8 text-xs" /></td>
                         <td className="p-1.5"><Input type="number" step="0.01" value={it.unit_price ?? ''} onChange={(e) => updateItem(idx, 'unit_price', e.target.value)} className="h-8 text-xs" /></td>
@@ -478,6 +487,12 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
               </div>
             )}
           </div>
+
+          <datalist id="po-line-cost-codes">
+            {costCodes.map((c) => (
+              <option key={c.id} value={c.cost_code}>{c.cost_code}{c.description ? ` — ${c.description}` : ''}</option>
+            ))}
+          </datalist>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-2">

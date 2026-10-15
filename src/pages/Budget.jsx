@@ -343,6 +343,7 @@ export default function Budget() {
 function ExpenseFormDialog({ open, onOpenChange, expense, projects, onSubmit, loading }) {
   const [formData, setFormData] = React.useState(expense || {
     project_id: '',
+    cost_code: '',
     category: 'other',
     description: '',
     amount: '',
@@ -352,12 +353,19 @@ function ExpenseFormDialog({ open, onOpenChange, expense, projects, onSubmit, lo
     status: 'pending',
   });
 
+  const { data: costCodes = [] } = useQuery({
+    queryKey: ['expenseCostCodes', formData.project_id],
+    queryFn: async () => (await base44.entities.CostCodeBudgetLine.filter({ project_id: formData.project_id }, { sort: 'cost_code' }))?.items || [],
+    enabled: !!formData.project_id,
+  });
+
   React.useEffect(() => {
     if (expense) {
       setFormData(expense);
     } else {
       setFormData({
         project_id: '',
+        cost_code: '',
         category: 'other',
         description: '',
         amount: '',
@@ -388,7 +396,7 @@ function ExpenseFormDialog({ open, onOpenChange, expense, projects, onSubmit, lo
             <Label>Project *</Label>
             <Select
               value={formData.project_id}
-              onValueChange={(value) => setFormData({ ...formData, project_id: value })}
+              onValueChange={(value) => setFormData({ ...formData, project_id: value, cost_code: '' })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select project" />
@@ -399,6 +407,20 @@ function ExpenseFormDialog({ open, onOpenChange, expense, projects, onSubmit, lo
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Cost Code</Label>
+            <Input
+              list="expense-cost-codes"
+              value={formData.cost_code || ''}
+              onChange={(e) => setFormData({ ...formData, cost_code: e.target.value })}
+              placeholder="e.g. FA-100"
+            />
+            <datalist id="expense-cost-codes">
+              {costCodes.map((c) => (
+                <option key={c.id} value={c.cost_code}>{c.cost_code}{c.description ? ` — ${c.description}` : ''}</option>
+              ))}
+            </datalist>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">

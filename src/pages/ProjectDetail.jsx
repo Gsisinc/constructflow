@@ -31,6 +31,7 @@ import FieldLogsTab from '../components/projects/FieldLogsTab';
 import ProjectResourcesTab from '../components/projects/ProjectResourcesTab';
 import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
 import ProjectDashboard from '@/components/projects/ProjectDashboard';
+import CostCodeBudgetBoard from '@/components/projects/CostCodeBudgetBoard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -491,6 +492,7 @@ export default function ProjectDetail() {
 
         <TabsContent value="financials" className="mt-6">
           <div className="space-y-6">
+            <CostCodeBudgetBoard projectId={projectId} />
             <div className="bg-white rounded-xl border border-slate-200 p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Project Financials</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
