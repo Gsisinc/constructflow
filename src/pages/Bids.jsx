@@ -366,7 +366,7 @@ export default function Bids() {
       <Card className="premium-card border-none">
         <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600"><Calendar className="h-5 w-5" /></div>
+            <div className="p-2.5 rounded-xl bg-navy-50 text-navy-700"><Calendar className="h-5 w-5" /></div>
             <div>
               <p className="text-sm font-semibold text-slate-900">Daily Bid Scraper</p>
               <p className="text-xs text-slate-500">
@@ -454,7 +454,7 @@ export default function Bids() {
                           {bid.title || bid.project_name}
                         </h3>
                         {bid.ai_analysis && (
-                          <Badge className="bg-purple-50 text-purple-700 border-purple-100 px-2 py-0.5 flex items-center gap-1">
+                          <Badge className="bg-gold-50 text-gold-700 border-gold-200 px-2 py-0.5 flex items-center gap-1">
                             <Sparkles className="h-3 w-3" /> AI Analyzed
                           </Badge>
                         )}

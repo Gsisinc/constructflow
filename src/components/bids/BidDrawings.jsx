@@ -63,7 +63,7 @@ export function DrawingRow({ drawing: d, onDelete }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            {d.kind === 'link' ? <Link2 className="h-4 w-4 text-blue-600" /> : <FileText className="h-4 w-4 text-slate-500" />}
+            {d.kind === 'link' ? <Link2 className="h-4 w-4 text-navy-700" /> : <FileText className="h-4 w-4 text-slate-500" />}
             <p className="font-semibold text-slate-900 text-sm">{d.title}</p>
             {d.revision && <Badge variant="outline" className="text-xs">Rev {d.revision}</Badge>}
             <Badge variant="secondary" className="text-xs">{d.kind === 'link' ? 'Link' : 'File'}</Badge>
@@ -72,7 +72,7 @@ export function DrawingRow({ drawing: d, onDelete }) {
             {d.date ? format(new Date(d.date), 'MMM d, yyyy') : ''}{d.entered_by ? ` · Entered by ${d.entered_by}` : ''}
           </p>
           {d.kind === 'link' && d.link_url && (
-            <a href={d.link_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1 mt-1">
+            <a href={d.link_url} target="_blank" rel="noopener noreferrer" className="text-xs text-navy-700 underline inline-flex items-center gap-1 mt-1">
               <Link2 className="h-3 w-3" /> {d.link_label || d.link_url}
             </a>
           )}

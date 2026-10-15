@@ -307,12 +307,12 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+              <div className="bg-navy-50 p-3 rounded-lg border border-navy-200">
                 <div className="flex items-center gap-2 mb-1">
-                  <DollarSign className="h-4 w-4 text-blue-600" />
+                  <DollarSign className="h-4 w-4 text-navy-700" />
                   <span className="text-xs text-slate-600">Budgeted</span>
                 </div>
-                <p className="text-xl font-bold text-blue-600">${(budget?.budgeted_amount || 0).toLocaleString()}</p>
+                <p className="text-xl font-bold text-navy-700">${(budget?.budgeted_amount || 0).toLocaleString()}</p>
               </div>
 
               <div className="bg-red-50 p-3 rounded-lg border border-red-200">
