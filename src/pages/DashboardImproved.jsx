@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useProjectBilling } from '@/hooks/useProjectData';
+import { fmtDollars } from '@/lib/money';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -248,7 +249,7 @@ export default function Dashboard() {
         <KpiCard title="Billed to Date" value={fmtMoney(billingTotals?.billed)} sub="invoices issued" icon={TrendingUp} loading={loadingProjects} />
         <KpiCard title="Outstanding" value={fmtMoney(billingTotals?.outstanding)} sub="billed − paid" icon={AlertTriangle} loading={loadingProjects} />
         <KpiCard title="Retention Held" value={fmtMoney(billingTotals?.retention)} sub="from pay apps" icon={Receipt} loading={loadingProjects} />
-        <KpiCard title="Cost to Date vs Budget" value={fmtCompact(sumSpentActive)} sub={`of ${fmtCompact(sumBudgetActive)} budget`} icon={Wallet} loading={loadingProjects} progress={costPct} />
+        <KpiCard title="Cost to Date vs Budget" value={fmtDollars(sumSpentActive)} sub={`of ${fmtDollars(sumBudgetActive)} budget`} icon={Wallet} loading={loadingProjects} progress={costPct} />
         <KpiCard title="DualTrack Red Flags" value={redFlagProjectIds.size} sub="projects off track" icon={Flag} accent="gold" loading={loadingDual} />
         <KpiCard title="Open POs" value={openPOs.length} sub="awaiting fulfillment" icon={ShoppingCart} loading={loadingPOs} />
         <KpiCard title="Upcoming Milestones" value={upcomingTasks.length} sub="next 7 days" icon={CalendarClock} loading={loadingTasks} />
@@ -317,8 +318,8 @@ export default function Dashboard() {
                             <span className="text-xs font-semibold text-slate-600 w-8 text-right">{p.progress || 0}%</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-right font-medium text-slate-700">{fmtMoney(p.budget)}</td>
-                        <td className="px-4 py-3 text-right font-medium text-slate-700">{fmtMoney(p.spent)}</td>
+                        <td className="px-4 py-3 text-right font-medium text-slate-700">{fmtDollars(p.budget)}</td>
+                        <td className="px-4 py-3 text-right font-medium text-slate-700">{fmtDollars(p.spent)}</td>
                         <td className="px-4 py-3 text-center">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${flagStyle[flag.tone]}`}>{flag.label}</span>
                         </td>

@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { fmtDollars } from '@/lib/money';
 import BidUploader from '@/components/bids/BidUploader';
 import BidRequirements from '@/components/bids/BidRequirements';
 import BidToProject from '@/components/bids/BidToProject';
@@ -158,7 +159,7 @@ export default function BidDetail() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? format(new Date(String(bid.due_date).slice(0, 10) + 'T00:00:00'), 'MMM d, yyyy') : 'Not set'} />
-        <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={`$${Number(bid.estimated_value || bid.value || 0).toLocaleString()}`} />
+        <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={fmtDollars(bid.estimated_value || bid.value || 0)} />
         <StatCard icon={<TrendingUp className="h-8 w-8 text-blue-600" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
         <Card>
           <CardContent className="p-4">
@@ -237,7 +238,7 @@ export default function BidDetail() {
                     .map((est) => (
                       <div key={est.id} className="border rounded-lg overflow-hidden">
                         <div className="bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-                          Version {est.version ?? 1} · Subtotal ${Number(est.subtotal || 0).toLocaleString()} · Total bid ${Number(est.total_bid_amount || 0).toLocaleString()}
+                          Version {est.version ?? 1} · Subtotal {fmtDollars(est.subtotal || 0)} · Total bid {fmtDollars(est.total_bid_amount || 0)}
                         </div>
                         <table className="w-full sm:w-auto text-sm">
                           <thead>

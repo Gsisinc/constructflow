@@ -16,3 +16,10 @@ export const signedMoney = (n) => {
   if (cents === 0) return '$0.00';
   return cents < 0 ? '(' + fmtMoney(Math.abs(cents)) + ')' : fmtMoney(cents);
 };
+
+// Exact whole-dollar formatting for summary surfaces (project cards, bids,
+// dashboard budget card, accounts) where cents aren't meaningful.
+export const fmtDollars = (n) => {
+  const cents = roundCents(n);
+  return '$' + Math.round(cents).toLocaleString('en-US', { maximumFractionDigits: 0 });
+};

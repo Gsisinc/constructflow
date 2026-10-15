@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Edit } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { fmtDollars } from '@/lib/money';
 
 const ACCOUNT_TYPES = ["all", "Assets", "Liabilities", "Equity", "Revenue", "Expenses"];
 const TYPE_COLORS = {
@@ -52,7 +53,7 @@ export default function AccountsTable({ accounts, onEdit, filter, onFilterChange
                                         <Badge className={TYPE_COLORS[account.type]}>{account.type}</Badge>
                                     </TableCell>
                                     <TableCell>{account.subtype}</TableCell>
-                                    <TableCell className="text-right font-mono">${(account.balance || 0).toLocaleString()}</TableCell>
+                                    <TableCell className="text-right font-mono">{fmtDollars(account.balance || 0)}</TableCell>
                                     <TableCell>
                                         <Button variant="ghost" size="icon" onClick={() => onEdit(account)}>
                                             <Edit className="w-4 h-4" />

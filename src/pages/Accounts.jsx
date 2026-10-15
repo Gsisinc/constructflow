@@ -5,6 +5,7 @@ import { User } from "@/entities/User";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Building } from "lucide-react";
+import { fmtDollars } from "@/lib/money";
 
 import AccountForm from "../components/accounts/AccountForm";
 import AccountsTable from "../components/accounts/AccountsTable";
@@ -164,7 +165,7 @@ export default function Accounts() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold text-navy-900">
-                                    ${totalBalance.toLocaleString()}
+                                    {fmtDollars(totalBalance)}
                                 </div>
                             </CardContent>
                         </Card>

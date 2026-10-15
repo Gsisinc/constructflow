@@ -27,11 +27,31 @@ export default function WIPReport() {
     enabled: !!user?.organization_id,
   });
 
+  const { data: payApps = [] } = useQuery({
+    queryKey: ['org-payapps-earned', user?.organization_id],
+    queryFn: async () => {
+      const res = await base44.entities.PayApplication.filter({ organization_id: user?.organization_id }, { sort: '-period', limit: 500 });
+      return res?.items || res || [];
+    },
+    enabled: !!user?.organization_id,
+  });
+
   const sovByProject = React.useMemo(() => {
     const m = {};
     sovs.forEach((s) => { m[s.project_id] = s.line_items || []; });
     return m;
   }, [sovs]);
+
+  // Authoritative earned revenue = the latest pay app's total_completed_value.
+  // Falls back to the contract×% calc below when a project has no pay app yet.
+  const earnedByProject = React.useMemo(() => {
+    const m = {};
+    payApps.forEach((pa) => {
+      if (!pa.project_id || pa.project_id in m) return;
+      m[pa.project_id] = safe(pa.total_completed_value);
+    });
+    return m;
+  }, [payApps]);
 
   const billedByProject = React.useMemo(() => {
     const m = {};
@@ -50,7 +70,8 @@ export default function WIPReport() {
     const pctComplete = sovLines.length
       ? (sovLines.reduce((s, l) => s + safe(l.scheduled_value) * (safe(l.percent_complete) / 100), 0) / Math.max(1, sovScheduled)) * 100
       : safe(p.progress);
-    const earned = roundCents(contract * (pctComplete / 100));
+    const sovEarned = roundCents(contract * (pctComplete / 100));
+    const earned = roundCents(earnedByProject[p.id] ?? sovEarned);
     const billed = roundCents(safe(billedByProject[p.id]));
     const overUnder = roundCents(billed - earned);
     const eac = costToDate + safe(p.committed_costs) + safe(p.cost_to_complete);

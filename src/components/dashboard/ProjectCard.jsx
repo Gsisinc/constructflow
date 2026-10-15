@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, DollarSign } from 'lucide-react';
 import { fmtDate } from '@/lib/dates';
+import { fmtDollars } from '@/lib/money';
 
 const statusColors = {
   bidding: 'bg-purple-50 text-purple-700 border-purple-200',
@@ -96,7 +97,7 @@ export default function ProjectCard({ project }) {
             </div>
             <div className="text-right">
               <p className="text-sm font-medium text-slate-900">
-                ${(project.spent || 0).toLocaleString()} / ${project.budget.toLocaleString()}
+                {fmtDollars(project.spent)} / {fmtDollars(project.budget)}
               </p>
               <p className={cn(
                 "text-xs",

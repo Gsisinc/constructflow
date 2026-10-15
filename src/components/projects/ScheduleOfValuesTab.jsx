@@ -9,9 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Save, FilePlus2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { fmtDate } from '@/lib/dates';
+import { fmtMoney as money, signedMoney, roundCents } from '@/lib/money';
 
 const safe = (n) => (Number.isFinite(n) ? Number(n) : 0);
-const money = (n) => `$${safe(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
 const emptyLine = () => ({ description: '', cost_code: '', scheduled_value: 0, percent_complete: 0, billed_to_date: 0 });
 
@@ -53,7 +53,7 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
 
   const totals = useMemo(() => {
     const scheduled = lines?.reduce((s, l) => s + safe(l.scheduled_value), 0) || 0;
-    const earned = lines?.reduce((s, l) => s + safe(l.scheduled_value) * (safe(l.percent_complete) / 100), 0) || 0;
+    const earned = lines?.reduce((s, l) => s + roundCents(safe(l.scheduled_value) * (safe(l.percent_complete) / 100)), 0) || 0;
     const billed = lines?.reduce((s, l) => s + safe(l.billed_to_date), 0) || 0;
     return { scheduled, earned, billed, balance: scheduled - billed };
   }, [lines]);
@@ -69,7 +69,7 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
   const remaining = contract - actual - committed;
   const fade = ctc - remaining;
   // WIP over/under billing — same sign convention as the WIP Report
-  const wipOverUnder = totals.billed - totals.earned;
+  const wipOverUnder = roundCents(totals.billed - totals.earned);
 
   const updateLine = (idx, field, value) => {
     setLines((prev) => {
@@ -217,7 +217,7 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
             <Metric label="EAC = Actual + Committed + CTC" value={money(eac)} tone={eac > contract ? 'red' : 'green'} />
             <Metric label="Remaining = Budget − Actual − Committed" value={money(remaining)} />
             <Metric label="Fade = CTC − Remaining" value={money(fade)} tone={fade > 0 ? 'red' : 'green'} />
-            <Metric label="WIP Over/(Under) = Billed − Earned" value={money(wipOverUnder)} tone={wipOverUnder < 0 ? 'red' : wipOverUnder > 0 ? 'amber' : 'green'} />
+            <Metric label="WIP Over/(Under) = Billed − Earned" value={signedMoney(wipOverUnder)} tone={wipOverUnder < 0 ? 'red' : wipOverUnder > 0 ? 'amber' : 'green'} />
             <Metric label="% Complete (project)" value={`${safe(project?.progress)}%`} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">

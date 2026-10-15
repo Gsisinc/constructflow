@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
 import { fmtDate } from '@/lib/dates';
+import { fmtDollars } from '@/lib/money';
 import { normalizeBidAnalysis } from '@/lib/bidAnalysis';
 import { getPhaseTemplate } from '../components/projects/projectTemplates';
 import { convertBidToProject } from '@/lib/bidConversion';
@@ -345,7 +346,7 @@ export default function Bids() {
           { label: 'Total Bids', value: stats.total, icon: FileText, color: 'text-navy-700', bg: 'bg-navy-50' },
           { label: 'Won Bids', value: stats.won, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { label: 'Active Bids', value: stats.active, icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Pipeline Value', value: `$${(stats.value / 1000000).toFixed(1)}M`, icon: DollarSign, color: 'text-gold-700', bg: 'bg-gold-50' },
+          { label: 'Pipeline Value', value: fmtDollars(stats.value), icon: DollarSign, color: 'text-gold-700', bg: 'bg-gold-50' },
         ].map((stat, i) => (
           <Card key={i} className="premium-card border-none">
             <CardContent className="p-6 flex items-center gap-4">
@@ -475,7 +476,7 @@ export default function Bids() {
                         {bid.estimated_value && (
                           <div className="flex items-center gap-1.5 text-sm font-bold text-slate-700 bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
                             <DollarSign className="h-4 w-4 text-slate-400" />
-                            {bid.estimated_value.toLocaleString()}
+                            {fmtDollars(bid.estimated_value)}
                           </div>
                         )}
                         {bid.due_date && (
@@ -664,7 +665,7 @@ function BidForm({ bid, onSubmit }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-2 text-xs">
                   {aiPreview.title && <div><span className="text-slate-500">Title:</span> <span className="font-medium">{aiPreview.title}</span></div>}
                   {aiPreview.agency && <div><span className="text-slate-500">Agency:</span> <span className="font-medium">{aiPreview.agency}</span></div>}
-                  {aiPreview.estimated_value > 0 && <div><span className="text-slate-500">Value:</span> <span className="font-medium">${Number(aiPreview.estimated_value).toLocaleString()}</span></div>}
+                  {aiPreview.estimated_value > 0 && <div><span className="text-slate-500">Value:</span> <span className="font-medium">{fmtDollars(aiPreview.estimated_value)}</span></div>}
                   {aiPreview.due_date && <div><span className="text-slate-500">Due:</span> <span className="font-medium">{aiPreview.due_date}</span></div>}
                   {aiPreview.location && <div><span className="text-slate-500">Location:</span> <span className="font-medium">{aiPreview.location}</span></div>}
                 </div>
