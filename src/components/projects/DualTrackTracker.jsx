@@ -95,6 +95,28 @@ export default function DualTrackTracker({ projectId, project }) {
     }
   };
 
+  // Dedupe duplicate stage records (a known double-seed artifact) down to one
+  // per stage number. Safe: only removes exact duplicates, keeps most progress.
+  useEffect(() => {
+    if (!projectId || isLoading || stages.length === 0) return;
+    const byNum = {};
+    stages.forEach((s) => { (byNum[s.stage_number] = byNum[s.stage_number] || []).push(s); });
+    const dups = Object.values(byNum).filter((a) => a.length > 1);
+    if (dups.length === 0) return;
+    (async () => {
+      for (const arr of dups) {
+        arr.sort((a, b) => {
+          const ad = ((a.field_track_items || []).filter((i) => i.completed).length) + ((a.money_track_items || []).filter((i) => i.completed).length);
+          const bd = ((b.field_track_items || []).filter((i) => i.completed).length) + ((b.money_track_items || []).filter((i) => i.completed).length);
+          if (bd !== ad) return bd - ad;
+          return (a.created_date || '').localeCompare(b.created_date || '');
+        });
+        for (let i = 1; i < arr.length; i++) { try { await base44.entities.DualTrackStage.delete(arr[i].id); } catch (e) { console.warn('dedup delete', e); } }
+      }
+      qc.invalidateQueries({ queryKey: ['dualtrack-stages', projectId] });
+    })();
+  }, [stages, projectId, isLoading, qc]);
+
   const redFlags = useMemo(() => stages.filter((s) => {
     const remaining = safe(s.budget) - safe(s.actual) - safe(s.committed);
     const fade = safe(s.cost_to_complete) - remaining;

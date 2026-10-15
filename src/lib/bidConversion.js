@@ -1,4 +1,5 @@
 import { getPhaseTemplate } from '@/components/projects/projectTemplates';
+import { reconcileDualTrackFromPhases } from '@/lib/phaseStageLink';
 
 // Map a bid division to a Project project_type (mirrors Bids.jsx divisionToProjectType)
 const divisionToProjectType = (d) => ({
@@ -81,6 +82,17 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
       if (item && item.trim()) reqs.push({ project_id: project.id, phase_name: phase.phase, requirement_text: item.trim(), status: 'pending' });
     }));
     if (reqs.length) await base44Client.entities.PhaseRequirement.bulkCreate(reqs);
+  }
+
+  // Link the carried bid-stage phases/requirements to the 12 DualTrack stages:
+  // a stage whose requirements were all completed at the bid stage is marked
+  // cleared; partial progress shows as in progress. Stages 1-4 are NOT blindly
+  // auto-cleared — only a stage whose own linked requirements were all done
+  // clears. Also dedupes any duplicate stage records. Best-effort.
+  try {
+    await reconcileDualTrackFromPhases(base44Client, project.id);
+  } catch (e) {
+    console.warn('dualtrack reconcile failed', e);
   }
 
   // Hand off bid requirements → project tasks (Sales → PM) and AI risks → issues.
