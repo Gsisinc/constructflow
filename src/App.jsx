@@ -11,6 +11,7 @@ import EstimatorWizard from './pages/EstimatorWizard';
 import WIPReport from './pages/WIPReport';
 import OwnerActionItems from './pages/OwnerActionItems';
 import OpsDashboard from './pages/OpsDashboard';
+import ResourceBoard from './pages/ResourceBoard';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -227,6 +228,13 @@ const AuthenticatedApp = () => {
         <RoleGuard pageName="OpsDashboard">
           <LayoutWrapper currentPageName="OpsDashboard">
             <OpsDashboard />
+          </LayoutWrapper>
+        </RoleGuard>
+      } />
+      <Route path="/ResourceBoard" element={
+        <RoleGuard pageName="ResourceBoard">
+          <LayoutWrapper currentPageName="ResourceBoard">
+            <ResourceBoard />
           </LayoutWrapper>
         </RoleGuard>
       } />

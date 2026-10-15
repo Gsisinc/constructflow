@@ -34,6 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import ClockIn from "@/components/dashboard/ClockIn";
 import TechFieldLogs from "@/components/tech/TechFieldLogs";
+import MyAssignments from "@/components/tech/MyAssignments";
 
 function SectionTitle({ eyebrow, title, right }) {
   return (
@@ -409,6 +410,15 @@ export default function TechnicianPortal() {
                 </CardHeader>
                 <CardContent>
                   <TechFieldLogs user={user} projects={assignedProjects} />
+                </CardContent>
+              </GlassCard>
+
+              <GlassCard className="rounded-[28px]">
+                <CardHeader>
+                  <SectionTitle eyebrow="Schedule" title="My Assignments" />
+                </CardHeader>
+                <CardContent>
+                  <MyAssignments user={user} />
                 </CardContent>
               </GlassCard>
             </main>

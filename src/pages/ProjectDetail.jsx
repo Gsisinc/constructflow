@@ -28,6 +28,7 @@ import ScheduleOfValuesTab from '../components/projects/ScheduleOfValuesTab';
 import OpsDocsTab from '../components/projects/OpsDocsTab';
 import OpsDocsOverview from '../components/projects/OpsDocsOverview';
 import FieldLogsTab from '../components/projects/FieldLogsTab';
+import ProjectResourcesTab from '../components/projects/ProjectResourcesTab';
 import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
 import ProjectDashboard from '@/components/projects/ProjectDashboard';
 import { Button } from '@/components/ui/button';
@@ -403,6 +404,7 @@ export default function ProjectDetail() {
           <TabsTrigger value="financials">Financials</TabsTrigger>
           <TabsTrigger value="opsdocs">Ops / Field Docs</TabsTrigger>
           <TabsTrigger value="fieldlogs">Field Logs</TabsTrigger>
+          <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="sov">SOV & Pay Apps</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
         </TabsList>
@@ -535,6 +537,10 @@ export default function ProjectDetail() {
 
         <TabsContent value="fieldlogs" className="mt-6">
           <FieldLogsTab projectId={projectId} />
+        </TabsContent>
+
+        <TabsContent value="resources" className="mt-6">
+          <ProjectResourcesTab projectId={projectId} project={project} />
         </TabsContent>
 
         <TabsContent value="sov" className="mt-6">

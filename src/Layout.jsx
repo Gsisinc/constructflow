@@ -33,6 +33,7 @@ import {
   BookOpen,
   Banknote,
   CalendarOff,
+  CalendarRange,
   Building2,
   Truck,
   Tag,
@@ -58,6 +59,7 @@ const navGroups = [
     { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
     { name: 'Schedule', icon: Calendar, page: 'Calendar' },
     { name: 'Ops Dashboard', icon: BarChart3, page: 'OpsDashboard' },
+    { name: 'Resource Board', icon: CalendarRange, page: 'ResourceBoard' },
   ]},
   { label: 'Sales & Estimating', items: [
     { name: 'Bids', icon: FileText, page: 'Bids' },

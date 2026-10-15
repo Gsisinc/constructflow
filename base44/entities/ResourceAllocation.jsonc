@@ -1,0 +1,99 @@
+{
+  "name": "ResourceAllocation",
+  "type": "object",
+  "description": "Ops resource allocation \u2014 assigns a tech (Worker) or equipment to a project/phase for a date range. Overlapping allocations for the same resource are flagged as conflicts on the allocation board.",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "resource_type": {
+      "type": "string",
+      "enum": [
+        "tech",
+        "equipment"
+      ],
+      "default": "tech",
+      "description": "tech = a Worker; equipment = a tool/vehicle/equipment asset"
+    },
+    "resource_id": {
+      "type": "string",
+      "description": "Worker id (when tech) or equipment identifier"
+    },
+    "resource_name": {
+      "type": "string",
+      "description": "Denormalized resource display name"
+    },
+    "resource_email": {
+      "type": "string",
+      "description": "Tech email \u2014 matches Tech Portal user.email so assignments show on the tech's portal"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "project_name": {
+      "type": "string",
+      "description": "Denormalized project name for the board"
+    },
+    "phase_id": {
+      "type": "string",
+      "description": "Optional CustomPhase this assignment is tied to"
+    },
+    "phase_name": {
+      "type": "string",
+      "description": "Denormalized phase display name"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "role": {
+      "type": "string",
+      "description": "Role on this assignment (e.g. Lead, Helper, Operator)"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "entered_by": {
+      "type": "string",
+      "description": "User who created this allocation (email)"
+    }
+  },
+  "required": [
+    "resource_type",
+    "resource_name",
+    "start_date",
+    "end_date"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
