@@ -66,7 +66,9 @@ Deno.serve(async (req) => {
     else await base44.asServiceRole.entities.ScraperStatus.create({ ...payload, organization_id: orgId || '' });
   } catch (_) {}
 
-  return Response.json({ success: true, found: found.length, added, last_run: now, error: scrapeError || null });
+  const samError = scrapeError ? scrapeError.replace(/^SAM\.gov:\s*/, '') : null;
+  const sources = [{ name: 'SAM.gov', found: found.length, added, error: samError }];
+  return Response.json({ success: true, found: found.length, added, last_run: now, error: scrapeError || null, sources });
 });
 
 async function scrapeSamGov(workType, state, apiKey) {

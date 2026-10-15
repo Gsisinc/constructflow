@@ -188,7 +188,16 @@ export default function Bids() {
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['scraper-status'] });
       queryClient.invalidateQueries({ queryKey: ['bids-all'] });
-      toast.success(`Scrape complete — ${res?.added ?? 0} new bid(s) added`);
+      const added = res?.added ?? 0;
+      const failedSources = (res?.sources || []).filter((s) => s.error);
+      if (failedSources.length) {
+        const names = failedSources.map((s) => s.name).join(', ');
+        toast.warning(`Scrape partial — ${added} new bid(s) added. Failed source: ${names}`);
+      } else if (added === 0) {
+        toast.info('Scrape complete — no new bids found');
+      } else {
+        toast.success(`Scrape complete — ${added} new bid(s) added`);
+      }
     },
     onError: (e) => toast.error('Scrape failed: ' + (e.message || '')),
   });
