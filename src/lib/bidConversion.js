@@ -157,6 +157,24 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
     status: 'won',
     linked_project_id: project.id,
   });
+  // B14-9 Sales: carry estimate material/equipment lines to the project's Materials (labor carries as hours above)
+  try {
+    const items = (estimate?.line_items || []).filter((li) => li && li.name && (!li.category || li.category === 'material' || li.category === 'equipment'));
+    for (const li of items) {
+      await base44Client.entities.ProjectMaterial.create({
+        organization_id: organizationId,
+        project_id: project.id,
+        name: li.name,
+        quantity: Number(li.quantity) || 0,
+        unit: li.unit || 'ea',
+        unit_cost: Number(li.unit_cost) || 0,
+        category: 'material',
+        notes: 'From estimate at bid conversion (B14-9). Entered by: Sales',
+      });
+    }
+  } catch (e) {
+    console.warn('material carry-over failed', e);
+  }
 
   // Carry drawings over to the project — same records, no re-upload.
   try {
