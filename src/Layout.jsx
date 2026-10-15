@@ -26,7 +26,7 @@ import {
   User,
   Bot,
   Search,
-  Grid3x3,
+  LayoutGrid,
   ArrowLeft,
   Wrench,
   Calendar,
@@ -414,10 +414,12 @@ export default function Layout({ children, currentPageName }) {
               variant="ghost"
               size="sm"
               onClick={() => setMegaMenuOpen(!megaMenuOpen)}
-              className="h-8 sm:h-9 px-1.5 sm:px-2 text-slate-600 hover:text-navy-700 hover:bg-slate-100 flex-shrink-0"
+              className="h-8 sm:h-9 px-2 sm:px-3 gap-1.5 rounded-full bg-navy-900 text-white hover:bg-navy-700 hover:text-white shadow-sm ring-1 ring-navy-700 flex-shrink-0"
               title="Quick Access"
+              aria-label="Quick Access"
             >
-              <Grid3x3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gold-500" />
+              <span className="hidden sm:inline text-xs sm:text-sm font-semibold">Quick Access</span>
             </Button>
             <ThemeToggle />
             {user && <UserMenu user={user} onLogout={handleLogout} />}
