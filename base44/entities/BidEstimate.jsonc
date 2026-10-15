@@ -50,6 +50,15 @@
             ],
             "default": "cost",
             "description": "cost = raw cost (overhead/profit applied on top); dollar = sell price with margin already included (overhead/profit forced to 0 to avoid double counting)"
+          },
+          "price_source": {
+            "type": "string"
+          },
+          "quote_ref": {
+            "type": "string"
+          },
+          "supplier_name": {
+            "type": "string"
           }
         }
       }
