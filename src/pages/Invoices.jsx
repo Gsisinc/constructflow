@@ -116,7 +116,7 @@ export default function Invoices() {
         </div>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
-            <Button className="w-full sm:w-auto sm:w-auto bg-green-600 hover:bg-green-700">
+            <Button className="w-full sm:w-auto sm:w-auto bg-primary hover:bg-primary/90">
               <Plus className="h-4 w-4 mr-2" /> New Invoice
             </Button>
           </DialogTrigger>
@@ -195,7 +195,7 @@ export default function Invoices() {
                   <option value="rejected">Rejected</option>
                 </select>
               </div>
-              <Button onClick={handleSubmit} className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
+              <Button onClick={handleSubmit} className="w-full sm:w-auto bg-primary hover:bg-primary/90">
                 Create Invoice
               </Button>
             </div>

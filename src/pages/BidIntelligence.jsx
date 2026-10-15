@@ -82,7 +82,7 @@ function DocumentAnalysisTab() {
             </p>
             <Button
               onClick={() => fileInputRef.current?.click()}
-              className="bg-amber-600 hover:bg-amber-700"
+              className="bg-primary hover:bg-primary/90"
             >
               <Upload className="h-4 w-4 mr-2" />
               Select File
@@ -283,7 +283,7 @@ function DrawingMeasurementTab() {
             </p>
             <Button
               onClick={() => fileInputRef.current?.click()}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-primary hover:bg-primary/90"
             >
               <Upload className="h-4 w-4 mr-2" />
               Select Drawing
@@ -392,7 +392,7 @@ function DrawingMeasurementTab() {
                     size="sm"
                     onClick={handleAddToEstimate}
                     disabled={selectedItems.length === 0}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-primary hover:bg-primary/90"
                   >
                     <Plus className="h-4 w-4 mr-1" />
                     Add Selected ({selectedItems.length})

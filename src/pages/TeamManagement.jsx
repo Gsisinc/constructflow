@@ -459,7 +459,7 @@ function WorkerFormDialog({ open, onOpenChange, worker, onSubmit }) {
               </select>
             </div>
           </div>
-          <Button onClick={() => onSubmit(formData)} className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700">
+          <Button onClick={() => onSubmit(formData)} className="w-full sm:w-auto bg-primary hover:bg-primary/90">
             {worker ? 'Update' : 'Add'} Team Member
           </Button>
         </div>
@@ -546,7 +546,7 @@ function AssignmentDialog({ open, onOpenChange, worker, projects, organizationId
           <Button 
             onClick={() => createAssignmentMutation.mutate(assignmentData)}
             disabled={!assignmentData.project_id || createAssignmentMutation.isPending}
-            className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700"
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90"
           >
             {createAssignmentMutation.isPending ? 'Creating...' : 'Create Assignment'}
           </Button>

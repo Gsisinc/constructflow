@@ -297,7 +297,7 @@ export default function BlueprintEstimateResult({ result, imageUrl, onClose }) {
 
           {/* Actions */}
           <div className="flex flex-wrap gap-2 pt-1">
-            <Button size="sm" onClick={handleAddToEstimates} disabled={saving || !canSaveToEstimates} title={!canSaveToEstimates ? 'Save to Estimates unavailable' : undefined} className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5">
+            <Button size="sm" onClick={handleAddToEstimates} disabled={saving || !canSaveToEstimates} title={!canSaveToEstimates ? 'Save to Estimates unavailable' : undefined} className="bg-primary hover:bg-primary/90 text-white gap-1.5">
               <Plus className="h-3.5 w-3.5" />
               {saving ? 'Saving...' : 'Add to Estimates'}
             </Button>

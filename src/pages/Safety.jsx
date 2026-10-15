@@ -67,7 +67,7 @@ export default function Safety() {
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Safety Management</h1>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
-            <Button className="bg-red-600 hover:bg-red-700">
+            <Button className="bg-primary hover:bg-primary/90">
               <Plus className="h-4 w-4 mr-2" /> Report Incident
             </Button>
           </DialogTrigger>

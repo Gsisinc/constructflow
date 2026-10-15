@@ -148,8 +148,8 @@ export default function Layout({ children, currentPageName }) {
           const org = await base44.entities.Organization.filter({ id: userData.organization_id });
           if (org.length > 0) {
             setOrganization(org[0]);
-            document.documentElement.style.setProperty('--primary', hexToHSL(org[0].primary_color || '#1e40af'));
-            document.documentElement.style.setProperty('--secondary', hexToHSL(org[0].secondary_color || '#3b82f6'));
+            document.documentElement.style.setProperty('--primary', hexToHSL(org[0].primary_color || '#0B1F3A'));
+            document.documentElement.style.setProperty('--secondary', hexToHSL(org[0].secondary_color || '#1E3A5F'));
           }
         }
       } catch (e) {

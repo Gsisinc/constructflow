@@ -71,7 +71,7 @@ function AiExtractionPreview({ extracted, onApply, onDiscard }) {
             <Button size="sm" variant="outline" onClick={onDiscard} className="text-slate-600">
               Discard
             </Button>
-            <Button size="sm" onClick={onApply} className="bg-amber-600 hover:bg-amber-700 text-white gap-1">
+            <Button size="sm" onClick={onApply} className="bg-primary hover:bg-primary/90 text-white gap-1">
               <CheckCircle className="h-4 w-4" /> Apply to Form
             </Button>
           </div>
@@ -198,7 +198,7 @@ function PhaseEditor({ phases, setPhases }) {
             <ClipboardList className="h-5 w-5 text-amber-600" />
             Project Phases &amp; Requirements
           </CardTitle>
-          <Button size="sm" onClick={handleAddPhase} className="bg-amber-600 hover:bg-amber-700">
+          <Button size="sm" onClick={handleAddPhase} className="bg-primary hover:bg-primary/90">
             <Plus className="h-4 w-4 mr-1" /> Add Phase
           </Button>
         </div>
@@ -294,7 +294,7 @@ function PhaseEditor({ phases, setPhases }) {
                       className="h-8 text-sm"
                       onKeyDown={(e) => e.key === 'Enter' && handleAddRequirement(phaseIdx)}
                     />
-                    <Button size="sm" onClick={() => handleAddRequirement(phaseIdx)} className="h-8 bg-amber-600 hover:bg-amber-700">
+                    <Button size="sm" onClick={() => handleAddRequirement(phaseIdx)} className="h-8 bg-primary hover:bg-primary/90">
                       <Plus className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -463,7 +463,7 @@ function AnalysisResultCard({ analysisResult, createdBidId, createdProjectId, na
           )}
           {createdProjectId && (
             <Button
-              className="bg-amber-600 hover:bg-amber-700 gap-2"
+              className="bg-primary hover:bg-primary/90 gap-2"
               onClick={() => navigate(createPageUrl('ProjectDetail') + `?id=${createdProjectId}`)}
             >
               <ArrowRight className="h-4 w-4" />
@@ -1121,7 +1121,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`;
       <Button
         onClick={handleSubmit}
         disabled={analyzing || !canSubmit}
-        className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 h-14 text-base font-semibold gap-3"
+        className="w-full sm:w-auto bg-primary hover:bg-primary/90 h-14 text-base font-semibold gap-3"
       >
         {analyzing ? (
           <>

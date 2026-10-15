@@ -202,7 +202,7 @@ function CourseCard({ assignment, isActive }) {
           )}
 
           {isActive && (
-            <Button className="w-full sm:w-auto mt-4 bg-blue-600 hover:bg-blue-700">
+            <Button className="w-full sm:w-auto mt-4 bg-primary hover:bg-primary/90">
               <BookOpen className="w-4 h-4 mr-2" />
               Continue Learning
             </Button>

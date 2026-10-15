@@ -187,7 +187,7 @@ export default function ProjectTools({ projectId, organizationId }) {
         </div>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
-            <Button onClick={handleReset} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleReset} className="bg-primary hover:bg-primary/90">
               <Plus className="h-4 w-4 mr-2" /> Add Tool
             </Button>
           </DialogTrigger>
@@ -311,7 +311,7 @@ export default function ProjectTools({ projectId, organizationId }) {
               <div className="flex gap-2 pt-4">
                 <Button
                   onClick={handleSubmit}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="flex-1 bg-primary hover:bg-primary/90"
                   disabled={createMutation.isPending || updateMutation.isPending}
                 >
                   {editingTool ? 'Update' : 'Add'} Tool

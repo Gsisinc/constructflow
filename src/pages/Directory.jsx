@@ -624,7 +624,7 @@ export default function Directory() {
           </Button>
           <Button
             size="sm"
-            className="h-8 bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs md:text-sm px-2"
+            className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground text-xs md:text-sm px-2"
             onClick={() => { setEditingContact(null); setNewContact({ name: '', role: 'electrician', company: '', phone: '', email: '', category: 'worker', group: '', avatar_url: '' }); setShowAddForm(true); }}
           >
             <UserPlus className="h-3 w-3 md:h-4 md:w-4 mr-1" /> Add
@@ -1202,7 +1202,7 @@ export default function Directory() {
             <Button
               onClick={handleSaveContact}
               disabled={createWorkerMutation.isPending || updateWorkerMutation.isPending}
-              className="bg-amber-500 hover:bg-amber-600 text-slate-900"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {(createWorkerMutation.isPending || updateWorkerMutation.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {editingContact ? 'Save' : 'Add'}

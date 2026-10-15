@@ -71,7 +71,7 @@ export default function TrainingMaterials() {
             <p className="text-slate-600">Presentations, handouts, videos, and exams</p>
           </div>
           {user?.role === 'admin' && (
-            <Button className="bg-blue-600 hover:bg-blue-700 gap-2">
+            <Button className="bg-primary hover:bg-primary/90 gap-2">
               <Plus className="w-4 h-4" /> Add Material
             </Button>
           )}

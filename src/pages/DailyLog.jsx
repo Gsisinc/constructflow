@@ -80,7 +80,7 @@ export default function DailyLog() {
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Daily Logs</h1>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
-            <Button className="bg-amber-600 hover:bg-amber-700">
+            <Button className="bg-primary hover:bg-primary/90">
               <Plus className="h-4 w-4 mr-2" /> New Log
             </Button>
           </DialogTrigger>
@@ -131,7 +131,7 @@ export default function DailyLog() {
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               />
-              <Button onClick={handleSubmit} className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700" disabled={createMutation.isPending}>
+              <Button onClick={handleSubmit} className="w-full sm:w-auto bg-primary hover:bg-primary/90" disabled={createMutation.isPending}>
                 {createMutation.isPending ? 'Creating...' : 'Create Log'}
               </Button>
             </div>

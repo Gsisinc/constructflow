@@ -67,7 +67,7 @@ export default function Projects() {
             <h1 className="text-2xl sm:text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Projects</h1>
             <p className="text-sm text-slate-600 mt-1">Manage your construction work efficiently</p>
           </div>
-        <Button onClick={() => setShowForm(true)} className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 shadow-lg hover:shadow-xl min-h-[44px] select-none text-sm sm:text-base">
+        <Button onClick={() => setShowForm(true)} className="min-h-[44px] select-none text-sm sm:text-base">
           <Plus className="h-4 w-4 mr-1.5 sm:mr-2" />
           <span className="hidden sm:inline">New Project</span>
           <span className="sm:hidden">New</span>

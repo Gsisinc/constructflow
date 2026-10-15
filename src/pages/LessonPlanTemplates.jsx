@@ -83,7 +83,7 @@ export default function LessonPlanTemplates() {
             <p className="text-slate-600">Standardized teaching plans for each module</p>
           </div>
           {user?.role === 'admin' && (
-            <Button className="bg-blue-600 hover:bg-blue-700 gap-2">
+            <Button className="bg-primary hover:bg-primary/90 gap-2">
               <Plus className="w-4 h-4" /> New Lesson Plan
             </Button>
           )}

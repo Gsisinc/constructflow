@@ -128,7 +128,7 @@ export default function TaskTracker() {
         </div>
         <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
           <DialogTrigger asChild>
-            <Button className="gap-2 bg-amber-600 hover:bg-amber-700 min-h-[44px] text-sm sm:text-base select-none">
+            <Button className="gap-2 bg-primary hover:bg-primary/90 min-h-[44px] text-sm sm:text-base select-none">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">New Task</span>
               <span className="sm:hidden">New</span>
@@ -185,7 +185,7 @@ export default function TaskTracker() {
         <Button
           variant={selectedProject === null ? 'default' : 'outline'}
           onClick={() => setSelectedProject(null)}
-          className="whitespace-nowrap bg-amber-600 hover:bg-amber-700 min-h-[40px] text-xs sm:text-sm h-auto py-2"
+          className="whitespace-nowrap bg-primary hover:bg-primary/90 min-h-[40px] text-xs sm:text-sm h-auto py-2"
         >
           All
         </Button>
@@ -194,7 +194,7 @@ export default function TaskTracker() {
             key={p.id}
             variant={selectedProject === p.id ? 'default' : 'outline'}
             onClick={() => setSelectedProject(p.id)}
-            className="whitespace-nowrap bg-amber-600 hover:bg-amber-700 min-h-[40px] text-xs sm:text-sm h-auto py-2"
+            className="whitespace-nowrap bg-primary hover:bg-primary/90 min-h-[40px] text-xs sm:text-sm h-auto py-2"
           >
             {p.name?.substring(0, 12)}
           </Button>

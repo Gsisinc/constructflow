@@ -65,7 +65,7 @@ export default function Photos() {
         <h1 className="text-2xl md:text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Photo Gallery</h1>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
-            <Button className="bg-amber-600 hover:bg-amber-700">
+            <Button className="bg-primary hover:bg-primary/90">
               <Plus className="h-4 w-4 mr-2" /> Upload Photos
             </Button>
           </DialogTrigger>

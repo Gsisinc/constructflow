@@ -209,7 +209,7 @@ export default function PaymentRequestSubmission() {
                       Download
                     </Button>
                     {invoice.status === 'pending' && (
-                      <Button size="sm" className="gap-2 bg-blue-600 hover:bg-blue-700">
+                      <Button size="sm" className="gap-2 bg-primary hover:bg-primary/90">
                         <Send className="w-4 h-4" />
                         Send for Approval
                       </Button>

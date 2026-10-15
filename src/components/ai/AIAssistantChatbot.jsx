@@ -166,7 +166,7 @@ export default function AIAssistantChatbot() {
             <Button size="icon" variant="outline">
               <Paperclip className="w-4 h-4" />
             </Button>
-            <Button size="icon" onClick={handleSendMessage} className="bg-blue-600">
+            <Button size="icon" onClick={handleSendMessage} className="bg-primary">
               <Send className="w-4 h-4" />
             </Button>
           </div>

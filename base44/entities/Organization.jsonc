@@ -10,15 +10,15 @@
     },
     "primary_color": {
       "type": "string",
-      "default": "#1e40af"
+      "default": "#0B1F3A"
     },
     "secondary_color": {
       "type": "string",
-      "default": "#3b82f6"
+      "default": "#1E3A5F"
     },
     "accent_color": {
       "type": "string",
-      "default": "#60a5fa"
+      "default": "#C9A227"
     },
     "industry": {
       "type": "string",

@@ -201,7 +201,7 @@ function AssignmentsSection({ assignments, technicians, courses, org }) {
             placeholder="Due date"
           />
 
-          <Button onClick={handleAssign} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleAssign} className="w-full sm:w-auto bg-primary hover:bg-primary/90">
             <Plus className="w-4 h-4 mr-2" />
             Assign Course
           </Button>

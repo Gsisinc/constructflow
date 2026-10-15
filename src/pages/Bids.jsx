@@ -462,7 +462,7 @@ export default function Bids() {
                     </div>
                     {bid.status === 'won' && !bid.linked_project_id && (
                       <Button size="sm"
-                        className="h-8 px-3 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                        className="h-8 px-3 text-xs bg-primary hover:bg-primary/90 text-white"
                         disabled={convertToProjectMutation.isPending}
                         onClick={(e) => { e.stopPropagation(); convertToProjectMutation.mutate(bid); }}>
                         {convertToProjectMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />}
@@ -621,7 +621,7 @@ function BidForm({ bid, onSubmit }) {
                   <div className="flex items-center gap-1.5 text-sm font-semibold text-amber-800">
                     <Sparkles className="h-4 w-4" /> AI Extracted
                   </div>
-                  <Button size="sm" onClick={handleApplyAi} className="bg-amber-600 hover:bg-amber-700 text-white h-7 text-xs gap-1">
+                  <Button size="sm" onClick={handleApplyAi} className="bg-primary hover:bg-primary/90 text-white h-7 text-xs gap-1">
                     <CheckCircle className="h-3.5 w-3.5" /> Apply
                   </Button>
                 </div>
@@ -798,7 +798,7 @@ function BidForm({ bid, onSubmit }) {
       </div>
       </div>
       )}
-      <Button onClick={() => onSubmit({ ...formData, source_files: uploadedFiles })} className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 mt-4">
+      <Button onClick={() => onSubmit({ ...formData, source_files: uploadedFiles })} className="w-full sm:w-auto bg-primary hover:bg-primary/90 mt-4">
         {bid ? 'Update Bid' : 'Create Bid'}
       </Button>
     </div>

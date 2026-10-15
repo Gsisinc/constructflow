@@ -205,7 +205,7 @@ export default function AIAgentsMultiPlatform() {
                 <p className="text-xs text-amber-900 dark:text-amber-200 mb-2">Most AI sites block embedding. Use the button below to open in a new window.</p>
                 <Button
                   size="sm"
-                  className="w-full sm:w-auto sm:w-auto bg-amber-600 hover:bg-amber-700 text-white gap-1"
+                  className="w-full sm:w-auto sm:w-auto bg-primary hover:bg-primary/90 text-white gap-1"
                   onClick={() => config.url && openMinibrowser(config.url, config.name)}
                 >
                   <ExternalLink className="h-3 w-3" /> Open in new window

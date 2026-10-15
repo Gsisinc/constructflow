@@ -140,7 +140,7 @@ export default function Budget() {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={() => { setEditingExpense(null); setShowForm(true); }} className="bg-amber-600 hover:bg-amber-700 min-h-[44px] text-sm select-none">
+          <Button onClick={() => { setEditingExpense(null); setShowForm(true); }} className="bg-primary hover:bg-primary/90 min-h-[44px] text-sm select-none">
             <Plus className="h-4 w-4 mr-1.5 sm:mr-2" />
             <span className="hidden sm:inline">Add Expense</span>
             <span className="sm:hidden">Add</span>

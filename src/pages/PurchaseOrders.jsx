@@ -83,7 +83,7 @@ export default function PurchaseOrders() {
             <Upload className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Upload</span>
           </Button>
-          <Button onClick={() => { setEditingPO(null); setShowForm(true); }} className="bg-amber-600 hover:bg-amber-700 min-h-[44px]">
+          <Button onClick={() => { setEditingPO(null); setShowForm(true); }} className="bg-primary hover:bg-primary/90 min-h-[44px]">
             <Plus className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Create</span>
           </Button>

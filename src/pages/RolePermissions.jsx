@@ -83,7 +83,7 @@ export default function RolePermissions() {
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 break-words">Role & Permissions Matrix</h1>
           <p className="text-sm text-slate-600 mt-1">Phase 1 control center for module-level access management.</p>
         </div>
-        <Button onClick={handleSave} disabled={!canEdit || saving} className="bg-amber-600 hover:bg-amber-700">
+        <Button onClick={handleSave} disabled={!canEdit || saving} className="bg-primary hover:bg-primary/90">
           {saving ? 'Saving...' : 'Save matrix'}
         </Button>
       </div>

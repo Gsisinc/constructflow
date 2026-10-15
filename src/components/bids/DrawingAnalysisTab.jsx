@@ -961,7 +961,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                       <option value="cable">Cable (ft)</option>
                     </select>
                   </div>
-                  <Button size="sm" className="w-full text-[10px] h-7 bg-blue-600" onClick={applyManualMeasurementsToAnalysis} disabled={!analysis}>
+                  <Button size="sm" className="w-full text-[10px] h-7 bg-primary" onClick={applyManualMeasurementsToAnalysis} disabled={!analysis}>
                     Add to Takeoff Totals
                   </Button>
                 </div>

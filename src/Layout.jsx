@@ -215,8 +215,8 @@ export default function Layout({ children, currentPageName }) {
     base44.entities.Organization.filter({ id: user.organization_id }).then((orgs) => {
       if (cancelled || !orgs?.length) return;
       setOrganization(orgs[0]);
-      document.documentElement.style.setProperty('--primary', hexToHSL(orgs[0].primary_color || '#2563eb'));
-      document.documentElement.style.setProperty('--secondary', hexToHSL(orgs[0].secondary_color || '#3b82f6'));
+      document.documentElement.style.setProperty('--primary', hexToHSL(orgs[0].primary_color || '#0B1F3A'));
+      document.documentElement.style.setProperty('--secondary', hexToHSL(orgs[0].secondary_color || '#1E3A5F'));
     }).catch(() => {});
     return () => { cancelled = true; };
   }, [user?.organization_id]);

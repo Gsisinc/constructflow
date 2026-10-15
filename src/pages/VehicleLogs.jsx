@@ -168,7 +168,7 @@ export default function VehicleLogs() {
         </div>
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
-            <Button className="w-full sm:w-auto sm:w-auto bg-blue-600 hover:bg-blue-700">
+            <Button className="w-full sm:w-auto sm:w-auto bg-primary hover:bg-primary/90">
               <Plus className="h-4 w-4 mr-2" /> New Log Entry
             </Button>
           </DialogTrigger>
@@ -307,7 +307,7 @@ export default function VehicleLogs() {
                   className="mt-1"
                 />
               </div>
-              <Button onClick={handleSubmit} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700">
+              <Button onClick={handleSubmit} className="w-full sm:w-auto bg-primary hover:bg-primary/90">
                 Save Entry
               </Button>
             </div>
@@ -414,7 +414,7 @@ export default function VehicleLogs() {
                           <div className="flex gap-2">
                             <Button
                               onClick={handleCreateExpense}
-                              className="flex-1 bg-blue-600 hover:bg-blue-700"
+                              className="flex-1 bg-primary hover:bg-primary/90"
                               disabled={createExpenseMutation.isPending}
                             >
                               Create Expense

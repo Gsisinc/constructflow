@@ -104,7 +104,7 @@ export default function AlertSettings() {
           <p className="text-slate-600 mt-1">Configure alert thresholds and manage dismissed alerts</p>
         </div>
         {thresholds.length === 0 && (
-          <Button onClick={createDefaultThresholds} className="bg-amber-600 hover:bg-amber-700">
+          <Button onClick={createDefaultThresholds} className="bg-primary hover:bg-primary/90">
             Create Default Thresholds
           </Button>
         )}

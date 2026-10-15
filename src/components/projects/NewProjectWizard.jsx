@@ -443,7 +443,7 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
                Next <ChevronRight className="h-4 w-4 ml-1" />
              </Button>
            ) : (
-             <Button onClick={handleCreate} disabled={saving || !canProceedStep2} className="bg-green-600 hover:bg-green-700">
+             <Button onClick={handleCreate} disabled={saving || !canProceedStep2} className="bg-primary hover:bg-primary/90">
                {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
                Create Project
              </Button>

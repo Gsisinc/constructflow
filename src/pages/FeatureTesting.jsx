@@ -221,7 +221,7 @@ export default function FeatureTesting() {
                         onClick={feature.test}
                         disabled={isLoading}
                         size="sm"
-                        className="bg-amber-600 hover:bg-amber-700"
+                        className="bg-primary hover:bg-primary/90"
                       >
                         {isLoading ? (
                           <>

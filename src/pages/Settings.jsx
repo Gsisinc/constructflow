@@ -274,14 +274,14 @@ export default function Settings() {
                   <div className="flex gap-2 mt-2">
                     <input
                       type="color"
-                      value={orgForm.primary_color || '#1e40af'}
+                      value={orgForm.primary_color || '#0B1F3A'}
                       onChange={(e) => setOrgForm({ ...orgForm, primary_color: e.target.value })}
                       className="h-10 w-16 rounded border cursor-pointer"
                     />
                     <Input
-                      value={orgForm.primary_color || '#1e40af'}
+                      value={orgForm.primary_color || '#0B1F3A'}
                       onChange={(e) => setOrgForm({ ...orgForm, primary_color: e.target.value })}
-                      placeholder="#1e40af"
+                      placeholder="#0B1F3A"
                     />
                   </div>
                 </div>
@@ -290,14 +290,14 @@ export default function Settings() {
                   <div className="flex gap-2 mt-2">
                     <input
                       type="color"
-                      value={orgForm.secondary_color || '#3b82f6'}
+                      value={orgForm.secondary_color || '#1E3A5F'}
                       onChange={(e) => setOrgForm({ ...orgForm, secondary_color: e.target.value })}
                       className="h-10 w-16 rounded border cursor-pointer"
                     />
                     <Input
-                      value={orgForm.secondary_color || '#3b82f6'}
+                      value={orgForm.secondary_color || '#1E3A5F'}
                       onChange={(e) => setOrgForm({ ...orgForm, secondary_color: e.target.value })}
-                      placeholder="#3b82f6"
+                      placeholder="#1E3A5F"
                     />
                   </div>
                 </div>
@@ -306,14 +306,14 @@ export default function Settings() {
                   <div className="flex gap-2 mt-2">
                     <input
                       type="color"
-                      value={orgForm.accent_color || '#60a5fa'}
+                      value={orgForm.accent_color || '#C9A227'}
                       onChange={(e) => setOrgForm({ ...orgForm, accent_color: e.target.value })}
                       className="h-10 w-16 rounded border cursor-pointer"
                     />
                     <Input
-                      value={orgForm.accent_color || '#60a5fa'}
+                      value={orgForm.accent_color || '#C9A227'}
                       onChange={(e) => setOrgForm({ ...orgForm, accent_color: e.target.value })}
-                      placeholder="#60a5fa"
+                      placeholder="#C9A227"
                     />
                   </div>
                 </div>

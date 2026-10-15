@@ -159,7 +159,7 @@ export default function AIAgents() {
             </CardHeader>
             <CardContent className="pt-0">
               <Button
-                className="bg-amber-600 hover:bg-amber-700 text-white"
+                className="bg-primary hover:bg-primary/90 text-white"
                 onClick={() => { setActiveTab('custom'); setSelectedAgent('technician_field_guide'); setChatAgent({ id: 'technician_field_guide', name: 'Technician Field Guide', description: AGENT_WORKFLOWS.technician_field_guide?.purpose, color: 'from-amber-500 to-orange-600' }); }}
               >
                 <Bot className="h-4 w-4 mr-2" /> Open Field Guide
@@ -373,7 +373,7 @@ export default function AIAgents() {
                   url={currentAgent.url}
                   label="Open in new window"
                   variant="default"
-                  className="w-full sm:w-auto sm:w-auto bg-amber-600 hover:bg-amber-700 text-white border-0 px-6 py-3 text-base font-medium"
+                  className="w-full sm:w-auto sm:w-auto bg-primary hover:bg-primary/90 text-white border-0 px-6 py-3 text-base font-medium"
                   icon={Maximize2}
                 />
               </CardContent>
