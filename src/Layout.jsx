@@ -199,6 +199,9 @@ export default function Layout({ children, currentPageName }) {
   // Auth guard: no org -> onboarding (handled once auth is ready)
   useEffect(() => {
     if (!user) return;
+    // FIX (tech loop): technicians/clients cannot open Onboarding (RoleGuard bounces them to their portal),
+    // so redirecting them there ping-pongs forever when organization_id is missing. Admin-only redirect.
+    if (user.role === 'technician' || user.role === 'client') return;
     if (!user.organization_id && currentPageName !== 'Onboarding' && !isHomePage && !isLandingPage) {
       navigate(createPageUrl('Onboarding'));
     }
