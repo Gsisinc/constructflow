@@ -10,7 +10,7 @@ import { fmtMoney, roundCents } from '@/lib/money';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
-const SUGGESTED_CODES = ['FA-100', 'FA-200', 'FA-300', 'FA-400', 'FA-500', 'FA-600', 'FA-700', 'FA-800', 'FA-900'];
+const SUGGESTED_CODES = [{code:'100',name:'Labor',category:'labor'},{code:'110',name:'Field Installation Labor',category:'labor'},{code:'120',name:'Programming & Commissioning Labor',category:'labor'},{code:'130',name:'Design & Engineering Labor',category:'labor'},{code:'140',name:'Project Management Labor',category:'labor'},{code:'200',name:'Material',category:'material'},{code:'210',name:'Devices & Equipment (installed)',category:'material'},{code:'220',name:'Cable, Conduit & Consumables',category:'material'},{code:'230',name:'Software Licenses & Subscriptions',category:'material'},{code:'300',name:'Equipment',category:'equipment'},{code:'310',name:'Rental Equipment',category:'equipment'},{code:'320',name:'Owned Tools & Equipment',category:'equipment'},{code:'400',name:'Subcontractors',category:'subs'},{code:'410',name:'Subcontract Labor',category:'subs'},{code:'420',name:'Professional Services',category:'subs'},{code:'500',name:'General Conditions',category:'general_conditions'},{code:'510',name:'Permits, Fees & Inspections',category:'general_conditions'},{code:'520',name:'Travel, Lodging & Per Diem',category:'general_conditions'},{code:'530',name:'Freight & Delivery',category:'general_conditions'},{code:'540',name:'Bonds & Job Insurance',category:'general_conditions'},{code:'550',name:'Site Logistics',category:'general_conditions'},{code:'900',name:'Contingency',category:'contingency'}]; // GSIS company-wide cost codes DRAFT 2026-10-15 (PM). Overhead and profit are markups, not codes.
 
 export default function CostCodeBudgetBoard({ projectId }) {
   const queryClient = useQueryClient();
@@ -264,7 +264,7 @@ export default function CostCodeBudgetBoard({ projectId }) {
           </table>
         </div>
         <datalist id="ccb-codes">
-          {SUGGESTED_CODES.map((c) => <option key={c} value={c} />)}
+          {SUGGESTED_CODES.map((c) => <option key={c.code} value={c.code}>{c.code} - {c.name}</option>)}
         </datalist>
         <div className="px-4 pb-4 pt-2 text-xs text-slate-500 flex flex-wrap gap-2 items-center">
           <Badge variant="outline" className="text-[10px]">Actual</Badge>
