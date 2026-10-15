@@ -459,7 +459,7 @@ export default function TechnicianPortal() {
                   <SectionTitle eyebrow="Schedule" title="My Assignments" />
                 </CardHeader>
                 <CardContent>
-                  <MyAssignments user={user} targetEmail={targetEmail} isAdmin={isAdmin} />
+                  <MyAssignments user={user} targetEmail={targetEmail} targetName={targetName} isAdmin={isAdmin} />
                 </CardContent>
               </GlassCard>
             </main>

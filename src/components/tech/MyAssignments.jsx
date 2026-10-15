@@ -10,7 +10,7 @@ import { buildConflictMap, isConflicted } from "@/lib/resourceConflicts";
  * Loads allocations by resource_email === user.email, with org-wide conflict detection.
  * props: user
  */
-export default function MyAssignments({ user, targetEmail, isAdmin }) {
+export default function MyAssignments({ user, targetEmail, targetName, isAdmin }) {
   const orgId = user?.organization_id;
 
   const { data: mine = [] } = useQuery({
@@ -45,7 +45,7 @@ export default function MyAssignments({ user, targetEmail, isAdmin }) {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-sm text-slate-300">{mine.length} assignment{mine.length === 1 ? "" : "s"} {isAdmin ? (targetEmail ? "for this tech" : "across all techs") : "on your calendar"}.</p>
+        <p className="text-sm text-slate-300">{mine.length} assignment{mine.length === 1 ? "" : "s"} {isAdmin ? (targetEmail ? `for ${targetName || targetEmail}` : "across all techs") : "on your calendar"}.</p>
         {myConflicts.length > 0 && (
           <Badge variant="destructive" className="gap-1">
             <AlertTriangle className="h-3 w-3" /> {myConflicts.length} double-booked

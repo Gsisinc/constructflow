@@ -84,6 +84,8 @@ export default function TechFieldLogs({ user, projects, targetEmail, targetName,
 
   const byEmail = targetEmail || user?.email;
   const byName = targetName || user?.full_name || user?.email;
+  const scopeLabel = isAdmin ? (targetEmail ? (targetName || targetEmail) : 'All techs') : 'My';
+  const scopeSuffix = isAdmin ? ` · ${scopeLabel}` : '';
 
   const submitDaily = () => {
     if (!dlProject) { toast.error('Select a project'); return; }
@@ -121,7 +123,7 @@ export default function TechFieldLogs({ user, projects, targetEmail, targetName,
       <Card className="border border-white/10 bg-white/[0.04] text-slate-100">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-white text-base">
-            <ClipboardList className="h-4 w-4 text-[#CBAE63]" /> Daily Logs
+            <ClipboardList className="h-4 w-4 text-[#CBAE63]" /> Daily Logs<span className="text-slate-400 font-normal">{scopeSuffix}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -156,7 +158,7 @@ export default function TechFieldLogs({ user, projects, targetEmail, targetName,
           </div>
           <div className="space-y-2 pt-2 border-t border-white/10">
             {myDailyLogs.length === 0 ? (
-              <p className="text-sm text-slate-400 py-3 text-center">No daily logs yet.</p>
+              <p className="text-sm text-slate-400 py-3 text-center">No daily logs{scopeSuffix ? ` for ${scopeLabel}` : ''} yet.</p>
             ) : myDailyLogs.map(l => (
               <div key={l.id} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                 <div className="flex items-center justify-between">
@@ -175,7 +177,7 @@ export default function TechFieldLogs({ user, projects, targetEmail, targetName,
       <Card className="border border-white/10 bg-white/[0.04] text-slate-100">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-white text-base">
-            <Route className="h-4 w-4 text-[#CBAE63]" /> Mileage
+            <Route className="h-4 w-4 text-[#CBAE63]" /> Mileage<span className="text-slate-400 font-normal">{scopeSuffix}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -212,7 +214,7 @@ export default function TechFieldLogs({ user, projects, targetEmail, targetName,
           </div>
           <div className="space-y-2 pt-2 border-t border-white/10">
             {myMileage.length === 0 ? (
-              <p className="text-sm text-slate-400 py-3 text-center">No mileage entries yet.</p>
+              <p className="text-sm text-slate-400 py-3 text-center">No mileage entries{scopeSuffix ? ` for ${scopeLabel}` : ''} yet.</p>
             ) : myMileage.map(m => (
               <div key={m.id} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                 <div className="flex items-center justify-between">
