@@ -18,12 +18,11 @@ import {
   ChevronDown, ChevronRight, CheckCircle2, Circle, ListChecks, Layers, AlarmClock, Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { fmtDollars as money } from '@/lib/money';
 import { toast } from 'sonner';
 
 const NAVY = '#0B1F3A';
 const GOLD = '#C9A227';
-
-const money = (n) => (n || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
 const addDays = (dateStr, days) => {
   if (!dateStr) return null;
