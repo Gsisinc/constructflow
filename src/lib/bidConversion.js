@@ -1,5 +1,5 @@
 import { getPhaseTemplate } from '@/components/projects/projectTemplates';
-import { reconcileDualTrackFromPhases } from '@/lib/phaseStageLink';
+import { reconcileDualTrackFromPhases, seedRequirementsIdempotent } from '@/lib/phaseStageLink';
 
 // Map a bid division to a Project project_type (mirrors Bids.jsx divisionToProjectType)
 const divisionToProjectType = (d) => ({
@@ -101,11 +101,7 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
       status: 'pending',
     }));
     if (customPhases.length) await base44Client.entities.CustomPhase.bulkCreate(customPhases);
-    const reqs = [];
-    tpl.forEach((phase) => (phase.items || []).forEach((item) => {
-      if (item && item.trim()) reqs.push({ project_id: project.id, phase_name: phase.phase, requirement_text: item.trim(), status: 'pending' });
-    }));
-    if (reqs.length) await base44Client.entities.PhaseRequirement.bulkCreate(reqs);
+    await seedRequirementsIdempotent(base44Client, project.id, tpl);
   }
 
   // Link the carried bid-stage phases/requirements to the 12 DualTrack stages:

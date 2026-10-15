@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { getPhaseTemplate } from '@/components/projects/projectTemplates';
+import { seedRequirementsIdempotent } from '@/lib/phaseStageLink';
 import DualTrackTracker from '@/components/projects/DualTrackTracker';
 import PhaseNavigator from '@/components/phases/PhaseNavigator';
 import PhaseManager from '@/components/phases/PhaseManager';
@@ -59,11 +60,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
           status: 'pending',
         }));
         if (phases.length) await base44.entities.CustomPhase.bulkCreate(phases);
-        const reqs = [];
-        tpl.forEach((phase) => (phase.items || []).forEach((item) => {
-          if (item && item.trim()) reqs.push({ project_id: bidId, phase_name: phase.phase, requirement_text: item.trim(), status: 'pending' });
-        }));
-        if (reqs.length) await base44.entities.PhaseRequirement.bulkCreate(reqs);
+        await seedRequirementsIdempotent(base44, bidId, tpl);
         qc.invalidateQueries({ queryKey: ['customPhases', bidId] });
       } catch (e) {
         console.error('bid phase seed failed', e);

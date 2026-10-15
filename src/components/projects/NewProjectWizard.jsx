@@ -11,6 +11,7 @@ import { ChevronRight, ChevronLeft, Plus, Trash2, Upload, Loader2, X, Check } fr
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { PROJECT_TYPE_CATALOG, getPhaseTemplate } from './projectTemplates';
+import { seedRequirementsIdempotent } from '@/lib/phaseStageLink';
 
 const STATUSES = [
   { value: 'bidding', label: 'Bidding' },
@@ -349,26 +350,10 @@ export default function NewProjectWizard({ open, onOpenChange, onCreated, organi
         await base44.entities.CustomPhase.bulkCreate(customPhases);
       }
 
-      // Create PhaseRequirements
-      const allRequirements = [];
-      phasesToCreate.forEach((phase) => {
-        phase.items.forEach((item) => {
-          if (item.text.trim()) {
-            allRequirements.push({
-              project_id: project.id,
-              phase_name: phase.phase,
-              requirement_text: item.text.trim(),
-              status: item.completed ? 'completed' : 'pending',
-            });
-          }
-        });
-      });
+      // Create PhaseRequirements (idempotent — never duplicates on re-run)
+      const seedRes = await seedRequirementsIdempotent(base44, project.id, phasesToCreate);
 
-      if (allRequirements.length > 0) {
-        await base44.entities.PhaseRequirement.bulkCreate(allRequirements);
-      }
-
-      toast.success(`Project created with ${customPhases.length} phases and ${allRequirements.length} requirements`);
+      toast.success(`Project created with ${customPhases.length} phases and ${seedRes.created} requirements`);
       onCreated(project);
       setStep(1);
       setSelectedType('');
