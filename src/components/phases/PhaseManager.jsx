@@ -170,7 +170,7 @@ export default function PhaseManager({ projectId, currentPhase }) {
 
   const { data: notes = [] } = useQuery({
     queryKey: ['phaseNotes', projectId, selectedPhase],
-    queryFn: () => base44.entities.PhaseNote.filter({ project_id: projectId, phase_name: selectedPhase }),
+    queryFn: () => base44.entities.PhaseNote.filter({ project_id: projectId }).then(all => all.filter(n => n.phase_key === selectedPhase || (!n.phase_key && n.phase_name === selectedPhase))),
     enabled: !!projectId
   });
 
