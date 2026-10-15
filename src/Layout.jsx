@@ -40,6 +40,8 @@ import {
   Mic,
   Calculator,
   BarChart3,
+  ChevronUp as FooterChevronUp,
+  HelpCircle as FooterHelpCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -49,6 +51,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import MegaMenu from '@/components/layout/MegaMenu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import AgentChat from '@/components/agents/AgentChat';
 // import ApiKeyBanner from '@/components/settings/ApiKeyBanner';
@@ -175,6 +178,77 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
       <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-[#C9A227]/70 group-hover:text-[#C9A227]")} />
       <span className="truncate">{item.name}</span>
     </Link>
+  );
+}
+
+// ---- AppFooter (inlined: Base44 editor cannot create new files) ----
+// Former "Settings & Support" group. Labels and routes unchanged; split per settings-audit/audit.md.
+// CORE: listed first in the Add-ins popover (placement B keeps the bar to Settings + Support, per mockup v4).
+const coreLinks = [
+  { label: 'AI Agents', page: 'AIAgents' },
+  { label: 'Role Permissions', page: 'RolePermissions' },
+  { label: 'Audit Trail', page: 'AuditTrail' },
+];
+// ADD-IN (real, occasional use) then DEAD (stub/misrouted/irrelevant: hidden in the popover, not deleted).
+const addInLinks = [
+  { label: 'Bid Leveling & Forecasts', page: 'Phase2Operations' },
+  { label: 'Enterprise Integrations', page: 'Phase3Operations' },
+  { label: 'Reliability & Support Ops', page: 'Phase6ReliabilityOps' },
+];
+const deadLinks = [
+  { label: 'Help & Support', page: 'Settings' },
+  { label: 'Support Channels', page: 'SupportChannels' },
+  { label: "What's New", page: 'Dashboard' },
+  { label: 'Make a Suggestion', page: 'Settings' },
+  { label: 'Implementation', page: 'Implementation' },
+  { label: 'Platform & Tenant Control', page: 'Phase5PlatformScale' },
+];
+
+const linkCls = 'text-navy-200 hover:text-gold-500 transition-colors whitespace-nowrap';
+
+/**
+ * Admin-only footer, placement A (Kemar 3:59 PM PT): sits right under the content on short pages.
+ * No logo, company name or license text; buttons only, right-aligned.
+ * The "Support" button goes to ServiceDesk, the working support/ticket page; the old
+ * "Help & Support" label routed to Settings, which has no help content.
+ */
+function AppFooter({ userRole }) {
+  if (userRole !== 'admin') return null;
+
+  return (
+    <footer className="bg-navy-900 text-navy-200 border-t-2 border-gold-500" role="contentinfo">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 sm:gap-4">
+        <nav aria-label="Settings and support" className="flex flex-wrap items-center gap-2 sm:ml-auto text-[12px]">
+          <Link to={createPageUrl('Settings')} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-gold-500 text-navy-900 font-semibold hover:brightness-110 transition">
+            <Settings className="h-3.5 w-3.5" /> Settings
+          </Link>
+          <Link to={createPageUrl('ServiceDesk')} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full border border-gold-500 text-white font-semibold hover:bg-gold-500/10 transition">
+            <FooterHelpCircle className="h-3.5 w-3.5" /> Support
+          </Link>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button type="button" className="inline-flex items-center gap-1 h-8 px-2.5 rounded-full border border-navy-700 text-navy-200 hover:text-gold-500 hover:border-gold-500 transition-colors">
+                Add-ins <FooterChevronUp className="h-3 w-3" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="top" align="end" className="w-56 p-2 bg-navy-900 border-navy-700 text-[12px]">
+              <p className="px-1 pb-1 text-[10px] uppercase tracking-wider text-gold-500 font-bold">Admin</p>
+              {coreLinks.map((item) => (
+                <Link key={item.label} to={createPageUrl(item.page)} className={`block px-1 py-1 rounded hover:bg-navy-800 ${linkCls}`}>{item.label}</Link>
+              ))}
+              <p className="px-1 pt-2 pb-1 mt-1 border-t border-navy-700 text-[10px] uppercase tracking-wider text-gold-500 font-bold">Add-ins</p>
+              {addInLinks.map((item) => (
+                <Link key={item.label} to={createPageUrl(item.page)} className={`block px-1 py-1 rounded hover:bg-navy-800 ${linkCls}`}>{item.label}</Link>
+              ))}
+              <p className="px-1 pt-2 pb-1 mt-1 border-t border-navy-700 text-[10px] uppercase tracking-wider text-navy-400 font-bold">Hidden / under review</p>
+              {deadLinks.map((item) => (
+                <Link key={item.label} to={createPageUrl(item.page)} className="block px-1 py-1 rounded text-navy-400 hover:text-gold-500 hover:bg-navy-800 whitespace-nowrap">{item.label}</Link>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </nav>
+      </div>
+    </footer>
   );
 }
 
@@ -449,8 +523,9 @@ export default function Layout({ children, currentPageName }) {
         sidebarOpen ? "translate-x-0" : "-translate-x-full",
         "lg:translate-x-0"
       )}>
-        <div className={cn("flex items-center px-4 h-12 border-b border-[#C9A227]/15", sidebarCollapsed && "lg:hidden")}>
-          <span className="text-lg font-bold tracking-tight text-[#C9A227]">GSIS</span>
+        {/* Sidebar brand block (Kemar 3:52 PM PT): GSIS logo only, no text (Kemar 4:00 PM PT) */}
+        <div className={cn("flex flex-col items-center px-4 pt-5 pb-4 border-b border-[#C9A227]/15", sidebarCollapsed && "lg:hidden")}>
+          <img src="/mygsis-logo.png" alt="Golden State Integrated Systems" className="h-24 w-24 rounded-xl bg-white p-1 ring-2 ring-[#C9A227] object-contain" />
         </div>
         <nav className="p-3 sm:p-4 pb-6 sm:pb-4 space-y-1">
           {user?.role === 'technician' ? (
@@ -531,6 +606,7 @@ export default function Layout({ children, currentPageName }) {
             {children}
           </motion.div>
         </AnimatePresence>
+        <AppFooter userRole={user?.role} />
       </main>
 
       {/* Mobile Bottom Navigation */}
