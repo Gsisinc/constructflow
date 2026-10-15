@@ -32,6 +32,7 @@ import ProjectResourcesTab from '../components/projects/ProjectResourcesTab';
 import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
 import ProjectDashboard from '@/components/projects/ProjectDashboard';
 import CostCodeBudgetBoard from '@/components/projects/CostCodeBudgetBoard';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -358,17 +359,22 @@ export default function ProjectDetail() {
               </div>
             )}
             {project.project_manager && (
-              <div className="flex items-center gap-2 text-sm">
-                <Users className="h-4 w-4 text-slate-400" />
-                <div>
-                  <p className="text-slate-500">Manager</p>
-                  <p className="font-medium">{project.project_manager}</p>
-                </div>
-              </div>
+             <div className="flex items-center gap-2 text-sm">
+               <Users className="h-4 w-4 text-slate-400" />
+               <div>
+                 <p className="text-slate-500">Manager</p>
+                 <p className="font-medium">{project.project_manager}</p>
+               </div>
+             </div>
             )}
-          </div>
-        </div>
-      </div>
+            </div>
+
+            {/* Entered by + timestamps (auto-stamped by the platform) */}
+            <div className="mt-4 pt-4 border-t border-slate-100">
+            <RecordAuditInfo record={project} />
+            </div>
+            </div>
+            </div>
 
       {/* Project Dashboard: forecast, countdown, phases view, tracking panels */}
       <ProjectDashboard

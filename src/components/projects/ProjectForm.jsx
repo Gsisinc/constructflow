@@ -19,6 +19,7 @@ import {
 import { Loader2, Upload, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import { stampCreate, stampUpdate } from '@/lib/audit';
 import { PROJECT_TYPE_CATALOG } from './projectTemplates';
 
 // Build the flat type list from the same catalog the create wizard uses,
@@ -53,6 +54,9 @@ const EMPTY = {
   start_date: '',
   end_date: '',
   budget: '',
+  labor_hours: '',
+  labor_rate: '',
+  equipment_cost: '',
   description: '',
   project_manager: '',
   image_url: '',
@@ -72,10 +76,17 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await onSubmit({
+    const baseData = {
       ...formData,
       budget: formData.budget ? parseFloat(formData.budget) : null,
-    });
+      labor_hours: formData.labor_hours ? parseFloat(formData.labor_hours) : 0,
+      labor_rate: formData.labor_rate ? parseFloat(formData.labor_rate) : 0,
+      equipment_cost: formData.equipment_cost ? parseFloat(formData.equipment_cost) : 0,
+    };
+    const stamped = project
+      ? await stampUpdate(baseData)
+      : await stampCreate(baseData);
+    await onSubmit(stamped);
     setLoading(false);
   };
 
@@ -237,6 +248,42 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
                 value={formData.project_manager}
                 onChange={(e) => setFormData({ ...formData, project_manager: e.target.value })}
                 placeholder="Manager name"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="labor_hours">Labor Hours</Label>
+              <Input
+                id="labor_hours"
+                type="number"
+                step="0.25"
+                value={formData.labor_hours ?? ''}
+                onChange={(e) => setFormData({ ...formData, labor_hours: e.target.value })}
+                placeholder="0"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="labor_rate">Labor Rate ($/hr)</Label>
+              <Input
+                id="labor_rate"
+                type="number"
+                step="0.01"
+                value={formData.labor_rate ?? ''}
+                onChange={(e) => setFormData({ ...formData, labor_rate: e.target.value })}
+                placeholder="0.00"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="equipment_cost">Equipment Cost ($)</Label>
+              <Input
+                id="equipment_cost"
+                type="number"
+                step="0.01"
+                value={formData.equipment_cost ?? ''}
+                onChange={(e) => setFormData({ ...formData, equipment_cost: e.target.value })}
+                placeholder="0.00"
               />
             </div>
           </div>

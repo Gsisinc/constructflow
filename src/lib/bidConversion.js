@@ -30,6 +30,18 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
   const projectType = divisionToProjectType(bid.division);
   const today = new Date().toISOString().split('T')[0];
 
+  // Carry labor hours, labor rate and equipment cost over from the bid's
+  // linked estimate so the project starts with the estimator's numbers.
+  let estimate = null;
+  if (bid.linked_estimate_id) {
+    try {
+      const ests = await base44Client.entities.BidEstimate.filter({ id: bid.linked_estimate_id });
+      estimate = ests?.[0] || null;
+    } catch (e) {
+      console.warn('estimate carry-over lookup failed', e);
+    }
+  }
+
   const project = await base44Client.entities.Project.create({
     organization_id: organizationId,
     name: bid.title || bid.project_name || 'Converted Project',
@@ -38,6 +50,9 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
     project_type: projectType,
     address: bid.location || '',
     budget: bid.estimated_value || 0,
+    labor_hours: estimate?.labor_hours || 0,
+    labor_rate: estimate?.labor_rate || 0,
+    equipment_cost: estimate?.equipment_cost || 0,
     description: bid.scope_of_work || bid.description || '',
     status: 'awarded',
     current_phase: 'preconstruction',

@@ -26,6 +26,7 @@ import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandar
 import BidPhaseWorkspace from '@/components/bids/BidPhaseWorkspace';
 import BidStatusSelect from '@/components/bids/BidStatusSelect';
 import EstimateEditor from '@/components/bids/EstimateEditor';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
 import { convertBidToProject } from '@/lib/bidConversion';
 
 const statusColors = {
@@ -170,6 +171,11 @@ export default function BidDetail() {
         <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? format(new Date(String(bid.due_date).slice(0, 10) + 'T00:00:00'), 'MMM d, yyyy') : 'Not set'} />
         <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={fmtDollars(bid.estimated_value || bid.value || 0)} />
         <StatCard icon={<TrendingUp className="h-8 w-8 text-navy-700" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
+        <div className="md:col-span-2 lg:col-span-4">
+          <div className="bg-white rounded-xl border border-slate-200 px-4 py-3">
+            <RecordAuditInfo record={bid} />
+          </div>
+        </div>
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
