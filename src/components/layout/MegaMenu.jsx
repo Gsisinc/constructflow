@@ -88,9 +88,9 @@ const clientMenuSections = [
 
 const menuSections = [
   {
-    title: 'Project Management',
+    title: 'Operation Management',
     items: [
-      { icon: LayoutDashboard, label: 'Dashboard', page: 'Dashboard' },
+      { icon: LayoutDashboard, label: 'Ops Dashboard', page: 'Dashboard' },
       { icon: FileText, label: 'Daily Log', page: 'DailyLog' },
       { icon: Clock, label: 'Time Cards', page: 'TimeCards' },
       { icon: Calendar, label: 'Schedules', page: 'Calendar' },
@@ -100,15 +100,8 @@ const menuSections = [
       { icon: Smartphone, label: 'Vehicles', page: 'VehicleLogs' },
       { icon: Package, label: 'Materials', page: 'Materials' },
       { icon: FileStack, label: 'Documents', page: 'Documents' },
-    ]
-  },
-  {
-    title: 'Estimating & Proposals',
-    items: [
-      { icon: FileText, label: 'Cost Library', page: 'CostLibrary' },
-      { icon: FileText, label: 'AI Estimate Generator', page: 'EstimateGenerator' },
-      { icon: MessageSquare, label: 'Send Text Messages', page: 'TextMessages' },
-      { icon: FileText, label: 'E-signatures', page: 'ESignatures' },
+      { icon: Wrench, label: 'Service Desk', page: 'ServiceDesk' },
+      { icon: Video, label: 'Training & Support', page: 'PMSetupGuide' },
     ]
   },
   {
@@ -125,6 +118,18 @@ const menuSections = [
       { icon: TrendingUp, label: 'Job Costing (WIP)', page: 'JobCosting' },
       { icon: FileStack, label: 'Cost Plus Invoicing', page: 'CostPlusInvoicing' },
       { icon: Building2, label: 'QuickBooks Sync', page: 'QuickBooksSync' },
+    ]
+  },
+  {
+    title: 'Bid Management',
+    items: [
+      { icon: FileText, label: 'Add Bid Manually', page: 'AddBid' },
+      { icon: Search, label: 'Bid Discovery', page: 'BidDiscovery' },
+      { icon: FileStack, label: 'Active Bids', page: 'Bids' },
+      { icon: FileText, label: 'Cost Library', page: 'CostLibrary' },
+      { icon: FileText, label: 'AI Estimate Generator', page: 'EstimateGenerator' },
+      { icon: MessageSquare, label: 'Send Text Messages', page: 'TextMessages' },
+      { icon: FileText, label: 'E-signatures', page: 'ESignatures' },
     ]
   },
   {
@@ -149,14 +154,6 @@ const menuSections = [
     ]
   },
   {
-    title: 'Bid Management',
-    items: [
-      { icon: FileText, label: 'Add Bid Manually', page: 'AddBid' },
-      { icon: Search, label: 'Bid Discovery', page: 'BidDiscovery' },
-      { icon: FileStack, label: 'Active Bids', page: 'Bids' },
-    ]
-  },
-  {
     title: 'Documents',
     items: [
       { icon: Camera, label: 'Photos', page: 'Photos' },
@@ -177,12 +174,9 @@ const menuSections = [
       { icon: Bot, label: 'AI Agents', page: 'AIAgents' },
       { icon: Settings, label: 'Role Permissions', page: 'RolePermissions' },
       { icon: FileStack, label: 'Audit Trail', page: 'AuditTrail' },
-      { icon: Wrench, label: 'Service Desk', page: 'ServiceDesk' },
       { icon: Building2, label: 'Implementation', page: 'Implementation' },
-      { icon: Video, label: 'Ongoing Training', page: 'OngoingTraining' },
       { icon: TrendingUp, label: 'Bid Leveling & Forecasts', page: 'Phase2Operations' },
       { icon: Building2, label: 'Enterprise Integrations', page: 'Phase3Operations' },
-      { icon: Bot, label: 'AI Governance & Automation', page: 'Phase4AIAutomation' },
       { icon: Building2, label: 'Platform & Tenant Control', page: 'Phase5PlatformScale' },
       { icon: Wrench, label: 'Reliability & Support Ops', page: 'Phase6ReliabilityOps' },
     ]
@@ -190,11 +184,10 @@ const menuSections = [
   {
     title: 'Resources',
     items: [
-      { icon: Video, label: 'Training & Support', page: 'PMSetupGuide' },
       { icon: Book, label: 'Knowledge Base', page: 'PMSetupGuide' },
       { icon: Building2, label: "Who's Behind It", page: 'Home' },
     ]
-  }
+  },
 ];
 
 export default function MegaMenu({ isOpen, onClose, userRole }) {
