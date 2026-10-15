@@ -15,8 +15,8 @@ module.exports = {
 			sm: 'calc(var(--radius) - 4px)'
 		},
 		boxShadow: {
-			card: '0 1px 2px rgba(15, 23, 42, 0.06)',
-			'card-hover': '0 4px 12px rgba(15, 23, 42, 0.08)',
+			card: '0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04)',
+			'card-hover': '0 6px 16px rgba(15, 23, 42, 0.10)',
 		},
   		colors: {
   			navy: {
@@ -30,13 +30,13 @@ module.exports = {
   				800: '#6E5816', 900: '#4A3C12',
   			},
   			success: {
-  				DEFAULT: '#15803D', 50: '#F0FDF4', 100: '#DCFCE7', 600: '#15803D', 700: '#166534',
+  				DEFAULT: '#16A34A', 50: '#F0FDF4', 100: '#DCFCE7', 600: '#16A34A', 700: '#15803D',
   			},
   			warning: {
-  				DEFAULT: '#B45309', 50: '#FFFBEB', 100: '#FEF3C7', 600: '#B45309', 700: '#92400E',
+  				DEFAULT: '#D97706', 50: '#FFFBEB', 100: '#FEF3C7', 600: '#D97706', 700: '#B45309',
   			},
   			danger: {
-  				DEFAULT: '#B91C1C', 50: '#FEF2F2', 100: '#FEE2E2', 600: '#B91C1C', 700: '#991B1B',
+  				DEFAULT: '#DC2626', 50: '#FEF2F2', 100: '#FEE2E2', 600: '#DC2626', 700: '#B91C1C',
   			},
   			info: {
   				DEFAULT: '#1D4ED8', 50: '#EFF6FF', 100: '#DBEAFE', 600: '#1D4ED8', 700: '#1E40AF',

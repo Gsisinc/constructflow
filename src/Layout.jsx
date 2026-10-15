@@ -165,7 +165,7 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
         "group flex items-center gap-3 px-4 py-2.5 rounded-r-lg text-sm font-medium transition-all duration-200 min-h-[44px] border-l-[3px]",
         isActive
           ? "bg-[#16335C] text-white font-semibold border-[#C9A227] shadow-sm"
-          : "text-white/70 border-transparent hover:bg-[#16335C] hover:text-white"
+          : "text-white/70 border-transparent hover:bg-white/5 hover:text-white"
       )}
     >
       <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-[#C9A227]" : "text-[#C9A227]/70 group-hover:text-[#C9A227]")} />
