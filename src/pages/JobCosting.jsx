@@ -16,7 +16,7 @@ export default function JobCosting() {
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects-jobcosting'],
-    queryFn: async () => (await base44.entities.Project.filter({}, { sort: '-created_date', limit: 200, fields: ['name', 'client_name', 'budget', 'status', 'progress'] }))?.items || [],
+    queryFn: async () => (await base44.entities.Project.filter({}, { sort: '-created_date', limit: 200, fields: ['name', 'client_name', 'budget', 'status', 'progress', 'projected_final_cost', 'cost_to_complete'] }))?.items || [],
   });
 
   const { data: expenses = [] } = useQuery({
@@ -27,6 +27,12 @@ export default function JobCosting() {
   const { data: changeOrders = [] } = useQuery({
     queryKey: ['changeorders-jobcosting'],
     queryFn: async () => (await base44.entities.ChangeOrder.filter({}, { limit: 200, fields: ['project_id', 'cost_impact', 'status'] }))?.items || [],
+  });
+
+  // WIP Report: invoices (same SalesInvoice data the Billing page's "Billed" column uses)
+  const { data: wipInvoices = [] } = useQuery({
+    queryKey: ['invoices-jobcosting-wip'],
+    queryFn: async () => (await base44.entities.SalesInvoice.filter({}, { sort: '-invoice_date', limit: 1000, fields: ['invoice_number', 'total_amount', 'status', 'project_id', 'invoice_date'] }))?.items || [],
   });
 
   const filteredProjects = selectedProject === 'all' ? projects : projects.filter(p => p.id === selectedProject);
@@ -50,6 +56,36 @@ export default function JobCosting() {
     const spent = safeNum(expenses.filter(e => e.project_id === p.id).reduce((s, e) => s + safeNum(e.amount), 0));
     return { name: (p.name || '').substring(0, 15), budget: safeNum(p.budget), actual: spent, variance: safeNum(p.budget) - spent };
   });
+
+  // ---- WIP Report calculations ----
+  // Billed to Date = sum of non-draft SalesInvoice total_amount per project (same logic as Billing's "Billed").
+  const wipBilledByProject = {};
+  wipInvoices.forEach(inv => {
+    if (!inv.project_id || inv.status === 'draft') return;
+    wipBilledByProject[inv.project_id] = safeNum(wipBilledByProject[inv.project_id]) + safeNum(inv.total_amount);
+  });
+  const wipRows = filteredProjects.map(p => {
+    const cost = safeNum(expenses.filter(e => e.project_id === p.id).reduce((s, e) => s + safeNum(e.amount), 0));
+    // Contract to Date = contract value (Project.budget) + approved/executed change orders (same rule as Revised Budget above)
+    const coImpact = safeNum(changeOrders.filter(co => co.project_id === p.id && (co.status === 'approved' || co.status === 'executed')).reduce((s, co) => s + safeNum(co.cost_impact), 0));
+    const contract = safeNum(p.budget) + coImpact;
+    // EAC = projected_final_cost, else cost to date + PM cost_to_complete; 0 means not set
+    const finalCost = safeNum(p.projected_final_cost);
+    const toComplete = safeNum(p.cost_to_complete);
+    const eac = finalCost > 0 ? finalCost : (toComplete > 0 ? cost + toComplete : 0);
+    const pct = eac > 0 ? Math.min(cost / eac, 1) : 0;
+    const earned = pct * contract;
+    const billed = safeNum(wipBilledByProject[p.id]);
+    return { id: p.id, name: p.name, contract, eac, cost, pct, earned, billed, overUnder: billed - earned };
+  });
+  const wipTotals = {
+    contract: wipRows.reduce((s, r) => s + r.contract, 0),
+    eac: wipRows.reduce((s, r) => s + r.eac, 0),
+    cost: wipRows.reduce((s, r) => s + r.cost, 0),
+    earned: wipRows.reduce((s, r) => s + r.earned, 0),
+    billed: wipRows.reduce((s, r) => s + r.billed, 0),
+    overUnder: wipRows.reduce((s, r) => s + r.overUnder, 0),
+  };
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -161,32 +197,49 @@ export default function JobCosting() {
                   <thead>
                     <tr className="border-b text-left">
                       <th className="pb-2 font-semibold text-slate-600">Project</th>
-                      <th className="pb-2 font-semibold text-slate-600 text-right">Contract Value</th>
+                      <th className="pb-2 font-semibold text-slate-600 text-right">Contract to Date</th>
+                      <th className="pb-2 font-semibold text-slate-600 text-right">EAC</th>
+                      <th className="pb-2 font-semibold text-slate-600 text-right">Cost to Date</th>
                       <th className="pb-2 font-semibold text-slate-600 text-right">% Complete</th>
-                      <th className="pb-2 font-semibold text-slate-600 text-right">Earned Revenue</th>
-                      <th className="pb-2 font-semibold text-slate-600 text-right">Costs to Date</th>
-                      <th className="pb-2 font-semibold text-slate-600 text-right">Over/Under</th>
+                      <th className="pb-2 font-semibold text-slate-600 text-right">Earned</th>
+                      <th className="pb-2 font-semibold text-slate-600 text-right">Billed to Date</th>
+                      <th className="pb-2 font-semibold text-slate-600 text-right">Over/(Under)</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredProjects.map(p => {
-                      const spent = safeNum(expenses.filter(e => e.project_id === p.id).reduce((s, e) => s + safeNum(e.amount), 0));
-                      const pct = safeNum(p.progress) || 0;
-                      const earned = safeNum(p.budget) * (pct / 100);
-                      const overUnder = earned - spent;
+                    {wipRows.map(r => {
+                      const ou = Math.round(r.overUnder * 100) / 100;
                       return (
-                        <tr key={p.id} className="border-b hover:bg-slate-50">
-                          <td className="py-3 font-medium">{p.name}</td>
-                          <td className="py-3 text-right">${safeNum(p.budget).toLocaleString()}</td>
-                          <td className="py-3 text-right">{pct}%</td>
-                          <td className="py-3 text-right">${earned.toLocaleString()}</td>
-                          <td className="py-3 text-right">${spent.toLocaleString()}</td>
-                          <td className={`py-3 text-right font-medium ${overUnder >= 0 ? 'text-green-600' : 'text-red-600'}`}>{overUnder >= 0 ? '+' : ''}${Math.abs(overUnder).toLocaleString()}</td>
+                        <tr key={r.id} className="border-b hover:bg-slate-50">
+                          <td className="py-3 font-medium">{r.name}</td>
+                          <td className="py-3 text-right">{wipMoney(r.contract)}</td>
+                          <td className="py-3 text-right">{r.eac > 0 ? wipMoney(r.eac) : <span className="text-slate-400 italic">Set budget</span>}</td>
+                          <td className="py-3 text-right">{wipMoney(r.cost)}</td>
+                          <td className="py-3 text-right">{(r.pct * 100).toFixed(1)}%</td>
+                          <td className="py-3 text-right">{wipMoney(r.earned)}</td>
+                          <td className="py-3 text-right">{wipMoney(r.billed)}</td>
+                          <td className={`py-3 text-right font-medium ${ou > 0 ? 'text-amber-600' : ou < 0 ? 'text-slate-700' : 'text-slate-500'}`}>
+                            {wipOverUnder(ou)}{ou > 0 ? <span className="ml-1 text-xs">Over</span> : ou < 0 ? <span className="ml-1 text-xs">Under</span> : null}
+                          </td>
                         </tr>
                       );
                     })}
-                    {filteredProjects.length === 0 && <tr><td colSpan={6} className="py-8 text-center text-slate-400">No projects found</td></tr>}
+                    {wipRows.length === 0 && <tr><td colSpan={8} className="py-8 text-center text-slate-400">No projects found</td></tr>}
                   </tbody>
+                  {wipRows.length > 0 && (
+                    <tfoot>
+                      <tr className="border-t-2 font-bold text-slate-900">
+                        <td className="py-3">Total</td>
+                        <td className="py-3 text-right">{wipMoney(wipTotals.contract)}</td>
+                        <td className="py-3 text-right">{wipMoney(wipTotals.eac)}</td>
+                        <td className="py-3 text-right">{wipMoney(wipTotals.cost)}</td>
+                        <td className="py-3 text-right"></td>
+                        <td className="py-3 text-right">{wipMoney(wipTotals.earned)}</td>
+                        <td className="py-3 text-right">{wipMoney(wipTotals.billed)}</td>
+                        <td className={`py-3 text-right ${wipTotals.overUnder > 0.005 ? 'text-amber-600' : ''}`}>{wipOverUnder(Math.round(wipTotals.overUnder * 100) / 100)}</td>
+                      </tr>
+                    </tfoot>
+                  )}
                 </table>
               </div>
             </CardContent>
@@ -201,4 +254,14 @@ function fmt(n) {
   const v = safeNum(n);
   if (Math.abs(v) >= 1000) return `$${(v / 1000).toFixed(0)}K`;
   return `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
+function wipMoney(n) {
+  return `$${safeNum(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+// Over/(Under): positive = Over (billed more than earned), negative shown in parentheses = Under
+function wipOverUnder(n) {
+  const v = safeNum(n);
+  return v < 0 ? `(${wipMoney(Math.abs(v))})` : wipMoney(v);
 }
