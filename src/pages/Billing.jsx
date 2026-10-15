@@ -73,7 +73,7 @@ export default function Billing() {
                     <th className="pb-2 font-semibold">Project</th>
                     <th className="pb-2 font-semibold text-right">Contract</th>
                     <th className="pb-2 font-semibold text-right">Billed</th>
-                    <th className="pb-2 font-semibold text-right">Retention (10%)</th>
+                    <th className="pb-2 font-semibold text-right">Retention Held</th>
                     <th className="pb-2 font-semibold text-right">Outstanding</th>
                     <th className="pb-2 font-semibold">Status</th>
                   </tr>

@@ -12,6 +12,7 @@ import {
   FileText,
   Wallet,
   AlertTriangle,
+  TrendingUp,
   ShoppingCart,
   CalendarClock,
   Briefcase,
@@ -179,8 +180,8 @@ export default function Dashboard() {
   const pipelineBids = bidList.filter((b) => PIPELINE_STATUSES.includes(b.status));
   const pipelineCount = pipelineBids.length;
   const pipelineValue = pipelineBids.reduce((s, b) => s + (b.estimated_value || 0), 0);
-  // Billing Outstanding — from actual invoices (shared with Billing page)
-  const billingOutstanding = billingTotals?.outstanding || 0;
+  // Billing totals (contract / billed / outstanding / retention) come from the same
+  // useProjectBilling hook as the Billing page, so the four figures match exactly.
   const costPct = sumBudgetActive ? (sumSpentActive / sumBudgetActive) * 100 : 0;
 
   // DualTrack red flags — a project is flagged if any of its stages has a fade or a blocked track
@@ -238,13 +239,15 @@ export default function Dashboard() {
       {/* KPI Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <KpiCard title="All Jobs" value={projects.length} sub={`${activeJobs.length} active`} icon={HardHat} loading={loadingProjects} />
-        <KpiCard title="Total Contract Value" value={fmtCompact(sumBudgetActive)} sub="across active jobs" icon={FileText} loading={loadingProjects} />
+        <KpiCard title="Total Contract Value" value={fmtMoney(billingTotals?.contract)} sub="matches Billing" icon={FileText} loading={loadingProjects} />
+        <KpiCard title="Billed to Date" value={fmtMoney(billingTotals?.billed)} sub="invoices issued" icon={TrendingUp} loading={loadingProjects} />
+        <KpiCard title="Outstanding" value={fmtMoney(billingTotals?.outstanding)} sub="billed − paid" icon={AlertTriangle} loading={loadingProjects} />
+        <KpiCard title="Retention Held" value={fmtMoney(billingTotals?.retention)} sub="from pay apps" icon={Receipt} loading={loadingProjects} />
         <KpiCard title="Cost to Date vs Budget" value={fmtCompact(sumSpentActive)} sub={`of ${fmtCompact(sumBudgetActive)} budget`} icon={Wallet} loading={loadingProjects} progress={costPct} />
         <KpiCard title="DualTrack Red Flags" value={redFlagProjectIds.size} sub="projects off track" icon={Flag} accent="gold" loading={loadingDual} />
         <KpiCard title="Open POs" value={openPOs.length} sub="awaiting fulfillment" icon={ShoppingCart} loading={loadingPOs} />
         <KpiCard title="Upcoming Milestones" value={upcomingTasks.length} sub="next 7 days" icon={CalendarClock} loading={loadingTasks} />
         <KpiCard title="Bids in Pipeline" value={pipelineCount} sub={`${fmtCompact(pipelineValue)} value`} icon={Briefcase} loading={loadingBids} />
-        <KpiCard title="Billing Outstanding" value={fmtCompact(billingOutstanding)} sub="contract − billed" icon={Receipt} loading={loadingProjects} />
       </div>
 
       {/* All Jobs table */}

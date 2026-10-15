@@ -35,6 +35,21 @@ export function useOrgInvoices(orgId) {
   });
 }
 
+// All PayApplications for the org (actual retention held, by project).
+export function useOrgPayApps(orgId) {
+  return useQuery({
+    queryKey: ['org-payapps', orgId],
+    queryFn: async () => {
+      const res = await base44.entities.PayApplication.filter(
+        { organization_id: orgId },
+        { sort: '-created_date', limit: 1000, fields: ['project_id', 'retention_amount', 'status'] }
+      );
+      return res?.items || res || [];
+    },
+    enabled: !!orgId,
+  });
+}
+
 const safe = (n) => (Number.isFinite(n) ? n : 0);
 
 // Billed = sum of invoice totals (status != draft) grouped by project.
@@ -47,19 +62,45 @@ function billedByProject(invoices) {
   return map;
 }
 
+// Paid = sum of invoice totals where status === 'paid' (collected), grouped by project.
+function paidByProject(invoices) {
+  const map = {};
+  invoices.forEach((inv) => {
+    if (!inv.project_id || inv.status !== 'paid') return;
+    map[inv.project_id] = safe(map[inv.project_id]) + safe(inv.total_amount);
+  });
+  return map;
+}
+
+// Retention held = sum of actual retention_amount on billed (non-draft) pay apps, by project.
+function retentionByProject(payApps) {
+  const map = {};
+  payApps.forEach((pa) => {
+    if (!pa.project_id || pa.status === 'draft') return;
+    map[pa.project_id] = safe(map[pa.project_id]) + safe(pa.retention_amount);
+  });
+  return map;
+}
+
 // Shared billing rows + totals for Billing and Dashboard.
-export function useProjectBilling(orgId, retentionPct = 10) {
+export function useProjectBilling(orgId) {
   const projectsQ = useOrgProjects(orgId);
   const invoicesQ = useOrgInvoices(orgId);
+  const payAppsQ = useOrgPayApps(orgId);
   const projects = projectsQ.data || [];
   const invoices = invoicesQ.data || [];
+  const payApps = payAppsQ.data || [];
   const billedMap = billedByProject(invoices);
+  const paidMap = paidByProject(invoices);
+  const retentionMap = retentionByProject(payApps);
 
   const rows = projects.map((p) => {
     const contract = safe(p.budget);
     const billed = safe(billedMap[p.id]);
-    const retention = Math.round(contract * (retentionPct / 100));
-    const outstanding = Math.max(0, contract - billed);
+    const paid = safe(paidMap[p.id]);
+    const retention = safe(retentionMap[p.id]);
+    // Outstanding = billed minus collected, never more than the contract value.
+    const outstanding = Math.max(0, Math.min(billed - paid, contract));
     const status = contract > 0 && billed >= contract ? 'complete' : billed > 0 ? 'partial' : 'unbilled';
     return {
       id: p.id,
@@ -68,6 +109,7 @@ export function useProjectBilling(orgId, retentionPct = 10) {
       status: p.status,
       contract,
       billed,
+      paid,
       retention,
       outstanding,
       billStatus: status,
@@ -77,11 +119,12 @@ export function useProjectBilling(orgId, retentionPct = 10) {
   const totals = {
     contract: rows.reduce((s, r) => s + r.contract, 0),
     billed: rows.reduce((s, r) => s + r.billed, 0),
+    paid: rows.reduce((s, r) => s + r.paid, 0),
     outstanding: rows.reduce((s, r) => s + r.outstanding, 0),
     retention: rows.reduce((s, r) => s + r.retention, 0),
     count: rows.length,
     billingCount: rows.filter((r) => BILLING_STATUSES.includes(r.status)).length,
   };
 
-  return { projects, invoices, rows, totals, isLoading: projectsQ.isLoading || invoicesQ.isLoading };
+  return { projects, invoices, payApps, rows, totals, isLoading: projectsQ.isLoading || invoicesQ.isLoading || payAppsQ.isLoading };
 }
