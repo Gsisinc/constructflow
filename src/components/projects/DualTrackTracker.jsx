@@ -217,6 +217,7 @@ function StageCard({ stage, gate, onUpdate }) {
     onUpdate(stage.id, patch);
   };
 
+  const anyDone = [...fieldItems, ...moneyItems].some((i) => i.completed);
   const cardTone = redFlag ? 'border-red-300 bg-red-50/30' : watch ? 'border-amber-300 bg-amber-50/20' : gatePassed ? 'border-green-300' : '';
   const statusBadge = gatePassed
     ? <Badge className="bg-green-100 text-green-700"><CheckCircle2 className="h-3 w-3 mr-1" />Cleared</Badge>
@@ -224,7 +225,9 @@ function StageCard({ stage, gate, onUpdate }) {
     ? <Badge className="bg-red-100 text-red-700"><Flag className="h-3 w-3 mr-1" />Red Flag</Badge>
     : watch
     ? <Badge className="bg-amber-100 text-amber-700"><Eye className="h-3 w-3 mr-1" />Watch</Badge>
-    : <Badge variant="secondary">In Progress</Badge>;
+    : anyDone
+    ? <Badge variant="secondary">In Progress</Badge>
+    : <Badge variant="neutral">Not Started</Badge>;
 
   return (
     <Card className={cardTone}>
