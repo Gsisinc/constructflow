@@ -146,8 +146,15 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
     const netDue = Math.round((thisPeriod - retentionAmount) * 100) / 100;
     const today = new Date().toISOString().slice(0, 10);
     try {
+      // Resolve the authoritative org id — the project prop can be stale/missing it,
+      // and a null org_id would exclude the invoice from the org-scoped Billing query.
+      let orgId = project?.organization_id;
+      if (!orgId) {
+        const fresh = (await base44.entities.Project.filter({ id: projectId }))[0];
+        orgId = fresh?.organization_id;
+      }
       const inv = await base44.entities.SalesInvoice.create({
-        organization_id: project?.organization_id,
+        organization_id: orgId,
         invoice_number: `PA-${Date.now().toString().slice(-6)}`,
         invoice_date: today,
         due_date: today,
@@ -162,7 +169,7 @@ export default function ScheduleOfValuesTab({ projectId, project }) {
         payment_terms: 'Net 30',
       });
       await base44.entities.PayApplication.create({
-        organization_id: project?.organization_id,
+        organization_id: orgId,
         project_id: projectId,
         application_number: `PA-${Date.now().toString().slice(-6)}`,
         period: today,
