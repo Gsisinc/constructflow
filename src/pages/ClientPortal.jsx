@@ -12,7 +12,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, MessageSquare, Image as ImageIcon, FileText, Send, Clock, Home, Loader2, Wrench } from 'lucide-react';
-import { format } from 'date-fns';
 import { fmtDate } from '@/lib/dates';
 import { toast } from 'sonner';
 import ProjectDeadlines from '../components/calendar/ProjectDeadlines';
@@ -212,7 +211,7 @@ export default function ClientPortal() {
                     <p className="text-sm font-medium text-slate-700 mb-2">Recent updates</p>
                     <ul className="space-y-1 max-h-32 overflow-y-auto text-sm text-slate-600">
                       {updates.slice(0, 5).map((u) => (
-                        <li key={u.id}><span className="font-medium">{u.title || u.update_type}:</span> {u.content || u.message} — {u.created_date ? format(new Date(u.created_date), 'MMM d') : ''}</li>
+                        <li key={u.id}><span className="font-medium">{u.title || u.update_type}:</span> {u.content || u.message} — {u.created_date ? fmtDate(u.created_date, 'MMM d') : ''}</li>
                       ))}
                     </ul>
                   </div>
@@ -442,7 +441,7 @@ export default function ClientPortal() {
                                 )}
                               </div>
                               <span className="text-sm text-slate-500">
-                                {format(new Date(update.created_date), 'MMM dd, yyyy')}
+                                {fmtDate(update.created_date, 'MMM dd, yyyy')}
                               </span>
                             </div>
                             {update.title && <p className="font-semibold text-slate-900 mb-1">{update.title}</p>}

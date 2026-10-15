@@ -317,7 +317,7 @@ export default function Bids() {
               <p className="text-sm font-semibold text-slate-900">Daily Bid Scraper</p>
               <p className="text-xs text-slate-500">
                 {scraperStatus?.last_run
-                  ? `Last run ${fmtDate((scraperStatus.last_run || '').slice(0, 10))} · ${scraperStatus.records_added ?? 0} records added`
+                  ? `Last run ${fmtDate(scraperStatus.last_run, 'MMM d, yyyy · h:mm a')} · ${scraperStatus.records_added ?? 0} records added`
                   : 'Never run · scheduled daily at 6 AM PT'}
               </p>
             </div>

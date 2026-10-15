@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
+import { fmtDate } from '@/lib/dates';
 import { cn } from '@/lib/utils';
 import EmptyState from '../components/ui/EmptyState';
 
@@ -132,7 +133,7 @@ export default function PurchaseOrders() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-2 text-xs">
                 <div><p className="text-slate-500">Total</p><p className="font-semibold">${(po.total || 0).toLocaleString()}</p></div>
-                <div><p className="text-slate-500">Date</p><p className="font-semibold">{po.po_date ? format(new Date(po.po_date), 'MMM d') : '-'}</p></div>
+                <div><p className="text-slate-500">Date</p><p className="font-semibold">{po.po_date ? fmtDate(po.po_date, 'MMM d') : '-'}</p></div>
               </div>
               <div className="flex gap-1 pt-1 border-t border-slate-100 flex-wrap">
                 {po.status === 'pending_approval' && (
@@ -179,7 +180,7 @@ export default function PurchaseOrders() {
                   <tr key={po.id} className="border-b border-slate-100 hover:bg-amber-50/30">
                     <td className="p-4 font-medium text-slate-900 break-words">{po.po_number || '-'}</td>
                     <td className="p-4 text-slate-600">{po.vendor}</td>
-                    <td className="p-4 text-slate-600">{po.po_date ? format(new Date(po.po_date), 'MMM d, yyyy') : '-'}</td>
+                    <td className="p-4 text-slate-600">{po.po_date ? fmtDate(po.po_date, 'MMM d, yyyy') : '-'}</td>
                     <td className="p-4 font-semibold">${(po.total || 0).toLocaleString()}</td>
                     <td className="p-4"><Badge className={cn("border text-xs", statusColors[po.status])}>{po.status?.replace('_', ' ')}</Badge></td>
                     <td className="p-4 text-right space-x-1">
@@ -253,7 +254,7 @@ function generatePDF(po) {
   doc.setFontSize(10);
   doc.text(`PO Number: ${po.po_number || 'N/A'}`, 20, yPos);
   yPos += 6;
-  doc.text(`Date: ${po.po_date ? format(new Date(po.po_date), 'MMM d, yyyy') : 'N/A'}`, 20, yPos);
+  doc.text(`Date: ${po.po_date ? fmtDate(po.po_date, 'MMM d, yyyy') : 'N/A'}`, 20, yPos);
   yPos += 6;
   doc.text(`Vendor: ${po.vendor}`, 20, yPos);
   yPos += 10;

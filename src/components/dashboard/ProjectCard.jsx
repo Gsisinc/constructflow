@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, DollarSign } from 'lucide-react';
-import { format } from 'date-fns';
+import { fmtDate } from '@/lib/dates';
 
 const statusColors = {
   bidding: 'bg-purple-50 text-purple-700 border-purple-200',
@@ -73,7 +73,7 @@ export default function ProjectCard({ project }) {
           {project.end_date && (
             <div className="flex items-center gap-1.5">
               <Calendar className="h-3.5 w-3.5" />
-              <span>{format(new Date(project.end_date), 'MMM d')}</span>
+              <span>{fmtDate(project.end_date, 'MMM d')}</span>
             </div>
           )}
         </div>
