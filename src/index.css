@@ -378,3 +378,108 @@ body, html { overscroll-behavior-y: none; overscroll-behavior-x: none; }
 
 /* navy cards in light keep a subtle sheen (premium.css v2), not the white one */
 html.theme-light :is(.gs-attn,.gs-alert)::before, html[data-theme=light] :is(.gs-attn,.gs-alert)::before { background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 40%); }
+
+/* =====================================================================
+   DARK-MODE OVERRIDE LAYER (v2)
+   Pages hard-code light Tailwind classes. In DARK only, remap them to premium tokens.
+   Scope D = dark theme and NOT light. Specificity (0,3,x) beats Tailwind utilities (0,1,0),
+   so !important is only used where inline-ish arbitrary values or gradients need it.
+   Note: tailwind.config remaps blue-* to the navy scale, so text-blue-* is navy (invisible on dark).
+   ===================================================================== */
+
+/* --- Logo plate: frosted in dark (mockup), white in light. Image untouched. --- */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .gs-logo-plate {
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));
+  box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 0 0 1px rgba(212,165,55,.30),0 10px 28px -10px rgba(0,0,0,.6),0 0 30px -12px rgba(212,165,55,.40);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+}
+
+/* --- Surfaces: white / near-white boxes -> premium glass --- */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.bg-white,.bg-\[\#fff\],.bg-\[\#ffffff\],.bg-\[\#FFFFFF\],.bg-\[\#fafaf9\],.bg-card) {
+  background:linear-gradient(180deg,rgba(24,48,86,.55),rgba(12,28,54,.50)) !important;
+  border-color:var(--line);
+  backdrop-filter:blur(16px) saturate(130%); -webkit-backdrop-filter:blur(16px) saturate(130%);
+}
+/* quiet / tinted light surfaces -> subtle glass */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.bg-gray-50,.bg-slate-50,.bg-slate-50\/50,.bg-slate-50\/60,.bg-navy-50,.bg-blue-50,.bg-stone-50,.bg-neutral-50) {
+  background-color:rgba(255,255,255,.035) !important;
+}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.bg-gray-100,.bg-slate-100,.bg-navy-100,.bg-stone-100) {
+  background-color:rgba(255,255,255,.06) !important;
+}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.bg-gray-200,.bg-slate-200,.bg-slate-300,.bg-navy-200) {
+  background-color:rgba(148,178,226,.14) !important;
+}
+/* light gradients (from-slate-50 to-slate-100, from-blue-50 ... to-white) */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.from-slate-50,.from-gray-50,.from-blue-50,.from-blue-100,.from-white) {
+  --tw-gradient-from:rgba(24,48,86,.55) !important;
+  --tw-gradient-to:rgba(12,28,54,.5) !important;
+  --tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to) !important;
+}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.to-white,.to-slate-50,.to-slate-100,.to-blue-50,.to-gray-50) {
+  --tw-gradient-to:rgba(12,28,54,.5) !important;
+}
+/* light status pills keep hue but go translucent */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-blue-100 { background-color:rgba(94,168,255,.14) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-green-50,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-green-100,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-emerald-50,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-emerald-100,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-success-50,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-success-100 { background-color:rgba(61,214,140,.13) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-red-50,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-red-100,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-danger-50,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-danger-100 { background-color:rgba(255,107,107,.14) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-amber-50,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-amber-100,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-yellow-50,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-yellow-100,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-orange-50,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-orange-100,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-warning-50,
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .bg-warning-100 { background-color:rgba(245,181,68,.14) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.bg-purple-50,.bg-purple-100,.bg-violet-50,.bg-violet-100,.bg-indigo-50,.bg-indigo-100) { background-color:rgba(167,139,250,.14) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.bg-gold-50,.bg-gold-100) { background-color:rgba(212,165,55,.14) !important; }
+/* status text: deep -700/-800 shades -> premium bright tones */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-green-600,.text-green-700,.text-green-800,.text-emerald-600,.text-emerald-700,.text-success-600,.text-success-700) { color:var(--green) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-red-600,.text-red-700,.text-red-800,.text-danger-600,.text-danger-700) { color:var(--red) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-amber-600,.text-amber-700,.text-amber-800,.text-yellow-700,.text-yellow-800,.text-orange-600,.text-orange-700,.text-warning-600,.text-warning-700) { color:var(--amber) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-purple-600,.text-purple-700,.text-violet-700,.text-indigo-600,.text-indigo-700) { color:var(--violet) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-gold-600,.text-gold-700,.text-gold-800) { color:var(--gold-2) !important; }
+
+/* --- Text: dark ink -> premium light text --- */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-slate-900,.text-gray-900,.text-slate-950,.text-black,.text-navy-900,.text-navy-800,.text-\[\#111827\],.text-\[\#1c1917\],.text-\[\#08111F\],.text-\[\#0B1F3A\]) { color:var(--text) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-slate-800,.text-gray-800,.text-slate-700,.text-gray-700,.text-navy-700,.text-\[\#57534e\]) { color:var(--text-2) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-slate-600,.text-gray-600,.text-slate-500,.text-gray-500,.text-\[\#4B5563\],.text-\[\#78716c\]) { color:var(--text-muted) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-slate-400,.text-gray-400,.text-\[\#a8a29e\]) { color:var(--dim) !important; }
+/* blue-* is the NAVY scale in tailwind.config -> invisible on dark; use premium blue/light */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.text-blue-600,.text-blue-700,.text-blue-800,.text-blue-900,.text-blue-500) { color:var(--blue) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.hover\:text-blue-600,.hover\:text-blue-500,.hover\:text-blue-400,.hover\:text-slate-900,.hover\:text-slate-700,.hover\:text-slate-600):hover { color:var(--gold-2) !important; }
+
+/* --- Borders / dividers -> premium line --- */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.border-slate-100,.border-slate-200,.border-slate-300,.border-gray-100,.border-gray-200,.border-gray-300,.border-navy-200,.border-blue-100,.border-blue-200,.border-blue-300,.border-white,.border-\[\#e7e5e4\],.border-\[\#E5E7EB\]) { border-color:var(--line-2) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.divide-slate-100,.divide-slate-200,.divide-gray-100,.divide-gray-200) > :not([hidden]) ~ :not([hidden]) { border-color:var(--line) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.hover\:border-slate-300,.hover\:border-\[\#d6d3d1\]):hover { border-color:var(--line-gold) !important; }
+
+/* --- Hover backgrounds --- */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.hover\:bg-slate-50,.hover\:bg-gray-50,.hover\:bg-blue-50,.hover\:bg-white):hover { background-color:rgba(255,255,255,.045) !important; }
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(.hover\:bg-slate-100,.hover\:bg-gray-100,.hover\:bg-slate-200):hover { background-color:rgba(255,255,255,.08) !important; }
+
+/* --- Navy / dark buttons that vanish on navy: gold outline + glow --- */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(button,a,[role=button]):is(.bg-blue-600,.bg-blue-700,.bg-blue-800,.bg-blue-900,.bg-navy-700,.bg-navy-800,.bg-navy-900,.bg-slate-800,.bg-slate-900,.bg-\[\#0B1F3A\],.bg-\[\#16335C\],.bg-primary-navy) {
+  color:#F3CF6D !important;
+  box-shadow:0 0 0 1px rgba(212,165,55,.55),0 8px 22px -10px rgba(0,0,0,.6),0 0 22px -8px rgba(212,165,55,.55) !important;
+}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(button,a,[role=button]):is(.bg-blue-600,.bg-blue-700,.bg-blue-800,.bg-blue-900,.bg-navy-700,.bg-navy-800,.bg-navy-900,.bg-slate-800,.bg-slate-900,.bg-\[\#0B1F3A\],.bg-\[\#16335C\]) svg { color:#F3CF6D; }
+/* gradient navy buttons (from-blue-600 to-blue-700 etc.) */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(button,a):is(.from-blue-500,.from-blue-600,.from-blue-700) {
+  box-shadow:0 0 0 1px rgba(212,165,55,.55),0 0 22px -8px rgba(212,165,55,.55) !important; color:#F3CF6D !important;
+}
+/* outline buttons with dark text (shadcn outline uses bg-background + border-input: already tokenized) */
+
+/* --- Inputs that hard-code white --- */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) :is(input,select,textarea).bg-white { background:rgba(255,255,255,.04) !important; color:var(--text); }
+
+/* keep navy shell untouched: sidebar & topbar content */
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light) .gs-sidebar .bg-white:not(img) { background:rgba(255,255,255,.06) !important; }
