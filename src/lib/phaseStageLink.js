@@ -51,7 +51,15 @@ const doneCount = (s) =>
 //     that stage's Field Track; all done -> cleared, partial -> in progress
 // Best-effort; never throws (called from conversion + on demand).
 export async function reconcileDualTrackFromPhases(base44Client, projectId) {
-  if (!projectId) return { reconciled: 0, deduped: 0 };
+  if (!projectId) return { reconciled: 0, deduped: 0, reqsDeduped: 0 };
+
+  // Dedupe duplicate PhaseRequirement records first (merge tick state, never
+  // delete a completed/ticked record) so the rebuild below sees one per text.
+  let reqsDeduped = 0;
+  try {
+    const r = await dedupePhaseRequirements(base44Client, projectId);
+    reqsDeduped = r?.deduped || 0;
+  } catch (e) { console.warn('req dedupe failed', e); }
 
   const phasePage = await base44Client.entities.CustomPhase.filter({ project_id: projectId }, { limit: 200, sort: 'order' });
   const phases = phasePage?.items || phasePage || [];
@@ -76,28 +84,30 @@ export async function reconcileDualTrackFromPhases(base44Client, projectId) {
     }
   }
 
-  // Map each phase -> stage, merging requirements when several phases map to one
+  // Map each phase -> stage. Requirements are deduped by text (a known re-seed
+  // artifact creates the same requirement several times); an item is completed
+  // if ANY duplicate req is completed OR the stage already had that text ticked
+  // (preserves manual ticks made directly in the tracker).
   const stagePatch = {};
   phases.forEach((p) => {
     const stageNum = stageForPhase(p.phase_name);
     if (!stageNum) return;
     const phaseReqs = reqsByPhase[p.phase_name] || [];
     if (!phaseReqs.length) return;
-    const items = phaseReqs.map((r) => ({ text: r.requirement_text, completed: r.status === 'completed' }));
-    const allDone = items.every((i) => i.completed);
-    const someDone = items.some((i) => i.completed);
-    const prev = stagePatch[stageNum];
-    const fieldItems = prev ? [...prev.fieldItems, ...items] : items;
-    const mergedAll = (prev ? prev.allDone : true) && allDone;
-    const mergedSome = (prev ? prev.someDone : false) || someDone;
-    stagePatch[stageNum] = { fieldItems, allDone: mergedAll, someDone: mergedSome };
+    const acc = stagePatch[stageNum]?.fieldItems
+      ? byTextFrom(stagePatch[stageNum].fieldItems)
+      : {};
+    (keepers[stageNum]?.field_track_items || []).forEach((it) => mergeItem(acc, it.text, !!it.completed));
+    phaseReqs.forEach((r) => mergeItem(acc, r.requirement_text, r.status === 'completed'));
+    stagePatch[stageNum] = { fieldItems: Object.values(acc) };
   });
 
   let reconciled = 0;
   for (const num of Object.keys(stagePatch)) {
     const stage = keepers[num];
     if (!stage) continue;
-    const { fieldItems, allDone } = stagePatch[num];
+    const { fieldItems } = stagePatch[num];
+    const allDone = fieldItems.length > 0 && fieldItems.every((i) => i.completed);
     const fieldStatus = trackStatusFor(fieldItems);
     const patch = {
       field_track_items: fieldItems,
@@ -121,5 +131,107 @@ export async function reconcileDualTrackFromPhases(base44Client, projectId) {
     }
   }
 
-  return { reconciled, deduped };
+  return { reconciled, deduped, reqsDeduped };
+}
+
+// ─── Requirement dedupe + idempotent seeding helpers ────────────────────────
+const normText = (t) => (t || '').trim();
+const keyFor = (t) => normText(t).toLowerCase();
+function mergeItem(acc, text, completed) {
+  const key = keyFor(text);
+  if (!key) return;
+  if (!(key in acc)) acc[key] = { text: normText(text), completed: !!completed };
+  else if (completed) acc[key].completed = true;
+}
+function byTextFrom(items) {
+  const acc = {};
+  (items || []).forEach((it) => mergeItem(acc, it.text, !!it.completed));
+  return acc;
+}
+
+// Dedupe duplicate PhaseRequirement records for a project. Per
+// (phase_name, requirement_text) group: if any duplicate is completed (ticked),
+// keep ALL completed records and delete only the non-completed duplicates; if
+// none are completed, keep the earliest and delete the rest. A completed/ticked
+// record is never deleted — tick state is preserved.
+export async function dedupePhaseRequirements(base44Client, projectId) {
+  const page = await base44Client.entities.PhaseRequirement.filter({ project_id: projectId }, { limit: 5000 });
+  const reqs = page?.items || page || [];
+  const groups = {};
+  reqs.forEach((r) => {
+    const key = `${r.phase_name || ''}\u0000${(r.requirement_text || '').trim().toLowerCase()}`;
+    (groups[key] = groups[key] || []).push(r);
+  });
+  let deduped = 0;
+  for (const key of Object.keys(groups)) {
+    const arr = groups[key];
+    if (arr.length <= 1) continue;
+    const completed = arr.filter((r) => r.status === 'completed');
+    if (completed.length >= 1) {
+      const keepIds = new Set(completed.map((r) => r.id));
+      for (const r of arr) {
+        if (keepIds.has(r.id)) continue;
+        try { await base44Client.entities.PhaseRequirement.delete(r.id); deduped++; } catch (e) { console.warn('req dedupe delete', e); }
+      }
+    } else {
+      arr.sort((a, b) => (a.created_date || '').localeCompare(b.created_date || ''));
+      for (let i = 1; i < arr.length; i++) {
+        try { await base44Client.entities.PhaseRequirement.delete(arr[i].id); deduped++; } catch (e) { console.warn('req dedupe delete', e); }
+      }
+    }
+  }
+  return { deduped };
+}
+
+// Dedupe a stage's field/money track items by text, merging completed state
+// (an item stays ticked if ANY duplicate was ticked). Safe to run on any stage;
+// never loses a tick.
+export async function dedupeStageTrackItems(base44Client, projectId) {
+  const page = await base44Client.entities.DualTrackStage.filter({ project_id: projectId }, { limit: 200 });
+  const stages = page?.items || page || [];
+  let deduped = 0;
+  for (const s of stages) {
+    const fieldItems = Object.values(byTextFrom(s.field_track_items));
+    const moneyItems = Object.values(byTextFrom(s.money_track_items));
+    const hadFieldDups = (s.field_track_items?.length || 0) !== fieldItems.length;
+    const hadMoneyDups = (s.money_track_items?.length || 0) !== moneyItems.length;
+    if (!hadFieldDups && !hadMoneyDups) continue;
+    const fieldStatus = trackStatusFor(fieldItems);
+    const moneyStatus = trackStatusFor(moneyItems);
+    const gate = (fieldItems.length > 0 && moneyItems.length > 0 && fieldItems.every((i) => i.completed) && moneyItems.every((i) => i.completed))
+      ? true : !!s.exit_gate_passed;
+    const patch = {
+      field_track_items: fieldItems,
+      money_track_items: moneyItems,
+      field_track_status: fieldStatus,
+      money_track_status: moneyStatus,
+      exit_gate_passed: gate,
+    };
+    try { await base44Client.entities.DualTrackStage.update(s.id, patch); deduped++; } catch (e) { console.warn('stage track dedupe update', e); }
+  }
+  return { deduped };
+}
+
+// Idempotently seed PhaseRequirements for a project from a phase template. Only
+// (phase_name, requirement_text) pairs not already present are created, so
+// re-running the seed (or running it after a carry-over) never duplicates.
+export async function seedRequirementsIdempotent(base44Client, projectId, templatePhases) {
+  const page = await base44Client.entities.PhaseRequirement.filter({ project_id: projectId }, { limit: 5000 });
+  const existing = page?.items || page || [];
+  const have = new Set(existing.map((r) => `${r.phase_name || ''}\u0000${(r.requirement_text || '').trim().toLowerCase()}`));
+  const reqs = [];
+  templatePhases.forEach((phase) => {
+    const phaseName = phase.phase || phase.phase_name || phase.name || '';
+    (phase.items || []).forEach((item) => {
+      const text = (typeof item === 'string' ? item : item?.text || '').trim();
+      if (!text) return;
+      const key = `${phaseName}\u0000${text.toLowerCase()}`;
+      if (have.has(key)) return;
+      have.add(key);
+      const completed = typeof item === 'object' && !!item?.completed;
+      reqs.push({ project_id: projectId, phase_name: phaseName, requirement_text: text, status: completed ? 'completed' : 'pending' });
+    });
+  });
+  if (reqs.length) await base44Client.entities.PhaseRequirement.bulkCreate(reqs);
+  return { created: reqs.length };
 }
