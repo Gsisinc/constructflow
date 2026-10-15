@@ -140,7 +140,7 @@ export default function SafetyManager({ projectId }) {
 
         <Dialog open={showForm} onOpenChange={setShowForm}>
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingIncident(null)} variant="destructive">
+            <Button onClick={() => setEditingIncident(null)}>
               <AlertTriangle className="h-4 w-4 mr-2" />
               Report Incident
             </Button>
