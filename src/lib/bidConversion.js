@@ -33,13 +33,22 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
   // Carry labor hours, labor rate and equipment cost over from the bid's
   // linked estimate so the project starts with the estimator's numbers.
   let estimate = null;
-  if (bid.linked_estimate_id) {
-    try {
+  try {
+    if (bid.linked_estimate_id) {
       const ests = await base44Client.entities.BidEstimate.filter({ id: bid.linked_estimate_id });
       estimate = ests?.[0] || null;
-    } catch (e) {
-      console.warn('estimate carry-over lookup failed', e);
     }
+    // Fallback: the bid's linked_estimate_id is not always set (EstimateEditor
+    // doesn't write it), so pull the latest estimate for this bid directly.
+    if (!estimate) {
+      const page = await base44Client.entities.BidEstimate.filter(
+        { bid_opportunity_id: bid.id },
+        { sort: '-created_date', limit: 1 }
+      );
+      estimate = Array.isArray(page) ? page[0] : page?.items?.[0] || null;
+    }
+  } catch (e) {
+    console.warn('estimate carry-over lookup failed', e);
   }
 
   const project = await base44Client.entities.Project.create({
