@@ -46,22 +46,42 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
     linked_bid_id: bid.id,
   });
 
-  // Seed default phases + requirements for this project type (same as New Project)
-  const tpl = getPhaseTemplate(projectType);
-  const customPhases = tpl.map((phase, idx) => ({
-    project_id: project.id,
-    phase_name: phase.phase,
-    display_name: phase.phase,
-    order: idx,
-    status: 'pending',
-  }));
-  if (customPhases.length) await base44Client.entities.CustomPhase.bulkCreate(customPhases);
+  // Carry over the bid's phases/stages/gates/requirements/notes/files EXACTLY.
+  // While the bid was open, its phase entities were scoped to project_id = bid.id
+  // (the PM did the logistics walk-down there). Re-point those same records to the
+  // new project id — nothing is recreated, so tick state, notes and files survive.
+  const phaseEntities = ['CustomPhase', 'PhaseGate', 'PhaseRequirement', 'PhaseFile', 'PhaseNote', 'DualTrackStage'];
+  for (const e of phaseEntities) {
+    try {
+      await base44Client.entities[e].updateMany({ project_id: bid.id }, { $set: { project_id: project.id } });
+    } catch (err) {
+      console.warn('phase carry-over failed for', e, err);
+    }
+  }
 
-  const reqs = [];
-  tpl.forEach((phase) => (phase.items || []).forEach((item) => {
-    if (item && item.trim()) reqs.push({ project_id: project.id, phase_name: phase.phase, requirement_text: item.trim(), status: 'pending' });
-  }));
-  if (reqs.length) await base44Client.entities.PhaseRequirement.bulkCreate(reqs);
+  // Fallback: if the bid never opened its phase tabs (no CustomPhase carried over),
+  // seed the default template on the project so it always has phases.
+  let carriedPhases = 0;
+  try {
+    const existing = await base44Client.entities.CustomPhase.filter({ project_id: project.id }, { limit: 1 });
+    carriedPhases = (existing?.items || existing || []).length;
+  } catch {}
+  if (carriedPhases === 0) {
+    const tpl = getPhaseTemplate(projectType);
+    const customPhases = tpl.map((phase, idx) => ({
+      project_id: project.id,
+      phase_name: phase.phase,
+      display_name: phase.phase,
+      order: idx,
+      status: 'pending',
+    }));
+    if (customPhases.length) await base44Client.entities.CustomPhase.bulkCreate(customPhases);
+    const reqs = [];
+    tpl.forEach((phase) => (phase.items || []).forEach((item) => {
+      if (item && item.trim()) reqs.push({ project_id: project.id, phase_name: phase.phase, requirement_text: item.trim(), status: 'pending' });
+    }));
+    if (reqs.length) await base44Client.entities.PhaseRequirement.bulkCreate(reqs);
+  }
 
   // Hand off bid requirements → project tasks (Sales → PM) and AI risks → issues.
   // Best-effort: the project + phases + link already succeeded, so a failure here

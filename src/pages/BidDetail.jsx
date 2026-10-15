@@ -21,6 +21,7 @@ import DrawingDesignerTab from '@/components/bids/DrawingDesignerTab';
 import BidDetailsEditor from '@/components/bids/BidDetailsEditor';
 import BidDrawings from '@/components/bids/BidDrawings';
 import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
+import BidPhaseWorkspace from '@/components/bids/BidPhaseWorkspace';
 
 const statusColors = {
   review: 'bg-blue-100 text-blue-800',
@@ -145,6 +146,7 @@ export default function BidDetail() {
       <Tabs defaultValue="overview" className="w-full sm:w-auto">
         <TabsList className="w-full sm:w-auto overflow-x-auto flex flex-nowrap gap-1 p-1 h-auto bg-slate-100 rounded-lg sm:inline-flex">
           <TabsTrigger value="overview" className="flex-shrink-0">Overview</TabsTrigger>
+          <TabsTrigger value="phases" className="flex-shrink-0">Phases/Stages</TabsTrigger>
           <TabsTrigger value="boq" className="flex-shrink-0">BOQ</TabsTrigger>
           <TabsTrigger value="requirements" className="flex-shrink-0">Requirements</TabsTrigger>
           <TabsTrigger value="documents" className="flex-shrink-0">Documents</TabsTrigger>
@@ -153,6 +155,10 @@ export default function BidDetail() {
           <TabsTrigger value="designer" className="flex-shrink-0">Designer</TabsTrigger>
           <TabsTrigger value="analysis" className="flex-shrink-0">AI Analysis</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="phases" className="space-y-4">
+          <BidPhaseWorkspace bid={bid} organizationId={user.organization_id} />
+        </TabsContent>
 
         <TabsContent value="overview" className="space-y-4">
           <BidDetailsEditor bid={bid} />
