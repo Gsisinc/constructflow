@@ -98,7 +98,7 @@ export default function GenerateSampleTransactions({ companyId, accounts, onGene
                 <p className="text-gray-600 mb-6">
                     Populate your books with sample data to see the application in action.
                 </p>
-                <Button 
+                {(typeof window !== 'undefined'&& !window.location.hostname.includes('mygsis.com')) && (<Button 
                     onClick={handleGenerate} 
                     disabled={isGenerating}
                     className="bg-gradient-to-r from-blue-500 to-blue-600"
@@ -109,7 +109,7 @@ export default function GenerateSampleTransactions({ companyId, accounts, onGene
                         <Wand2 className="w-4 h-4 mr-2" />
                     )}
                     {isGenerating ? 'Generating...' : 'Generate Sample Data'}
-                </Button>
+                </Button>)}
             </CardContent>
         </Card>
     );
