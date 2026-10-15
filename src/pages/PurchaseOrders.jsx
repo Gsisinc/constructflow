@@ -307,12 +307,6 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
     queryFn: () => base44.entities.Supplier.list(),
   });
 
-  const { data: costCodes = [] } = useQuery({
-    queryKey: ['poCostCodes', formData.project_id],
-    queryFn: async () => (await base44.entities.CostCodeBudgetLine.filter({ project_id: formData.project_id }, { sort: 'cost_code' }))?.items || [],
-    enabled: !!formData.project_id,
-  });
-
   const [formData, setFormData] = React.useState(po || {
     project_id: '',
     po_number: '',
@@ -323,6 +317,12 @@ function POForm({ open, onOpenChange, po, projects, onSubmit, loading }) {
     shipping: '',
     line_items: [],
     notes: '',
+  });
+
+  const { data: costCodes = [] } = useQuery({
+    queryKey: ['poCostCodes', formData.project_id],
+    queryFn: async () => (await base44.entities.CostCodeBudgetLine.filter({ project_id: formData.project_id }, { sort: 'cost_code' }))?.items || [],
+    enabled: !!formData.project_id,
   });
 
   React.useEffect(() => {
