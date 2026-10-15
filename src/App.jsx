@@ -93,10 +93,19 @@ const AuthenticatedApp = () => {
   const [showLoadingFallback, setShowLoadingFallback] = useState(false);
   const location = useLocation();
 
-  // FIX (tech loop): the old "backup" effect hard-reloaded (window.location.replace) technicians/clients to
-  // their portal on EVERY route change, even pages RoleGuard allows (Calendar, TaskTracker, TimeCards...).
-  // Combined with Layout's Onboarding redirect this produced an infinite full-page reload loop.
-  // RoleGuard already performs the role redirect client-side (<Navigate replace>), so the effect is removed.
+  // Backup: force technicians to Tech Portal, clients to Client Portal (in case auth redirect ran before route rendered)
+  useEffect(() => {
+    if (!user || isLoadingAuth) return;
+    if (user.role !== 'technician' && user.role !== 'client') return;
+    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || '';
+    const path = (location.pathname || '').replace(new RegExp('^' + (base || '')), '') || '/';
+    const segment = path.replace(/^\/+/, '').split('/')[0] || 'Home';
+    const target = user.role === 'technician' ? 'TechnicianPortal' : 'ClientPortal';
+    if (segment !== target) {
+      const origin = window.location.origin || '';
+      window.location.replace(`${origin}${base}/${target}`);
+    }
+  }, [user, user?.role, isLoadingAuth, location.pathname]);
 
   useEffect(() => {
     if (authError?.type === 'auth_required' && !hasStartedLoginRedirect && location.pathname !== '/Login') {
