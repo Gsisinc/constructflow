@@ -67,6 +67,30 @@
       "type": "boolean",
       "default": true,
       "description": "Can retake if failed"
+    },
+    "chat_kind": {
+      "type": "string",
+      "enum": [
+        "room",
+        "message"
+      ],
+      "description": "Chats feature only: 'room' or 'message'. Empty for real exam results."
+    },
+    "chat_room_id": {
+      "type": "string",
+      "description": "Chats: id of the room record a message belongs to"
+    },
+    "chat_room_name": {
+      "type": "string",
+      "description": "Chats: room/project name, e.g. 'Fire Sprinkler Tracy'"
+    },
+    "chat_sender": {
+      "type": "string",
+      "description": "Chats: display name typed by the sender for this session"
+    },
+    "chat_body": {
+      "type": "string",
+      "description": "Chats: message text"
     }
   },
   "required": [
