@@ -8,9 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ACCOUNT_TYPES = ["all", "Assets", "Liabilities", "Equity", "Revenue", "Expenses"];
 const TYPE_COLORS = {
-    Assets: "bg-blue-100 text-blue-800",
+    Assets: "bg-navy-100 text-navy-800",
     Liabilities: "bg-red-100 text-red-800",
-    Equity: "bg-purple-100 text-purple-800",
+    Equity: "bg-gold-100 text-gold-800",
     Revenue: "bg-green-100 text-green-800",
     Expenses: "bg-orange-100 text-orange-800",
 };

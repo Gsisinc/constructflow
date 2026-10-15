@@ -163,7 +163,7 @@ export default function Accounts() {
                                 <CardTitle className="text-sm font-medium text-gray-600">Total Balance</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-blue-600">
+                                <div className="text-2xl font-bold text-navy-900">
                                     ${totalBalance.toLocaleString()}
                                 </div>
                             </CardContent>

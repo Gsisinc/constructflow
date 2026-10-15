@@ -39,7 +39,7 @@ export default function Billing() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPI label="Total Contract Value" value={fmt(totals.contract)} icon={DollarSign} tone="slate" />
+        <KPI label="Total Contract Value" value={fmt(totals.contract)} icon={DollarSign} tone="navy" />
         <KPI label="Billed to Date" value={fmt(totals.billed)} icon={TrendingUp} tone="green" />
         <KPI label="Outstanding" value={fmt(totals.outstanding)} icon={AlertTriangle} tone="amber" />
         <KPI label="Retention Held" value={fmt(totals.retention)} icon={FileText} tone="navy" />

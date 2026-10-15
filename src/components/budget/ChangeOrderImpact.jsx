@@ -55,8 +55,8 @@ export default function ChangeOrderImpact({ changeOrders = [], onViewDetails }) 
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4">
-          <div className="flex items-center gap-2 text-blue-600 mb-2">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4">
+          <div className="flex items-center gap-2 text-navy-700 mb-2">
             <Calendar className="h-4 w-4" />
             <span className="text-sm font-medium">Schedule Impact</span>
           </div>
@@ -69,8 +69,8 @@ export default function ChangeOrderImpact({ changeOrders = [], onViewDetails }) 
           <p className="text-xs text-slate-500 mt-1">Net schedule change</p>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-4">
-          <div className="flex items-center gap-2 text-purple-600 mb-2">
+        <div className="bg-gradient-to-br from-gold-50 to-gold-100 rounded-xl p-4">
+          <div className="flex items-center gap-2 text-gold-700 mb-2">
             <FileText className="h-4 w-4" />
             <span className="text-sm font-medium">Scope Changes</span>
           </div>

@@ -342,10 +342,10 @@ export default function Bids() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Bids', value: stats.total, icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Total Bids', value: stats.total, icon: FileText, color: 'text-navy-700', bg: 'bg-navy-50' },
           { label: 'Won Bids', value: stats.won, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { label: 'Active Bids', value: stats.active, icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Pipeline Value', value: `$${(stats.value / 1000000).toFixed(1)}M`, icon: DollarSign, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+          { label: 'Pipeline Value', value: `$${(stats.value / 1000000).toFixed(1)}M`, icon: DollarSign, color: 'text-gold-700', bg: 'bg-gold-50' },
         ].map((stat, i) => (
           <Card key={i} className="premium-card border-none">
             <CardContent className="p-6 flex items-center gap-4">
