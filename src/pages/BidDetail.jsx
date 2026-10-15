@@ -28,15 +28,15 @@ import EstimateEditor from '@/components/bids/EstimateEditor';
 import { convertBidToProject } from '@/lib/bidConversion';
 
 const statusColors = {
-  review: 'bg-blue-100 text-blue-800',
-  intake: 'bg-cyan-100 text-cyan-800',
+  review: 'bg-navy-100 text-navy-800',
+  intake: 'bg-slate-100 text-slate-700',
   off_pricing: 'bg-amber-100 text-amber-800',
-  user_analyzing: 'bg-purple-100 text-purple-800',
-  estimated: 'bg-indigo-100 text-indigo-800',
+  user_analyzing: 'bg-gold-100 text-gold-800',
+  estimated: 'bg-slate-200 text-slate-800',
   submitted: 'bg-green-100 text-green-800',
   won: 'bg-emerald-100 text-emerald-800',
   lost: 'bg-red-100 text-red-800',
-  no_bid: 'bg-slate-100 text-slate-800',
+  no_bid: 'bg-slate-100 text-slate-600',
   closed: 'bg-slate-200 text-slate-700'
 };
 
@@ -160,11 +160,11 @@ export default function BidDetail() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? format(new Date(String(bid.due_date).slice(0, 10) + 'T00:00:00'), 'MMM d, yyyy') : 'Not set'} />
         <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={fmtDollars(bid.estimated_value || bid.value || 0)} />
-        <StatCard icon={<TrendingUp className="h-8 w-8 text-blue-600" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
+        <StatCard icon={<TrendingUp className="h-8 w-8 text-navy-700" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <FileText className="h-8 w-8 text-purple-600" />
+              <FileText className="h-8 w-8 text-navy-700" />
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-slate-500 mb-1">Status</p>
                 <div className="flex items-center gap-2">

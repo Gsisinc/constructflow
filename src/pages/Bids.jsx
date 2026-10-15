@@ -27,15 +27,15 @@ import BidStatusSelect from '@/components/bids/BidStatusSelect';
 // No Bid, User Analyzing, Estimated — plus Submitted, Won, Lost, Closed so the
 // pipeline still ends somewhere.
 const statusColors = {
-  review: 'bg-blue-100 text-blue-800',
-  intake: 'bg-cyan-100 text-cyan-800',
+  review: 'bg-navy-100 text-navy-800',
+  intake: 'bg-slate-100 text-slate-700',
   off_pricing: 'bg-amber-100 text-amber-800',
-  user_analyzing: 'bg-purple-100 text-purple-800',
-  estimated: 'bg-indigo-100 text-indigo-800',
+  user_analyzing: 'bg-gold-100 text-gold-800',
+  estimated: 'bg-slate-200 text-slate-800',
   submitted: 'bg-green-100 text-green-800',
   won: 'bg-emerald-100 text-emerald-800',
   lost: 'bg-red-100 text-red-800',
-  no_bid: 'bg-slate-100 text-slate-800',
+  no_bid: 'bg-slate-100 text-slate-600',
   closed: 'bg-slate-200 text-slate-700'
 };
 

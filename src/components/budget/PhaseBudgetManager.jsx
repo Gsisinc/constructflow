@@ -256,12 +256,12 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
   return (
     <div className="space-y-6">
       {/* Financial Twin Overview */}
-      <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+      <Card className="border-2 border-navy-200 bg-gradient-to-br from-navy-50 to-white">
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-blue-600" />
+                <Activity className="h-5 w-5 text-navy-700" />
                 Living Phase Financial Twin
               </CardTitle>
               <p className="text-sm text-slate-500 mt-1">Real-time predictive budget intelligence</p>
@@ -297,8 +297,8 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
               </div>
               <div>
                 <Label>Phase Transition Reserve</Label>
-                <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
-                  <p className="text-lg font-bold text-purple-600">
+                <div className="bg-gold-50 p-3 rounded-lg border border-gold-200">
+                  <p className="text-lg font-bold text-gold-700">
                     ${((budget?.budgeted_amount || 0) * 0.05).toLocaleString()}
                   </p>
                   <p className="text-xs text-slate-500">Recommended 5% buffer</p>
