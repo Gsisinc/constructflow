@@ -205,3 +205,4 @@ export default function ResourceAllocationBoard({ organizationId, projectId, pha
       />
     </div>
   );
+}
