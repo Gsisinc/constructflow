@@ -2,6 +2,9 @@
   "name": "VehicleLog",
   "type": "object",
   "properties": {
+    "organization_id": {
+      "type": "string"
+    },
     "vehicle_id": {
       "type": "string"
     },
@@ -52,6 +55,10 @@
     },
     "notes": {
       "type": "string"
+    },
+    "entered_by": {
+      "type": "string",
+      "description": "User who entered this mileage log (email)"
     }
   },
   "required": [

@@ -38,6 +38,7 @@ import {
   Tag,
   Mic,
   Calculator,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -56,6 +57,7 @@ const navGroups = [
   { items: [
     { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
     { name: 'Schedule', icon: Calendar, page: 'Calendar' },
+    { name: 'Ops Dashboard', icon: BarChart3, page: 'OpsDashboard' },
   ]},
   { label: 'Sales & Estimating', items: [
     { name: 'Bids', icon: FileText, page: 'Bids' },

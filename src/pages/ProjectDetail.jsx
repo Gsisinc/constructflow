@@ -27,6 +27,7 @@ import AppendixFormsTab from '../components/projects/AppendixFormsTab';
 import ScheduleOfValuesTab from '../components/projects/ScheduleOfValuesTab';
 import OpsDocsTab from '../components/projects/OpsDocsTab';
 import OpsDocsOverview from '../components/projects/OpsDocsOverview';
+import FieldLogsTab from '../components/projects/FieldLogsTab';
 import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
 import ProjectDashboard from '@/components/projects/ProjectDashboard';
 import { Button } from '@/components/ui/button';
@@ -401,6 +402,7 @@ export default function ProjectDetail() {
           <TabsTrigger value="materials">Materials</TabsTrigger>
           <TabsTrigger value="financials">Financials</TabsTrigger>
           <TabsTrigger value="opsdocs">Ops / Field Docs</TabsTrigger>
+          <TabsTrigger value="fieldlogs">Field Logs</TabsTrigger>
           <TabsTrigger value="sov">SOV & Pay Apps</TabsTrigger>
           <TabsTrigger value="client">Client Portal</TabsTrigger>
         </TabsList>
@@ -529,6 +531,10 @@ export default function ProjectDetail() {
 
         <TabsContent value="opsdocs" className="mt-6">
           <OpsDocsTab projectId={projectId} project={project} customPhases={customPhases} />
+        </TabsContent>
+
+        <TabsContent value="fieldlogs" className="mt-6">
+          <FieldLogsTab projectId={projectId} />
         </TabsContent>
 
         <TabsContent value="sov" className="mt-6">

@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import ClockIn from "@/components/dashboard/ClockIn";
+import TechFieldLogs from "@/components/tech/TechFieldLogs";
 
 function SectionTitle({ eyebrow, title, right }) {
   return (
@@ -399,6 +400,15 @@ export default function TechnicianPortal() {
                       );
                     })}
                   </div>
+                </CardContent>
+              </GlassCard>
+
+              <GlassCard className="rounded-[28px]">
+                <CardHeader>
+                  <SectionTitle eyebrow="Field Reporting" title="Daily Logs & Mileage" />
+                </CardHeader>
+                <CardContent>
+                  <TechFieldLogs user={user} projects={assignedProjects} />
                 </CardContent>
               </GlassCard>
             </main>
