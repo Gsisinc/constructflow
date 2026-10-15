@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ export default function ProjectMaterials({ projectId, organizationId }) {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState(null);
+  const submittingRef = useRef(false);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -106,15 +108,20 @@ export default function ProjectMaterials({ projectId, organizationId }) {
   });
 
   const handleSubmit = async () => {
-    if (!formData.name.trim()) {
-      toast.error('Material name is required');
-      return;
-    }
-
-    if (editingMaterial) {
-      updateMutation.mutate({ id: editingMaterial.id, data: await stampUpdate(formData) });
-    } else {
-      createMutation.mutate(await stampCreate(formData));
+    if (submittingRef.current) return;
+    if (!formData.name.trim()) { toast.error('Material name is required'); return; }
+    submittingRef.current = true;
+    setSubmitting(true);
+    try {
+      if (editingMaterial) {
+        updateMutation.mutate({ id: editingMaterial.id, data: await stampUpdate(formData) }, { onSettled: () => { submittingRef.current = false; setSubmitting(false); } });
+      } else {
+        createMutation.mutate(await stampCreate(formData), { onSettled: () => { submittingRef.current = false; setSubmitting(false); } });
+      }
+    } catch (e) {
+      submittingRef.current = false;
+      setSubmitting(false);
+      toast.error('Save failed: ' + (e.message || ''));
     }
   };
 
@@ -248,7 +255,7 @@ export default function ProjectMaterials({ projectId, organizationId }) {
                 <Button
                   onClick={handleSubmit}
                   className="flex-1 bg-primary hover:bg-primary/90"
-                  disabled={createMutation.isPending || updateMutation.isPending}
+                  disabled={createMutation.isPending || updateMutation.isPending || submitting}
                 >
                   {editingMaterial ? 'Update' : 'Add'} Material
                 </Button>
