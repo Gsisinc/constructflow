@@ -19,7 +19,7 @@ export default function LiveBudgetTracker({ project, expenses = [], changeOrders
 
   const pieData = [
     { name: 'Spent', value: spent, color: '#10B981' },
-    { name: 'Committed', value: committedCosts, color: '#3B82F6' },
+    { name: 'Committed', value: committedCosts, color: '#16335C' },
     { name: 'Pending Changes', value: pendingCosts, color: '#F59E0B' },
     { name: 'Remaining', value: Math.max(0, remainingBudget - committedCosts - pendingCosts), color: '#E5E7EB' },
   ].filter(d => d.value > 0);
@@ -51,12 +51,12 @@ export default function LiveBudgetTracker({ project, expenses = [], changeOrders
           </div>
           <p className="text-xl font-semibold text-green-700">${spent.toLocaleString()}</p>
         </div>
-        <div className="bg-blue-50 rounded-xl p-4">
-          <div className="flex items-center gap-2 text-blue-600 text-sm mb-1">
+        <div className="bg-navy-50 rounded-xl p-4">
+          <div className="flex items-center gap-2 text-navy-700 text-sm mb-1">
             <FileText className="h-4 w-4" />
             Committed Costs
           </div>
-          <p className="text-xl font-semibold text-blue-700">${committedCosts.toLocaleString()}</p>
+          <p className="text-xl font-semibold text-navy-700">${committedCosts.toLocaleString()}</p>
         </div>
         <div className="bg-amber-50 rounded-xl p-4">
           <div className="flex items-center gap-2 text-amber-600 text-sm mb-1">

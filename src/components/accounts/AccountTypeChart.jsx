@@ -4,9 +4,9 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { PieChart as PieChartIcon } from "lucide-react";
 
 const COLORS = {
-    Assets: "#3b82f6",
+    Assets: "#16335C",
     Liabilities: "#ef4444",
-    Equity: "#8b5cf6",
+    Equity: "#C9A227",
     Revenue: "#22c55e",
     Expenses: "#f97316",
 };

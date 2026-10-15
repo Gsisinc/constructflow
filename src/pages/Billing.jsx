@@ -38,7 +38,7 @@ export default function Billing() {
         <KPI label="Total Contract Value" value={fmt(totals.contract)} icon={DollarSign} tone="slate" />
         <KPI label="Billed to Date" value={fmt(totals.billed)} icon={TrendingUp} tone="green" />
         <KPI label="Outstanding" value={fmt(totals.outstanding)} icon={AlertTriangle} tone="amber" />
-        <KPI label="Retention Held" value={fmt(totals.retention)} icon={FileText} tone="blue" />
+        <KPI label="Retention Held" value={fmt(totals.retention)} icon={FileText} tone="navy" />
       </div>
 
       <Card>
@@ -104,7 +104,7 @@ export default function Billing() {
 }
 
 function KPI({ label, value, icon: Icon, tone }) {
-  const tones = { slate: 'bg-slate-100 text-slate-600', blue: 'bg-blue-100 text-blue-600', amber: 'bg-amber-100 text-amber-600', green: 'bg-green-100 text-green-600' };
+  const tones = { slate: 'bg-slate-100 text-slate-600', navy: 'bg-navy-100 text-navy-700', blue: 'bg-blue-100 text-blue-600', amber: 'bg-amber-100 text-amber-600', green: 'bg-green-100 text-green-600' };
   return (
     <Card><CardContent className="pt-4 pb-3">
       <div className="flex items-center gap-3">

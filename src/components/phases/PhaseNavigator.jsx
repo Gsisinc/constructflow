@@ -171,7 +171,7 @@ export default function PhaseNavigator({
             <span className="hidden sm:inline">New Phase</span>
             <span className="sm:hidden">New</span>
           </Button>
-          <Badge className="bg-blue-100 text-blue-700 whitespace-nowrap">
+          <Badge className="bg-navy-100 text-navy-700 whitespace-nowrap">
             Current: {PHASES.find(p => p.id === currentPhase)?.label}
           </Badge>
         </div>
@@ -183,7 +183,7 @@ export default function PhaseNavigator({
           {/* Progress Line */}
           <div className="absolute top-6 left-6 right-6 h-1 bg-slate-200 rounded-full">
             <div 
-              className="h-full bg-gradient-to-r from-green-500 to-blue-500 rounded-full transition-all duration-500"
+              className="h-full bg-gradient-to-r from-navy-700 to-gold-500 rounded-full transition-all duration-500"
               style={{ width: `${(currentPhaseIndex / (PHASES.length - 1)) * 100}%` }}
             />
           </div>
@@ -201,7 +201,7 @@ export default function PhaseNavigator({
                     className={cn(
                       "w-12 h-12 rounded-full flex items-center justify-center text-lg z-10 transition-all duration-300 flex-shrink-0",
                       status === 'completed' && "bg-green-500 text-white shadow-lg shadow-green-200",
-                      status === 'current' && "bg-blue-500 text-white shadow-lg shadow-blue-200 ring-4 ring-blue-100",
+                      status === 'current' && "bg-navy-700 text-white shadow-lg shadow-navy-200 ring-4 ring-navy-100",
                       status === 'pending_gate' && "bg-amber-100 text-amber-600 border-2 border-amber-300",
                       status === 'locked' && "bg-slate-100 text-slate-400"
                     )}
@@ -220,7 +220,7 @@ export default function PhaseNavigator({
                     <div className="flex items-center justify-center gap-1 flex-wrap">
                       <p className={cn(
                         "text-xs text-center font-medium break-words",
-                        status === 'current' ? "text-blue-600" : 
+                        status === 'current' ? "text-navy-700" : 
                         status === 'completed' ? "text-green-600" : "text-slate-500"
                       )}>
                         {phase.label}
@@ -314,17 +314,17 @@ export default function PhaseNavigator({
       </div>
 
       {/* Current Phase Details */}
-      <div className="mt-8 p-4 bg-blue-50 rounded-xl">
+      <div className="mt-8 p-4 bg-navy-50 rounded-xl">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-blue-600 font-medium">Current Phase</p>
+            <p className="text-sm text-navy-700 font-medium">Current Phase</p>
             <p className="text-lg font-semibold text-slate-900">
               {PHASES.find(p => p.id === currentPhase)?.label}
             </p>
           </div>
           <div className="text-right">
             <p className="text-sm text-slate-500">Phase Progress</p>
-            <p className="text-lg font-semibold text-blue-600">
+            <p className="text-lg font-semibold text-navy-700">
               {currentPhaseIndex + 1} of {PHASES.length}
             </p>
           </div>
@@ -405,7 +405,7 @@ export default function PhaseNavigator({
                                   data: { status: e.target.checked ? 'completed' : 'pending' }
                                 });
                               }}
-                              className="flex-shrink-0 cursor-pointer mt-0.5 accent-blue-600 rounded"
+                              className="flex-shrink-0 cursor-pointer mt-0.5 accent-navy-700 rounded"
                               style={{ width: '14px', height: '14px', minWidth: '14px', minHeight: '14px' }}
                             />
                             <span className={cn(req.status === 'completed' && 'line-through text-slate-500', 'flex-1 break-words leading-snug text-slate-700')}>
@@ -415,7 +415,7 @@ export default function PhaseNavigator({
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-5 px-1.5 sm:h-6 sm:px-2 text-xs opacity-100 hover:bg-blue-50 text-blue-600 whitespace-nowrap"
+                                className="h-5 px-1.5 sm:h-6 sm:px-2 text-xs opacity-100 hover:bg-navy-50 text-navy-700 whitespace-nowrap"
                                 onClick={() => {
                                   setSelectedParentReq(req);
                                   setRequirements('');
@@ -436,7 +436,7 @@ export default function PhaseNavigator({
                                     data: { status: e.target.checked ? 'completed' : 'pending' }
                                   });
                                 }}
-                                className="flex-shrink-0 cursor-pointer mt-0.5 accent-blue-600 rounded"
+                                className="flex-shrink-0 cursor-pointer mt-0.5 accent-navy-700 rounded"
                                 style={{ width: '12px', height: '12px', minWidth: '12px', minHeight: '12px' }}
                               />
                               <span className={cn(subReq.status === 'completed' && 'line-through text-slate-500', 'text-xs sm:text-sm text-slate-700 break-words leading-snug')}>

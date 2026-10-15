@@ -129,7 +129,7 @@ export default function Safety() {
                   }
                 }}
                 disabled={!selectedProject || !formData.description || !formData.location || !formData.incident_type || createMutation.isPending}
-                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {createMutation.isPending ? 'Submitting...' : 'Report Incident'}
               </Button>

@@ -29,7 +29,7 @@ export default function ProjectDeadlines({ projectId }) {
         <Card className="border-2 border-slate-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Calendar className="h-5 w-5 text-blue-600" />
+              <Calendar className="h-5 w-5 text-navy-700" />
               Project Completion
             </CardTitle>
           </CardHeader>
@@ -52,7 +52,7 @@ export default function ProjectDeadlines({ projectId }) {
         <Card className="border-2 border-slate-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Clock className="h-5 w-5 text-purple-600" />
+              <Clock className="h-5 w-5 text-navy-700" />
               Current Phase
             </CardTitle>
           </CardHeader>
