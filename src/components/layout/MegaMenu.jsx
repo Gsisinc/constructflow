@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import {
@@ -27,7 +27,8 @@ import {
   Shield,
   Radio,
   Wrench,
-  X
+  X,
+  LayoutGrid
 } from 'lucide-react';
 
 // Quick access for technicians only (tech portal dashboard + tools)
@@ -102,6 +103,15 @@ const menuSections = [
     ]
   },
   {
+    title: 'Estimating & Proposals',
+    items: [
+      { icon: FileText, label: 'Cost Library', page: 'CostLibrary' },
+      { icon: FileText, label: 'AI Estimate Generator', page: 'EstimateGenerator' },
+      { icon: MessageSquare, label: 'Send Text Messages', page: 'TextMessages' },
+      { icon: FileText, label: 'E-signatures', page: 'ESignatures' },
+    ]
+  },
+  {
     title: 'Financials',
     items: [
       { icon: DollarSign, label: 'Overview', page: 'Budget' },
@@ -112,24 +122,7 @@ const menuSections = [
       { icon: FileText, label: 'Bill Approvals', page: 'BillApprovals' },
       { icon: TrendingUp, label: 'Financial Projections', page: 'Budget' },
       { icon: FileStack, label: 'Change Orders', page: 'Budget' },
-    ]
-  },
-  {
-    title: 'Estimating & Proposals',
-    items: [
-      { icon: FileText, label: 'Cost Library', page: 'CostLibrary' },
-      { icon: FileText, label: 'AI Estimate Generator', page: 'EstimateGenerator' },
-      { icon: MessageSquare, label: 'Send Text Messages', page: 'TextMessages' },
-      { icon: FileText, label: 'E-signatures', page: 'ESignatures' },
-    ]
-  },
-  {
-    title: 'Financial Management',
-    items: [
-      { icon: FileText, label: 'Invoices', page: 'Invoices' },
-      { icon: DollarSign, label: 'Bill Approvals', page: 'BillApprovals' },
       { icon: TrendingUp, label: 'Job Costing (WIP)', page: 'JobCosting' },
-      { icon: FileText, label: 'AIA Billing (G702/G703)', page: 'AIABilling' },
       { icon: FileStack, label: 'Cost Plus Invoicing', page: 'CostPlusInvoicing' },
       { icon: Building2, label: 'QuickBooks Sync', page: 'QuickBooksSync' },
     ]
@@ -205,6 +198,8 @@ const menuSections = [
 ];
 
 export default function MegaMenu({ isOpen, onClose, userRole }) {
+  const [query, setQuery] = useState('');
+
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (event) => {
@@ -214,65 +209,114 @@ export default function MegaMenu({ isOpen, onClose, userRole }) {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (!isOpen) setQuery('');
+  }, [isOpen]);
 
   // Base44 only has user/admin: we map to technician | client | admin. Default to tech menu when role not yet loaded.
   const sections = userRole === 'admin' ? menuSections : userRole === 'client' ? clientMenuSections : technicianMenuSections;
   const subtitle = userRole === 'admin' ? 'Navigate to any feature across the platform' : userRole === 'client' ? 'Projects and support' : 'Your tools, schedule, and support';
 
+  const filteredSections = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return sections;
+    return sections
+      .map((section) => ({
+        ...section,
+        items: section.title.toLowerCase().includes(q)
+          ? section.items
+          : section.items.filter((item) => item.label.toLowerCase().includes(q)),
+      }))
+      .filter((section) => section.items.length > 0);
+  }, [sections, query]);
+
+  if (!isOpen) return null;
+
   return (
     <>
       {/* Overlay */}
-      <div 
-        className="fixed inset-0 z-40 bg-black/50"
+      <div
+        className="fixed inset-0 z-40 bg-navy-900/60 backdrop-blur-[2px]"
         aria-hidden="true"
         onClick={onClose}
       />
-      
-      {/* Mega Menu - Professional Design */}
-      <div className="fixed left-0 right-0 top-14 sm:top-16 lg:left-64 lg:right-0 z-50 bg-white border-b border-slate-200 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto shadow-2xl" role="dialog" aria-modal="true" aria-label="Quick access navigation">
-        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Quick Access</h2>
-              <p className="text-sm text-slate-500 mt-1">{subtitle}</p>
-            </div>
-            <button 
-              onClick={onClose} 
-              className="h-10 w-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-95"
-              title="Close menu"
-            >
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          
-          {/* Menu Grid - Professional card layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {sections.map((section, idx) => (
-              <div key={idx} className="bg-slate-50 rounded-lg p-3 border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
-                <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-2">{section.title}</h3>
-                <div className="space-y-1">
-                  {section.items.map((item, itemIdx) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={itemIdx}
-                        to={createPageUrl(item.page)}
-                        onClick={onClose}
-                        className="flex items-center gap-2 px-2 py-1.5 text-xs font-medium text-slate-700 hover:text-blue-600 hover:bg-white rounded-md transition-all group"
-                      >
-                        <div className="h-5 w-5 rounded-md bg-slate-200 flex items-center justify-center group-hover:bg-blue-200 group-hover:text-blue-600 transition-colors flex-shrink-0">
-                          <Icon className="h-3 w-3" />
-                        </div>
-                        <span className="truncate">{item.label}</span>
-                      </Link>
-                    );
-                  })}
+
+      {/* Quick Access panel */}
+      <div className="fixed left-0 right-0 top-14 sm:top-16 lg:left-64 lg:right-0 z-50 bg-slate-50 border-b border-navy-100 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto shadow-2xl" role="dialog" aria-modal="true" aria-label="Quick access navigation">
+        {/* Navy header band */}
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-navy-900 to-navy-700 text-white shadow-md">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-10 w-10 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center flex-shrink-0">
+                  <LayoutGrid className="h-5 w-5 text-gold-500" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Quick Access</h2>
+                  <p className="text-sm text-navy-200 mt-0.5 truncate">{subtitle}</p>
                 </div>
               </div>
-            ))}
+              <button
+                onClick={onClose}
+                className="h-10 w-10 rounded-full flex items-center justify-center text-navy-200 hover:text-white hover:bg-white/10 transition-all active:scale-95 flex-shrink-0"
+                title="Close menu"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            {/* Search / filter */}
+            <div className="relative mt-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-300 pointer-events-none" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Filter features..."
+                aria-label="Filter features"
+                className="w-full sm:max-w-md h-10 pl-9 pr-3 rounded-lg bg-white/10 text-white placeholder:text-navy-300 ring-1 ring-white/20 focus:ring-2 focus:ring-gold-500 focus:bg-white/15 outline-none text-sm transition"
+              />
+            </div>
           </div>
+        </div>
+
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+          {filteredSections.length === 0 ? (
+            <p className="text-sm text-slate-500 text-center py-10">No features match &ldquo;{query}&rdquo;.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+              {filteredSections.map((section) => {
+                const SectionIcon = section.items[0]?.icon || LayoutGrid;
+                return (
+                  <div key={section.title} className="bg-white rounded-xl border border-navy-100 border-t-4 border-t-navy-700 p-4 shadow-sm hover:shadow-lg hover:border-navy-200 transition-all">
+                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-navy-50">
+                      <div className="h-7 w-7 rounded-lg bg-navy-50 text-navy-700 flex items-center justify-center flex-shrink-0">
+                        <SectionIcon className="h-4 w-4" />
+                      </div>
+                      <h3 className="text-xs font-bold text-navy-900 uppercase tracking-wider">{section.title}</h3>
+                    </div>
+                    <div className="space-y-0.5">
+                      {section.items.map((item, itemIdx) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={itemIdx}
+                            to={createPageUrl(item.page)}
+                            onClick={onClose}
+                            className="flex items-center gap-2.5 px-2 py-2 text-sm font-medium text-slate-700 hover:text-navy-900 hover:bg-navy-50 rounded-lg transition-colors group"
+                          >
+                            <div className="h-6 w-6 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center group-hover:bg-navy-700 group-hover:text-white transition-colors flex-shrink-0">
+                              <Icon className="h-3.5 w-3.5" />
+                            </div>
+                            <span className="truncate">{item.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </>
