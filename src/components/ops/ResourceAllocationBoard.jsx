@@ -175,4 +175,33 @@ export default function ResourceAllocationBoard({ organizationId, projectId, pha
                                     {conflicted && <AlertTriangle className="h-3.5 w-3.5 text-red-600 flex-shrink-0" />}
                                   </div>
                                   <div className="text-[11px] text-slate-500 truncate">
-                                    {a.start_date?.slice(5)} – {a.end_da
+                                    {a.start_date?.slice(5)} – {a.end_date?.slice(5)}
+                                    {a.phase_name ? ` · ${a.phase_name}` : ""}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      <ResourceAssignmentDialog
+        open={showAdd}
+        onOpenChange={setShowAdd}
+        organizationId={organizationId}
+        onSaved={refresh}
+        projects={projects}
+        workers={workers}
+        projectId={projectId}
+        phasesForProject={phasesForProject}
+      />
+    </div>
+  );
