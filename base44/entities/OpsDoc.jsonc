@@ -1,0 +1,91 @@
+{
+  "name": "OpsDoc",
+  "type": "object",
+  "description": "Ops / Field Docs entry scoped to a project \u2014 dispatch packets, resource plans, daily logs, site access notes",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Project this ops doc belongs to"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "dispatch_packet",
+        "resource_plan",
+        "daily_log",
+        "site_access_note"
+      ],
+      "default": "dispatch_packet",
+      "description": "dispatch_packet, resource_plan, daily_log, site_access_note"
+    },
+    "title": {
+      "type": "string",
+      "description": "Entry title"
+    },
+    "linked_phase": {
+      "type": "string",
+      "description": "Phase this entry is tied to"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "file_attachments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Private storage URIs of uploaded files",
+      "default": []
+    },
+    "entered_by": {
+      "type": "string",
+      "description": "User who entered this doc"
+    },
+    "hours": {
+      "type": "number",
+      "default": 0,
+      "description": "Resource plan hours"
+    },
+    "labor_budget": {
+      "type": "number",
+      "default": 0,
+      "description": "Resource plan labor budget"
+    }
+  },
+  "required": [
+    "project_id",
+    "type",
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
