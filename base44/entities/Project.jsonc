@@ -159,6 +159,25 @@
     "image_url": {
       "type": "string"
     },
+    "retention_due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date retention is due to be released to GSIS (entered by Accounting). Optional."
+    },
+    "retention_release_status": {
+      "type": "string",
+      "enum": [
+        "held",
+        "requested",
+        "released"
+      ],
+      "default": "held",
+      "description": "Retention release state. 'released' removes the job from due / past-due figures on Financials."
+    },
+    "retention_notes": {
+      "type": "string",
+      "description": "Accounting notes on retention release (conditions, contact, request date)."
+    },
     "linked_bid_id": {
       "type": "string",
       "description": "BidOpportunity this project was awarded from (if bid-originated)"
