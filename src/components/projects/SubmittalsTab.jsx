@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, Loader2, FileText } from 'lucide-react';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { fmtDate } from '@/lib/dates';
 
 const TYPES = ['shop_drawings', 'product_data', 'samples', 'test_reports', 'certificates', 'other'];
 const STATUSES = ['preparing', 'submitted', 'under_review', 'approved', 'approved_as_noted', 'revise_and_resubmit', 'rejected'];
@@ -48,7 +48,7 @@ export default function SubmittalsTab({ projectId }) {
                       {s.submittal_number && <Badge variant="outline" className="text-xs">{s.submittal_number}</Badge>}
                       <Badge className={statusColor[s.status] || 'bg-slate-100'}>{(s.status || 'preparing').replace('_',' ')}</Badge>
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">{s.submittal_type ? s.submittal_type.replace('_',' ') : ''} {s.specification_section ? `· Spec ${s.specification_section}` : ''} {s.required_date ? `· Due ${format(new Date(s.required_date), 'MMM d')}` : ''}</p>
+                    <p className="text-xs text-slate-500 mt-1">{s.submittal_type ? s.submittal_type.replace('_',' ') : ''} {s.specification_section ? `· Spec ${s.specification_section}` : ''} {s.required_date ? `· Due ${fmtDate(s.required_date, 'MMM d')}` : ''}</p>
                   </div>
                 </div>
               </CardContent></Card>
