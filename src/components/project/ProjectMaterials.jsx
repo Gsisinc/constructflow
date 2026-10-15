@@ -30,17 +30,19 @@ export default function ProjectMaterials({ projectId, organizationId }) {
     queryFn: () => base44.auth.me()
   });
 
-  // Fetch project materials
+  // Fetch project materials — scoped by project_id only (organization_id may be null
+  // on some legacy/test projects and must NOT gate the query, or the list stays empty).
   const { data: materials = [] } = useQuery({
-    queryKey: ['projectMaterials', projectId, organizationId],
-    queryFn: () => {
-      if (!projectId || !organizationId) return [];
-      return base44.entities.ProjectMaterial.filter({ 
-        project_id: projectId,
-        organization_id: organizationId 
-      }, '-created_date');
+    queryKey: ['projectMaterials', projectId],
+    queryFn: async () => {
+      if (!projectId) return [];
+      const page = await base44.entities.ProjectMaterial.filter(
+        { project_id: projectId },
+        { sort: '-created_date', limit: 200 }
+      );
+      return page.items || page || [];
     },
-    enabled: !!projectId && !!organizationId
+    enabled: !!projectId
   });
 
   // Create mutation
