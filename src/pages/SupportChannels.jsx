@@ -18,18 +18,26 @@ const ENTERED_BY = 'Entered by: Ops Manager';
 function initials(name) {
   return (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join('');
 }
+function parseUtc(iso) {
+  // Base44 created_date is UTC; add Z when no zone is given so it isn't read as local time.
+  const s = String(iso);
+  return new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(s) ? s : s + 'Z');
+}
+function laKey(d) {
+  return d.toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' });
+}
 function fmtTime(iso) {
   if (!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  const d = parseUtc(iso);
+  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles' });
 }
 function fmtDay(iso) {
-  const d = new Date(iso);
+  const d = parseUtc(iso);
   const today = new Date();
-  const y = new Date(); y.setDate(today.getDate() - 1);
-  if (d.toDateString() === today.toDateString()) return 'Today';
-  if (d.toDateString() === y.toDateString()) return 'Yesterday';
-  return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+  const y = new Date(today.getTime() - 86400000);
+  if (laKey(d) === laKey(today)) return 'Today';
+  if (laKey(d) === laKey(y)) return 'Yesterday';
+  return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' });
 }
 
 export default function SupportChannels() {
