@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CardHeader, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
 import { Save, X, Plus, Trash2, Link2 } from 'lucide-react';
 import { format } from 'date-fns';
+import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
+import { stampCreate, stampUpdate } from '@/lib/audit';
 
 const emptyLine = () => ({ description: '', quantity: 1, unit: 'EA', unit_price: 0, total: 0 });
 
@@ -88,15 +90,17 @@ export default function PurchaseInvoiceForm({ invoice, rateCards = [], suppliers
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(formData);
+    const payload = invoice ? await stampUpdate(formData) : await stampCreate(formData);
+    onSave(payload);
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <CardHeader className="bg-slate-50">
         <CardTitle>{invoice ? 'Edit Purchase Invoice' : 'Create Purchase Invoice'}</CardTitle>
+        {invoice && <RecordAuditInfo record={invoice} className="pt-1" />}
       </CardHeader>
       <CardContent className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

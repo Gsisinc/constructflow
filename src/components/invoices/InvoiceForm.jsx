@@ -8,6 +8,8 @@ import { CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Save, X, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import RecordAuditInfo from "@/components/ui/RecordAuditInfo";
+import { stampCreate, stampUpdate } from "@/lib/audit";
 
 export default function InvoiceForm({ invoice, products, company, projects = [], onSave, onCancel }) {
     const [formData, setFormData] = useState({
@@ -103,15 +105,17 @@ export default function InvoiceForm({ invoice, products, company, projects = [],
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSave(formData);
+        const payload = invoice ? await stampUpdate(formData) : await stampCreate(formData);
+        onSave(payload);
     };
 
     return (
         <form onSubmit={handleSubmit}>
             <CardHeader className="bg-slate-50">
                 <CardTitle>{invoice ? 'Edit Invoice' : 'Create New Sales Invoice'}</CardTitle>
+                {invoice && <RecordAuditInfo record={invoice} className="pt-1" />}
             </CardHeader>
             <CardContent className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
