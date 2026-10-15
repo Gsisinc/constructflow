@@ -10,6 +10,7 @@ import PhaseNavigator from '@/components/phases/PhaseNavigator';
 import PhaseManager from '@/components/phases/PhaseManager';
 import PhaseRequirementManager from '@/components/phases/PhaseRequirementManager';
 import PhaseGateChecklist from '@/components/phases/PhaseGateChecklist';
+const seededBids = new Set();
 
 // Mirror a bid's project_id-scoped phase entities by treating bid.id as the
 // project_id while the bid is open. On conversion these same records are
@@ -48,6 +49,8 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
   useEffect(() => {
     if (seeding || !bidId || !phasesFetched) return;
     if (customPhases.length > 0) return;
+    if (seededBids.has(bidId)) return;
+    seededBids.add(bidId);
     setSeeding(true);
     (async () => {
       try {
