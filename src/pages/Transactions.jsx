@@ -15,6 +15,7 @@ export default function Transactions() {
     const [transactions, setTransactions] = useState([]);
     const [accounts, setAccounts] = useState([]);
     const [projects, setProjects] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
     const [selectedProject, setSelectedProject] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [editingTransaction, setEditingTransaction] = useState(null);
@@ -36,6 +37,7 @@ export default function Transactions() {
         setLoading(true);
         try {
             const user = await User.me();
+            setCurrentUser(user);
             const projectsData = await Project.filter({ created_by_id: user.id });
             setProjects(projectsData);
             if (projectsData.length > 0) {
@@ -167,11 +169,19 @@ export default function Transactions() {
                     <p className="text-gray-500">You need to create accounts before recording transactions</p>
                 </div>
             ) : transactions.length === 0 ? (
-                <GenerateSampleTransactions 
-                    companyId={selectedProject.id} 
-                    accounts={accounts} 
-                    onGenerationComplete={loadTransactions} 
-                />
+                currentUser?.role === 'admin' ? (
+                    <GenerateSampleTransactions
+                        companyId={selectedProject.id}
+                        accounts={accounts}
+                        onGenerationComplete={loadTransactions}
+                    />
+                ) : (
+                    <div className="text-center py-16">
+                        <Receipt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        <h2 className="text-xl font-semibold text-gray-900 mb-2">No Transactions Yet</h2>
+                        <p className="text-gray-500">Click "New Transaction" to record your first entry.</p>
+                    </div>
+                )
             ) : (
                 <>
                     {/* Stats */}

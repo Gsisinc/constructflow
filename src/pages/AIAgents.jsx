@@ -215,7 +215,7 @@ export default function AIAgents() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-white/80 text-sm">
-                  <span className="rounded-full bg-white/10 px-3 py-1">{filteredAgencyAgents.length} agents</span>
+                  <span className="rounded-full bg-white/10 px-3 py-1">{filteredAgencyAgents.length + customAgents.length} agents</span>
                 </div>
               </div>
             </div>
