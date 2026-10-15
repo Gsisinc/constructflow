@@ -44,6 +44,12 @@ const PRIORITIES = [
   { value: 'critical', label: 'Critical' },
 ];
 
+const RETENTION_STATUSES = [
+  { value: 'held', label: 'Held' },
+  { value: 'requested', label: 'Release requested' },
+  { value: 'released', label: 'Released' },
+];
+
 const EMPTY = {
   name: '',
   client_name: '',
@@ -60,6 +66,9 @@ const EMPTY = {
   description: '',
   project_manager: '',
   image_url: '',
+  retention_due_date: '',
+  retention_release_status: 'held',
+  retention_notes: '',
 };
 
 export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
@@ -82,6 +91,9 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
       labor_hours: formData.labor_hours ? parseFloat(formData.labor_hours) : 0,
       labor_rate: formData.labor_rate ? parseFloat(formData.labor_rate) : 0,
       equipment_cost: formData.equipment_cost ? parseFloat(formData.equipment_cost) : 0,
+      // Empty date input -> null so the optional date field is cleared, not saved as ''.
+      retention_due_date: formData.retention_due_date || null,
+      retention_release_status: formData.retention_release_status || 'held',
     };
     const stamped = project
       ? await stampUpdate(baseData)
@@ -284,6 +296,49 @@ export default function ProjectForm({ open, onOpenChange, project, onSubmit }) {
                 value={formData.equipment_cost ?? ''}
                 onChange={(e) => setFormData({ ...formData, equipment_cost: e.target.value })}
                 placeholder="0.00"
+              />
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 p-3 space-y-3">
+            <div className="text-sm font-semibold text-slate-700">Retention (Accounting)</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="retention_due_date">Retention Due Date</Label>
+                <Input
+                  id="retention_due_date"
+                  type="date"
+                  value={formData.retention_due_date || ''}
+                  onChange={(e) => setFormData({ ...formData, retention_due_date: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Retention Status</Label>
+                <Select
+                  value={formData.retention_release_status || 'held'}
+                  onValueChange={(value) => setFormData({ ...formData, retention_release_status: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RETENTION_STATUSES.map((s) => (
+                      <SelectItem key={s.value} value={s.value}>
+                        {s.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="retention_notes">Retention Notes</Label>
+              <Textarea
+                id="retention_notes"
+                value={formData.retention_notes || ''}
+                onChange={(e) => setFormData({ ...formData, retention_notes: e.target.value })}
+                placeholder="Release conditions, who to contact, date requested..."
+                rows={2}
               />
             </div>
           </div>
