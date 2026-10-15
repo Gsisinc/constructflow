@@ -5,6 +5,10 @@
     "project_id": {
       "type": "string"
     },
+    "phase_key": {
+      "type": "string",
+      "description": "CustomPhase key this note belongs to"
+    },
     "phase_name": {
       "type": "string",
       "enum": [
