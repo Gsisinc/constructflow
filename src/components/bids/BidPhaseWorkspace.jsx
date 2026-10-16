@@ -45,7 +45,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
   });
 
   // Lazy-seed the default phase template for this bid (mirrors a new project).
-  // The DualTrack 12 stages / 3 phases auto-seed themselves inside DualTrackTracker.
+  // The Phases 12 stages / 3 phases auto-seed themselves inside DualTrackTracker.
   useEffect(() => {
     if (seeding || !bidId || !phasesFetched) return;
     if (customPhases.length > 0) return;
@@ -62,6 +62,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
           order: idx,
           status: 'pending',
         }));
+        // Entered by: Sales
         if (phases.length) await base44.entities.CustomPhase.bulkCreate(phases);
         await seedRequirementsIdempotent(base44, bidId, tpl);
         qc.invalidateQueries({ queryKey: ['customPhases', bidId] });
@@ -73,6 +74,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
   }, [bidId, projectType, customPhases, seeding, qc, phasesFetched]);
 
   const createGateMutation = useMutation({
+    // Entered by: Sales
     mutationFn: (data) => base44.entities.PhaseGate.create(data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['phaseGates', bidId] }),
   });
@@ -101,7 +103,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
 
   return (
     <Tabs defaultValue="tracker" className="w-full">
-      <TabsList className="w-full sm:w-auto justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-slate-100 rounded-lg">
+      <TabsList className="w-full sm:w-auto justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-muted rounded-lg">
         <TabsTrigger value="tracker" className="flex-shrink-0">Phases/Stages</TabsTrigger>
         <TabsTrigger value="gates" className="flex-shrink-0">Gates</TabsTrigger>
         <TabsTrigger value="requirements" className="flex-shrink-0">Requirements</TabsTrigger>
