@@ -10,7 +10,7 @@ import { Loader2, Flag, CheckCircle2, AlertTriangle, Eye, Plus, X, Lock } from '
 import { toast } from 'sonner';
 
 // ─── D1 (OPEN DECISION — FLAG TO OWNER) ───────────────────────────────────
-// 12 stages / 3 phases (GSIS Field Manual) vs 13 stages / 4 phases (DualTrack spec).
+// 12 stages / 3 phases (GSIS Field Manual) vs 13 stages / 4 phases (Phases spec).
 // Currently configured as Phase A = stages 1-2, Phase B = 3-6, Phase C = 7-12.
 // Edit DUALTRACK_PHASES below to change grouping (no entity/schema change needed).
 const STAGE_DEFS = [
@@ -76,6 +76,7 @@ export default function DualTrackTracker({ projectId, project }) {
           exit_gate_passed: false,
           budget: 0, committed: 0, actual: 0, cost_to_complete: 0,
         }));
+        // Entered by: Sales (seeded from the bid's Phases/Stages tab)
         await base44.entities.DualTrackStage.bulkCreate(records);
         qc.invalidateQueries({ queryKey: ['dualtrack-stages', projectId] });
       } catch (e) {
@@ -130,25 +131,25 @@ export default function DualTrackTracker({ projectId, project }) {
         <CardContent className="pt-5 pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-bold text-slate-900">DualTrack Tracker</h2>
-              <p className="text-sm text-slate-500">A stage clears only when both its Field Track and Money Track action items are complete.</p>
+              <h2 className="text-lg font-bold text-foreground">Phases</h2>
+              <p className="text-sm text-muted-foreground">A stage clears only when both its Field Track and Money Track action items are complete.</p>
             </div>
             <div className="flex gap-4">
-              <div className="text-center"><p className="text-2xl font-bold text-slate-900">{clearedStages}/12</p><p className="text-xs text-slate-500">Stages Cleared</p></div>
-              <div className="text-center"><p className="text-2xl font-bold text-red-600 flex items-center gap-1 justify-center"><Flag className="h-5 w-5" />{redFlags.length}</p><p className="text-xs text-slate-500">Red Flags</p></div>
+              <div className="text-center"><p className="text-2xl font-bold text-foreground">{clearedStages}/12</p><p className="text-xs text-muted-foreground">Stages Cleared</p></div>
+              <div className="text-center"><p className="text-2xl font-bold text-red-600 dark:text-red-300 flex items-center gap-1 justify-center"><Flag className="h-5 w-5" />{redFlags.length}</p><p className="text-xs text-muted-foreground">Red Flags</p></div>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {isLoading || seeding ? (
-        <div className="py-10 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-slate-400" /></div>
+        <div className="py-10 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
       ) : (
         DUALTRACK_PHASES.map((ph) => (
           <div key={ph.key}>
             <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">{ph.label}</h3>
-              <div className="flex-1 h-px bg-slate-200" />
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wide">{ph.label}</h3>
+              <div className="flex-1 h-px bg-muted" />
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {ph.stages.map((n) => {
@@ -218,13 +219,13 @@ function StageCard({ stage, gate, onUpdate }) {
   };
 
   const anyDone = [...fieldItems, ...moneyItems].some((i) => i.completed);
-  const cardTone = redFlag ? 'border-red-300 bg-red-50/30' : watch ? 'border-amber-300 bg-amber-50/20' : gatePassed ? 'border-green-300' : '';
+  const cardTone = redFlag ? 'border-red-300 dark:border-red-500/40 bg-red-50/30' : watch ? 'border-amber-300 dark:border-amber-500/40 bg-amber-50/20' : gatePassed ? 'border-green-300 dark:border-green-500/40' : '';
   const statusBadge = gatePassed
-    ? <Badge className="bg-green-100 text-green-700"><CheckCircle2 className="h-3 w-3 mr-1" />Cleared</Badge>
+    ? <Badge className="bg-green-100 dark:bg-green-500/15 text-green-700 dark:text-green-300"><CheckCircle2 className="h-3 w-3 mr-1" />Cleared</Badge>
     : redFlag
-    ? <Badge className="bg-red-100 text-red-700"><Flag className="h-3 w-3 mr-1" />Red Flag</Badge>
+    ? <Badge className="bg-red-100 dark:bg-red-500/15 text-red-700 dark:text-red-300"><Flag className="h-3 w-3 mr-1" />Red Flag</Badge>
     : watch
-    ? <Badge className="bg-amber-100 text-amber-700"><Eye className="h-3 w-3 mr-1" />Watch</Badge>
+    ? <Badge className="bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300"><Eye className="h-3 w-3 mr-1" />Watch</Badge>
     : anyDone
     ? <Badge variant="secondary">In Progress</Badge>
     : <Badge variant="neutral">Not Started</Badge>;
@@ -234,10 +235,10 @@ function StageCard({ stage, gate, onUpdate }) {
       <CardContent className="pt-4 pb-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center h-7 w-7 rounded-full bg-slate-900 text-white text-xs font-bold">{stage.stage_number}</span>
+            <span className="flex items-center justify-center h-7 w-7 rounded-full bg-primary text-primary-foreground text-xs font-bold">{stage.stage_number}</span>
             <div>
-              <p className="font-semibold text-slate-900 text-sm">{stage.stage_name}</p>
-              <p className="text-xs text-slate-500">Gate: {stage.gate_criteria || gate}</p>
+              <p className="font-semibold text-foreground text-sm">{stage.stage_name}</p>
+              <p className="text-xs text-muted-foreground">Gate: {stage.gate_criteria || gate}</p>
             </div>
           </div>
           {statusBadge}
@@ -251,9 +252,9 @@ function StageCard({ stage, gate, onUpdate }) {
 
         {/* Blocking */}
         {!gatePassed && incomplete.length > 0 && (
-          <div className="mt-3 rounded-md bg-amber-50 border border-amber-200 p-2">
-            <p className="text-xs font-semibold text-amber-800 flex items-center gap-1"><Lock className="h-3 w-3" />Blocking close:</p>
-            <ul className="mt-1 ml-4 list-disc text-xs text-amber-700 space-y-0.5">
+          <div className="mt-3 rounded-md bg-amber-50 dark:bg-amber-500/15 border border-amber-200 dark:border-amber-500/40 p-2">
+            <p className="text-xs font-semibold text-amber-800 dark:text-amber-300 flex items-center gap-1"><Lock className="h-3 w-3" />Blocking close:</p>
+            <ul className="mt-1 ml-4 list-disc text-xs text-amber-700 dark:text-amber-300 space-y-0.5">
               {incomplete.slice(0, 5).map((t, i) => <li key={i}>{t}</li>)}
             </ul>
           </div>
@@ -269,13 +270,13 @@ function StageCard({ stage, gate, onUpdate }) {
 
         {/* Computed */}
         <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
-          <div className="bg-slate-50 rounded p-2">
-            <p className="text-slate-500">Remaining = Budget − Actual − Committed</p>
-            <p className={`font-bold ${remaining < 0 ? 'text-red-600' : 'text-slate-900'}`}>${remaining.toLocaleString()}</p>
+          <div className="bg-muted rounded p-2">
+            <p className="text-muted-foreground">Remaining = Budget − Actual − Committed</p>
+            <p className={`font-bold ${remaining < 0 ? 'text-red-600 dark:text-red-300' : 'text-foreground'}`}>${remaining.toLocaleString()}</p>
           </div>
-          <div className={`rounded p-2 ${fade > 0 ? 'bg-red-100' : 'bg-slate-50'}`}>
-            <p className="text-slate-500">Fade = Cost to Complete − Remaining</p>
-            <p className={`font-bold ${fade > 0 ? 'text-red-700' : 'text-slate-900'}`}>{fade > 0 ? <span className="flex items-center gap-1"><AlertTriangle className="h-3 w-3" />${fade.toLocaleString()}</span> : `$${fade.toLocaleString()}`}</p>
+          <div className={`rounded p-2 ${fade > 0 ? 'bg-red-100 dark:bg-red-500/15' : 'bg-muted'}`}>
+            <p className="text-muted-foreground">Fade = Cost to Complete − Remaining</p>
+            <p className={`font-bold ${fade > 0 ? 'text-red-700 dark:text-red-300' : 'text-foreground'}`}>{fade > 0 ? <span className="flex items-center gap-1"><AlertTriangle className="h-3 w-3" />${fade.toLocaleString()}</span> : `$${fade.toLocaleString()}`}</p>
           </div>
         </div>
       </CardContent>
@@ -286,20 +287,20 @@ function StageCard({ stage, gate, onUpdate }) {
 function TrackItems({ label, items, onToggle, onAdd, onRemove, passed }) {
   const [draft, setDraft] = useState('');
   return (
-    <div className={`rounded-md border p-2 ${passed ? 'border-green-200 bg-green-50/40' : 'border-slate-200 bg-slate-50/60'}`}>
+    <div className={`rounded-md border p-2 ${passed ? 'border-green-200 dark:border-green-500/40 bg-green-50/40' : 'border-border bg-muted'}`}>
       <div className="flex items-center justify-between mb-1.5">
-        <Label className="text-xs font-semibold text-slate-600">{label}</Label>
-        {passed && <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />}
+        <Label className="text-xs font-semibold text-muted-foreground">{label}</Label>
+        {passed && <CheckCircle2 className="h-3.5 w-3.5 text-green-600 dark:text-green-300" />}
       </div>
       <div className="space-y-1">
         {items.map((it, i) => (
           <div key={i} className="flex items-start gap-1.5">
-            <input type="checkbox" checked={!!it.completed} onChange={() => onToggle(i)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-gold-500 focus:ring-gold-500" />
-            <span className={`text-xs flex-1 ${it.completed ? 'line-through text-slate-400' : 'text-slate-700'}`}>{it.text}</span>
-            <button onClick={() => onRemove(i)} className="text-slate-300 hover:text-red-500"><X className="h-3 w-3" /></button>
+            <input type="checkbox" checked={!!it.completed} onChange={() => onToggle(i)} className="mt-0.5 h-4 w-4 rounded border-border text-[hsl(var(--brand-gold,43_67%_47%))] focus:ring-[hsl(var(--brand-gold,43_67%_47%))]" />
+            <span className={`text-xs flex-1 ${it.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>{it.text}</span>
+            <button onClick={() => onRemove(i)} className="text-muted-foreground hover:text-red-500"><X className="h-3 w-3" /></button>
           </div>
         ))}
-        {items.length === 0 && <p className="text-[11px] text-slate-400">No items — add one below.</p>}
+        {items.length === 0 && <p className="text-[11px] text-muted-foreground">No items — add one below.</p>}
       </div>
       <div className="flex gap-1 mt-1.5">
         <Input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Add action item…" className="h-7 text-xs" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); onAdd(draft); setDraft(''); } }} />
@@ -320,7 +321,7 @@ function MoneyInput({ label, value, onChange }) {
   };
   return (
     <div>
-      <Label className="text-xs text-slate-500">{label}</Label>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
       <Input
         type="number"
         className="h-8 text-sm mt-0.5"
