@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 
 const safeNum = (n) => (Number.isFinite(n) ? n : 0);
 const fmt = (n) => `$${safeNum(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+const fmtK = (n) => { const v = safeNum(n); const a = Math.abs(v); return a >= 1e6 ? `$${(v/1e6).toFixed(1)}M` : a >= 1e4 ? `$${(v/1e3).toFixed(1)}K` : fmt(v); };
 
 // Accept both SDK result shapes: plain array or { items: [...] }.
 const toRows = (res) => (Array.isArray(res) ? res : Array.isArray(res?.items) ? res.items : []);
@@ -46,7 +47,7 @@ export default function Estimates() {
   });
   const { data: bids = [] } = useQuery({
     queryKey: ['estimates-bids'],
-    queryFn: async () => toRows(await base44.entities.BidOpportunity.filter({}, { limit: 200, fields: ['title', 'project_name'] })),
+    queryFn: async () => toRows(await base44.entities.BidOpportunity.filter({}, { sort: '-created_date', limit: 500 })),
   });
 
   // P0 (2026-10-15): also list BidEstimate records (made from Bid Detail), labeled with their bid.
@@ -120,7 +121,7 @@ export default function Estimates() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
         <KPI label="Total Estimates" value={allRows.length} sub={`${estimates.length} estimates · ${bidEstimates.length} bid estimates`} icon={FileText} tone="slate" />
-        <KPI label="Current Value" value={fmt(totalCurrent)} icon={DollarSign} tone="green" />
+        <KPI label="Current Value" value={fmtK(totalCurrent)} icon={DollarSign} tone="green" />
         <KPI label="Drafts" value={allRows.filter(e => e.status === 'draft').length} icon={History} tone="amber" />
         <KPI label="Submitted" value={allRows.filter(e => e.status === 'submitted').length} icon={ArrowRight} tone="blue" />
       </div>
