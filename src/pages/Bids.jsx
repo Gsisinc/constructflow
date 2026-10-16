@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles, ChevronRight, Upload, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles, ChevronRight, Upload, Loader2, CheckCircle, AlertTriangle, Trophy, Activity, CircleDollarSign, CalendarClock, Building2, MapPin, Layers, RefreshCw, Briefcase, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import EmptyState from '@/components/ui/EmptyState';
 import { useNavigate } from 'react-router-dom';
@@ -27,16 +27,16 @@ import BidStatusSelect from '@/components/bids/BidStatusSelect';
 // No Bid, User Analyzing, Estimated — plus Submitted, Won, Lost, Closed so the
 // pipeline still ends somewhere.
 const statusColors = {
-  review: 'bg-navy-100 text-navy-800',
-  intake: 'bg-slate-100 text-slate-700',
-  off_pricing: 'bg-amber-100 text-amber-800',
-  user_analyzing: 'bg-gold-100 text-gold-800',
-  estimated: 'bg-slate-200 text-slate-800',
-  submitted: 'bg-green-100 text-green-800',
-  won: 'bg-emerald-100 text-emerald-800',
-  lost: 'bg-red-100 text-red-800',
-  no_bid: 'bg-slate-100 text-slate-600',
-  closed: 'bg-slate-200 text-slate-700'
+  review: 'bg-primary/15 text-primary',
+  intake: 'bg-muted text-foreground',
+  off_pricing: 'bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300',
+  user_analyzing: 'bg-accent text-accent-foreground',
+  estimated: 'bg-muted text-foreground',
+  submitted: 'bg-green-100 dark:bg-green-500/15 text-green-800 dark:text-green-300',
+  won: 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300',
+  lost: 'bg-red-100 dark:bg-red-500/15 text-red-800 dark:text-red-300',
+  no_bid: 'bg-muted text-muted-foreground',
+  closed: 'bg-muted text-foreground'
 };
 
 const bidStatuses = ['All', 'review', 'intake', 'off_pricing', 'user_analyzing', 'estimated', 'submitted', 'won', 'lost', 'no_bid', 'closed'];
@@ -120,6 +120,7 @@ export default function Bids() {
   });
 
   const createBidMutation = useMutation({
+    // Entered by: Sales
     mutationFn: (data) => base44.entities.BidOpportunity.create({ 
       ...data, 
       organization_id: user.organization_id 
@@ -298,18 +299,18 @@ export default function Bids() {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 animate-slide-up">
+    <div className="max-w-[1600px] mx-auto space-y-5 animate-slide-up">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-5">
         <div>
           <div className="flex items-center gap-2 text-primary font-semibold text-sm mb-2 uppercase tracking-wider">
             <Sparkles className="h-4 w-4" />
             Intelligence Center
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-semibold text-primary tracking-tight">
             Bid Opportunities
           </h1>
-          <p className="text-slate-500 mt-2 text-lg">
+          <p className="text-muted-foreground mt-1 text-sm">
             Manage, analyze, and track your construction bids with AI-powered insights.
           </p>
         </div>
@@ -318,7 +319,7 @@ export default function Bids() {
             <DialogTrigger asChild>
               <Button 
                 onClick={() => setEditingBid(null)}
-                className="btn-premium-primary h-12 px-6 gap-2"
+                className="h-10 px-4 gap-2 bg-[hsl(var(--brand-gold,43_67%_47%))] text-[hsl(var(--brand-navy,214_68%_14%))] hover:opacity-90 font-semibold"
               >
                 <Plus className="h-5 w-5" />
                 Create New Bid
@@ -340,87 +341,77 @@ export default function Bids() {
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Stats: one compact row of chips */}
+      <div className="flex flex-wrap items-center gap-2">
         {[
-          { label: 'Total Bids', value: stats.total, icon: FileText, color: 'text-navy-700', bg: 'bg-navy-50' },
-          { label: 'Won Bids', value: stats.won, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Active Bids', value: stats.active, icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Pipeline Value', value: fmtDollars(stats.value), icon: DollarSign, color: 'text-gold-700', bg: 'bg-gold-50' },
-        ].map((stat, i) => (
-          <Card key={i} className="premium-card border-none">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className={`p-3 rounded-xl ${stat.bg} ${stat.color}`}>
-                <stat.icon className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-slate-500">{stat.label}</p>
-                <p className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 break-words">{stat.value}</p>
-              </div>
-            </CardContent>
-          </Card>
+          { label: 'Total', value: stats.total, icon: FileText },
+          { label: 'Active', value: stats.active, icon: Activity },
+          { label: 'Won', value: stats.won, icon: Trophy },
+          { label: 'Pipeline', value: fmtDollars(stats.value), icon: CircleDollarSign },
+        ].map((stat) => (
+          <div key={stat.label} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm shadow-sm">
+            <stat.icon className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))]" />
+            <span className="text-muted-foreground">{stat.label}</span>
+            <span className="font-semibold tabular-nums text-primary">{stat.value}</span>
+          </div>
         ))}
+        <div className="ml-auto inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+          <Calendar className="h-3.5 w-3.5" />
+          {scraperStatus?.last_run
+            ? `Scraper ${fmtDate(scraperStatus.last_run, 'MMM d, h:mm a')} · ${scraperStatus.records_added ?? 0} added`
+            : 'Scraper never run · daily 6 AM PT'}
+          <Button size="sm" variant="ghost" className="h-7 px-2" disabled={runScraperMutation.isPending} onClick={() => runScraperMutation.mutate()} title="Run scraper now">
+            {runScraperMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+          </Button>
+        </div>
       </div>
 
-      {/* Daily scraper status */}
-      <Card className="premium-card border-none">
-        <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-navy-50 text-navy-700"><Calendar className="h-5 w-5" /></div>
-            <div>
-              <p className="text-sm font-semibold text-slate-900">Daily Bid Scraper</p>
-              <p className="text-xs text-slate-500">
-                {scraperStatus?.last_run
-                  ? `Last run ${fmtDate(scraperStatus.last_run, 'MMM d, yyyy · h:mm a')} · ${scraperStatus.records_added ?? 0} records added`
-                  : 'Never run · scheduled daily at 6 AM PT'}
-              </p>
-            </div>
-          </div>
-          <Button size="sm" variant="outline" disabled={runScraperMutation.isPending} onClick={() => runScraperMutation.mutate()}>
-            {runScraperMutation.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Calendar className="h-4 w-4 mr-1" />}
-            Run scraper now
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Search and Filters */}
-      <Card className="premium-card border-none shadow-sm">
-        <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row gap-6 items-center">
-            <div className="relative w-full lg:w-96">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-              <Input
-                placeholder="Search by title, client, or agency..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 bg-slate-50 border-none focus-visible:ring-primary/20 rounded-xl"
-              />
-            </div>
-            <div className="h-8 w-px bg-slate-200 hidden lg:block" />
-            <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 w-full lg:w-auto no-scrollbar">
-              {bidStatuses.map((status) => (
-                <Button
-                  key={status}
-                  variant={statusFilter === status ? 'default' : 'ghost'}
-                  onClick={() => setStatusFilter(status)}
-                  className={`h-10 px-4 rounded-xl font-medium transition-all ${
-                    statusFilter === status 
-                      ? 'bg-slate-900 text-white shadow-md' 
-                      : 'text-slate-500 hover:bg-slate-100'
-                  }`}
-                >
-                  {bidStatusLabels[status] || status}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Search and status filter */}
+      <div className="flex flex-col md:flex-row gap-3 md:items-center">
+        <div className="relative w-full md:w-80">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search title, client, agency..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 h-10 bg-card border-border rounded-lg"
+          />
+        </div>
+        {/* Segmented control on desktop (main stages), select on mobile / for all statuses */}
+        <div className="hidden lg:inline-flex rounded-lg border border-border bg-card p-1">
+          {['All', 'review', 'intake', 'off_pricing', 'estimated', 'submitted', 'won', 'lost'].map((status) => (
+            <button
+              key={status}
+              type="button"
+              onClick={() => setStatusFilter(status)}
+              className={`h-8 px-3 rounded-md text-sm font-medium transition-colors ${
+                statusFilter === status ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {bidStatusLabels[status]}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 lg:ml-auto">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="h-10 rounded-lg border border-border bg-card px-3 text-sm"
+            aria-label="Filter by status"
+          >
+            {bidStatuses.map((status) => (
+              <option key={status} value={status}>{bidStatusLabels[status] || status}</option>
+            ))}
+          </select>
+          <span className="text-sm text-muted-foreground whitespace-nowrap">{filteredBids.length} shown</span>
+        </div>
+      </div>
 
       {/* Bids List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {filteredBids.length === 0 ? (
-          <div className="py-20">
+          <div className="py-20 md:col-span-2 xl:col-span-3">
             <EmptyState
               icon={FileText}
               title="No bids found"
@@ -434,84 +425,78 @@ export default function Bids() {
           </div>
         ) : (
           filteredBids.map((bid) => (
-            <Card 
-              key={bid.id} 
-              className="premium-card border-none group cursor-pointer"
+            <Card
+              key={bid.id}
+              className="group cursor-pointer rounded-xl border border-border border-l-4 border-l-[hsl(var(--brand-gold,43_67%_47%))] bg-card shadow-sm transition-shadow hover:shadow-md"
               onClick={() => navigate(createPageUrl('BidDetail') + `?id=${bid.id}`)}
             >
-              <CardContent className="p-0">
-                <div className="flex flex-col md:flex-row md:items-center justify-between p-6 gap-6">
-                  <div className="flex items-start gap-5 flex-1">
-                    <div className={`h-14 w-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                      bid.status === 'won' ? 'bg-emerald-50 text-emerald-600' : 
-                      bid.status === 'lost' ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-500'
-                    } group-hover:bg-primary group-hover:text-white`}>
-                      <FileText className="h-7 w-7" />
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-bold text-xl text-slate-900 group-hover:text-primary transition-colors">
-                          {bid.title || bid.project_name}
-                        </h3>
-                        {bid.ai_analysis && (
-                          <Badge className="bg-gold-50 text-gold-700 border-gold-200 px-2 py-0.5 flex items-center gap-1">
-                            <Sparkles className="h-3 w-3" /> AI Analyzed
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-slate-500 font-medium flex items-center gap-2">
-                        {bid.client_name || bid.agency}
-                        <span className="h-1 w-1 rounded-full bg-slate-300" />
-                        {bid.location || 'No location set'}
-                      </p>
-                      <div className="flex flex-wrap gap-3 mt-4">
-                        <Badge className={`${statusColors[bid.status]} px-3 py-1 rounded-lg font-semibold uppercase text-[10px] tracking-wider`}>
-                          {bid.status.replace('_', ' ')}
-                        </Badge>
-                        {belowFloorByBid[bid.id] && (
-                          <Badge className="bg-amber-100 text-amber-800 border border-amber-200 px-3 py-1 rounded-lg font-semibold uppercase text-[10px] tracking-wider flex items-center gap-1">
-                            <AlertTriangle className="h-3 w-3" /> Below floor
-                          </Badge>
-                        )}
-                        {bid.estimated_value && (
-                          <div className="flex items-center gap-1.5 text-sm font-bold text-slate-700 bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
-                            <DollarSign className="h-4 w-4 text-slate-400" />
-                            {fmtDollars(bid.estimated_value)}
-                          </div>
-                        )}
-                        {bid.due_date && (
-                          <div className="flex items-center gap-1.5 text-sm font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
-                            <Calendar className="h-4 w-4 text-slate-400" />
-                            Due {fmtDate(bid.due_date)}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+              <CardContent className="p-5 space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="text-base font-semibold text-primary leading-snug line-clamp-2 group-hover:underline">
+                      {bid.title || bid.project_name || 'Untitled bid'}
+                    </h3>
+                    <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground truncate">
+                      <Building2 className="h-3.5 w-3.5 flex-shrink-0" />
+                      {bid.client_name || bid.agency || 'No customer'}
+                    </p>
                   </div>
-                  <div className="flex flex-col items-stretch gap-2 border-t md:border-t-0 pt-4 md:pt-0 md:items-end">
-                    <div className="flex items-center gap-1.5" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
-                      <label className="text-[10px] uppercase tracking-wide text-slate-400">Status</label>
-                      <BidStatusSelect
-                        value={bid.status}
-                        onChange={(v) => { if (v === 'won') handleMarkWon(bid); else tagBidMutation.mutate({ id: bid.id, status: v }); }}
-                        className="h-8 w-[150px]"
-                      />
-                    </div>
+                  <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                    <Badge className={`${statusColors[bid.status] || 'bg-muted text-foreground'} rounded-full px-2.5 py-0.5 text-[11px] font-semibold`}>
+                      {bidStatusLabels[bid.status] || (bid.status || 'new').replace('_', ' ')}
+                    </Badge>
+                    {belowFloorByBid[bid.id] && (
+                      <Badge className="bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-500/40 rounded-full px-2 py-0.5 text-[11px] flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" /> Below floor
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <CircleDollarSign className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))] flex-shrink-0" />
+                    <div className="min-w-0"><dt className="text-xs text-muted-foreground">Value</dt><dd className="font-semibold tabular-nums text-primary">{bid.estimated_value ? fmtDollars(bid.estimated_value) : '—'}</dd></div>
+                  </div>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <CalendarClock className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))] flex-shrink-0" />
+                    <div className="min-w-0"><dt className="text-xs text-muted-foreground">Due</dt><dd className="font-semibold text-primary">{bid.due_date ? fmtDate(bid.due_date) : '—'}</dd></div>
+                  </div>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <MapPin className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))] flex-shrink-0" />
+                    <div className="min-w-0"><dt className="text-xs text-muted-foreground">Location</dt><dd className="font-medium text-foreground truncate">{bid.location || '—'}</dd></div>
+                  </div>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Layers className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))] flex-shrink-0" />
+                    <div className="min-w-0"><dt className="text-xs text-muted-foreground">Division</dt><dd className="font-medium text-foreground truncate">{(DIVISIONS.find((d) => d.value === bid.division) || {}).label || '—'}</dd></div>
+                  </div>
+                </dl>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                  <BidStatusSelect
+                    value={bid.status}
+                    onChange={(v) => { if (v === 'won') handleMarkWon(bid); else tagBidMutation.mutate({ id: bid.id, status: v }); }}
+                    className="h-8 w-[150px]"
+                  />
+                  <div className="flex items-center gap-2">
                     {bid.status === 'won' && !bid.linked_project_id && (
                       <Button size="sm"
-                        className="h-8 px-3 text-xs bg-primary hover:bg-primary/90 text-white"
+                        className="h-8 px-3 text-xs bg-primary hover:bg-primary/90 text-primary-foreground gap-1"
                         disabled={convertToProjectMutation.isPending}
-                        onClick={(e) => { e.stopPropagation(); convertToProjectMutation.mutate(bid); }}>
+                        onClick={() => convertToProjectMutation.mutate(bid)}>
                         {convertToProjectMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ArrowRight className="h-3.5 w-3.5" />}
                         Convert to Project
                       </Button>
                     )}
                     {bid.linked_project_id && (
-                      <Button size="sm" variant="ghost" className="h-8 px-3 text-xs text-emerald-600"
-                        onClick={(e) => { e.stopPropagation(); navigate(createPageUrl('ProjectDetail') + `?id=${bid.linked_project_id}`); }}>
-                        View Project
+                      <Button size="sm" variant="ghost" className="h-8 px-3 text-xs text-emerald-700 dark:text-emerald-300 gap-1"
+                        onClick={() => navigate(createPageUrl('ProjectDetail') + `?id=${bid.linked_project_id}`)}>
+                        <Briefcase className="h-3.5 w-3.5" /> View Project
                       </Button>
                     )}
+                    <Button size="sm" variant="ghost" className="h-8 px-2 text-primary" onClick={() => navigate(createPageUrl('BidDetail') + `?id=${bid.id}`)} title="Open bid">
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -630,17 +615,17 @@ function BidForm({ bid, onSubmit }) {
           </TabsList>
           <TabsContent value="upload" className="space-y-3 mt-3">
             <label className="cursor-pointer block">
-              <div className="border-2 border-dashed border-amber-300 rounded-xl p-6 hover:border-amber-500 hover:bg-amber-50 transition-all text-center">
+              <div className="border-2 border-dashed border-amber-300 dark:border-amber-500/40 rounded-xl p-6 hover:border-amber-500 hover:bg-amber-50 transition-all text-center">
                 {uploading ? (
                   <div className="space-y-2">
-                    <Loader2 className="h-8 w-8 mx-auto text-amber-600 animate-spin" />
-                    <p className="text-sm text-slate-600">Uploading &amp; analyzing...</p>
+                    <Loader2 className="h-8 w-8 mx-auto text-amber-600 dark:text-amber-300 animate-spin" />
+                    <p className="text-sm text-muted-foreground">Uploading &amp; analyzing...</p>
                   </div>
                 ) : (
                   <>
                     <Upload className="h-8 w-8 mx-auto text-amber-500 mb-2" />
-                    <p className="font-semibold text-slate-800">Drop bid document here</p>
-                    <p className="text-xs text-slate-500 mt-1">PDF, Word, Excel &middot; AI auto-fills all fields</p>
+                    <p className="font-semibold text-foreground">Drop bid document here</p>
+                    <p className="text-xs text-muted-foreground mt-1">PDF, Word, Excel &middot; AI auto-fills all fields</p>
                   </>
                 )}
                 <input type="file" multiple onChange={handleFileUpload} className="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" />
@@ -649,28 +634,28 @@ function BidForm({ bid, onSubmit }) {
             {uploadedFiles.length > 0 && (
               <div className="space-y-1">
                 {uploadedFiles.map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 rounded px-2 py-1">
-                    <FileText className="h-3.5 w-3.5 text-amber-600" />{f.name}
+                  <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded px-2 py-1">
+                    <FileText className="h-3.5 w-3.5 text-amber-600 dark:text-amber-300" />{f.name}
                   </div>
                 ))}
               </div>
             )}
             {aiPreview && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+              <div className="bg-amber-50 dark:bg-amber-500/15 border border-amber-200 dark:border-amber-500/40 rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-sm font-semibold text-amber-800">
+                  <div className="flex items-center gap-1.5 text-sm font-semibold text-amber-800 dark:text-amber-300">
                     <Sparkles className="h-4 w-4" /> AI Extracted
                   </div>
-                  <Button size="sm" onClick={handleApplyAi} className="bg-primary hover:bg-primary/90 text-white h-7 text-xs gap-1">
+                  <Button size="sm" onClick={handleApplyAi} className="bg-primary hover:bg-primary/90 text-primary-foreground h-7 text-xs gap-1">
                     <CheckCircle className="h-3.5 w-3.5" /> Apply
                   </Button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-2 text-xs">
-                  {aiPreview.title && <div><span className="text-slate-500">Title:</span> <span className="font-medium">{aiPreview.title}</span></div>}
-                  {aiPreview.agency && <div><span className="text-slate-500">Agency:</span> <span className="font-medium">{aiPreview.agency}</span></div>}
-                  {aiPreview.estimated_value > 0 && <div><span className="text-slate-500">Value:</span> <span className="font-medium">{fmtDollars(aiPreview.estimated_value)}</span></div>}
-                  {aiPreview.due_date && <div><span className="text-slate-500">Due:</span> <span className="font-medium">{aiPreview.due_date}</span></div>}
-                  {aiPreview.location && <div><span className="text-slate-500">Location:</span> <span className="font-medium">{aiPreview.location}</span></div>}
+                  {aiPreview.title && <div><span className="text-muted-foreground">Title:</span> <span className="font-medium">{aiPreview.title}</span></div>}
+                  {aiPreview.agency && <div><span className="text-muted-foreground">Agency:</span> <span className="font-medium">{aiPreview.agency}</span></div>}
+                  {aiPreview.estimated_value > 0 && <div><span className="text-muted-foreground">Value:</span> <span className="font-medium">{fmtDollars(aiPreview.estimated_value)}</span></div>}
+                  {aiPreview.due_date && <div><span className="text-muted-foreground">Due:</span> <span className="font-medium">{aiPreview.due_date}</span></div>}
+                  {aiPreview.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{aiPreview.location}</span></div>}
                 </div>
               </div>
             )}
