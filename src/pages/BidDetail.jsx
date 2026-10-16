@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Calendar, DollarSign, FileText, MoreHorizontal, Trash2, TrendingUp, Send, Upload, ArrowDownToLine, Copy, Download } from 'lucide-react';
+import { ArrowLeft, Calendar, DollarSign, FileText, MoreHorizontal, Trash2, TrendingUp, Send, Upload, ArrowDownToLine, Copy, Download, LayoutDashboard, ListChecks, Boxes, Calculator, ShoppingCart, ClipboardList, FolderOpen, FileImage, Building2, MapPin, CalendarClock, Layers, CircleDollarSign, PieChart, StickyNote, Lock, ExternalLink, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { toast } from 'sonner';
@@ -18,30 +18,29 @@ import { fmtDollars } from '@/lib/money';
 import BidUploader from '@/components/bids/BidUploader';
 import BidRequirements from '@/components/bids/BidRequirements';
 import BidToProject from '@/components/bids/BidToProject';
-import DrawingAnalysisTab from '@/components/bids/DrawingAnalysisTab';
-import DrawingDesignerTab from '@/components/bids/DrawingDesignerTab';
 import BidDetailsEditor from '@/components/bids/BidDetailsEditor';
 import BidDrawings from '@/components/bids/BidDrawings';
 import CompanyStandardsFloors from '@/components/companyStandards/CompanyStandardsFloors';
 import BidPhaseWorkspace from '@/components/bids/BidPhaseWorkspace';
 import BidStatusSelect from '@/components/bids/BidStatusSelect';
-import EstimateEditor from '@/components/bids/EstimateEditor';
+import EstimateEditor, { computeEstimateTotals, marginBand } from '@/components/bids/EstimateEditor';
+import { fmtDate } from '@/lib/dates';
 import RecordAuditInfo from '@/components/ui/RecordAuditInfo';
 import { Input } from '@/components/ui/input';
 import { stampUpdate } from '@/lib/audit';
 import { convertBidToProject } from '@/lib/bidConversion';
 
 const statusColors = {
-  review: 'bg-navy-100 text-navy-800',
-  intake: 'bg-slate-100 text-slate-700',
-  off_pricing: 'bg-amber-100 text-amber-800',
-  user_analyzing: 'bg-gold-100 text-gold-800',
-  estimated: 'bg-slate-200 text-slate-800',
-  submitted: 'bg-green-100 text-green-800',
-  won: 'bg-emerald-100 text-emerald-800',
-  lost: 'bg-red-100 text-red-800',
-  no_bid: 'bg-slate-100 text-slate-600',
-  closed: 'bg-slate-200 text-slate-700'
+  review: 'bg-primary/15 text-primary',
+  intake: 'bg-muted text-foreground',
+  off_pricing: 'bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300',
+  user_analyzing: 'bg-accent text-accent-foreground',
+  estimated: 'bg-muted text-foreground',
+  submitted: 'bg-green-100 dark:bg-green-500/15 text-green-800 dark:text-green-300',
+  won: 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300',
+  lost: 'bg-red-100 dark:bg-red-500/15 text-red-800 dark:text-red-300',
+  no_bid: 'bg-muted text-muted-foreground',
+  closed: 'bg-muted text-foreground'
 };
 
 export default function BidDetail() {
@@ -120,7 +119,7 @@ export default function BidDetail() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto" />
-          <p className="mt-4 text-slate-600">Loading...</p>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -134,8 +133,8 @@ export default function BidDetail() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 break-words">{bid.title || bid.project_name || 'Untitled Bid'}</h1>
-            <p className="text-sm text-slate-600 mt-1">{bid.agency || bid.client_name || 'Unknown Agency'}</p>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground break-words">{bid.title || bid.project_name || 'Untitled Bid'}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{bid.agency || bid.client_name || 'Unknown Agency'}</p>
           </div>
         </div>
 
@@ -156,7 +155,7 @@ export default function BidDetail() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem
-                className="text-red-600 focus:text-red-600"
+                className="text-red-600 dark:text-red-300 focus:text-red-600"
                 onClick={() => {
                   if (confirm('Delete this bid?')) deleteMutation.mutate(bid.id);
                 }}
@@ -170,22 +169,22 @@ export default function BidDetail() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard icon={<Calendar className="h-8 w-8 text-amber-600" />} label="Due Date" value={bid.due_date ? format(new Date(String(bid.due_date).slice(0, 10) + 'T00:00:00'), 'MMM d, yyyy') : 'Not set'} />
-        <StatCard icon={<DollarSign className="h-8 w-8 text-green-600" />} label="Estimated Value" value={fmtDollars(bid.estimated_value || bid.value || 0)} />
-        <StatCard icon={<TrendingUp className="h-8 w-8 text-navy-700" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
+        <StatCard icon={<Calendar className="h-8 w-8 text-amber-600 dark:text-amber-300" />} label="Due Date" value={bid.due_date ? format(new Date(String(bid.due_date).slice(0, 10) + 'T00:00:00'), 'MMM d, yyyy') : 'Not set'} />
+        <StatCard icon={<DollarSign className="h-8 w-8 text-green-600 dark:text-green-300" />} label="Estimated Value" value={fmtDollars(bid.estimated_value || bid.value || 0)} />
+        <StatCard icon={<TrendingUp className="h-8 w-8 text-primary" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
         <div className="md:col-span-2 lg:col-span-4">
-          <div className="bg-white rounded-xl border border-slate-200 px-4 py-3">
+          <div className="bg-card rounded-xl border border-border px-4 py-3">
             <RecordAuditInfo record={bid} />
           </div>
         </div>
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <FileText className="h-8 w-8 text-navy-700" />
+              <FileText className="h-8 w-8 text-primary" />
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-slate-500 mb-1">Status</p>
+                <p className="text-xs text-muted-foreground mb-1">Status</p>
                 <div className="flex items-center gap-2">
-                  <Badge className={statusColors[bid.status] || 'bg-slate-100 text-slate-700'}>{(bid.status || 'new').replace('_', ' ')}</Badge>
+                  <Badge className={statusColors[bid.status] || 'bg-muted text-foreground'}>{(bid.status || 'new').replace('_', ' ')}</Badge>
                   <BidStatusSelect value={bid.status} onChange={(v) => statusMutation.mutate({ id: bid.id, status: v })} className="h-8 w-[150px]" />
                 </div>
               </div>
@@ -195,20 +194,16 @@ export default function BidDetail() {
       </div>
 
       <Tabs defaultValue="overview" className="w-full sm:w-auto">
-        <TabsList className="w-full sm:w-auto overflow-x-auto flex flex-nowrap gap-1 p-1 h-auto bg-slate-100 rounded-lg sm:inline-flex">
-          <TabsTrigger value="overview" className="flex-shrink-0">Overview</TabsTrigger>
-          <TabsTrigger value="phases" className="flex-shrink-0">Phases/Stages</TabsTrigger>
-          <TabsTrigger value="boq" className="flex-shrink-0">BOQ</TabsTrigger>
-          <TabsTrigger value="estimate" className="flex-shrink-0">Estimate</TabsTrigger>
-          {typeof window !== 'undefined' && true && (
-            <TabsTrigger value="procurement" className="flex-shrink-0">Procurement</TabsTrigger>
-          )}
-          <TabsTrigger value="requirements" className="flex-shrink-0">Requirements</TabsTrigger>
-          <TabsTrigger value="documents" className="flex-shrink-0">Documents</TabsTrigger>
-          <TabsTrigger value="bid-drawings" className="flex-shrink-0">Drawings</TabsTrigger>
-          <TabsTrigger value="drawings" className="flex-shrink-0">Drawing Analysis</TabsTrigger>
-          <TabsTrigger value="designer" className="flex-shrink-0">Designer</TabsTrigger>
-          <TabsTrigger value="analysis" className="flex-shrink-0">AI Analysis</TabsTrigger>
+        <TabsList className="w-full sm:w-auto overflow-x-auto flex flex-nowrap gap-1 p-1 h-auto bg-muted rounded-lg sm:inline-flex">
+          <TabsTrigger value="overview" className="flex-shrink-0 gap-1.5"><LayoutDashboard className="h-4 w-4" />Overview</TabsTrigger>
+          <TabsTrigger value="phases" className="flex-shrink-0 gap-1.5"><ListChecks className="h-4 w-4" />Phases/Stages</TabsTrigger>
+          <TabsTrigger value="boq" className="flex-shrink-0 gap-1.5"><Boxes className="h-4 w-4" />BOQ</TabsTrigger>
+          <TabsTrigger value="estimate" className="flex-shrink-0 gap-1.5"><Calculator className="h-4 w-4" />Estimate</TabsTrigger>
+          <TabsTrigger value="procurement" className="flex-shrink-0 gap-1.5"><ShoppingCart className="h-4 w-4" />Procurement</TabsTrigger>
+          <TabsTrigger value="requirements" className="flex-shrink-0 gap-1.5"><ClipboardList className="h-4 w-4" />Requirements</TabsTrigger>
+          <TabsTrigger value="documents" className="flex-shrink-0 gap-1.5"><FolderOpen className="h-4 w-4" />Documents</TabsTrigger>
+          <TabsTrigger value="bid-drawings" className="flex-shrink-0 gap-1.5"><FileImage className="h-4 w-4" />Drawings</TabsTrigger>
+          {/* Drawing Analysis now lives under Estimate; Designer and AI Analysis tabs removed (UI only). */}
         </TabsList>
 
         <TabsContent value="phases" className="space-y-4">
@@ -216,20 +211,9 @@ export default function BidDetail() {
         </TabsContent>
 
         <TabsContent value="overview" className="space-y-4">
+          <BidOverviewPanel bid={bid} documents={documents} statusColors={statusColors} />
           <BidDetailsEditor bid={bid} />
           <CompanyStandardsFloors />
-          <Card>
-            <CardHeader><CardTitle>Bid Overview</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-slate-700 whitespace-pre-wrap">{bid.description || 'No description yet.'}</p>
-              {bid.location && <p className="text-sm text-slate-600"><strong>Location:</strong> {bid.location}</p>}
-              {bid.url && (
-                <a href={bid.url} target="_blank" rel="noopener noreferrer" className="text-sm text-amber-600 hover:underline block">
-                  View original posting →
-                </a>
-              )}
-            </CardContent>
-          </Card>
         </TabsContent>
 
         <TabsContent value="boq" className="space-y-4">
@@ -238,7 +222,7 @@ export default function BidDetail() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <CardTitle>Bill of Quantities</CardTitle>
-                  <p className="text-sm text-slate-500 mt-1">Estimate line items for this bid. Apply takeoff from Drawing Analysis to populate.</p>
+                  <p className="text-sm text-muted-foreground mt-1">Estimate line items for this bid. Apply a takeoff from Estimate &gt; Blueprints & Drawing Analysis to populate.</p>
                 </div>
                 {bidEstimates.length > 0 && (
                   <Button variant="outline" size="sm" onClick={() => setShowRfqDialog(true)}>
@@ -250,19 +234,19 @@ export default function BidDetail() {
             </CardHeader>
             <CardContent>
               {bidEstimates.length === 0 ? (
-                <p className="text-sm text-slate-500">No estimates yet. Run Drawing Analysis and click &quot;Apply this takeoff to bid estimate&quot;, or add an estimate from the Estimates page.</p>
+                <p className="text-sm text-muted-foreground">No estimates yet. Open the Estimate tab to start one from scratch or apply a drawing takeoff.</p>
               ) : (
                 <div className="space-y-4">
                   {bidEstimates
                     .sort((a, b) => (b.version || 0) - (a.version || 0))
                     .map((est) => (
                       <div key={est.id} className="border rounded-lg overflow-hidden">
-                        <div className="bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <div className="bg-muted px-4 py-2 text-sm font-medium text-foreground">
                           Version {est.version ?? 1} · Subtotal {fmtDollars(est.subtotal || 0)} · Total bid {fmtDollars(est.total_bid_amount || 0)}
                         </div>
                         <table className="w-full sm:w-auto text-sm">
                           <thead>
-                            <tr className="border-b bg-slate-100 dark:bg-slate-800">
+                            <tr className="border-b bg-muted">
                               <th className="text-left p-2">Description</th>
                               <th className="text-right p-2">Qty</th>
                               <th className="text-right p-2">Unit</th>
@@ -271,11 +255,11 @@ export default function BidDetail() {
                           </thead>
                           <tbody>
                             {(est.line_items || []).map((line, idx) => (
-                              <tr key={idx} className="border-b border-slate-100">
+                              <tr key={idx} className="border-b border-border">
                                 <td className="p-2">{line.description}</td>
                                 <td className="p-2 text-right">{line.quantity}</td>
                                 <td className="p-2 text-right">{line.unit || 'ea'}</td>
-                                <td className="p-2 text-right text-slate-500">{line.category || '—'}</td>
+                                <td className="p-2 text-right text-muted-foreground">{line.category || '—'}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -289,7 +273,7 @@ export default function BidDetail() {
         </TabsContent>
 
         <TabsContent value="estimate" className="space-y-4">
-          <EstimateEditor bidId={bid.id} organizationId={user.organization_id} bidTitle={bid.title || bid.project_name || 'Bid'} />
+          <EstimateEditor bidId={bid.id} organizationId={user.organization_id} bidTitle={bid.title || bid.project_name || 'Bid'} bid={bid} />
         </TabsContent>
         {typeof window !== 'undefined' && true && (
           <TabsContent value="procurement" className="space-y-4">
@@ -314,16 +298,16 @@ export default function BidDetail() {
 
           {documents.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-slate-900 break-words">Uploaded Documents</h3>
+              <h3 className="text-sm font-semibold text-foreground break-words">Uploaded Documents</h3>
               {documents.map((doc) => (
                 <Card key={doc.id}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-slate-400" />
+                        <FileText className="h-5 w-5 text-muted-foreground" />
                         <div>
                           <p className="text-sm font-medium">{doc.name || 'Untitled document'}</p>
-                          <p className="text-xs text-slate-500">{formatFileSize(doc.file_size)}</p>
+                          <p className="text-xs text-muted-foreground">{formatFileSize(doc.file_size)}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -342,112 +326,13 @@ export default function BidDetail() {
 
         <TabsContent value="bid-drawings" className="space-y-4">
           <Card>
-            <CardHeader><CardTitle>Drawings</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="flex items-center gap-2"><FileImage className="h-5 w-5 text-primary" />Drawings</CardTitle></CardHeader>
             <CardContent>
               <BidDrawings bidId={bid.id} organizationId={user.organization_id} />
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="drawings" className="space-y-4">
-          <DrawingAnalysisTab
-            bid={bid}
-            organizationId={user.organization_id}
-            onAnalysisSaved={() => {
-              queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
-              queryClient.invalidateQueries({ queryKey: ['bidDocuments', bidId] });
-              refetchBid();
-            }}
-          />
-        </TabsContent>
-
-        <TabsContent value="designer" className="space-y-4">
-          <DrawingDesignerTab
-            bid={bid}
-            onDesignerSaved={() => {
-              queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
-              refetchBid();
-            }}
-          />
-        </TabsContent>
-
-        <TabsContent value="analysis" className="space-y-4">
-          {analysis.hasAnyData ? (
-            <div className="space-y-4">
-              {analysis.complexityScore !== null && (
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Complexity Score</CardTitle></CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-4">
-                      <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-600">{analysis.complexityScore}/10</div>
-                      <p className="text-sm text-slate-600">{analysis.complexityLabel}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {analysis.riskFactors.length > 0 && (
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Risk Factors</CardTitle></CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {analysis.riskFactors.map((risk, idx) => (
-                        <li key={`${risk}-${idx}`} className="flex items-start gap-2 text-sm"><span className="text-red-500 mt-0.5">⚠</span><span>{risk}</span></li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {analysis.recommendedMarkup !== null && (
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Recommended Markup</CardTitle></CardHeader>
-                  <CardContent><p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">{analysis.recommendedMarkup}%</p></CardContent>
-                </Card>
-              )}
-
-              {analysis.keyPoints.length > 0 && (
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Key Points</CardTitle></CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-sm text-slate-700 list-disc ml-5">
-                      {analysis.keyPoints.map((point, idx) => <li key={`${point}-${idx}`}>{point}</li>)}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {analysis.deadlines.length > 0 && (
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Deadlines</CardTitle></CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-sm text-slate-700 list-disc ml-5">
-                      {analysis.deadlines.map((deadline, idx) => <li key={`${deadline}-${idx}`}>{deadline}</li>)}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {analysis.extractedRequirements.length > 0 && (
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Extracted Requirements</CardTitle></CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-sm text-slate-700 list-disc ml-5">
-                      {analysis.extractedRequirements.map((item, idx) => <li key={`${item}-${idx}`}>{item}</li>)}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="py-12 text-center text-slate-500">
-                <p className="text-sm">No AI analysis available yet.</p>
-                <p className="text-xs mt-2">Upload documents to generate insights.</p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
       </Tabs>
 
       <Dialog open={showRfqDialog} onOpenChange={setShowRfqDialog}>
@@ -455,7 +340,7 @@ export default function BidDetail() {
           <DialogHeader>
             <DialogTitle>Send RFQ to vendors</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-slate-600">Enter vendor email addresses (one per line). They will receive a request for quote for this bid.</p>
+          <p className="text-sm text-muted-foreground">Enter vendor email addresses (one per line). They will receive a request for quote for this bid.</p>
           <Label className="sr-only">Vendor emails</Label>
           <Textarea
             placeholder="vendor1@example.com&#10;vendor2@example.com"
@@ -563,7 +448,7 @@ function StatCard({ icon, label, value }) {
         <div className="flex items-center gap-3">
           {icon}
           <div>
-            <p className="text-xs text-slate-500">{label}</p>
+            <p className="text-xs text-muted-foreground">{label}</p>
             <p className="text-sm font-semibold">{value}</p>
           </div>
         </div>
@@ -1054,7 +939,7 @@ function ProcurementTab({ bidId, bidTitle }) {
             </tbody>
           </table>
           {skippedChanges.length > 0 && (
-            <div className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md p-3 space-y-1">
+            <div className="text-sm text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/15 border border-amber-200 dark:border-amber-500/40 rounded-md p-3 space-y-1">
               <div className="font-medium">Skipped {skippedChanges.length} line(s) — no unique key match:</div>
               <ul className="list-disc pl-5">
                 {skippedChanges.map((s) => (
@@ -1075,6 +960,168 @@ function ProcurementTab({ bidId, bidTitle }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// ==== Bid Overview panel (inlined; same copy in BidDetail and BidOpportunityDetail) ====
+const ovAsList = (res) => (Array.isArray(res) ? res : res?.items || []);
+
+const DIVISION_LABELS = { fire_alarm: 'Fire Alarm', low_voltage: 'Low Voltage', drone: 'Drone', software: 'Software', other: 'Other' };
+const STATUS_LABELS = { review: 'Review', intake: 'Intake', off_pricing: 'Off Pricing', user_analyzing: 'User Analyzing', estimated: 'Estimated', submitted: 'Submitted', won: 'Won', lost: 'Lost', no_bid: 'No Bid', closed: 'Closed' };
+// Mirrors DualTrackTracker phase grouping (Phase A 1-2, B 3-6, C 7-12).
+const PHASES = [
+  { label: 'Phase A', stages: [1, 2] },
+  { label: 'Phase B', stages: [3, 4, 5, 6] },
+  { label: 'Phase C', stages: [7, 8, 9, 10, 11, 12] },
+];
+
+const safeDate = (d) => {
+  if (!d) return '—';
+  try { return fmtDate(d); } catch (e) { return String(d).slice(0, 10); }
+};
+
+// Read-only overview used by BidDetail and BidOpportunityDetail.
+// Estimate total and margin are INTERNAL (this page is staff-only).
+function BidOverviewPanel({ bid, documents = [], statusColors = {} }) {
+  const bidId = bid?.id;
+
+  const { data: estimates = [] } = useQuery({
+    queryKey: ['bidEstimates', bidId],
+    queryFn: async () => ovAsList(await base44.entities.BidEstimate.filter({ bid_opportunity_id: bidId })),
+    enabled: !!bidId,
+  });
+  const { data: drawings = [] } = useQuery({
+    queryKey: ['bid-drawings', bidId],
+    queryFn: async () => (await base44.entities.Drawing.filter({ bid_id: bidId }, { sort: '-created_date', limit: 200 }))?.items || [],
+    enabled: !!bidId,
+  });
+  const { data: stages = [] } = useQuery({
+    queryKey: ['dualtrack-stages', bidId],
+    queryFn: async () => (await base44.entities.DualTrackStage.filter({ project_id: bidId }, { sort: 'stage_number', limit: 50 }))?.items || [],
+    enabled: !!bidId,
+  });
+
+  const latest = [...estimates].sort((a, b) => (b.version || 0) - (a.version || 0))[0];
+  const t = latest ? computeEstimateTotals(latest) : null;
+  const band = t ? marginBand(t.margin_pct) : null;
+  const cleared = new Set(stages.filter((s) => s.exit_gate_passed).map((s) => s.stage_number));
+  const pct = Math.round((cleared.size / 12) * 100);
+  const currentStage = stages.find((s) => !s.exit_gate_passed);
+
+  const facts = [
+    { icon: Building2, label: 'Customer / GC', value: bid.client_name || bid.agency || '—', sub: bid.client_name && bid.agency && bid.agency !== bid.client_name ? bid.agency : null },
+    { icon: MapPin, label: 'Location', value: bid.location || '—' },
+    { icon: CalendarClock, label: 'Due date', value: bid.due_date ? safeDate(bid.due_date) : 'Not set' },
+    { icon: Layers, label: 'Division', value: DIVISION_LABELS[bid.division] || bid.division || '—' },
+    { icon: User, label: 'Owner', value: bid.owner_name || '—' },
+    { icon: CircleDollarSign, label: 'Estimated value', value: fmtDollars(bid.estimated_value || bid.value || 0) },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Key facts */}
+      <Card className="lg:col-span-2 rounded-xl border-border">
+        <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-base">Bid details</CardTitle>
+          <Badge className={statusColors[bid.status] || 'bg-muted text-foreground'}>{STATUS_LABELS[bid.status] || bid.status || 'New'}</Badge>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+            {facts.map(({ icon: Icon, label, value, sub }) => (
+              <div key={label} className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><Icon className="h-4 w-4" /></div>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-muted-foreground">{label}</p>
+                  <p className="text-sm font-semibold text-foreground break-words">{value}</p>
+                  {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+          {bid.url && (
+            <a href={bid.url} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+              <ExternalLink className="h-4 w-4" /> View original posting
+            </a>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Estimate (internal) */}
+      <Card className="rounded-xl border-border border-t-4 border-t-[hsl(var(--brand-gold,43_67%_47%))]">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2"><Calculator className="h-4 w-4 text-primary" />Estimate <Badge variant="outline" className="text-[10px]"><Lock className="h-3 w-3 mr-1" />Internal</Badge></CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {t ? (
+            <>
+              <div>
+                <p className="text-xs text-muted-foreground">Estimate total (v{latest.version || 1})</p>
+                <p className="text-[28px] font-bold leading-tight tabular-nums text-primary">{fmtDollars(t.total_bid_amount)}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <PieChart className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))]" />
+                <span className="text-sm font-semibold tabular-nums">{t.margin_pct.toFixed(1)}% · {fmtDollars(t.margin_dollars)}</span>
+                <Badge className={`border ${band.cls}`}>{band.label}</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">Margin on sell · target 25–30% · floor 20%</p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">No estimate yet. Open the Estimate tab to start one.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Phase progress */}
+      <Card className="lg:col-span-2 rounded-xl border-border">
+        <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-base flex items-center gap-2"><ListChecks className="h-4 w-4 text-primary" />Phase progress</CardTitle>
+          <span className="text-sm font-semibold tabular-nums text-primary">{cleared.size}/12 stages</span>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="h-2 rounded-full bg-muted overflow-hidden"><div className="h-full bg-[hsl(var(--brand-gold,43_67%_47%))]" style={{ width: `${pct}%` }} /></div>
+          <div className="grid grid-cols-3 gap-3">
+            {PHASES.map((p) => {
+              const done = p.stages.filter((n) => cleared.has(n)).length;
+              return (
+                <div key={p.label} className="rounded-lg border border-border p-3">
+                  <p className="text-xs font-semibold text-muted-foreground">{p.label}</p>
+                  <p className="text-sm font-bold text-primary">{done}/{p.stages.length} cleared</p>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {currentStage ? <>Current stage: <span className="font-semibold text-foreground">{currentStage.stage_number}. {currentStage.stage_name}</span></> : stages.length ? 'All stages cleared' : 'Stages are created when the Phases/Stages tab is first opened.'}
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Counts + key dates */}
+      <Card className="rounded-xl border-border">
+        <CardHeader className="pb-2"><CardTitle className="text-base">Files & dates</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg bg-primary/10 p-3"><FileImage className="h-4 w-4 text-primary" /><p className="mt-1 text-xl font-bold text-primary">{drawings.length}</p><p className="text-xs text-muted-foreground">Drawings</p></div>
+            <div className="rounded-lg bg-accent p-3"><FolderOpen className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))]" /><p className="mt-1 text-xl font-bold text-primary">{documents.length}</p><p className="text-xs text-muted-foreground">Documents</p></div>
+          </div>
+          <dl className="space-y-1.5 text-sm">
+            <div className="flex justify-between"><dt className="text-muted-foreground">Created</dt><dd className="font-medium">{safeDate(bid.created_date)}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted-foreground">Due</dt><dd className="font-medium">{bid.due_date ? safeDate(bid.due_date) : '—'}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted-foreground">Last updated</dt><dd className="font-medium">{safeDate(bid.updated_date)}</dd></div>
+            {latest && <div className="flex justify-between"><dt className="text-muted-foreground">Estimate saved</dt><dd className="font-medium">{safeDate(latest.updated_date || latest.created_date)}</dd></div>}
+          </dl>
+        </CardContent>
+      </Card>
+
+      {/* Description / notes */}
+      <Card className="lg:col-span-3 rounded-xl border-border">
+        <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><StickyNote className="h-4 w-4 text-primary" />Scope & notes</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div><p className="text-xs font-medium text-muted-foreground mb-1">Description / scope</p><p className="whitespace-pre-wrap text-foreground">{bid.scope_of_work || bid.description || 'No description yet.'}</p></div>
+          <div><p className="text-xs font-medium text-muted-foreground mb-1">Notes</p><p className="whitespace-pre-wrap text-foreground">{bid.notes || '—'}</p></div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
