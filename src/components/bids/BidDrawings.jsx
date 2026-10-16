@@ -30,13 +30,13 @@ export default function BidDrawings({ bidId, organizationId }) {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">Drawings</h3>
-          <p className="text-xs text-slate-500">Upload a drawing (PDF/DWG/image) or add a link to a bidding site / shared drive. These carry over to the project when the bid is won.</p>
+          <h3 className="text-base font-semibold text-foreground">Drawings</h3>
+          <p className="text-xs text-muted-foreground">Upload a drawing (PDF/DWG/image) or add a link to a bidding site / shared drive. These carry over to the project when the bid is won.</p>
         </div>
         <Button size="sm" className="bg-primary hover:bg-primary/90 gap-1" onClick={() => setShowAdd(true)}><Plus className="h-4 w-4" /> Add Drawing</Button>
       </div>
-      {isLoading ? <div className="py-6 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-slate-400" /></div>
-        : items.length === 0 ? <div className="text-center py-8"><PenLine className="h-8 w-8 text-slate-300 mx-auto mb-2" /><p className="text-slate-400 text-sm">No drawings yet.</p></div>
+      {isLoading ? <div className="py-6 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        : items.length === 0 ? <div className="text-center py-8"><PenLine className="h-8 w-8 text-muted-foreground mx-auto mb-2" /><p className="text-muted-foreground text-sm">No drawings yet.</p></div>
         : (
           <div className="space-y-2">
             {items.map((d) => <DrawingRow key={d.id} drawing={d} onDelete={remove} />)}
@@ -63,20 +63,20 @@ export function DrawingRow({ drawing: d, onDelete }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            {d.kind === 'link' ? <Link2 className="h-4 w-4 text-navy-700" /> : <FileText className="h-4 w-4 text-slate-500" />}
-            <p className="font-semibold text-slate-900 text-sm">{d.title}</p>
+            {d.kind === 'link' ? <Link2 className="h-4 w-4 text-primary" /> : <FileText className="h-4 w-4 text-muted-foreground" />}
+            <p className="font-semibold text-foreground text-sm">{d.title}</p>
             {d.revision && <Badge variant="outline" className="text-xs">Rev {d.revision}</Badge>}
             <Badge variant="secondary" className="text-xs">{d.kind === 'link' ? 'Link' : 'File'}</Badge>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {d.date ? format(new Date(d.date), 'MMM d, yyyy') : ''}{d.entered_by ? ` · Entered by ${d.entered_by}` : ''}
           </p>
           {d.kind === 'link' && d.link_url && (
-            <a href={d.link_url} target="_blank" rel="noopener noreferrer" className="text-xs text-navy-700 underline inline-flex items-center gap-1 mt-1">
+            <a href={d.link_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline inline-flex items-center gap-1 mt-1">
               <Link2 className="h-3 w-3" /> {d.link_label || d.link_url}
             </a>
           )}
-          {d.kind === 'file' && d.filename && <p className="text-xs text-slate-400 mt-1 truncate">{d.filename}</p>}
+          {d.kind === 'file' && d.filename && <p className="text-xs text-muted-foreground mt-1 truncate">{d.filename}</p>}
         </div>
         <div className="flex gap-1.5">
           {d.kind === 'link' ? (
@@ -122,6 +122,7 @@ function AddDrawingDialog({ open, onOpenChange, bidId, organizationId, onSaved }
         file_uri = up.file_uri;
         filename = file.name;
       }
+      // Entered by: Sales
       await base44.entities.Drawing.create({
         organization_id: organizationId,
         bid_id: bidId,
@@ -165,7 +166,7 @@ function AddDrawingDialog({ open, onOpenChange, bidId, organizationId, onSaved }
             <div><Label>Label (optional)</Label><Input value={form.link_label} onChange={(e) => setForm({ ...form, link_label: e.target.value })} placeholder="e.g. Full plan set on Dropbox" /></div>
           </div>
         )}
-        <div className="text-xs text-slate-500">Entered by: <span className="font-medium">{enteredBy || '—'}</span></div>
+        <div className="text-xs text-muted-foreground">Entered by: <span className="font-medium">{enteredBy || '—'}</span></div>
         <div className="flex justify-end gap-2 pt-2 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button className="bg-primary hover:bg-primary/90" disabled={saving} onClick={submit}>{saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Add Drawing</Button>
