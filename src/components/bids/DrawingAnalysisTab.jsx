@@ -48,7 +48,10 @@ const CSI_DIVISIONS = [
   '28 Electronic Safety and Security'
 ];
 
-export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSaved }) {
+// onApplyTakeoff (optional): when the tab is rendered inside the Estimate tab,
+// "Apply Takeoff" hands the lines to the open estimate editor instead of
+// creating a separate BidEstimate record.
+export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSaved, onApplyTakeoff }) {
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [applyingEstimate, setApplyingEstimate] = useState(false);
@@ -251,6 +254,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
       for (const file of files) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        // Entered by: Sales
         const bidDoc = await base44.entities.BidDocument.create({
           bid_opportunity_id: bid.id,
           organization_id: organizationId,
@@ -425,6 +429,25 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
   const handleApplyEstimate = async () => {
     if (!analysis) return;
     
+    if (typeof onApplyTakeoff === 'function') {
+      const takeoffLines = (analysis.materials || []).map(mat => ({
+        cost_code: '',
+        name: mat.item,
+        description: mat.notes || '',
+        quantity: mat.quantity,
+        unit: mat.unit || 'ea',
+        unit_cost: 0,
+        total_cost: 0,
+        category: mat.csi_division || classification,
+        pricing_type: 'cost'
+      }));
+      onApplyTakeoff(takeoffLines, {
+        labor_hours: analysis.estimateInputs?.labor_hours || 0,
+        equipment_cost: analysis.estimateInputs?.equipment_cost || 0
+      });
+      return;
+    }
+
     setApplyingEstimate(true);
     try {
       const existingEstimates = await base44.entities.BidEstimate.filter({ bid_opportunity_id: bid.id }).catch(() => []);
@@ -446,6 +469,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
         category: mat.csi_division || classification
       }));
 
+      // Entered by: Sales
       await base44.entities.BidEstimate.create({
         bid_opportunity_id: bid.id,
         organization_id: organizationId,
@@ -628,9 +652,9 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <label className="text-sm">
-              <span className="text-slate-600 font-medium">Classification</span>
+              <span className="text-muted-foreground font-medium">Classification</span>
               <select
-                className="mt-1 w-full border rounded-md px-3 py-2 bg-white"
+                className="mt-1 w-full border rounded-md px-3 py-2 bg-card"
                 value={classification}
                 onChange={(e) => setClassification(e.target.value)}
               >
@@ -638,9 +662,9 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               </select>
             </label>
             <label className="text-sm">
-              <span className="text-slate-600 font-medium">CSI Division Focus</span>
+              <span className="text-muted-foreground font-medium">CSI Division Focus</span>
               <select
-                className="mt-1 w-full border rounded-md px-3 py-2 bg-white"
+                className="mt-1 w-full border rounded-md px-3 py-2 bg-card"
                 value={csiDivision}
                 onChange={(e) => setCsiDivision(e.target.value)}
               >
@@ -650,9 +674,9 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
           </div>
 
           {existingDocs.length > 0 && (
-            <div className="border border-amber-200 bg-amber-50/50 rounded-lg p-4">
+            <div className="border border-amber-200 dark:border-amber-500/40 bg-amber-50/50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-amber-900">
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
                   {existingDocs.length} document{existingDocs.length > 1 ? 's' : ''} uploaded
                 </p>
                 <div className="flex gap-3">
@@ -662,7 +686,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                         ? [] 
                         : existingDocs.map(d => d.id)
                     )}
-                    className="text-xs text-amber-700 hover:text-amber-900 font-medium underline"
+                    className="text-xs text-amber-700 dark:text-amber-300 hover:text-amber-900 font-medium underline"
                   >
                     {selectedDocIds.length === existingDocs.length ? 'Deselect All' : 'Select All'}
                   </button>
@@ -672,7 +696,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                 {existingDocs.map(doc => (
                   <div 
                     key={doc.id} 
-                    className={`flex items-center justify-between p-2 rounded border transition-colors ${selectedDocForPreview?.id === doc.id ? 'bg-amber-100 border-amber-300' : 'bg-white border-slate-200 hover:bg-slate-50'}`}
+                    className={`flex items-center justify-between p-2 rounded border transition-colors ${selectedDocForPreview?.id === doc.id ? 'bg-amber-100 dark:bg-amber-500/15 border-amber-300 dark:border-amber-500/40' : 'bg-card border-border hover:bg-muted'}`}
                   >
                     <label className="flex items-center gap-2 text-xs cursor-pointer flex-1 truncate">
                       <input
@@ -685,17 +709,17 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                             setSelectedDocIds(selectedDocIds.filter(id => id !== doc.id));
                           }
                         }}
-                        className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                        className="rounded border-border text-amber-600 dark:text-amber-300 focus:ring-amber-500"
                         onClick={(e) => e.stopPropagation()}
                       />
-                      <span className="truncate font-medium text-slate-700">{doc.name}</span>
+                      <span className="truncate font-medium text-foreground">{doc.name}</span>
                     </label>
                     <button 
                       onClick={() => {
                         setSelectedDocForPreview(doc);
                         setViewMode('visual');
                       }}
-                      className="p-1 hover:bg-amber-200 rounded text-amber-700"
+                      className="p-1 hover:bg-amber-200 rounded text-amber-700 dark:text-amber-300"
                       title="View Drawing"
                     >
                       <Eye className="h-3.5 w-3.5" />
@@ -708,7 +732,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                 disabled={analyzing || selectedDocIds.length === 0}
                 variant="outline"
                 size="sm"
-                className="w-full border-amber-300 text-amber-800 hover:bg-amber-100"
+                className="w-full border-amber-300 dark:border-amber-500/40 text-amber-800 dark:text-amber-300 hover:bg-amber-100"
               >
                 {analyzing ? (
                   <>
@@ -726,20 +750,20 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
           )}
 
           <label className="cursor-pointer block">
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-amber-500 hover:bg-slate-50 transition-all group">
+            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-amber-500 hover:bg-muted transition-all group">
               {uploading || analyzing ? (
                 <div className="flex flex-col items-center">
-                  <Loader2 className="h-12 w-12 text-amber-600 animate-spin mb-3" />
-                  <p className="text-sm font-medium text-slate-700">{uploading ? 'Uploading drawing files...' : 'Analyzing drawings with AI...'}</p>
-                  <p className="text-xs text-slate-500 mt-1">This may take a minute for complex plans.</p>
+                  <Loader2 className="h-12 w-12 text-amber-600 dark:text-amber-300 animate-spin mb-3" />
+                  <p className="text-sm font-medium text-foreground">{uploading ? 'Uploading drawing files...' : 'Analyzing drawings with AI...'}</p>
+                  <p className="text-xs text-muted-foreground mt-1">This may take a minute for complex plans.</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
-                  <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center mb-3 group-hover:bg-amber-200 transition-colors">
-                    <Upload className="h-6 w-6 text-amber-600" />
+                  <div className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center mb-3 group-hover:bg-amber-200 transition-colors">
+                    <Upload className="h-6 w-6 text-amber-600 dark:text-amber-300" />
                   </div>
-                  <p className="text-sm font-semibold text-slate-800">Upload drawing files for takeoff</p>
-                  <p className="text-xs text-slate-500 mt-1">Supports multi-page PDF, PNG, JPG</p>
+                  <p className="text-sm font-semibold text-foreground">Upload drawing files for takeoff</p>
+                  <p className="text-xs text-muted-foreground mt-1">Supports multi-page PDF, PNG, JPG</p>
                 </div>
               )}
               <input
@@ -761,19 +785,19 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
       {viewMode === 'visual' && selectedDocForPreview && (
         <Card className="overflow-hidden">
-          <CardHeader className="bg-slate-900 text-white flex flex-row items-center justify-between py-3">
+          <CardHeader className="bg-primary text-primary-foreground flex flex-row items-center justify-between py-3">
             <div className="flex items-center gap-3">
               <Maximize2 className="h-5 w-5 text-amber-400" />
               <div>
                 <CardTitle className="text-base font-bold">{selectedDocForPreview.name}</CardTitle>
-                <p className="text-[10px] text-slate-400">Interactive Visual Takeoff Tool</p>
+                <p className="text-[10px] text-muted-foreground">Interactive Visual Takeoff Tool</p>
               </div>
             </div>
             <div className="flex gap-2">
               <Button 
                 size="sm" 
                 variant={isSettingScale ? "default" : "outline"}
-                className={isSettingScale ? "bg-amber-600" : "text-white border-slate-700 hover:bg-slate-800"}
+                className={isSettingScale ? "bg-amber-600" : "text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground/10"}
                 onClick={() => {
                   setIsSettingScale(true);
                   setIsMeasuring(false);
@@ -786,7 +810,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               <Button 
                 size="sm" 
                 variant={isMeasuring ? "default" : "outline"}
-                className={isMeasuring ? "bg-blue-600" : "text-white border-slate-700 hover:bg-slate-800"}
+                className={isMeasuring ? "bg-primary" : "text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground/10"}
                 onClick={() => {
                   if (scale === 1) {
                     toast.warning("Set the scale first for accurate measurements.");
@@ -800,7 +824,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="p-0 bg-slate-800 relative min-h-[600px] flex items-center justify-center overflow-auto">
+          <CardContent className="p-0 bg-muted relative min-h-[600px] flex items-center justify-center overflow-auto">
             <div 
               ref={containerRef}
               className="relative cursor-crosshair inline-block shadow-2xl"
@@ -810,18 +834,18 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               {(selectedDocForPreview.file_type?.includes('pdf') || selectedDocForPreview?.name?.toLowerCase?.().endsWith('.pdf')) ? (
                 <>
                   {pdfPreview.loading && (
-                    <div className="bg-white p-8 text-center rounded shadow-lg">
-                      <Loader2 className="h-10 w-10 mx-auto text-amber-600 animate-spin mb-3" />
-                      <p className="text-slate-800 font-bold">Rendering PDF for takeoff…</p>
-                      <p className="text-slate-500 text-sm mt-2 max-w-xs">This only renders for visual measuring. AI analysis still reads the original PDF.</p>
+                    <div className="bg-card p-8 text-center rounded shadow-lg">
+                      <Loader2 className="h-10 w-10 mx-auto text-amber-600 dark:text-amber-300 animate-spin mb-3" />
+                      <p className="text-foreground font-bold">Rendering PDF for takeoff…</p>
+                      <p className="text-muted-foreground text-sm mt-2 max-w-xs">This only renders for visual measuring. AI analysis still reads the original PDF.</p>
                     </div>
                   )}
 
                   {!pdfPreview.loading && pdfPreview.pages.length === 0 && (
-                    <div className="bg-white p-8 text-center rounded shadow-lg">
-                      <Files className="h-16 w-16 mx-auto text-slate-300 mb-4" />
-                      <p className="text-slate-800 font-bold">PDF preview unavailable</p>
-                      <p className="text-slate-500 text-sm mt-2 max-w-xs">Try opening the PDF in a new tab or upload a PNG/JPG for the cleanest visual takeoff.</p>
+                    <div className="bg-card p-8 text-center rounded shadow-lg">
+                      <Files className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-foreground font-bold">PDF preview unavailable</p>
+                      <p className="text-muted-foreground text-sm mt-2 max-w-xs">Try opening the PDF in a new tab or upload a PNG/JPG for the cleanest visual takeoff.</p>
                       <Button variant="outline" className="mt-4" onClick={() => window.open(selectedDocForPreview.file_url, '_blank')}>
                         Open PDF in New Tab
                       </Button>
@@ -829,10 +853,10 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                   )}
 
                   {!pdfPreview.loading && pdfPreview.pages.length > 0 && (
-                    <div className="absolute top-3 left-3 z-10 flex items-center gap-2 bg-white/95 backdrop-blur border rounded px-2 py-1">
-                      <span className="text-[10px] font-semibold text-slate-700">Page</span>
+                    <div className="absolute top-3 left-3 z-10 flex items-center gap-2 bg-card/95 backdrop-blur border rounded px-2 py-1">
+                      <span className="text-[10px] font-semibold text-foreground">Page</span>
                       <select
-                        className="text-[10px] border rounded px-1 py-0.5 bg-white"
+                        className="text-[10px] border rounded px-1 py-0.5 bg-card"
                         value={pdfPreview.pageIndex}
                         onChange={(e) => setPdfPreview((p) => ({ ...p, pageIndex: Number(e.target.value) || 1 }))}
                       >
@@ -928,32 +952,32 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
             {/* Floating Measurement List */}
             {measurements.length > 0 && (
-              <div className="absolute top-4 right-4 w-64 bg-white/95 backdrop-blur shadow-xl rounded-lg border border-slate-200 overflow-hidden">
-                <div className="bg-slate-100 px-3 py-2 border-b flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-700">Manual Takeoffs</span>
+              <div className="absolute top-4 right-4 w-64 bg-card/95 backdrop-blur shadow-xl rounded-lg border border-border overflow-hidden">
+                <div className="bg-muted px-3 py-2 border-b flex justify-between items-center">
+                  <span className="text-xs font-bold text-foreground">Manual Takeoffs</span>
                   <Badge variant="secondary" className="text-[10px]">{measurements.length}</Badge>
                 </div>
                 <div className="max-h-60 overflow-y-auto p-2 space-y-1">
                   {measurements.map((m) => (
-                    <div key={m.id} className="flex items-center justify-between p-2 bg-slate-50 rounded border border-slate-100 text-[11px] group">
+                    <div key={m.id} className="flex items-center justify-between p-2 bg-muted rounded border border-border text-[11px] group">
                       <div className="flex-1 truncate">
-                        <p className="font-bold text-slate-800 truncate">{m.name}</p>
-                        <p className="text-slate-500">{Math.round(m.lengthFt)} linear feet</p>
+                        <p className="font-bold text-foreground truncate">{m.name}</p>
+                        <p className="text-muted-foreground">{Math.round(m.lengthFt)} linear feet</p>
                       </div>
                       <button 
                         onClick={() => setMeasurements(measurements.filter(x => x.id !== m.id))}
-                        className="p-1 hover:text-red-600 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="p-1 hover:text-red-600 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <Trash2 className="h-3 w-3" />
                       </button>
                     </div>
                   ))}
                 </div>
-                <div className="p-2 bg-slate-50 border-t space-y-2">
+                <div className="p-2 bg-muted border-t space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-semibold text-slate-600">Apply as</span>
+                    <span className="text-[10px] font-semibold text-muted-foreground">Apply as</span>
                     <select
-                      className="text-[10px] border rounded px-2 py-1 bg-white flex-1"
+                      className="text-[10px] border rounded px-2 py-1 bg-card flex-1"
                       value={manualTakeoffTarget}
                       onChange={(e) => setManualTakeoffTarget(e.target.value)}
                     >
@@ -974,13 +998,13 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
       {analysis && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
-            <Card className="border-2 border-amber-200 bg-amber-50/30">
+            <Card className="border-2 border-amber-200 dark:border-amber-500/40 bg-amber-50/30">
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-amber-900">
+                <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-300">
                   <Calculator className="h-5 w-5" /> 
                   Apply Takeoff to Bid Estimate
                 </CardTitle>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Create a new estimate version from this takeoff. This will update the bid&apos;s estimated value.
                 </p>
               </CardHeader>
@@ -988,7 +1012,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                 <Button
                   onClick={handleApplyEstimate}
                   disabled={applyingEstimate}
-                  className="bg-amber-600 hover:bg-amber-700 text-white shadow-md"
+                  className="bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-500 dark:text-black shadow-md"
                 >
                   {applyingEstimate ? (
                     <>
@@ -999,7 +1023,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
                     'Create Bid Estimate from Takeoff'
                   )}
                 </Button>
-                <Button variant="outline" onClick={handleExportTakeoffCsv} className="border-amber-300 text-amber-800 hover:bg-amber-50">
+                <Button variant="outline" onClick={handleExportTakeoffCsv} className="border-amber-300 dark:border-amber-500/40 text-amber-800 dark:text-amber-300 hover:bg-amber-50">
                   <Download className="h-4 w-4 mr-2" />
                   Export CSV
                 </Button>
@@ -1008,26 +1032,26 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2"><Package className="h-5 w-5 text-blue-600" /> Material Quantities</CardTitle>
+                <CardTitle className="flex items-center gap-2"><Package className="h-5 w-5 text-primary" /> Material Quantities</CardTitle>
               </CardHeader>
               <CardContent>
                 {analysis.materials.length === 0 ? (
-                  <div className="text-center py-8 bg-slate-50 rounded border border-dashed">
-                    <Package className="h-8 w-8 mx-auto text-slate-300 mb-2" />
-                    <p className="text-sm text-slate-500">No materials extracted from these drawings.</p>
+                  <div className="text-center py-8 bg-muted rounded border border-dashed">
+                    <Package className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">No materials extracted from these drawings.</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {analysis.materials.map((item, idx) => (
-                      <div key={idx} className="border rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow">
+                      <div key={idx} className="border rounded-lg p-3 bg-card shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-1">
-                          <p className="font-bold text-slate-800 text-sm leading-tight">{item.item}</p>
-                          <Badge variant="secondary" className="text-[10px] bg-blue-50 text-blue-700 border-blue-100">
+                          <p className="font-bold text-foreground text-sm leading-tight">{item.item}</p>
+                          <Badge variant="secondary" className="text-[10px] bg-primary/10 text-primary border-primary/20">
                             {item.quantity} {item.unit}
                           </Badge>
                         </div>
-                        <p className="text-[10px] text-slate-500 font-medium">CSI: {item.csi_division || 'General'}</p>
-                        {item.notes && <p className="text-[11px] text-slate-600 mt-2 italic">&ldquo;{item.notes}&rdquo;</p>}
+                        <p className="text-[10px] text-muted-foreground font-medium">CSI: {item.csi_division || 'General'}</p>
+                        {item.notes && <p className="text-[11px] text-muted-foreground mt-2 italic">&ldquo;{item.notes}&rdquo;</p>}
                       </div>
                     ))}
                   </div>
@@ -1037,7 +1061,7 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
           </div>
 
           <div className="space-y-4">
-            <Card className="bg-slate-900 text-white border-0 shadow-xl">
+            <Card className="bg-primary text-primary-foreground border-0 shadow-xl">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-amber-400">
                   <Ruler className="h-5 w-5" /> 
@@ -1046,26 +1070,26 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg border border-slate-700">
-                    <span className="text-xs text-slate-400">Conduit Length</span>
+                  <div className="flex justify-between items-center p-3 bg-primary-foreground/10 rounded-lg border border-primary-foreground/20">
+                    <span className="text-xs text-muted-foreground">Conduit Length</span>
                     <span className="font-bold text-amber-400">{analysis.takeoffTotals.conduit_length_ft.toLocaleString()} ft</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg border border-slate-700">
-                    <span className="text-xs text-slate-400">Cable Length</span>
+                  <div className="flex justify-between items-center p-3 bg-primary-foreground/10 rounded-lg border border-primary-foreground/20">
+                    <span className="text-xs text-muted-foreground">Cable Length</span>
                     <span className="font-bold text-amber-400">{analysis.takeoffTotals.cable_length_ft.toLocaleString()} ft</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg border border-slate-700">
-                    <span className="text-xs text-slate-400">Device Count</span>
+                  <div className="flex justify-between items-center p-3 bg-primary-foreground/10 rounded-lg border border-primary-foreground/20">
+                    <span className="text-xs text-muted-foreground">Device Count</span>
                     <span className="font-bold text-amber-400">{analysis.takeoffTotals.device_count} ea</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg border border-slate-700">
-                    <span className="text-xs text-slate-400">Fixture Count</span>
+                  <div className="flex justify-between items-center p-3 bg-primary-foreground/10 rounded-lg border border-primary-foreground/20">
+                    <span className="text-xs text-muted-foreground">Fixture Count</span>
                     <span className="font-bold text-amber-400">{analysis.takeoffTotals.fixture_count} ea</span>
                   </div>
                 </div>
                 
-                <div className="pt-4 border-t border-slate-700">
-                  <p className="text-[11px] text-slate-400 leading-relaxed italic">
+                <div className="pt-4 border-t border-primary-foreground/20">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed italic">
                     &ldquo;{analysis.summary}&rdquo;
                   </p>
                 </div>
@@ -1074,36 +1098,36 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2"><Calculator className="h-5 w-5 text-emerald-600" /> Estimate Summary</CardTitle>
+                <CardTitle className="flex items-center gap-2"><Calculator className="h-5 w-5 text-emerald-600 dark:text-emerald-300" /> Estimate Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-sm space-y-2">
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-muted-foreground">
                     <span>Labor ({analysis.estimateInputs.labor_hours} hrs)</span>
                     <span>${(analysis.estimateInputs.labor_hours * 65).toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-muted-foreground">
                     <span>Materials</span>
                     <span>${analysis.estimateInputs.material_cost.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-muted-foreground">
                     <span>Equipment</span>
                     <span>${analysis.estimateInputs.equipment_cost.toLocaleString()}</span>
                   </div>
-                  <div className="pt-2 border-t flex justify-between font-bold text-slate-900 text-base">
+                  <div className="pt-2 border-t flex justify-between font-bold text-foreground text-base">
                     <span>Subtotal</span>
                     <span>${analysis.estimateInputs.subtotal.toLocaleString()}</span>
                   </div>
                 </div>
                 
                 {analysis.missingInformation.length > 0 && (
-                  <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-100">
-                    <p className="text-[11px] font-bold text-amber-800 flex items-center gap-1 mb-1">
+                  <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-500/15 rounded-lg border border-amber-100 dark:border-amber-500/40">
+                    <p className="text-[11px] font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1 mb-1">
                       <Files className="h-3 w-3" /> Missing Information
                     </p>
                     <ul className="space-y-1">
                       {analysis.missingInformation.map((note, idx) => (
-                        <li key={idx} className="text-[10px] text-amber-700 flex items-start gap-1">
+                        <li key={idx} className="text-[10px] text-amber-700 dark:text-amber-300 flex items-start gap-1">
                           <span className="mt-1">•</span>
                           <span>{note}</span>
                         </li>
@@ -1120,23 +1144,23 @@ export default function DrawingAnalysisTab({ bid, organizationId, onAnalysisSave
               </CardHeader>
               <CardContent>
                 {analysis.symbols.length === 0 ? (
-                  <p className="text-xs text-slate-500 text-center py-4">No symbols detected.</p>
+                  <p className="text-xs text-muted-foreground text-center py-4">No symbols detected.</p>
                 ) : (
                   <div className="space-y-2">
                     {analysis.symbols.slice(0, 10).map((symbol, idx) => (
-                      <div key={idx} className="flex items-center justify-between text-xs p-2 bg-slate-50 rounded border border-slate-100">
+                      <div key={idx} className="flex items-center justify-between text-xs p-2 bg-muted rounded border border-border">
                         <div className="flex-1 truncate mr-2">
-                          <p className="font-bold text-slate-800 truncate">{symbol.symbol}</p>
-                          <p className="text-[10px] text-slate-500">{symbol.classification}</p>
+                          <p className="font-bold text-foreground truncate">{symbol.symbol}</p>
+                          <p className="text-[10px] text-muted-foreground">{symbol.classification}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-slate-900">× {symbol.count}</p>
-                          <p className="text-[9px] text-emerald-600 font-medium">{symbol.confidence}</p>
+                          <p className="font-bold text-foreground">× {symbol.count}</p>
+                          <p className="text-[9px] text-emerald-600 dark:text-emerald-300 font-medium">{symbol.confidence}</p>
                         </div>
                       </div>
                     ))}
                     {analysis.symbols.length > 10 && (
-                      <p className="text-[10px] text-center text-slate-400">+{analysis.symbols.length - 10} more symbols detected</p>
+                      <p className="text-[10px] text-center text-muted-foreground">+{analysis.symbols.length - 10} more symbols detected</p>
                     )}
                   </div>
                 )}
