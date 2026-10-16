@@ -18,6 +18,9 @@ import { toast } from 'sonner';
 const safeNum = (n) => (Number.isFinite(n) ? n : 0);
 const fmt = (n) => `$${safeNum(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
+// Accept both SDK result shapes: plain array or { items: [...] }.
+const toRows = (res) => (Array.isArray(res) ? res : Array.isArray(res?.items) ? res.items : []);
+
 const DIVISIONS = ['fire_alarm', 'low_voltage', 'drone', 'software', 'other'];
 const STATUSES = ['draft', 'estimating', 'ready_for_bid', 'submitted', 'won', 'lost', 'archived'];
 
@@ -35,45 +38,73 @@ export default function Estimates() {
 
   const { data: estimates = [], isLoading } = useQuery({
     queryKey: ['estimates-list'],
-    queryFn: async () => (await base44.entities.Estimate.filter({}, { sort: '-created_date', limit: 200 }))?.items || [],
+    queryFn: async () => toRows(await base44.entities.Estimate.filter({}, { sort: '-created_date', limit: 200 })),
   });
   const { data: projects = [] } = useQuery({
     queryKey: ['estimates-projects'],
-    queryFn: async () => (await base44.entities.Project.filter({}, { limit: 200, fields: ['name'] }))?.items || [],
+    queryFn: async () => toRows(await base44.entities.Project.filter({}, { limit: 200, fields: ['name'] })),
   });
   const { data: bids = [] } = useQuery({
     queryKey: ['estimates-bids'],
-    queryFn: async () => (await base44.entities.BidOpportunity.filter({}, { limit: 200, fields: ['title', 'project_name'] }))?.items || [],
+    queryFn: async () => toRows(await base44.entities.BidOpportunity.filter({}, { limit: 200, fields: ['title', 'project_name'] })),
   });
 
-  const owners = useMemo(() => {
-    const set = new Set(estimates.map(e => e.owner_name).filter(Boolean));
-    return Array.from(set);
-  }, [estimates]);
+  // P0 (2026-10-15): also list BidEstimate records (made from Bid Detail), labeled with their bid.
+  const { data: bidEstimatesRaw = [], isLoading: loadingBidEst } = useQuery({
+    queryKey: ['estimates-bid-estimates'],
+    queryFn: async () => toRows(await base44.entities.BidEstimate.filter({}, { sort: '-created_date', limit: 200 })),
+  });
+  const bidById = useMemo(() => new Map(bids.map(b => [b.id, b])), [bids]);
+  // Normalize BidEstimate rows into the Estimate row shape used below. _kind marks the source.
+  const bidEstimates = useMemo(() => bidEstimatesRaw.map(be => {
+    const bid = bidById.get(be.bid_opportunity_id);
+    return {
+      ...be,
+      _kind: 'bid',
+      linked_bid_id: be.bid_opportunity_id || null,
+      project_name: bid?.title || bid?.project_name || 'Bid estimate',
+      _bidLabel: bid ? (bid.title || bid.project_name || 'Bid estimate') : 'Bid estimate',
+      total_bid_amount: Number(be.total_bid_amount ?? be.total_cost),
+      version: be.version || 1,
+    };
+  }), [bidEstimatesRaw, bidById]);
+  const allRows = useMemo(() => [...estimates, ...bidEstimates], [estimates, bidEstimates]);
 
-  const filtered = useMemo(() => estimates.filter(e => {
-    const ms = (e.project_name || '').toLowerCase().includes(search.toLowerCase()) || (e.estimate_number || '').toLowerCase().includes(search.toLowerCase());
-    const mProj = fProject === 'all' || e.linked_project_id === fProject;
+  const owners = useMemo(() => {
+    const set = new Set(allRows.map(e => e.owner_name).filter(Boolean));
+    return Array.from(set);
+  }, [allRows]);
+
+  const filtered = useMemo(() => allRows.filter(e => {
+    const ms = (e.project_name || '').toLowerCase().includes(search.toLowerCase()) || (e.estimate_number || '').toLowerCase().includes(search.toLowerCase()) || (e._bidLabel || '').toLowerCase().includes(search.toLowerCase());
+    const mProj = fProject === 'all' || e.linked_project_id === fProject; // bid estimates have no project link, so they hide when a project is picked
     const mBid = fBid === 'all' || e.linked_bid_id === fBid;
     const mDiv = fDivision === 'all' || e.division === fDivision;
     const mStat = fStatus === 'all' || e.status === fStatus;
     const mOwn = fOwner === 'all' || e.owner_name === fOwner;
     return ms && mProj && mBid && mDiv && mStat && mOwn;
-  }), [estimates, search, fProject, fBid, fDivision, fStatus, fOwner]);
+  }), [allRows, search, fProject, fBid, fDivision, fStatus, fOwner]);
 
   // Group by bid/job to show "current" + version history
   const grouped = useMemo(() => {
     const map = new Map();
     filtered.forEach(e => {
-      const key = e.linked_bid_id || e.linked_project_id || e.id;
+      // Bid estimates group per bid, separate from Estimate records for the same bid (different record types).
+      const key = e._kind === 'bid' ? `bid:${e.linked_bid_id || e.id}` : (e.linked_bid_id || e.linked_project_id || e.id);
       if (!map.has(key)) map.set(key, []);
       map.get(key).push(e);
     });
-    Array.from(map.values()).forEach(arr => arr.sort((a, b) => (b.version || 1) - (a.version || 1)));
+    Array.from(map.values()).forEach(arr => arr.sort((a, b) => (b.version || 1) - (a.version || 1) || String(b.created_date || '').localeCompare(String(a.created_date || ''))));
     return Array.from(map.entries());
   }, [filtered]);
 
-  const totalCurrent = filtered.filter(e => e.is_current).reduce((s, e) => s + safeNum(e.total_bid_amount), 0);
+  // Current value: Estimate rows flagged is_current + the newest BidEstimate per bid.
+  const totalCurrent = grouped.reduce((s, [, versions]) => {
+    const cur = versions[0]?._kind === 'bid' ? versions[0] : versions.find(v => v.is_current);
+    return s + (cur ? safeNum(cur.total_bid_amount) : 0);
+  }, 0);
+  const listLoading = isLoading || loadingBidEst;
+  const openRow = (row) => (row._kind === 'bid' && row.linked_bid_id ? navigate(`${createPageUrl('BidDetail')}?id=${encodeURIComponent(row.linked_bid_id)}`) : setViewing(row));
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -87,11 +118,11 @@ export default function Estimates() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPI label="Total Estimates" value={estimates.length} icon={FileText} tone="slate" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+        <KPI label="Total Estimates" value={allRows.length} sub={`${estimates.length} estimates · ${bidEstimates.length} bid estimates`} icon={FileText} tone="slate" />
         <KPI label="Current Value" value={fmt(totalCurrent)} icon={DollarSign} tone="green" />
-        <KPI label="Drafts" value={estimates.filter(e => e.status === 'draft').length} icon={History} tone="amber" />
-        <KPI label="Submitted" value={estimates.filter(e => e.status === 'submitted').length} icon={ArrowRight} tone="blue" />
+        <KPI label="Drafts" value={allRows.filter(e => e.status === 'draft').length} icon={History} tone="amber" />
+        <KPI label="Submitted" value={allRows.filter(e => e.status === 'submitted').length} icon={ArrowRight} tone="blue" />
       </div>
 
       <Card>
@@ -125,20 +156,22 @@ export default function Estimates() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {listLoading ? (
             <div className="py-10 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-slate-400" /></div>
           ) : grouped.length === 0 ? (
             <p className="text-center text-slate-400 py-10">No estimates yet. Create one from a bid or project.</p>
           ) : (
             <div className="space-y-4">
               {grouped.map(([key, versions]) => {
-                const current = versions.find(v => v.is_current) || versions[0];
+                const isBid = versions[0]?._kind === 'bid';
+                const current = isBid ? versions[0] : (versions.find(v => v.is_current) || versions[0]);
                 return (
-                  <div key={key} className="border border-slate-200 rounded-lg p-4">
+                  <div key={key} className="border border-slate-200 rounded-lg p-3 sm:p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-slate-900">{current.project_name || current.estimate_number || 'Untitled'}</h3>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                          <h3 className="font-semibold text-slate-900 break-words min-w-0">{current.project_name || current.estimate_number || 'Untitled'}</h3>
+                          {isBid && <Badge className="bg-blue-100 text-blue-700">Bid estimate</Badge>}
                           {current.is_current && <Badge className="bg-green-100 text-green-700">Current</Badge>}
                           {current.division && <Badge variant="outline">{current.division.replace('_', ' ')}</Badge>}
                           {current.status && <Badge variant="secondary">{current.status.replace('_', ' ')}</Badge>}
@@ -147,12 +180,12 @@ export default function Estimates() {
                           {current.owner_name ? `Owner: ${current.owner_name} · ` : ''}v{current.version || 1} · {current.created_date ? format(new Date(current.created_date), 'MMM d, yyyy') : ''}
                         </p>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
+                      <div className="flex items-center justify-between sm:justify-end gap-3">
+                        <div className="sm:text-right">
                           <p className="text-xs text-slate-500">Total</p>
                           <p className="text-lg font-bold text-slate-900">{fmt(current.total_bid_amount)}</p>
                         </div>
-                        <Button size="sm" variant="outline" onClick={() => setViewing(current)}>Open</Button>
+                        <Button size="sm" variant="outline" className="min-h-[40px]" onClick={() => openRow(current)}>{isBid && current.linked_bid_id ? 'Open bid' : 'Open'}</Button>
                       </div>
                     </div>
                     {versions.length > 1 && (
@@ -161,7 +194,7 @@ export default function Estimates() {
                         <div className="flex flex-wrap gap-2">
                           {versions.map(v => (
                             <span key={v.id} className={`text-xs px-2 py-1 rounded ${v.is_current ? 'bg-green-50 text-green-700 font-medium' : 'bg-slate-50 text-slate-500'}`}>
-                              v{v.version || 1} · {fmt(v.total_bid_amount)} {v.is_current ? '· current' : ''}
+                              v{v.version || 1} · {fmt(v.total_bid_amount)} {(isBid ? v === versions[0] : v.is_current) ? '· current' : ''}
                             </span>
                           ))}
                         </div>
@@ -335,13 +368,13 @@ function CreateEstimateDialog({ open, onOpenChange, projects, bids, onCreated })
   );
 }
 
-function KPI({ label, value, icon: Icon, tone }) {
+function KPI({ label, value, sub, icon: Icon, tone }) {
   const tones = { slate: 'bg-slate-100 text-slate-600', blue: 'bg-blue-100 text-blue-600', amber: 'bg-amber-100 text-amber-600', green: 'bg-green-100 text-green-600' };
   return (
     <Card><CardContent className="pt-4 pb-3">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <div className={`p-2 rounded-lg ${tones[tone] || tones.slate}`}><Icon className="h-5 w-5" /></div>
-        <div><p className="text-lg font-bold text-slate-900">{value}</p><p className="text-xs text-slate-500">{label}</p></div>
+        <div className="min-w-0"><p className="text-lg font-bold text-slate-900">{value}</p><p className="text-xs text-slate-500">{label}</p>{sub && <p className="text-[10px] text-slate-400 truncate">{sub}</p>}</div>
       </div>
     </CardContent></Card>
   );
