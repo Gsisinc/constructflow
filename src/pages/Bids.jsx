@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles, ChevronRight, Upload, Loader2, CheckCircle, AlertTriangle, Trophy, Activity, CircleDollarSign, CalendarClock, Building2, MapPin, Layers, RefreshCw, Briefcase, Filter } from 'lucide-react';
+import { Plus, FileText, TrendingUp, DollarSign, Search, ArrowRight, Calendar, Sparkles, ChevronRight, Upload, Loader2, CheckCircle, AlertTriangle, Trophy, Activity, CircleDollarSign, CalendarClock, Building2, MapPin, Layers, RefreshCw, Briefcase, Filter, LayoutGrid, List as ListIcon, Send, Inbox, PencilRuler, GripVertical, Flame, Scale, Timer, TrendingDown, Target, SlidersHorizontal, MousePointer2 } from 'lucide-react';
 import { toast } from 'sonner';
 import EmptyState from '@/components/ui/EmptyState';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +54,299 @@ const bidStatusLabels = {
   closed: 'Closed',
 };
 
+// ---- Pipeline (matches mockups/Chief/Premium/bids.html) ----
+// Maps the owner's status enum (bidStatuses above) onto the 4 mockup stages.
+// lost / no_bid / closed (and any unknown/empty status) do NOT map to a stage;
+// they are counted in the "Not in pipeline" note and lost feeds the win rate.
+const PIPELINE_STAGES = [
+  { key: 'new', defaultStatus: 'review', label: 'New', icon: Inbox, statuses: ['review', 'intake'] },
+  { key: 'bidding', defaultStatus: 'off_pricing', label: 'Bidding', icon: PencilRuler, statuses: ['off_pricing', 'user_analyzing', 'estimated'] },
+  { key: 'submitted', defaultStatus: 'submitted', label: 'Submitted', icon: Send, statuses: ['submitted'] },
+  { key: 'won', defaultStatus: 'won', label: 'Won', icon: Trophy, statuses: ['won'] },
+];
+const STATUS_TO_STAGE = PIPELINE_STAGES.reduce((m, s) => { s.statuses.forEach((st) => { m[st] = s.key; }); return m; }, {});
+const UNMAPPED_STATUSES = bidStatuses.filter((s) => s !== 'All' && !STATUS_TO_STAGE[s]); // ['lost','no_bid','closed']
+
+const fmtCompact = (v) => {
+  const n = Number(v) || 0;
+  if (Math.abs(n) >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+  if (Math.abs(n) >= 1e3) return '$' + Math.round(n / 1e3) + 'K';
+  return '$' + Math.round(n).toLocaleString();
+};
+
+// Stage colors (mockup premium.css palette; Bidding is orange per spec). Light / dark via the .dark class.
+const PIPELINE_CSS = `
+.gsis-pipe{--st-new:#2B6FCF;--st-bidding:#E0730E;--st-submitted:#6F52D6;--st-won:#119A5B;--pipe-gold:hsl(var(--brand-gold,43 67% 47%));--pipe-navy:hsl(var(--brand-navy,214 68% 14%));--pipe-col:hsl(var(--muted)/.55);--pipe-card:hsl(var(--card));}
+.dark .gsis-pipe{--st-new:#5EA8FF;--st-bidding:#FF9F43;--st-submitted:#A78BFA;--st-won:#3DD68C;--pipe-col:rgba(10,26,50,.45);--pipe-card:linear-gradient(180deg,rgba(26,52,92,.75),rgba(14,32,60,.8));}
+.gsis-pipe .seg-glow{box-shadow:0 0 14px -2px var(--c)}
+.gsis-pipe .dot-glow{box-shadow:0 0 10px var(--c)}
+.gsis-pipe .pcol{background:var(--pipe-col)}
+.gsis-pipe .pcard{background:var(--pipe-card);transition:transform .2s,box-shadow .2s,border-color .2s}
+.gsis-pipe .pcard:hover{transform:translateY(-2px);border-color:var(--pipe-gold);box-shadow:0 14px 30px -16px rgba(0,0,0,.45),0 0 30px -14px var(--pipe-gold)}
+.gsis-pipe .pcard[data-stage="won"]{box-shadow:0 0 0 1px color-mix(in srgb,var(--st-won) 45%,transparent),0 0 28px -12px var(--st-won)}
+.gsis-pipe .pcol.over{border-color:color-mix(in srgb,var(--pipe-gold) 55%,transparent);background:color-mix(in srgb,var(--pipe-gold) 6%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--pipe-gold) 20%,transparent) inset,0 0 40px -14px var(--pipe-gold)}
+.gsis-pipe .pcard.dragging{opacity:.35;transform:scale(.98)}
+.gsis-pipe .pcard.won-flash{animation:gsisWonGlow 1.4s cubic-bezier(.2,.8,.2,1)}
+@keyframes gsisWonGlow{0%{box-shadow:0 0 0 1px rgba(61,214,140,.9),0 0 40px rgba(61,214,140,.6)}100%{box-shadow:none}}
+.gsis-pipe .add-c:hover{color:var(--pipe-gold);border-color:color-mix(in srgb,var(--pipe-gold) 55%,transparent)}
+.gsis-pipe.kpi-wrap{}
+.gsis-pipe .kpi{background:var(--pipe-card)}
+.gsis-pipe .kpi.attn{border-color:color-mix(in srgb,var(--pipe-gold) 45%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--pipe-gold) 15%,transparent),0 18px 40px -24px var(--pipe-gold)}
+/* Light mode: mockup's highlighted KPI is a navy card with light text (re-scoped theme vars) */
+html:not(.dark) .gsis-pipe .kpi.attn{background:linear-gradient(180deg,hsl(var(--brand-navy,214 68% 14%)/.92),hsl(var(--brand-navy,214 68% 14%)));--foreground:0 0% 98%;--muted-foreground:215 25% 78%;--muted:215 45% 26%;--border:215 30% 28%;color:hsl(var(--foreground))}
+.gsis-pipe .pboard{scroll-snap-type:x mandatory}
+.gsis-pipe .pboard>*{scroll-snap-align:start}
+`;
+
+export function BidPipeline({ bids = [], allBids = bids, belowFloorByBid = {}, onOpen, onStatusChange, onAdd, renderActions }) {
+  const [dragId, setDragId] = useState(null);
+  const [overCol, setOverCol] = useState(null);
+  const [flashId, setFlashId] = useState(null);
+  const stages = useMemo(() => PIPELINE_STAGES.map((s) => {
+    const items = bids.filter((b) => STATUS_TO_STAGE[b.status] === s.key);
+    return { ...s, items, count: items.length, total: items.reduce((a, b) => a + (Number(b.estimated_value) || 0), 0) };
+  }), [bids]);
+  const unmapped = useMemo(() => bids.filter((b) => !STATUS_TO_STAGE[b.status]), [bids]);
+  const unmappedBreakdown = useMemo(() => unmapped.reduce((m, b) => { const k = b.status || '(none)'; m[k] = (m[k] || 0) + 1; return m; }, {}), [unmapped]);
+  const wonCount = allBids.filter((b) => b.status === 'won').length;
+  const lostCount = allBids.filter((b) => b.status === 'lost').length;
+  const decided = wonCount + lostCount;
+  const winRate = decided ? Math.round((wonCount / decided) * 100) : null;
+  const pipelineTotal = stages.reduce((a, s) => a + s.total, 0);
+  const pipelineCount = stages.reduce((a, s) => a + s.count, 0);
+
+  // Native HTML5 drag & drop (desktop). Mobile keeps the status dropdown on each card.
+  const handleDrop = (e, stage) => {
+    e.preventDefault();
+    setOverCol(null);
+    const id = e.dataTransfer.getData('text/plain') || dragId;
+    setDragId(null);
+    const bid = bids.find((b) => String(b.id) === String(id));
+    if (!bid || STATUS_TO_STAGE[bid.status] === stage.key) return;
+    if (stage.key === 'won') { setFlashId(bid.id); setTimeout(() => setFlashId(null), 1500); }
+    onStatusChange?.(bid, stage.defaultStatus);
+  };
+
+  return (
+    <section className="gsis-pipe space-y-4" data-testid="bid-pipeline">
+      <style>{PIPELINE_CSS}</style>
+      {/* Segmented pipeline bar + legend + win rate */}
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
+          <div>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Pipeline</div>
+            <div className="text-2xl font-bold tabular-nums text-foreground">{fmtCompact(pipelineTotal)}<span className="ml-2 text-sm font-medium text-muted-foreground">{pipelineCount} bids</span></div>
+          </div>
+          <div className="text-right" data-testid="win-rate">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1 justify-end"><Trophy className="h-3.5 w-3.5 text-[hsl(var(--brand-gold,43_67%_47%))]" />Win rate</div>
+            <div className="text-2xl font-bold tabular-nums" style={{ color: 'var(--st-won)' }}>{winRate === null ? '—' : `${winRate}%`}</div>
+            <div className="text-xs text-muted-foreground">{wonCount} won of {decided} decided</div>
+          </div>
+        </div>
+        <div className="flex h-3 w-full gap-1 overflow-hidden rounded-full bg-muted" role="img" aria-label="Pipeline by stage">
+          {stages.map((s) => (s.count > 0 ? (
+            <div key={s.key} className="seg-glow h-full rounded-full transition-all" title={`${s.label}: ${s.count} · ${fmtCompact(s.total)}`}
+              style={{ '--c': `var(--st-${s.key})`, background: `var(--st-${s.key})`, flexGrow: pipelineTotal > 0 ? Math.max(s.total, pipelineTotal * 0.03) : s.count, flexBasis: 0 }} />
+          ) : null))}
+        </div>
+        <ul className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 text-sm" data-testid="pipeline-legend">
+          {stages.map((s) => (
+            <li key={s.key} className="flex items-center gap-2 min-w-0">
+              <span className="dot-glow h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ '--c': `var(--st-${s.key})`, background: `var(--st-${s.key})` }} />
+              <span className="font-medium text-foreground">{s.label}</span>
+              <span className="text-muted-foreground tabular-nums">{s.count}</span>
+              <span className="ml-auto font-semibold tabular-nums text-foreground">{fmtCompact(s.total)}</span>
+            </li>
+          ))}
+        </ul>
+        {unmapped.length > 0 && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Not in pipeline: {Object.entries(unmappedBreakdown).map(([k, n]) => `${bidStatusLabels[k] || k} ${n}`).join(' · ')}
+          </p>
+        )}
+      </div>
+
+      {/* Board: 4-up at xl, scroll-snap columns (82vw on phones) below */}
+      <div className="pboard -mx-4 px-4 sm:mx-0 sm:px-0 flex gap-3.5 overflow-x-auto pb-2.5 xl:grid xl:grid-cols-4 xl:overflow-visible items-start">
+        {stages.map((s) => (
+          <div key={s.key} data-stage-col={s.key}
+            onDragOver={(e) => { if (!dragId) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (overCol !== s.key) setOverCol(s.key); }}
+            onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOverCol((c) => (c === s.key ? null : c)); }}
+            onDrop={(e) => handleDrop(e, s)}
+            className={`pcol ${overCol === s.key ? 'over' : ''} w-[82vw] max-w-[340px] sm:w-[260px] xl:w-auto xl:max-w-none flex-shrink-0 rounded-2xl border border-border p-3 min-h-[200px] xl:min-h-[420px]`}>
+            <div className="flex items-center gap-2 px-1 pb-2.5">
+              <span className="dot-glow h-2.5 w-2.5 rounded-full" style={{ '--c': `var(--st-${s.key})`, background: `var(--st-${s.key})` }} />
+              <b className="text-[13px] text-foreground">{s.label}</b>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground tabular-nums">{s.count}</span>
+              <span className="ml-auto text-[12.5px] font-bold tabular-nums text-muted-foreground">{fmtCompact(s.total)}</span>
+            </div>
+            <div className="mx-1 mb-3 h-[3px] rounded opacity-90" style={{ background: `linear-gradient(90deg, var(--st-${s.key}), transparent)` }} />
+            <div className="flex flex-col gap-[9px] min-h-[60px]">
+              {s.items.map((bid) => {
+                const prob = s.key === 'won' ? 100 : Math.max(0, Math.min(100, Number(bid.win_probability) || 0));
+                const probColor = s.key === 'won' ? 'var(--st-won)' : prob >= 50 ? 'var(--pipe-gold)' : 'var(--st-new)';
+                const daysOut = bid.due_date ? Math.ceil((new Date(bid.due_date) - new Date()) / 86400000) : null;
+                const dueSoon = (s.key === 'new' || s.key === 'bidding') && daysOut !== null && daysOut >= 0 && daysOut <= 7;
+                const division = DIVISIONS.find((d) => d.value === bid.division);
+                const FootIcon = s.key === 'won' ? Trophy : s.key === 'submitted' ? Send : Calendar;
+                return (
+                  <div key={bid.id} data-status={bid.status} data-stage={s.key} role="button" tabIndex={0} draggable
+                    onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(bid.id)); setDragId(bid.id); }}
+                    onDragEnd={() => { setDragId(null); setOverCol(null); }}
+                    onClick={() => onOpen?.(bid)} onKeyDown={(e) => { if (e.key === 'Enter') onOpen?.(bid); }}
+                    className={`pcard group relative cursor-grab active:cursor-grabbing select-none rounded-[13px] border border-border p-3 text-left ${dragId === bid.id ? 'dragging' : ''} ${flashId === bid.id ? 'won-flash' : ''}`}>
+                    <GripVertical className="absolute right-2.5 top-3 h-3.5 w-3.5 text-muted-foreground/60" />
+                    <div className="pr-5 text-[13.5px] font-semibold leading-snug text-foreground line-clamp-2">{bid.title || bid.project_name || 'Untitled bid'}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground truncate">{bid.client_name || bid.agency || 'No customer'}</div>
+                    <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                      {bid.division && <TradeChip division={bid.division} label={division?.label || bid.division} />}
+                      {dueSoon && <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold" style={{ color: 'var(--st-bidding)', background: 'color-mix(in srgb, var(--st-bidding) 14%, transparent)', border: '1px solid color-mix(in srgb, var(--st-bidding) 35%, transparent)' }}><Flame className="h-3 w-3" />Due soon</span>}
+                      {belowFloorByBid[bid.id] && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-500/15 px-2 py-0.5 text-[11px] text-amber-800 dark:text-amber-300"><AlertTriangle className="h-3 w-3" />Below floor</span>
+                      )}
+                    </div>
+                    <div className="mt-2.5 text-[17px] font-extrabold tracking-tight tabular-nums text-foreground">{bid.estimated_value ? fmtDollars(bid.estimated_value) : '—'}</div>
+                    <div className="mt-2 h-1 overflow-hidden rounded bg-muted">
+                      <i className="block h-full rounded" style={{ width: `${prob}%`, background: probColor }} />
+                    </div>
+                    <div className="mt-2.5 flex items-center gap-2 border-t border-border pt-2.5 text-[11.5px] text-muted-foreground">
+                      <span className="inline-flex items-center gap-1"><FootIcon className="h-3.5 w-3.5" />{s.key === 'won' ? 'Won' : s.key === 'submitted' ? 'Due' : ''} {bid.due_date ? fmtDate(bid.due_date) : 'No date'}</span>
+                      <span>· {prob}%</span>
+                      {bid.owner_name && <Initials name={bid.owner_name} />}
+                    </div>
+                    {(onStatusChange || renderActions) && (
+                      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 empty:hidden" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                        {/* Mobile has no drag: keep the status dropdown there */}
+                        {onStatusChange && <div className="xl:hidden"><BidStatusSelect value={bid.status} onChange={(v) => onStatusChange(bid, v)} className="h-8 w-[140px]" /></div>}
+                        {renderActions?.(bid)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              {dragId && overCol === s.key && <div className="h-[86px] rounded-[13px] border-[1.5px] border-dashed" style={{ borderColor: 'color-mix(in srgb, var(--pipe-gold) 50%, transparent)', background: 'color-mix(in srgb, var(--pipe-gold) 6%, transparent)' }} />}
+            </div>
+            {onAdd && (
+              <button type="button" onClick={() => onAdd(s.defaultStatus)}
+                className="add-c mt-[9px] flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border p-[9px] text-[12.5px] text-muted-foreground transition-colors">
+                <Plus className="h-3.5 w-3.5" />Add bid
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+const TRADE_STYLE = { fire_alarm: '#E5484D', low_voltage: 'var(--st-new)', drone: 'var(--st-submitted)', software: 'var(--st-won)', other: 'hsl(var(--muted-foreground))' };
+function TradeChip({ division, label }) {
+  const c = TRADE_STYLE[division] || TRADE_STYLE.other;
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+      style={{ color: c, background: `color-mix(in srgb, ${c} 13%, transparent)`, border: `1px solid color-mix(in srgb, ${c} 32%, transparent)` }}>
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: c }} />{label}
+    </span>
+  );
+}
+
+const AV_COLORS = ['#E5484D', '#6F52D6', '#2B6FCF', '#119A5B', '#C8961F', '#D9690B'];
+function Initials({ name }) {
+  const parts = String(name).trim().split(/\s+/);
+  const ini = ((parts[0]?.[0] || '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+  const c = AV_COLORS[[...String(name)].reduce((a, ch) => a + ch.charCodeAt(0), 0) % AV_COLORS.length];
+  return <span title={name} className="ml-auto inline-flex h-[22px] w-[22px] items-center justify-center rounded-full text-[9.5px] font-bold text-white" style={{ background: c }}>{ini}</span>;
+}
+
+// ---- KPI cards (computed from created_date / updated_date / estimated_value / win_probability) ----
+const OPEN_STAGES = ['new', 'bidding', 'submitted'];
+const monthEnds = (n = 9) => {
+  const now = new Date();
+  return Array.from({ length: n }, (_, i) => new Date(now.getFullYear(), now.getMonth() - (n - 1 - i) + 1, 0, 23, 59, 59));
+};
+const ts = (d) => (d ? new Date(d).getTime() : NaN);
+// Decision date for won/lost: no award-date field exists on BidOpportunity in this file, so use updated_date (fallback created_date).
+const decidedAt = (b) => ts(b.awarded_date || b.updated_date || b.created_date);
+
+function computeKpis(bids) {
+  const ends = monthEnds(9);
+  const openAt = (end) => bids.filter((b) => OPEN_STAGES.includes(STATUS_TO_STAGE[b.status]) && ts(b.created_date) <= end.getTime());
+  const openVal = (end) => openAt(end).reduce((a, b) => a + (Number(b.estimated_value) || 0), 0);
+  const weightedVal = (end) => openAt(end).reduce((a, b) => a + (Number(b.estimated_value) || 0) * ((Number(b.win_probability) || 0) / 100), 0);
+  const winWindow = (end) => {
+    const from = end.getTime() - 90 * 86400000;
+    const d = bids.filter((b) => ['won', 'lost'].includes(b.status) && decidedAt(b) > from && decidedAt(b) <= end.getTime());
+    const w = d.filter((b) => b.status === 'won').length;
+    return { w, n: d.length, pct: d.length ? Math.round((w / d.length) * 100) : 0 };
+  };
+  const daysToAward = (end) => {
+    const from = end.getTime() - 90 * 86400000;
+    const won = bids.filter((b) => b.status === 'won' && b.created_date && decidedAt(b) > from && decidedAt(b) <= end.getTime());
+    return won.length ? Math.round(won.reduce((a, b) => a + (decidedAt(b) - ts(b.created_date)) / 86400000, 0) / won.length) : null;
+  };
+  const now = new Date();
+  const open = { series: ends.map(openVal), value: openAt(now).reduce((a, b) => a + (Number(b.estimated_value) || 0), 0) };
+  const weighted = { series: ends.map(weightedVal), value: weightedVal(now) };
+  const win = { series: ends.map((e) => winWindow(e).pct), ...winWindow(now) };
+  const days = { series: ends.map((e) => daysToAward(e) ?? 0), value: daysToAward(now) };
+  const prev = ends[ends.length - 2];
+  const pct = (a, b) => (b ? Math.round(((a - b) / b) * 100) : null);
+  return {
+    open: { ...open, delta: pct(open.value, openVal(prev)), prevLabel: format(prev, 'MMM') },
+    weighted,
+    win: { ...win, delta: win.n ? win.pct - winWindow(prev).pct : null },
+    days: { ...days, delta: days.value !== null && daysToAward(prev) !== null ? days.value - daysToAward(prev) : null },
+  };
+}
+
+function Sparkline({ data = [], color }) {
+  const w = 160, h = 40;
+  const max = Math.max(...data, 1), min = Math.min(...data, 0);
+  const pts = data.map((v, i) => [(i / Math.max(data.length - 1, 1)) * w, h - 3 - ((v - min) / (max - min || 1)) * (h - 8)]);
+  const line = pts.map((p) => p.map((n) => n.toFixed(1)).join(',')).join(' ');
+  const id = 'sg' + color.replace(/[^a-z]/gi, '');
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="mt-2.5 h-10 w-full" aria-hidden="true">
+      <defs><linearGradient id={id} x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor={color} stopOpacity=".35" /><stop offset="1" stopColor={color} stopOpacity="0" /></linearGradient></defs>
+      {pts.length > 1 && <polygon points={`0,${h} ${line} ${w},${h}`} fill={`url(#${id})`} />}
+      {pts.length > 1 && <polyline points={line} fill="none" stroke={color} strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
+    </svg>
+  );
+}
+
+function Delta({ v, suffix = '%', invert = false }) {
+  if (v === null || v === undefined || Number.isNaN(v)) return null;
+  const good = invert ? v <= 0 : v >= 0;
+  const Icon = v >= 0 ? TrendingUp : TrendingDown;
+  return <span className="inline-flex items-center gap-1 font-semibold" style={{ color: good ? 'var(--st-won)' : '#E5484D' }}><Icon className="h-3.5 w-3.5" />{Math.abs(v)}{suffix}</span>;
+}
+
+export function BidKpis({ bids = [] }) {
+  const k = useMemo(() => computeKpis(bids), [bids]);
+  const cards = [
+    { key: 'open', label: 'Open Pipeline', icon: Layers, value: fmtCompact(k.open.value), meta: <><Delta v={k.open.delta} /><span>vs {k.open.prevLabel}</span></>, series: k.open.series, color: 'var(--pipe-gold)', attn: true },
+    { key: 'weighted', label: 'Weighted Value', icon: Scale, value: fmtCompact(k.weighted.value), meta: <span>Probability-adjusted</span>, series: k.weighted.series, color: 'var(--st-new)' },
+    { key: 'win', label: 'Win Rate · 90d', icon: Trophy, value: k.win.n ? `${k.win.pct}%` : '—', meta: <><Delta v={k.win.delta} suffix=" pts" /><span>{k.win.w} of {k.win.n} bids</span></>, series: k.win.series, color: 'var(--st-won)' },
+    { key: 'days', label: 'Avg Days to Award', icon: Timer, value: k.days.value ?? '—', meta: k.days.delta !== null ? <><Delta v={k.days.delta} suffix=" days" invert /><span>{k.days.delta <= 0 ? 'faster' : 'slower'}</span></> : <span>Won bids · 90d</span>, series: k.days.series, color: 'var(--st-submitted)' },
+  ];
+  return (
+    <section className="gsis-pipe grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4" data-testid="bid-kpis">
+      <style>{PIPELINE_CSS}</style>
+      {cards.map((c) => (
+        <div key={c.key} className={`kpi rounded-2xl border bg-card p-3.5 sm:p-4 shadow-sm min-w-0 ${c.attn ? 'attn' : 'border-border'}`}>
+          <div className="flex items-center gap-2 text-[12.5px] text-muted-foreground min-w-0">
+            <span className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border border-border bg-muted/60"><c.icon className="h-3.5 w-3.5 text-foreground/80" /></span>
+            <span className="truncate">{c.label}</span>
+          </div>
+          <div className="mt-3 text-2xl sm:text-[28px] font-bold tracking-tight tabular-nums text-foreground">{c.value}</div>
+          <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">{c.meta}</div>
+          <Sparkline data={c.series} color={c.color} />
+        </div>
+      ))}
+    </section>
+  );
+}
+
 const DIVISIONS = [
   { value: 'fire_alarm', label: 'Fire Alarm' },
   { value: 'low_voltage', label: 'Low Voltage' },
@@ -85,6 +378,9 @@ export default function Bids() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDialog, setShowDialog] = useState(false);
   const [editingBid, setEditingBid] = useState(null);
+  const [view, setView] = useState('pipeline'); // 'pipeline' | 'list'
+  const [tradeFilter, setTradeFilter] = useState('All');
+  const [newBidStatus, setNewBidStatus] = useState(null); // preset status from a column's Add button
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -284,7 +580,8 @@ export default function Bids() {
       bid.project_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       bid.client_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       bid.agency?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
+    const matchesTrade = tradeFilter === 'All' || bid.division === tradeFilter;
+    return matchesStatus && matchesSearch && matchesTrade;
   });
 
   const stats = {
@@ -303,31 +600,33 @@ export default function Bids() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-5">
         <div>
-          <div className="flex items-center gap-2 text-primary font-semibold text-sm mb-2 uppercase tracking-wider">
-            <Sparkles className="h-4 w-4" />
-            Intelligence Center
+          <div className="flex items-center gap-2 text-[hsl(var(--brand-gold,43_67%_47%))] font-bold text-xs mb-2 uppercase tracking-[.14em]">
+            <Target className="h-4 w-4" />
+            Sales
           </div>
-          <h1 className="text-2xl font-semibold text-primary tracking-tight">
-            Bid Opportunities
+          <h1 className="text-2xl sm:text-[28px] font-bold text-foreground tracking-tight">
+            Bid <span className="text-[hsl(var(--brand-gold,43_67%_47%))]">Pipeline</span>
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Manage, analyze, and track your construction bids with AI-powered insights.
+            Drag cards between stages — totals update live.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <Dialog open={showDialog} onOpenChange={(o) => { setShowDialog(o); if (!o) setNewBidStatus(null); }}>
             <DialogTrigger asChild>
               <Button 
-                onClick={() => setEditingBid(null)}
-                className="h-10 px-4 gap-2 bg-[hsl(var(--brand-gold,43_67%_47%))] text-[hsl(var(--brand-navy,214_68%_14%))] hover:opacity-90 font-semibold"
+                onClick={() => { setEditingBid(null); setNewBidStatus(null); }}
+                className="h-10 px-4 gap-2 bg-[hsl(var(--brand-navy,214_68%_14%))] text-[hsl(var(--brand-gold,43_67%_47%))] dark:bg-[hsl(var(--brand-gold,43_67%_47%))] dark:text-[hsl(var(--brand-navy,214_68%_14%))] shadow-[0_8px_24px_-10px_hsl(var(--brand-gold,43_67%_47%))] hover:opacity-90 font-semibold"
               >
                 <Plus className="h-5 w-5" />
-                Create New Bid
+                New Bid
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
-              <BidForm 
+ <BidForm 
+                key={editingBid?.id || `new-${newBidStatus || 'review'}`}
                 bid={editingBid} 
+                initialStatus={newBidStatus}
                 onSubmit={(data) => {
                   if (editingBid) {
                     updateBidMutation.mutate({ id: editingBid.id, data });
@@ -341,21 +640,23 @@ export default function Bids() {
         </div>
       </div>
 
-      {/* Stats: one compact row of chips */}
+      {/* KPI cards (mockup) — computed from all queried bids */}
+      <BidKpis bids={bids} />
+
+      {/* Trade tabs (division) + drag hint + scraper */}
       <div className="flex flex-wrap items-center gap-2">
-        {[
-          { label: 'Total', value: stats.total, icon: FileText },
-          { label: 'Active', value: stats.active, icon: Activity },
-          { label: 'Won', value: stats.won, icon: Trophy },
-          { label: 'Pipeline', value: fmtDollars(stats.value), icon: CircleDollarSign },
-        ].map((stat) => (
-          <div key={stat.label} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm shadow-sm">
-            <stat.icon className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))]" />
-            <span className="text-muted-foreground">{stat.label}</span>
-            <span className="font-semibold tabular-nums text-primary">{stat.value}</span>
-          </div>
-        ))}
-        <div className="ml-auto inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+        <div className="inline-flex max-w-full overflow-x-auto rounded-xl border border-border bg-card p-1" role="tablist" aria-label="Trade">
+          {[{ value: 'All', label: 'All trades' }, ...DIVISIONS.filter((d) => d.value !== 'other' || bids.some((b) => b.division === 'other'))].map((d, i) => (
+            <button key={d.value} type="button" role="tab" aria-selected={tradeFilter === d.value} onClick={() => setTradeFilter(d.value)}
+              className={`${i > 1 ? 'hidden sm:inline-flex' : 'inline-flex'} h-8 items-center whitespace-nowrap px-3 rounded-lg text-[12.5px] font-medium transition-colors ${tradeFilter === d.value ? 'bg-muted text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+              {d.value === 'fire_alarm' ? 'Fire alarm' : d.value === 'low_voltage' ? 'Low-voltage' : d.label}
+            </button>
+          ))}
+        </div>
+        <span className="hidden xl:inline-flex items-center gap-1.5 text-xs text-muted-foreground ml-auto">
+          <MousePointer2 className="h-3.5 w-3.5" />Drag to move · drop in <b style={{ color: 'var(--st-won, #119A5B)' }}>Won</b> to convert
+        </span>
+        <div className="xl:ml-0 ml-auto inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
           <Calendar className="h-3.5 w-3.5" />
           {scraperStatus?.last_run
             ? `Scraper ${fmtDate(scraperStatus.last_run, 'MMM d, h:mm a')} · ${scraperStatus.records_added ?? 0} added`
@@ -392,7 +693,7 @@ export default function Bids() {
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2 lg:ml-auto">
+        <div className="flex flex-wrap items-center gap-2 lg:ml-auto">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <select
             value={statusFilter}
@@ -404,11 +705,46 @@ export default function Bids() {
               <option key={status} value={status}>{bidStatusLabels[status] || status}</option>
             ))}
           </select>
+          <select value={tradeFilter} onChange={(e) => setTradeFilter(e.target.value)} className="sm:hidden h-10 rounded-lg border border-border bg-card px-2 text-sm" aria-label="Filter by trade">
+            <option value="All">All trades</option>
+            {DIVISIONS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+          </select>
           <span className="text-sm text-muted-foreground whitespace-nowrap">{filteredBids.length} shown</span>
+          <div className="inline-flex rounded-lg border border-border bg-card p-1" role="group" aria-label="View">
+            {[{ v: 'pipeline', icon: LayoutGrid, label: 'Pipeline' }, { v: 'list', icon: ListIcon, label: 'List' }].map((o) => (
+              <button key={o.v} type="button" onClick={() => setView(o.v)} title={o.label} aria-pressed={view === o.v}
+                className={`h-8 px-2.5 rounded-md text-sm inline-flex items-center gap-1 ${view === o.v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+                <o.icon className="h-4 w-4" /><span className="hidden sm:inline">{o.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
+      {view === 'pipeline' && filteredBids.length > 0 && (
+        <BidPipeline
+          bids={filteredBids}
+          allBids={bids}
+          belowFloorByBid={belowFloorByBid}
+          onAdd={(status) => { setEditingBid(null); setNewBidStatus(status); setShowDialog(true); }}
+          onOpen={(bid) => navigate(createPageUrl('BidDetail') + `?id=${bid.id}`)}
+          onStatusChange={(bid, v) => { if (v === 'won') handleMarkWon(bid); else tagBidMutation.mutate({ id: bid.id, status: v }); }}
+          renderActions={(bid) => (bid.linked_project_id ? (
+            <Button size="sm" variant="ghost" className="h-8 px-2 text-xs text-emerald-700 dark:text-emerald-300 gap-1"
+              onClick={() => navigate(createPageUrl('ProjectDetail') + `?id=${bid.linked_project_id}`)}>
+              <Briefcase className="h-3.5 w-3.5" /> Project
+            </Button>
+          ) : bid.status === 'won' ? (
+            <Button size="sm" className="h-8 px-2 text-xs bg-primary hover:bg-primary/90 text-primary-foreground gap-1"
+              disabled={convertToProjectMutation.isPending} onClick={() => convertToProjectMutation.mutate(bid)}>
+              <ArrowRight className="h-3.5 w-3.5" /> Convert
+            </Button>
+          ) : null)}
+        />
+      )}
+
       {/* Bids List */}
+      {(view === 'list' || filteredBids.length === 0) && (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {filteredBids.length === 0 ? (
           <div className="py-20 md:col-span-2 xl:col-span-3">
@@ -427,6 +763,7 @@ export default function Bids() {
           filteredBids.map((bid) => (
             <Card
               key={bid.id}
+              data-status={bid.status}
               className="group cursor-pointer rounded-xl border border-border border-l-4 border-l-[hsl(var(--brand-gold,43_67%_47%))] bg-card shadow-sm transition-shadow hover:shadow-md"
               onClick={() => navigate(createPageUrl('BidDetail') + `?id=${bid.id}`)}
             >
@@ -504,11 +841,12 @@ export default function Bids() {
           ))
         )}
       </div>
+      )}
     </div>
   );
 }
 
-function BidForm({ bid, onSubmit }) {
+function BidForm({ bid, onSubmit, initialStatus }) {
   const [formData, setFormData] = useState(bid || {
     title: '',
     project_name: '',
@@ -517,7 +855,7 @@ function BidForm({ bid, onSubmit }) {
     division: '',
     lv_domain: '',
     owner_name: '',
-    status: 'review',
+    status: initialStatus || 'review',
     estimated_value: '',
     due_date: '',
     description: '',
