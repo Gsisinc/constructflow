@@ -465,7 +465,9 @@ export default function PhaseManager({ projectId, currentPhase, project }) {
 function V5EditPhase({ cp, updatePhaseMutation }) {
   const init = () => ({ display_name: cp.display_name || '', icon: cp.icon || '📌', order: cp.order ?? '', is_hidden: !!cp.is_hidden, start_date: cp.start_date ? String(cp.start_date).slice(0, 10) : '', end_date: cp.end_date ? String(cp.end_date).slice(0, 10) : '', status: cp.status || 'not_started', progress_percent: cp.progress_percent ?? '' });
   const [f, setF] = useState(init);
+  const [editOpen, setEditOpen] = useState(true); // visual only: Cancel/Save close the panel, "Edit phase" reopens it
   useEffect(() => { setF(init()); }, [cp.id, cp.updated_date]);
+  useEffect(() => { setEditOpen(true); }, [cp.id]);
   const bad = !!(f.start_date && f.end_date && f.end_date < f.start_date);
   const save = () => {
     if (bad) return;
@@ -483,9 +485,18 @@ function V5EditPhase({ cp, updatePhaseMutation }) {
       ...(f.status === 'completed' && !cp.completed_date ? { completed_date: f.end_date || new Date().toISOString().slice(0, 10) } : {}),
     } });
     toast.success('Phase updated');
+    setEditOpen(false);
   };
   const upd = cp.updated_date || cp.created_date;
   const updPT = upd ? new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(/Z|[+-]\d\d:?\d\d$/.test(String(upd)) ? upd : String(upd) + 'Z')) + ' PT' : '';
+  if (!editOpen) {
+    return (
+      <div style={{ marginTop: 12 }}>
+        <button className="g-btn o" onClick={() => { setF(init()); setEditOpen(true); }}>✎ Edit phase</button>
+        <div className="g-muted g-foot">{upd ? `Updated ${updPT}` : 'No data yet'}</div>
+      </div>
+    );
+  }
   return (
     <>
       <div className="g-st" style={{ marginTop: 12 }}>Edit phase</div>
@@ -512,7 +523,7 @@ function V5EditPhase({ cp, updatePhaseMutation }) {
       {bad && <p className="g-muted" style={{ color: '#B42318', marginTop: 6 }}>End date can’t be before the start date.</p>}
       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
         <button className="g-btn" onClick={save} disabled={bad || !f.display_name.trim()}>Save</button>
-        <button className="g-btn o" onClick={() => setF(init())}>Cancel</button>
+        <button className="g-btn o" onClick={() => { setF(init()); setEditOpen(false); }}>Cancel</button>
       </div>
       <div className="g-muted g-foot">{upd ? `Updated ${updPT}` : 'No data yet'}</div>
     </>
@@ -690,7 +701,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle, files =
         {v5EditReq?.id === req.id && (
           <div className="g-files g-tedit">
             <input className="g-in" aria-label="Task text" value={v5EditReq.requirement_text} onChange={(e) => setV5EditReq({ ...v5EditReq, requirement_text: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && v5SaveEdit(req)} />
-            <label className="g-muted"><input type="checkbox" checked={v5EditReq.is_mandatory} onChange={(e) => setV5EditReq({ ...v5EditReq, is_mandatory: e.target.checked })} /> Mandatory</label>
+            <label className="g-muted g-dis" title="Needs a field, pending approval"><input type="checkbox" disabled title="Needs a field, pending approval" checked={v5EditReq.is_mandatory} onChange={(e) => setV5EditReq({ ...v5EditReq, is_mandatory: e.target.checked })} /> Mandatory</label>
             <select className="g-in" aria-label="Status" value={v5EditReq.done ? 'completed' : 'pending'} onChange={(e) => setV5EditReq({ ...v5EditReq, done: e.target.value === 'completed' })}>
               <option value="pending">Pending</option><option value="completed">Completed</option>
             </select>
@@ -876,6 +887,13 @@ function FilesTab({ projectId, phaseName, files }) {
     }
   }, [requirements, files, projectId, phaseName]);
 
+  // Display only: a task folder shows the task's CURRENT text (from the requirements query above), so a renamed task's folder
+  // shows its new name. The stored PhaseFile.file_name is not rewritten (no request added or changed).
+  const v5FolderLabel = (folder) => {
+    const req = requirements.find(r => `folder://${r.id}` === folder?.file_url);
+    return req?.requirement_text || (folder?.file_name || '').replace('[Folder] ', '');
+  };
+
   const createFolderMutation = useMutation({
     mutationFn: async (name) => {
       const maxOrder = Math.max(...folders.map(f => f.order || 0), 0);
@@ -991,7 +1009,7 @@ function FilesTab({ projectId, phaseName, files }) {
           {selectedFolder && (
             <>
               <Badge variant="secondary" className="text-sm">
-                {selectedFolder.file_name.replace('[Folder] ', '')}
+                {v5FolderLabel(selectedFolder)}
               </Badge>
               <Button
                 size="sm"
@@ -1073,7 +1091,7 @@ function FilesTab({ projectId, phaseName, files }) {
                                 <div className="flex items-center gap-2">
                                   <Folder className="h-5 w-5 text-amber-500" />
                                   <p className="text-sm font-medium truncate">
-                                    {folder.file_name.replace('[Folder] ', '')}
+                                    {v5FolderLabel(folder)}
                                   </p>
                                 </div>
                                 <p className="text-xs text-slate-500 ml-7">
@@ -1462,4 +1480,5 @@ const GS5_CSS = `
 .gs5p .neg{color:#B42318}
 :is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-task{--ac:#6EA0FF}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-file{--ac:#3CCBB4}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-note{--ac:#A992FF}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-bud{--ac:#E2B93B}
 :is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-grp{color:#8193B0}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-grp.sep{border-color:rgba(148,178,226,.16)}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .neg{color:#FF6B6B}
+.gs5p .g-dis{opacity:.6;cursor:not-allowed}
 `;
