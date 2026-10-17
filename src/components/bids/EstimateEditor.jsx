@@ -881,7 +881,83 @@ function LinesTable({ lines, editable, onChange, onRemove, compact }) {
   }
   const cell = 'h-9 text-sm';
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
+    <>
+    {/* Below md: one stacked card per line so nothing is cut off at phone widths. Same handlers as the table. */}
+    <div className="md:hidden space-y-2">
+      {lines.map((item, idx) => (
+        <div key={idx} className="rounded-lg border border-border bg-card p-3 text-sm text-foreground space-y-2">
+          <div className="flex items-start gap-2">
+            <span className="pt-0.5 text-xs font-semibold text-muted-foreground tabular-nums">#{idx + 1}</span>
+            <div className="min-w-0 flex-1 space-y-1">
+              {editable ? (
+                <>
+                  <Input className={cell} placeholder="Item name" value={item.name || ''} onChange={(e) => onChange(idx, 'name', e.target.value)} />
+                  <Input className={`${cell} text-muted-foreground`} placeholder="Description" value={item.description || ''} onChange={(e) => onChange(idx, 'description', e.target.value)} />
+                </>
+              ) : (
+                <>
+                  <p className="font-medium text-foreground break-words">{item.name || item.description || '—'}</p>
+                  {item.name && item.description && <p className="text-xs text-muted-foreground break-words">{item.description}</p>}
+                  {item.cost_code && <p className="text-xs text-muted-foreground">Code {item.cost_code}</p>}
+                </>
+              )}
+            </div>
+            {editable && (
+              <Button size="icon" variant="ghost" onClick={() => onRemove(idx)} className="h-9 w-9 shrink-0 text-red-600 dark:text-red-300" title="Remove line">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          {editable ? (
+            <div className="grid grid-cols-3 gap-2">
+              <label className="block">
+                <span className="mb-1 block text-xs text-muted-foreground">Qty</span>
+                <Input className={`${cell} text-right`} type="number" value={item.quantity ?? ''} onChange={(e) => onChange(idx, 'quantity', e.target.value)} />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs text-muted-foreground">Unit</span>
+                <Input className={cell} value={item.unit || ''} onChange={(e) => onChange(idx, 'unit', e.target.value)} />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs text-muted-foreground">Unit cost</span>
+                <Input className={`${cell} text-right`} type="number" value={item.unit_cost ?? ''} onChange={(e) => onChange(idx, 'unit_cost', e.target.value)} />
+              </label>
+            </div>
+          ) : null}
+          <div className="flex items-end justify-between gap-3 rounded-md bg-muted px-2.5 py-2">
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">Qty × unit cost</p>
+              <p className="tabular-nums text-foreground">{item.quantity ?? 0} {item.unit || ''} × {fmtMoney(parseFloat(item.unit_cost) || 0)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">Total</p>
+              <p className="font-semibold tabular-nums text-foreground">{fmtMoney(parseFloat(item.total_cost) || 0)}</p>
+            </div>
+          </div>
+          {(!compact || item.category) && (
+            <div className="flex items-center gap-2">
+              {!compact && (
+                <select
+                  value={item.pricing_type || 'cost'}
+                  onChange={(e) => onChange(idx, 'pricing_type', e.target.value)}
+                  disabled={!editable}
+                  aria-label="Line type"
+                  className="h-9 min-w-0 flex-1 rounded-md border border-border bg-background text-sm text-foreground px-2"
+                  title="Cost = raw cost (overhead/profit applied on top). Dollar = sell price with margin already included (overhead/profit forced to 0)."
+                >
+                  <option value="cost">Cost line</option>
+                  <option value="dollar">Dollar (sell)</option>
+                </select>
+              )}
+              {item.category && (
+                <span className="shrink-0 rounded-full border border-border bg-muted px-2 py-0.5 text-xs capitalize text-muted-foreground">{String(item.category).replace(/_/g, ' ')}</span>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+    <div className="hidden md:block overflow-x-auto rounded-lg border border-border">
       <table className="w-full text-sm">
         <thead className="bg-primary text-primary-foreground">
           <tr>
@@ -949,6 +1025,7 @@ function LinesTable({ lines, editable, onChange, onRemove, compact }) {
         </tbody>
       </table>
     </div>
+    </>
   );
 }
 
@@ -976,11 +1053,11 @@ function QuickAddLine({ onAdd }) {
 
 function RunningTotals({ t }) {
   return (
-    <div className="flex flex-wrap items-center justify-end gap-x-6 gap-y-1 rounded-lg bg-primary px-4 py-3 text-sm text-primary-foreground">
-      <span>Materials <span className="font-semibold tabular-nums">{fmtMoney(t.material_cost)}</span></span>
-      <span>Labor <span className="font-semibold tabular-nums">{fmtMoney(t.labor_cost)}</span></span>
-      <span>Direct cost <span className="font-semibold tabular-nums">{fmtMoney(t.subtotal)}</span></span>
-      <span className="text-[hsl(var(--brand-gold,43_67%_47%))]">Customer total <span className="text-lg font-bold tabular-nums">{fmtMoney(t.total_bid_amount)}</span></span>
+    <div className="flex flex-wrap items-center justify-end gap-x-6 gap-y-1 rounded-lg border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
+      <span>Materials <span className="font-semibold tabular-nums text-foreground">{fmtMoney(t.material_cost)}</span></span>
+      <span>Labor <span className="font-semibold tabular-nums text-foreground">{fmtMoney(t.labor_cost)}</span></span>
+      <span>Direct cost <span className="font-semibold tabular-nums text-foreground">{fmtMoney(t.subtotal)}</span></span>
+      <span className="font-medium text-foreground">Customer total <span className="text-lg font-bold tabular-nums text-foreground">{fmtMoney(t.total_bid_amount)}</span></span>
     </div>
   );
 }
