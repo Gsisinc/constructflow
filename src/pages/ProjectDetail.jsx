@@ -446,6 +446,7 @@ export default function ProjectDetail() {
             <PhaseManager
               projectId={projectId}
               currentPhase={project.current_phase || 'preconstruction'}
+              project={project}
             />
           </div>
         </TabsContent>
