@@ -5,7 +5,7 @@ import { useOrgProjects } from '@/hooks/useProjectData';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area, LabelList } from 'recharts';
 import { CheckCircle2, Building2, ClipboardList, Route, Layers, Target, ArrowUpRight, TrendingUp, Activity } from 'lucide-react';
 import { fmtDate } from '@/lib/dates';
 
@@ -147,9 +147,11 @@ export default function OpsDashboard() {
   const progressEmpty = progressData.length === 0 || progressData.every(d => d.progress === 0);
   const derivedCount = progressData.filter(d => d.source === 'phases').length;
 
-  const nameAxisProps = isMobile
-    ? { interval: 0, angle: -40, textAnchor: 'end', height: 70, tick: { fontSize: 11, fill: MUTED }, tickFormatter: (v) => trunc(v, 10) }
-    : { interval: 0, angle: -20, textAnchor: 'end', height: 64, tick: { fontSize: 11, fill: MUTED }, tickFormatter: (v) => trunc(v, 14) };
+  // Targets vs Actual — horizontal "bullet" rows (target = track, completed = gold fill on top),
+  // so long project names read cleanly at 390px; full name stays in the tooltip.
+  const tvaBar = isMobile ? 12 : 14;
+  const targetsH = Math.max(chartH, targetsData.length * (isMobile ? 34 : 32) + 56);
+  const targetsMax = Math.max(1, ...targetsData.map(d => d.target));
 
   return (
     <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6 text-foreground">
@@ -189,7 +191,7 @@ export default function OpsDashboard() {
         <ChartCard icon={TrendingUp} title="Progress per Project" sub={derivedCount > 0 ? `${derivedCount} from phase completion` : null}>
           {progressEmpty ? <Empty /> : (
             <ResponsiveContainer width="100%" height={progressH}>
-              <BarChart data={progressData} layout="vertical" margin={{ top: 4, right: 16, left: 4, bottom: 4 }} barCategoryGap={isMobile ? 6 : 8}>
+              <BarChart data={progressData} layout="vertical" margin={{ top: 4, right: isMobile ? 28 : 24, left: 4, bottom: 4 }} barCategoryGap={isMobile ? 6 : 8}>
                 <defs>
                   <linearGradient id="opsProgGrad" x1="0" y1="0" x2="1" y2="0">
                     <stop offset="0%" stopColor={GOLD} stopOpacity={0.55} />
@@ -197,8 +199,8 @@ export default function OpsDashboard() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid horizontal={false} strokeDasharray="3 6" stroke={GRID} strokeOpacity={0.6} />
-                <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 11, fill: MUTED }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" width={isMobile ? 100 : 120} interval={0} tickFormatter={(v) => trunc(v, 14)} tick={{ fontSize: isMobile ? 11 : 12, fill: FG }} axisLine={false} tickLine={false} />
+                <XAxis type="number" domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} interval={0} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 11, fill: MUTED }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" width={isMobile ? 100 : 120} interval={0} tick={<NameTick max={isMobile ? 12 : 14} fontSize={isMobile ? 11 : 12} />} axisLine={false} tickLine={false} />
                 <Tooltip {...TOOLTIP} labelFormatter={(l) => l} formatter={(v, _n, item) => [`${v}%${item?.payload?.source === 'phases' ? ' (from phases)' : ''}`, 'Progress']} />
                 <Bar dataKey="progress" name="Progress %" fill="url(#opsProgGrad)" radius={[0, 6, 6, 0]} background={{ fill: mix(GOLD, 6), radius: 6 }} maxBarSize={18} />
               </BarChart>
@@ -230,15 +232,31 @@ export default function OpsDashboard() {
         {/* Targets vs Actual */}
         <ChartCard icon={Target} title="Targets vs Actual (Phases)">
           {targetsData.every(d => d.target === 0) ? <Empty /> : (
-            <ResponsiveContainer width="100%" height={chartH}>
-              <BarChart data={targetsData} margin={{ top: 8, right: 8, left: -16, bottom: isMobile ? 16 : 12 }}>
-                <CartesianGrid vertical={false} strokeDasharray="3 6" stroke={GRID} strokeOpacity={0.5} />
-                <XAxis dataKey="name" hide={false} {...nameAxisProps} axisLine={false} tickLine={false} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: MUTED }} axisLine={false} tickLine={false} />
-                <Tooltip {...TOOLTIP} labelFormatter={(l) => l} />
-                <Legend wrapperStyle={{ fontSize: 13, color: MUTED }} />
-                <Bar dataKey="target" name="Target" fill={mix(MUTED, 35)} radius={[6, 6, 0, 0]} />
-                <Bar dataKey="actual" name="Completed" fill={GOLD} radius={[6, 6, 0, 0]} />
+            <ResponsiveContainer width="100%" height={targetsH}>
+              <BarChart data={targetsData} layout="vertical" margin={{ top: 0, right: isMobile ? 40 : 44, left: 4, bottom: 4 }} barCategoryGap={isMobile ? 8 : 10} barGap={-tvaBar}>
+                <defs>
+                  <linearGradient id="opsTvaGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor={GOLD} stopOpacity={0.7} />
+                    <stop offset="100%" stopColor={GOLD2} stopOpacity={1} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid horizontal={false} strokeDasharray="3 6" stroke={GRID} strokeOpacity={0.6} />
+                <XAxis type="number" domain={[0, targetsMax]} allowDecimals={false} tick={{ fontSize: 11, fill: MUTED }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" width={isMobile ? 100 : 120} interval={0} tick={<NameTick max={isMobile ? 12 : 14} fontSize={isMobile ? 11 : 12} />} axisLine={false} tickLine={false} />
+                <Tooltip {...TOOLTIP} labelFormatter={(l) => l} formatter={(v, n) => [`${v} phase${v === 1 ? '' : 's'}`, n]} />
+                <Legend verticalAlign="top" align="right" iconType="circle" iconSize={8} height={28} wrapperStyle={{ fontSize: 12 }} formatter={(v) => <span style={{ color: MUTED }}>{v}</span>} />
+                <Bar dataKey="target" name="Target" fill={mix(MUTED, 26)} radius={[0, 6, 6, 0]} barSize={tvaBar} isAnimationActive={false}>
+                  <LabelList dataKey="target" position="right" offset={8} content={(lp) => {
+                    const row = targetsData[lp.index];
+                    if (!row || lp.x == null) return null;
+                    return (
+                      <text x={lp.x + lp.width + 8} y={lp.y + lp.height / 2} dominantBaseline="central" fontSize={11} fill={MUTED} style={{ fontVariantNumeric: 'tabular-nums' }}>
+                        <tspan fill={FG} fontWeight={600}>{row.actual}</tspan>/{row.target}
+                      </text>
+                    );
+                  }} />
+                </Bar>
+                <Bar dataKey="actual" name="Completed" fill="url(#opsTvaGrad)" radius={[0, 6, 6, 0]} barSize={tvaBar} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -272,12 +290,13 @@ function ChartCard({ icon: Icon, title, sub, bodyClass = '', children }) {
   return (
     <Card className="min-w-0 rounded-2xl border-border bg-card" style={CARD_STYLE}>
       <CardHeader className="p-4 pb-2 sm:p-5 sm:pb-2">
-        <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-2">
+        {/* Title wraps instead of truncating; on phones the subtitle drops to its own line under the title. */}
+        <CardTitle className="text-sm sm:text-base font-semibold flex flex-wrap items-center gap-x-2 gap-y-0.5 leading-snug">
           <span className="grid place-items-center h-7 w-7 shrink-0 rounded-lg border" style={{ background: mix(GOLD, 10), borderColor: mix(GOLD, 20), color: GOLD2 }}>
             <Icon className="h-4 w-4" />
           </span>
-          <span className="truncate">{title}</span>
-          {sub && <span className="ml-auto text-xs font-normal text-muted-foreground whitespace-nowrap">{sub}</span>}
+          <span className="min-w-0 flex-1 break-words">{title}</span>
+          {sub && <span className="basis-full pl-9 sm:basis-auto sm:pl-0 sm:ml-auto text-xs font-normal text-muted-foreground sm:whitespace-nowrap">{sub}</span>}
         </CardTitle>
       </CardHeader>
       <CardContent className={`px-2 pb-3 sm:px-5 sm:pb-5 ${bodyClass}`}>{children}</CardContent>
@@ -316,6 +335,21 @@ function KpiViz({ viz, id }) {
       </div>
       <p className="text-[11px] sm:text-xs text-muted-foreground">{viz.note}</p>
     </div>
+  );
+}
+
+// Single-line category tick (recharts' default <Text> word-wraps long names into a 2-line jumble);
+// truncated with an ellipsis, full name on hover and in the tooltip.
+function NameTick({ x, y, payload, max = 14, fontSize = 12 }) {
+  const full = String(payload?.value ?? '');
+  const label = full.length > max ? `${full.slice(0, max).trimEnd()}…` : full;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={-6} y={0} dy="0.355em" textAnchor="end" fontSize={fontSize} fill={FG}>
+        <title>{full}</title>
+        {label}
+      </text>
+    </g>
   );
 }
 
