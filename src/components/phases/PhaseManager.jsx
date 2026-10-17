@@ -23,7 +23,9 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import PhaseBudgetManager from '../budget/PhaseBudgetManager';
 
-export default function PhaseManager({ projectId, currentPhase }) {
+// phases-v2 (2026-10-17): VISUAL-ONLY restyle to phases-cost-progress_v5. Every query/mutation/handler is byte-identical to the base;
+// new reads are pure additions (marked). `project` is a new optional display-only prop (Contract value card).
+export default function PhaseManager({ projectId, currentPhase, project }) {
   const queryClient = useQueryClient();
 
   const { data: customPhases = [] } = useQuery({
@@ -124,26 +126,39 @@ export default function PhaseManager({ projectId, currentPhase }) {
     }
   };
 
-  const [createForm, setCreateForm] = useState({ phase_name: '', display_name: '', order: customPhases.length });
+  const [createForm, setCreateForm] = useState({ phase_name: '', display_name: '', order: customPhases.length, status: 'not_started', start_date: '', end_date: '' });
 
   const handleEditPhase = (phase) => {
     setEditingPhase(phase);
     setCreateForm({
       phase_name: phase.phase_name,
       display_name: phase.display_name,
-      order: phase.order
+      order: phase.order,
+      status: phase.status || 'not_started',
+      start_date: phase.start_date ? String(phase.start_date).slice(0, 10) : '',
+      end_date: phase.end_date ? String(phase.end_date).slice(0, 10) : ''
     });
     setShowCreateDialog(true);
   };
 
+  // CustomPhase fields status / start_date / end_date / completed_date already exist (no entity change).
+  const datesInvalid = !!(createForm.start_date && createForm.end_date && createForm.end_date < createForm.start_date);
   const handleSavePhase = () => {
+    if (datesInvalid) return;
+    const { start_date, end_date, ...rest } = createForm;
+    const data = {
+      ...rest,
+      ...(start_date ? { start_date } : {}),
+      ...(end_date ? { end_date } : {}),
+      ...(createForm.status === 'completed' && !editingPhase?.completed_date ? { completed_date: end_date || new Date().toISOString().slice(0, 10) } : {}),
+    };
     if (editingPhase) {
       updatePhaseMutation.mutate({
         id: editingPhase.id,
-        data: createForm
+        data
       });
     } else {
-      createPhaseMutation.mutate({ project_id: projectId, ...createForm });
+      createPhaseMutation.mutate({ project_id: projectId, ...data });
     }
   };
 
@@ -215,62 +230,70 @@ export default function PhaseManager({ projectId, currentPhase }) {
   const currentPhaseLabel = allPhases.find(p => p.value === selectedPhase)?.label;
   const isLocked = phaseData?.is_locked || false;
 
+
+  // ===== v5 visual layer: PURE ADDITIONS below (every per-phase query/mutation above is unchanged) =====
+  // Same key + queryFn as PhaseNavigator's requirements query (shared cache): progress bars on collapsed phase cards.
+  const { data: v5AllReqs = [] } = useQuery({
+    queryKey: ['phaseRequirements', projectId],
+    queryFn: () => base44.entities.PhaseRequirement.filter({ project_id: projectId }),
+    enabled: !!projectId
+  });
+  // NEW read (addition): all PhaseBudget rows once, for the cost bar on every card. Key sits under ['phaseBudget'] so existing invalidations refresh it.
+  const { data: v5Budgets = [] } = useQuery({
+    queryKey: ['phaseBudget', projectId, '__all'],
+    queryFn: () => base44.entities.PhaseBudget.filter({ project_id: projectId }),
+    enabled: !!projectId
+  });
+  // NEW read (addition): all PhaseChangeOrder rows once (approved cost_impact = the "CO" part of the cost bar). Under ['phaseChangeOrders'] for the same reason.
+  const { data: v5COs = [] } = useQuery({
+    queryKey: ['phaseChangeOrders', projectId, '__all'],
+    queryFn: () => base44.entities.PhaseChangeOrder.filter({ project_id: projectId }),
+    enabled: !!projectId
+  });
+  // NEW read (addition): the SAME Expense query PhaseBudgetManager (the phase Budget tab) runs for every phase: Expense.filter({ project_id }).
+  // Fetched once (not per phase). Key sits under ['phaseExpenses'] so PhaseBudgetManager's existing invalidations refresh it.
+  const { data: v5Expenses = [] } = useQuery({
+    queryKey: ['phaseExpenses', projectId, '__all'],
+    queryFn: () => base44.entities.Expense.filter({ project_id: projectId }),
+    enabled: !!projectId
+  });
+  // Budget-tab formula (PhaseBudgetManager lines 175-185), copied so the bar shows the SAME numbers as the Budget tab:
+  //   spent = paid expenses, committed = approved expenses, COs = approved PhaseChangeOrder.cost_impact for the phase,
+  //   used = spent + committed + COs, % used = used / PhaseBudget.budgeted_amount.
+  const v5Spent = v5Expenses.reduce((sum, e) => sum + (e.status === 'paid' ? e.amount : 0), 0);
+  const v5Committed = v5Expenses.reduce((sum, e) => sum + (e.status === 'approved' ? e.amount : 0), 0);
+  const [ptab, setPtab] = useState('requirements');
+  const v5Num = (v) => { if (v === null || v === undefined || v === '') return null; const n = Number(v); return Number.isFinite(n) ? n : null; };
+  const v5Money = (v) => '$' + Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  const v5Date = (v) => { if (!v) return ''; const [y, m, d] = String(v).slice(0, 10).split('-').map(Number); return format(new Date(y, m - 1, d), 'MMM d, yyyy'); };
+  const V5Miss = () => <span className="g-miss">—<b>No data yet</b></span>;
+  const phaseBudgetTotal = v5Budgets.reduce((s, b) => s + (v5Num(b.budgeted_amount) || 0), 0);
+
   return (
-    <div className="space-y-6">
-      {/* Phase Selector */}
-      <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-        {allPhases.map(phase => {
-          const customPhase = customPhases.find(p => p.phase_name === phase.value);
-          return (
-            <div key={phase.value} className="flex items-center gap-1 flex-shrink-0">
-              <Button
-                variant={selectedPhase === phase.value ? 'default' : 'outline'}
-                onClick={() => setSelectedPhase(phase.value)}
-                className="whitespace-nowrap flex-shrink-0"
-              >
-                <span className="text-sm">{phase.label}</span>
-                {phase.value === currentPhase && (
-                  <Badge variant="secondary" className="ml-2 hidden sm:inline-flex">Current</Badge>
-                )}
-              </Button>
-              {phase.customPhaseId && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 flex-shrink-0">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleEditPhase(customPhases.find(cp => cp.id === phase.customPhaseId))}>
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleDeletePhase(customPhases.find(cp => cp.id === phase.customPhaseId))}
-                      className="text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-          );
-        })}
+    <div className="gs5p">
+      <style>{GS5_CSS}</style>
+      <div className="g-note"><b>Unchanged:</b> Tracker and Financials (Budget by Cost Code) stay as they are. The cost/progress bars on each phase come from that phase’s Budget tab and don’t replace it.</div>
+
+      {project && (
+        <div className="g-card">
+          <div className="g-st">Contract value</div>
+          <p className="g-p">{v5Num(project.budget) ? <><b>{v5Money(project.budget)}</b> <span className="g-muted">(project budget)</span></> : <V5Miss />}
+            {' '}· Phase budgets entered: {v5Budgets.length ? <b>{v5Money(phaseBudgetTotal)}</b> : <V5Miss />} <span className="g-muted">({v5Budgets.length} of {allPhases.length} phases)</span></p>
+          <p className="g-p g-muted">Total budget hours: {v5Num(project.labor_hours) ? `${v5Num(project.labor_hours).toFixed(2)} (from the bid estimate)` : 'No data yet'}.</p>
+        </div>
+      )}
+
+      <div className="g-toolbar">
+        <span className="g-muted">Click a phase to open its Task, Files, Notes and Budget.</span>
         <Dialog open={showCreateDialog} onOpenChange={(open) => {
           setShowCreateDialog(open);
           if (!open) {
             setEditingPhase(null);
-            setCreateForm({ phase_name: '', display_name: '', order: customPhases.length });
+            setCreateForm({ phase_name: '', display_name: '', order: customPhases.length, status: 'not_started', start_date: '', end_date: '' });
           }
         }}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="whitespace-nowrap flex-shrink-0">
-              <Plus className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">New Phase</span>
-              <span className="sm:hidden">New</span>
-            </Button>
+            <button className="g-btn">+ New Phase</button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -302,7 +325,27 @@ export default function PhaseManager({ projectId, currentPhase }) {
                   onChange={(e) => setCreateForm({ ...createForm, order: parseInt(e.target.value) })}
                 />
               </div>
-              <Button onClick={handleSavePhase} className="w-full">
+              <div>
+                <Label>Status</Label>
+                <select value={createForm.status || 'not_started'} onChange={(e) => setCreateForm({ ...createForm, status: e.target.value })} className="mt-1 w-full rounded-md border px-3 py-2 text-sm bg-background">
+                  <option value="not_started">Not started</option>
+                  <option value="in_progress">In progress</option>
+                  <option value="completed">Completed</option>
+                  {createForm.status === 'locked' && <option value="locked">Locked</option>}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Start date</Label>
+                  <Input type="date" value={createForm.start_date || ''} onChange={(e) => setCreateForm({ ...createForm, start_date: e.target.value })} />
+                </div>
+                <div>
+                  <Label>End date</Label>
+                  <Input type="date" value={createForm.end_date || ''} min={createForm.start_date || undefined} onChange={(e) => setCreateForm({ ...createForm, end_date: e.target.value })} />
+                </div>
+              </div>
+              {datesInvalid && <p className="text-xs text-red-600">End date can't be before the start date.</p>}
+              <Button onClick={handleSavePhase} disabled={datesInvalid} className="w-full">
                 {editingPhase ? 'Update Phase' : 'Create Phase'}
               </Button>
             </div>
@@ -310,89 +353,175 @@ export default function PhaseManager({ projectId, currentPhase }) {
         </Dialog>
       </div>
 
-      {/* Phase Overview */}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <CardTitle className="text-lg">{currentPhaseLabel} Phase</CardTitle>
-              {phaseData?.status && (
-                <Badge variant={phaseData.status === 'completed' ? 'default' : 'secondary'}>
-                  {phaseData.status.replace('_', ' ')}
-                </Badge>
-              )}
-              {isLocked && <Lock className="h-4 w-4 text-slate-400" />}
+      {allPhases.map((phase, i) => {
+        const cp = customPhases.find(p => p.phase_name === phase.value);
+        const open = selectedPhase === phase.value;
+        const reqs = open ? requirements : v5AllReqs.filter(r => r.phase_name === phase.value);
+        const done = reqs.filter(r => r.status === 'completed').length;
+        const pp = v5Num(cp?.progress_percent);
+        const progress = pp ? pp : reqs.length ? Math.round((done / reqs.length) * 100) : null;
+        const b = open && budget ? budget : v5Budgets.find(x => x.phase_name === phase.value);
+        const co = v5COs.filter(c => c.phase_name === phase.value && c.status === 'approved').reduce((s, c) => s + c.cost_impact, 0);
+        const budgeted = b && v5Num(b.budgeted_amount) ? v5Num(b.budgeted_amount) : null; // no PhaseBudget row / 0 => '—'
+        const used = v5Spent + v5Committed + co;
+        const costPct = budgeted ? used / budgeted * 100 : null;
+        const mainCount = reqs.filter(r => !r.parent_requirement_id).length;
+        const dates = cp?.start_date || cp?.end_date ? `${v5Date(cp.start_date) || '—'} – ${v5Date(cp.end_date) || '—'}` : null;
+        // Same 4 tab values as today. Grouped: Work (Tasks, Files, Notes) | Money (Budget); each has its own color accent.
+        const tabs = [['requirements', `Tasks${open ? ` (${mainCount})` : ''}`, 't-task'], ['files', 'Files', 't-file'], ['notes', 'Notes', 't-note'], ['budget', 'Budget', 't-bud']];
+        return (
+          <div key={phase.value} className={cn('g-card g-ph', open && 'open', phase.value === currentPhase && 'cur')} onClick={!open ? () => setSelectedPhase(phase.value) : undefined}>
+            <div className="g-st">
+              <span>{i + 1}. {phase.label}{cp?.is_locked ? ' 🔐' : ''}</span>
+              <span className="g-hdr-r" onClick={(e) => e.stopPropagation()}>
+                {open && phaseData?.status && <span className="g-badge">{phaseData.status.replace('_', ' ')}</span>}
+                <span className={cn('g-badge', open && 'gold')} onClick={() => !open && setSelectedPhase(phase.value)}>{open ? 'Expanded' : 'Click to expand'}</span>
+                {phase.customPhaseId && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="g-dots" aria-label={`Phase actions: ${phase.label}`}>⋯</button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="gs5-menu">
+                      <DropdownMenuItem onClick={() => handleEditPhase(customPhases.find(c => c.id === phase.customPhaseId))}>✎ Edit</DropdownMenuItem>
+                      {open && phaseData && !isLocked && phaseData.status !== 'completed' && (
+                        <DropdownMenuItem onClick={closePhase}>✓ Close Phase</DropdownMenuItem>
+                      )}
+                      {open && phaseData && (
+                        <DropdownMenuItem onClick={togglePhaseLock}>{isLocked ? '🔓 Unlock Phase' : '🔒 Lock Phase'}</DropdownMenuItem>
+                      )}
+                      <div className="hr" />
+                      <DropdownMenuItem className="red" onClick={() => handleDeletePhase(customPhases.find(c => c.id === phase.customPhaseId))}>🗑 Delete</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <span className="text-xs sm:text-sm text-slate-500">{completedReqs}/{requirements.length} complete</span>
-              <div className="w-full sm:w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
-                <div className="h-full bg-green-600" style={{ width: `${progressPercent}%` }} />
+            <div className="g-muted">{dates || <>Dates: <V5Miss /></>} · SOV <V5Miss /> · Crew: <V5Miss /></div>
+            <div className="g-bars">
+              <div>
+                <div className="g-muted">Cost (same numbers as this phase’s Budget tab): spent {v5Money(v5Spent)} + committed {v5Money(v5Committed)} + CO {v5Money(co)} = <b>{v5Money(used)}</b> of budgeted {budgeted !== null ? <b>{v5Money(budgeted)}</b> : <b>—</b>}{budgeted !== null && <> · remaining <b className={budgeted - used < 0 ? 'neg' : ''}>{v5Money(budgeted - used)}</b> ({costPct.toFixed(1)}% used)</>}</div>
+                <div className={cn('g-bar', costPct === null && 'empty', costPct > 100 && 'over')}>{costPct !== null && <i style={{ width: `${Math.min(100, Math.max(0, costPct))}%` }} />}</div>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="sm" variant="outline">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {phaseData && !isLocked && phaseData.status !== 'completed' && (
-                    <DropdownMenuItem onClick={closePhase}>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Close Phase
-                    </DropdownMenuItem>
-                  )}
-                  {phaseData && (
-                    <DropdownMenuItem onClick={togglePhaseLock}>
-                      {isLocked ? <Unlock className="h-4 w-4 mr-2" /> : <Lock className="h-4 w-4 mr-2" />}
-                      {isLocked ? 'Unlock Phase' : 'Lock Phase'}
-                    </DropdownMenuItem>
-                  )}
-
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div>
+                <div className="g-muted">Progress {progress !== null ? <b>{progress}%</b> : <V5Miss />}{reqs.length ? ` (${done}/${reqs.length} tasks)` : ''} · Budget hrs: <V5Miss /></div>
+                <div className={cn('g-bar', progress === null && 'empty')}>{progress !== null && <i style={{ width: `${Math.min(100, Math.max(0, progress))}%` }} />}</div>
+              </div>
             </div>
+
+            {!open && (
+              <div className="g-ptabs" onClick={(e) => e.stopPropagation()}>
+                <span className="g-grp">Work</span>
+                {tabs.slice(0, 3).map(([k, l, c]) => <button key={k} className={c} onClick={() => { setSelectedPhase(phase.value); setPtab(k); }}>{l}</button>)}
+                <span className="g-grp sep">Money</span>
+                {tabs.slice(3).map(([k, l, c]) => <button key={k} className={c} onClick={() => { setSelectedPhase(phase.value); setPtab(k); }}>{l}</button>)}
+              </div>
+            )}
+
+            {open && (
+              <div onClick={(e) => e.stopPropagation()}>
+                {isLocked ? (
+                  <Card>
+                    <CardContent className="py-12 text-center">
+                      <Lock className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                      <p className="text-slate-500">This phase is locked. Unlock it to make changes.</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Tabs value={ptab} onValueChange={setPtab} className="w-full">
+                    <TabsList className="g-tablist">
+                      <span className="g-grp">Work</span>
+                      {tabs.slice(0, 3).map(([k, l, c]) => <TabsTrigger key={k} value={k} className={c}>{l}</TabsTrigger>)}
+                      <span className="g-grp sep">Money</span>
+                      {tabs.slice(3).map(([k, l, c]) => <TabsTrigger key={k} value={k} className={c}>{l}</TabsTrigger>)}
+                    </TabsList>
+
+                    <TabsContent value="requirements" className="mt-3 g-pane t-task">
+                      <RequirementsTab projectId={projectId} phaseName={selectedPhase} requirements={requirements} onToggle={toggleRequirement} files={files} onOpenFiles={() => setPtab('files')} />
+                    </TabsContent>
+
+                    <TabsContent value="files" className="mt-3 g-pane t-file">
+                      <FilesTab projectId={projectId} phaseName={selectedPhase} files={files} />
+                    </TabsContent>
+
+                    <TabsContent value="notes" className="mt-3 g-pane t-note">
+                      <NotesTab projectId={projectId} phaseName={selectedPhase} notes={notes} />
+                    </TabsContent>
+
+                    <TabsContent value="budget" className="mt-3 g-pane t-bud">
+                      <PhaseBudgetManager projectId={projectId} phaseName={selectedPhase} />
+                    </TabsContent>
+                  </Tabs>
+                )}
+                {cp && <V5EditPhase cp={cp} updatePhaseMutation={updatePhaseMutation} />}
+              </div>
+            )}
           </div>
-        </CardHeader>
-      </Card>
-
-      {isLocked ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Lock className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500">This phase is locked. Unlock it to make changes.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Tabs defaultValue="requirements" className="w-full">
-          <TabsList className="w-full h-auto flex flex-wrap gap-1 p-1 bg-slate-100 rounded-lg justify-start lg:grid lg:grid-cols-4">
-            <TabsTrigger value="requirements" className="text-xs sm:text-sm">Requirements</TabsTrigger>
-            <TabsTrigger value="files" className="text-xs sm:text-sm">Files</TabsTrigger>
-            <TabsTrigger value="notes" className="text-xs sm:text-sm">Notes</TabsTrigger>
-            <TabsTrigger value="budget" className="text-xs sm:text-sm">Budget</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="requirements" className="mt-6">
-            <RequirementsTab projectId={projectId} phaseName={selectedPhase} requirements={requirements} onToggle={toggleRequirement} />
-          </TabsContent>
-
-          <TabsContent value="files" className="mt-6">
-            <FilesTab projectId={projectId} phaseName={selectedPhase} files={files} />
-          </TabsContent>
-
-          <TabsContent value="notes" className="mt-6">
-            <NotesTab projectId={projectId} phaseName={selectedPhase} notes={notes} />
-          </TabsContent>
-
-          <TabsContent value="budget" className="mt-6">
-            <PhaseBudgetManager projectId={projectId} phaseName={selectedPhase} />
-          </TabsContent>
-        </Tabs>
-      )}
+        );
+      })}
     </div>
   );
 }
 
-function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
+// v5 inline "Edit phase" form. Saves through the SAME updatePhaseMutation (CustomPhase.update) and the same field rules as handleSavePhase.
+function V5EditPhase({ cp, updatePhaseMutation }) {
+  const init = () => ({ display_name: cp.display_name || '', icon: cp.icon || '📌', order: cp.order ?? '', is_hidden: !!cp.is_hidden, start_date: cp.start_date ? String(cp.start_date).slice(0, 10) : '', end_date: cp.end_date ? String(cp.end_date).slice(0, 10) : '', status: cp.status || 'not_started', progress_percent: cp.progress_percent ?? '' });
+  const [f, setF] = useState(init);
+  useEffect(() => { setF(init()); }, [cp.id, cp.updated_date]);
+  const bad = !!(f.start_date && f.end_date && f.end_date < f.start_date);
+  const save = () => {
+    if (bad) return;
+    if (!f.display_name.trim()) return;
+    const pct = f.progress_percent === '' ? null : Math.max(0, Math.min(100, Number(f.progress_percent)));
+    updatePhaseMutation.mutate({ id: cp.id, data: {
+      display_name: f.display_name.trim(),
+      icon: f.icon,
+      ...(f.order !== '' && Number.isFinite(Number(f.order)) ? { order: Number(f.order) } : {}),
+      is_hidden: f.is_hidden,
+      status: f.status,
+      ...(f.start_date ? { start_date: f.start_date } : {}),
+      ...(f.end_date ? { end_date: f.end_date } : {}),
+      ...(pct !== null && Number.isFinite(pct) ? { progress_percent: pct } : {}),
+      ...(f.status === 'completed' && !cp.completed_date ? { completed_date: f.end_date || new Date().toISOString().slice(0, 10) } : {}),
+    } });
+    toast.success('Phase updated');
+  };
+  const upd = cp.updated_date || cp.created_date;
+  const updPT = upd ? new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(/Z|[+-]\d\d:?\d\d$/.test(String(upd)) ? upd : String(upd) + 'Z')) + ' PT' : '';
+  return (
+    <>
+      <div className="g-st" style={{ marginTop: 12 }}>Edit phase</div>
+      <div className="g-form">
+        <label className="g-muted">Phase name<input className="g-in" value={f.display_name} onChange={(e) => setF({ ...f, display_name: e.target.value })} /></label>
+        <label className="g-muted">Icon (emoji)<input className="g-in" maxLength={8} value={f.icon} onChange={(e) => setF({ ...f, icon: e.target.value })} /></label>
+        <label className="g-muted">Order<input className="g-in" type="number" min="0" value={f.order} onChange={(e) => setF({ ...f, order: e.target.value })} /></label>
+        <label className="g-muted">Start<input className="g-in" type="date" value={f.start_date} onChange={(e) => setF({ ...f, start_date: e.target.value })} /></label>
+        <label className="g-muted">End<input className="g-in" type="date" min={f.start_date || undefined} value={f.end_date} onChange={(e) => setF({ ...f, end_date: e.target.value })} /></label>
+        <label className="g-muted">Status<select className="g-in" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>
+          <option value="not_started">Not started</option><option value="in_progress">In progress</option><option value="completed">Completed</option>{f.status === 'locked' && <option value="locked">Locked</option>}
+        </select></label>
+        <label className="g-muted" title="Coming soon: CustomPhase has no budget-hours field">Budget hrs<input className="g-in" disabled placeholder="— No data yet" /></label>
+        <label className="g-muted" title="Coming soon: CustomPhase has no actual-hours field">Actual hrs<input className="g-in" disabled placeholder="— No data yet" /></label>
+        <label className="g-muted">% complete<input className="g-in" type="number" min="0" max="100" placeholder="— No data yet" value={f.progress_percent} onChange={(e) => setF({ ...f, progress_percent: e.target.value })} /></label>
+      </div>
+      <div className="g-muted" style={{ marginTop: 8, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+        <label style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><input type="checkbox" checked={f.is_hidden} onChange={(e) => setF({ ...f, is_hidden: e.target.checked })} /> Hidden from tracker</label>
+        <span>Phase key: <code>{cp.phase_name}</code> (fixed: tasks, files, notes and budget are linked by it)</span>
+        <span>Locked: <b>{cp.is_locked ? 'Yes' : 'No'}</b> (use ⋯ Lock/Unlock)</span>
+        <span>Delays logged: <b>{Array.isArray(cp.delays) ? cp.delays.length : 0}</b></span>
+      </div>
+      {!f.display_name.trim() && <p className="g-muted" style={{ color: '#B42318', marginTop: 6 }}>Phase name is required.</p>}
+      {bad && <p className="g-muted" style={{ color: '#B42318', marginTop: 6 }}>End date can’t be before the start date.</p>}
+      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+        <button className="g-btn" onClick={save} disabled={bad || !f.display_name.trim()}>Save</button>
+        <button className="g-btn o" onClick={() => setF(init())}>Cancel</button>
+      </div>
+      <div className="g-muted g-foot">{upd ? `Updated ${updPT}` : 'No data yet'}</div>
+    </>
+  );
+}
+
+
+function RequirementsTab({ projectId, phaseName, requirements, onToggle, files = [], onOpenFiles }) {
   const [showForm, setShowForm] = useState(false);
   const [selectedParentReq, setSelectedParentReq] = useState(null);
   const queryClient = useQueryClient();
@@ -511,63 +640,133 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
 
   const [formData, setFormData] = useState({ requirement_text: '', is_mandatory: true });
 
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <Dialog open={showForm} onOpenChange={setShowForm}>
-          <DialogTrigger asChild>
-            <Button size="sm"><Plus className="h-4 w-4 mr-2" />Add Requirement</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add Requirement</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {selectedParentReq && (
-                <div className="text-sm text-slate-600 mb-2">
-                  Adding sub-requirement to: <span className="font-medium">{selectedParentReq.requirement_text}</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="ml-2"
-                    onClick={() => setSelectedParentReq(null)}
-                  >
-                    ← Back
-                  </Button>
-                </div>
-              )}
-              <Input
-                value={formData.requirement_text}
-                onChange={(e) => setFormData({ ...formData, requirement_text: e.target.value })}
-                placeholder={selectedParentReq ? "Sub-requirement text" : "Requirement text"}
-              />
-              <Button 
-                onClick={() => createMutation.mutate({ 
-                  project_id: projectId, 
-                  phase_name: phaseName, 
-                  parent_requirement_id: selectedParentReq?.id || null,
-                  ...formData 
-                })} 
-                className="w-full"
-              >
-                Add {selectedParentReq ? 'Sub-Requirement' : 'Requirement'}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+
+  // ===== v5 render (visual only). Same mutations, same DnD droppable ids/types, same sort, same confirms. =====
+  const [v5NewText, setV5NewText] = useState('');
+  const [v5OpenFiles, setV5OpenFiles] = useState(null);
+  const v5FilesFor = (req) => { const folder = files.find(f => f.file_url === `folder://${req.id}`); return folder ? files.filter(f => f.parent_folder_id === folder.id) : []; };
+  const v5FilesOpen = (req) => (v5OpenFiles === null ? v5FilesFor(req).length > 0 : !!v5OpenFiles[req.id]);
+  const v5ToggleFiles = (req) => setV5OpenFiles({ ...(v5OpenFiles || Object.fromEntries(requirements.map(r => [r.id, v5FilesFor(r).length > 0]))), [req.id]: !v5FilesOpen(req) });
+  const v5AddMain = () => {
+    const t = v5NewText.trim(); if (!t) return;
+    createMutation.mutate({ project_id: projectId, phase_name: phaseName, parent_requirement_id: null, ...formData, requirement_text: t });
+    setV5NewText('');
+  };
+  const [v5EditReq, setV5EditReq] = useState(null); // { id, requirement_text, is_mandatory, done }
+  const v5Edit = (req) => setV5EditReq({ id: req.id, requirement_text: req.requirement_text || '', is_mandatory: !!req.is_mandatory, done: req.status === 'completed' });
+  const v5SaveEdit = (req) => {
+    const t = v5EditReq.requirement_text.trim(); if (!t) return;
+    if (t !== req.requirement_text || v5EditReq.is_mandatory !== !!req.is_mandatory) {
+      updateRequirementMutation.mutate({ id: req.id, data: { requirement_text: t, is_mandatory: v5EditReq.is_mandatory } });
+    }
+    if (v5EditReq.done !== (req.status === 'completed')) onToggle.mutate({ id: req.id, completed: v5EditReq.done }); // same toggle as the checkbox (sets completed_date)
+    setV5EditReq(null);
+  };
+  const v5Row = (req, provided, isSub) => {
+    const fl = v5FilesFor(req); const fOpen = v5FilesOpen(req);
+    return (
+      <div ref={provided.innerRef} {...provided.draggableProps} className={cn('g-req', isSub && 'child')}>
+        <div className="g-tk">
+          <span className="g-hd" title="Drag to reorder" {...provided.dragHandleProps}>⋮⋮</span>
+          <input type="checkbox" aria-label="Done" checked={req.status === 'completed'} onChange={(e) => onToggle.mutate({ id: req.id, completed: e.target.checked })} />
+          <span className={cn('tx', req.status === 'completed' && 'done')}>
+            {req.requirement_text}
+            {req.is_mandatory && <span className="g-badge" style={{ marginLeft: 6 }}>Mandatory</span>}
+            {req.completed_date && <span className="g-muted" style={{ display: 'block' }}>Completed {format(new Date(req.completed_date), 'MMM d, yyyy')}</span>}
+          </span>
+          <button className={cn('g-clip', fl.length > 0 && 'has')} onClick={() => v5ToggleFiles(req)} aria-expanded={fOpen}>📎 {fl.length} {fOpen ? '▾' : '▸'}</button>
+          {!isSub && <button className="g-sub" onClick={() => { setSelectedParentReq(req); setShowForm(true); }}>＋ <span>Add </span>sub-task</button>}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild><button className="g-dots" aria-label="Task actions">⋯</button></DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="gs5-menu" style={{ minWidth: 150 }}>
+              <DropdownMenuItem onClick={() => v5Edit(req)}>✎ Edit</DropdownMenuItem>
+              <DropdownMenuItem className="red" onClick={() => {
+                if (confirm(isSub ? 'Delete this sub-requirement?' : 'Delete this requirement and all its sub-requirements?')) {
+                  deleteMutation.mutate(req.id);
+                }
+              }}><span>🗑 Delete<small>Asks to confirm</small></span></DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        {v5EditReq?.id === req.id && (
+          <div className="g-files g-tedit">
+            <input className="g-in" aria-label="Task text" value={v5EditReq.requirement_text} onChange={(e) => setV5EditReq({ ...v5EditReq, requirement_text: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && v5SaveEdit(req)} />
+            <label className="g-muted"><input type="checkbox" checked={v5EditReq.is_mandatory} onChange={(e) => setV5EditReq({ ...v5EditReq, is_mandatory: e.target.checked })} /> Mandatory</label>
+            <select className="g-in" aria-label="Status" value={v5EditReq.done ? 'completed' : 'pending'} onChange={(e) => setV5EditReq({ ...v5EditReq, done: e.target.value === 'completed' })}>
+              <option value="pending">Pending</option><option value="completed">Completed</option>
+            </select>
+            <button className="g-btn" disabled={!v5EditReq.requirement_text.trim()} onClick={() => v5SaveEdit(req)}>Save</button>
+            <button className="g-btn o" onClick={() => setV5EditReq(null)}>Cancel</button>
+          </div>
+        )}
+        {fOpen && (
+          <div className="g-files">
+            <span className="lbl">Files</span>
+            {fl.length === 0 && <span className="g-muted">No files yet</span>}
+            {fl.map(f => (
+              <React.Fragment key={f.id}>
+                <span className="g-badge">📄 {f.file_name}</span>
+                <button className="g-btn o" onClick={() => window.open(f.file_url, '_blank', 'noopener')}>View</button>
+                <a href={f.file_url} download={f.file_name} target="_blank" rel="noreferrer"><button className="g-btn o" tabIndex={-1}>Download</button></a>
+              </React.Fragment>
+            ))}
+            <button className="g-btn" onClick={() => onOpenFiles?.()} title="Opens the Files tab (same upload as today)">+ Attach file</button>
+          </div>
+        )}
       </div>
+    );
+  };
+
+  return (
+    <div>
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Requirement</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedParentReq && (
+              <div className="text-sm text-slate-600 mb-2">
+                Adding sub-requirement to: <span className="font-medium">{selectedParentReq.requirement_text}</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="ml-2"
+                  onClick={() => setSelectedParentReq(null)}
+                >
+                  ← Back
+                </Button>
+              </div>
+            )}
+            <Input
+              value={formData.requirement_text}
+              onChange={(e) => setFormData({ ...formData, requirement_text: e.target.value })}
+              placeholder={selectedParentReq ? "Sub-requirement text" : "Requirement text"}
+            />
+            <Button 
+              onClick={() => createMutation.mutate({ 
+                project_id: projectId, 
+                phase_name: phaseName, 
+                parent_requirement_id: selectedParentReq?.id || null,
+                ...formData 
+              })} 
+              className="w-full"
+            >
+              Add {selectedParentReq ? 'Sub-Requirement' : 'Requirement'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="g-st" style={{ flexWrap: 'wrap' }}>Task <span className="g-muted">drag ⋮⋮ to reorder · <b>Drag onto a task’s sub-list to make it a sub-task</b> (drag back out to un-nest) · creating a main task auto-creates its file folder</span></div>
 
       {requirements.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-slate-500">
-            No requirements yet
-          </CardContent>
-        </Card>
+        <p className="g-muted" style={{ margin: '8px 0 12px' }}>No tasks yet</p>
       ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="requirements" type="main">
             {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+              <div {...provided.droppableProps} ref={provided.innerRef}>
                 {requirements
                   .filter(r => !r.parent_requirement_id)
                   .sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
@@ -578,109 +777,19 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
                     return (
                       <Draggable key={req.id} draggableId={req.id} index={index}>
                         {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            className="space-y-2"
-                          >
-                            <Card>
-                              <CardContent className="py-4">
-                                <div className="flex items-start gap-3">
-                                  <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
-                                    <GripVertical className="h-5 w-5 text-slate-400 hover:text-slate-600" />
-                                  </div>
-                                  <Checkbox
-                                    checked={req.status === 'completed'}
-                                    onCheckedChange={(checked) => onToggle.mutate({ id: req.id, completed: checked })}
-                                  />
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                      <span className={cn("text-sm break-words", req.status === 'completed' ? 'line-through text-slate-500' : '')}>{req.requirement_text}</span>
-                                      {req.is_mandatory && <Badge variant="outline" className="text-xs flex-shrink-0">Mandatory</Badge>}
-                                    </div>
-                                    {req.completed_date && (
-                                      <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(req.completed_date), 'MMM d, yyyy')}</p>
-                                    )}
-                                  </div>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-7 px-2 text-xs"
-                                    onClick={() => {
-                                      setSelectedParentReq(req);
-                                      setShowForm(true);
-                                    }}
-                                  >
-                                    + Sub
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-7 w-7 p-0 text-red-600 hover:bg-red-50"
-                                    onClick={() => {
-                                      if (confirm('Delete this requirement and all its sub-requirements?')) {
-                                        deleteMutation.mutate(req.id);
-                                      }
-                                    }}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
+                          <div ref={provided.innerRef} {...provided.draggableProps}>
+                            {v5Row(req, { innerRef: undefined, draggableProps: {}, dragHandleProps: provided.dragHandleProps }, false)}
                             <Droppable droppableId={`sub-${req.id}`} type="main">
                               {(provided, snapshot) => (
                                 <div
                                   {...provided.droppableProps}
                                   ref={provided.innerRef}
-                                  className={cn(
-                                    "ml-8 space-y-2 min-h-[8px] rounded-lg transition-colors",
-                                    snapshot.isDraggingOver && "bg-blue-50"
-                                  )}
+                                  className={cn('g-sublist', snapshot.isDraggingOver && 'over')}
                                 >
                                   {subReqs.map((subReq, subIndex) => (
-                                      <Draggable key={subReq.id} draggableId={subReq.id} index={subIndex}>
-                                        {(provided) => (
-                                          <Card
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            className="bg-slate-50"
-                                          >
-                                            <CardContent className="py-3">
-                                              <div className="flex items-start gap-3">
-                                                <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
-                                                  <GripVertical className="h-4 w-4 text-slate-400 hover:text-slate-600" />
-                                                </div>
-                                                <Checkbox
-                                                  checked={subReq.status === 'completed'}
-                                                  onCheckedChange={(checked) => onToggle.mutate({ id: subReq.id, completed: checked })}
-                                                  className="mt-0.5"
-                                                />
-                                                <div className="flex-1">
-                                                  <span className={cn("text-sm", subReq.status === 'completed' && 'line-through text-slate-500')}>
-                                                    {subReq.requirement_text}
-                                                  </span>
-                                                  {subReq.completed_date && (
-                                                    <p className="text-xs text-slate-400 mt-1">Completed {format(new Date(subReq.completed_date), 'MMM d, yyyy')}</p>
-                                                  )}
-                                                </div>
-                                                <Button
-                                                  size="sm"
-                                                  variant="ghost"
-                                                  className="h-6 w-6 p-0 text-red-600 hover:bg-red-50"
-                                                  onClick={() => {
-                                                    if (confirm('Delete this sub-requirement?')) {
-                                                      deleteMutation.mutate(subReq.id);
-                                                    }
-                                                  }}
-                                                >
-                                                  <Trash2 className="h-3 w-3" />
-                                                </Button>
-                                              </div>
-                                            </CardContent>
-                                          </Card>
-                                        )}
-                                      </Draggable>
+                                    <Draggable key={subReq.id} draggableId={subReq.id} index={subIndex}>
+                                      {(provided) => v5Row(subReq, provided, true)}
+                                    </Draggable>
                                   ))}
                                   {provided.placeholder}
                                 </div>
@@ -697,9 +806,15 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle }) {
           </Droppable>
         </DragDropContext>
       )}
+
+      <div className="g-addrow">
+        <input className="g-in" placeholder="New task…" value={v5NewText} onChange={(e) => setV5NewText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && v5AddMain()} />
+        <button className="g-btn" onClick={v5AddMain}>+ Add task</button>
+      </div>
     </div>
   );
 }
+
 
 function FilesTab({ projectId, phaseName, files }) {
   const [uploading, setUploading] = useState(false);
@@ -1187,3 +1302,165 @@ function BudgetTab({ projectId, phaseName, budget, onToggleLock }) {
     </div>
   );
 }
+
+// ===== v5 scoped styles (explicit hex; no --primary). Visual only. =====
+const GS5_CSS = `
+.gs5p{color:#0B1F3A;font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:1.15}
+.gs5p *{box-sizing:border-box}
+.gs5p .g-title{font-size:22px;line-height:1.3;font-weight:700;margin:0 0 16px;color:inherit}
+.gs5p .g-card{background:#fff;border:1px solid #DDE3EA;border-radius:12px;box-shadow:0 1px 3px rgba(11,31,58,.08);padding:16px;margin-bottom:16px}
+.gs5p .g-st{font-size:15px;font-weight:700;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;line-height:1.3}
+.gs5p .g-muted{color:#5B6B7F;font-size:12px;font-weight:400;line-height:1.35}
+.gs5p .g-foot{border-top:1px solid #DDE3EA;margin-top:10px;padding-top:6px}
+.gs5p .g-p{margin:16px 0;line-height:1.35}
+.gs5p .g-miss{color:#9A6700;font-weight:600;white-space:nowrap}.gs5p .g-miss b{background:#FFF4D6;border:1px solid #C9A227;border-radius:4px;padding:0 4px;font-size:11px;margin-left:4px}
+.gs5p .g-badge{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px;background:#E8EDF3;color:#16335C;white-space:nowrap}
+.gs5p .g-badge.gold{background:#C9A227;color:#0B1F3A}
+.gs5p button.g-btn{min-height:44px;min-width:44px;border:1px solid #1E3A5F;background:#0B1F3A;color:#fff;border-radius:8px;padding:0 14px;font:inherit;font-size:16px;cursor:pointer;line-height:1}
+.gs5p button.g-btn.o{background:#fff;color:#0B1F3A}
+.gs5p button.g-btn.goldb{background:#C9A227;color:#0B1F3A;border-color:#C9A227}
+.gs5p button:disabled{opacity:.55;cursor:not-allowed}
+.gs5p .g-bar{height:10px;background:#E8EDF3;border-radius:5px;overflow:hidden;margin-top:4px}.gs5p .g-bar i{display:block;height:100%;background:#C9A227;border-radius:5px}
+.gs5p .g-bar.over i{background:#B42318}
+.gs5p .g-bar.empty{background:repeating-linear-gradient(45deg,#E8EDF3 0 6px,#fff 6px 12px)}
+.gs5p .g-ph{cursor:pointer}.gs5p .g-ph.open{border:2px solid #C9A227;cursor:default}
+.gs5p .g-ph.cur{box-shadow:0 0 0 4px rgba(201,162,39,.14),0 6px 22px -6px rgba(201,162,39,.45)}
+.gs5p .g-phhd{cursor:pointer}
+.gs5p input.g-in,.gs5p select.g-in,.gs5p textarea.g-in{min-height:44px;border:1px solid #DDE3EA;border-radius:8px;padding:0 10px;font:inherit;font-size:16px;width:100%;background:#fff;color:#0B1F3A}
+.gs5p textarea.g-in{padding:10px;min-height:110px}
+.gs5p input.g-in:disabled{background:#F5F7FA}
+.gs5p .g-form{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.gs5p .g-form label{display:block}
+@media(min-width:768px){.gs5p .g-form input.g-in,.gs5p .g-form select.g-in{font-size:12px}}
+.gs5p .g-dots{border:1px solid #DDE3EA;background:#fff;border-radius:8px;min-width:36px;min-height:36px;height:36px;font-size:16px;line-height:1;cursor:pointer;color:#0B1F3A;padding:0}
+.gs5p .g-dots.sm{min-width:28px;min-height:28px;height:28px;margin-top:4px}
+.gs5p .g-dots.on{border-color:#C9A227;background:#FFF4D6}
+.gs5p .g-sub{border:1px solid #DDE3EA;background:#fff;color:#16335C;border-radius:8px;min-height:36px;height:36px;padding:0 10px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer}
+.gs5p .g-menu{position:fixed;z-index:60;background:#fff;border:1px solid #DDE3EA;border-radius:10px;box-shadow:0 10px 24px rgba(11,31,58,.2);min-width:220px;padding:6px;text-align:left;font-size:13px;color:#0B1F3A;font-weight:400}
+.gs5p .g-menu .mi{display:block;width:100%;text-align:left;background:none;border:0;font:inherit;font-size:13px;color:inherit;padding:9px 10px;border-radius:6px;min-height:36px;cursor:pointer;line-height:1.2}
+.gs5p .g-menu .mi:hover:not(:disabled){background:#F5F7FA}
+.gs5p .g-menu .mi:disabled{color:#A0AAB8;opacity:1}
+.gs5p .g-menu .mh{font-weight:700;color:#5B6B7F;font-size:11px;padding:9px 10px}
+.gs5p .g-menu .red{color:#B42318;font-weight:600}.gs5p .g-menu hr{border:0;border-top:1px solid #DDE3EA;margin:4px 0}
+.gs5p .g-menu small{display:block;color:#5B6B7F;font-size:11px;font-weight:400}
+.gs5p .g-pn{display:flex;align-items:flex-start;overflow-x:auto;padding:8px 4px 4px}
+.gs5p .g-pn .n{flex:1;min-width:76px;text-align:center;position:relative;font-size:11px;color:#5B6B7F;line-height:1.25}
+.gs5p .g-pn .n:before{content:"";position:absolute;top:20px;left:-50%;width:100%;height:3px;background:#DDE3EA;z-index:0}.gs5p .g-pn .n:first-child:before{display:none}
+.gs5p .g-pn .c{position:relative;z-index:1;width:40px;height:40px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;background:#E8EDF3;border:2px solid #DDE3EA;font-size:16px}
+.gs5p .g-pn .cur .c{background:#0B1F3A;border-color:#0B1F3A;box-shadow:0 0 0 4px #fff,0 0 0 7px #C9A227}.gs5p .g-pn .cur{color:#0B1F3A;font-weight:700}
+.gs5p .g-pn .done .c{background:#C9A227;color:#0B1F3A}
+.gs5p .g-pn .gate .c{border-color:#C9A227}
+.gs5p .g-cpbar{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#0B1F3A;color:#fff;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:16px}.gs5p .g-cpbar b{color:#C9A227}
+.gs5p .g-note{background:#FFF8E1;border-left:4px solid #C9A227;padding:8px 12px;font-size:13px;border-radius:6px;margin-bottom:12px;line-height:1.35}
+.gs5p .g-bars{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0}
+.gs5p .g-bud{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0}.gs5p .g-bud>div{background:#F5F7FA;border:1px solid #DDE3EA;border-radius:8px;padding:8px}
+.gs5p .g-bud dt{font-size:11px;color:#5B6B7F}.gs5p .g-bud dd{margin:0 0 8px}
+.gs5p .g-req{border:1px solid #DDE3EA;border-radius:10px;margin-bottom:10px;overflow:visible;background:#fff}
+.gs5p .g-req.child{margin-left:44px;border-left:3px solid #C9A227}
+.gs5p .g-req.drag{box-shadow:0 8px 20px rgba(11,31,58,.25);transform:rotate(-1deg);border:2px solid #C9A227;opacity:.95}
+.gs5p .g-req.combine{outline:2px dashed #C9A227;outline-offset:2px}
+.gs5p .g-tk{display:flex;align-items:center;gap:12px;padding:10px 12px;min-height:52px;background:transparent;border-radius:10px}
+.gs5p .g-tk input[type=checkbox]{width:20px;height:20px;min-height:20px;flex:0 0 20px;accent-color:#0B1F3A;margin:0}
+.gs5p .g-tk .tx{flex:1;line-height:1.3}
+.gs5p .g-tk .tx.done{text-decoration:line-through;color:#5B6B7F}
+.gs5p .g-hd{color:#8A99AB;cursor:grab;font-size:18px;letter-spacing:-3px;min-width:24px;user-select:none}
+.gs5p .g-clip{border:1px solid #DDE3EA;background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;min-height:36px;height:36px;white-space:nowrap;cursor:pointer;color:#0B1F3A}
+.gs5p .g-clip.has{background:#0B1F3A;color:#C9A227;font-weight:700}
+.gs5p .g-files{background:#F9F6EA;border-top:1px solid #E9DDB0;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-radius:0 0 10px 10px}
+.gs5p .g-files .lbl{font-weight:700;font-size:13px;margin-right:4px}.gs5p .g-files button.g-btn{min-height:40px;font-size:13px}
+.gs5p .g-ptabs{display:flex;flex-wrap:nowrap;gap:2px;border-bottom:1px solid #DDE3EA;margin:12px 0;overflow-x:auto}
+.gs5p .g-ptabs button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;padding:10px 18px;font:inherit;font-size:14px;color:#5B6B7F;white-space:nowrap;min-height:44px;cursor:pointer}
+.gs5p .g-ptabs button.on{color:#0B1F3A;font-weight:700;border-bottom-color:#C9A227}
+.gs5p .g-frames{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.gs5p .g-frame{border:2px dashed #C9A227;border-radius:12px;padding:12px;background:#fff;min-width:0}.gs5p .g-frame h4{margin:0 0 6px;font-size:13px;line-height:1.3;color:#9A6700;font-weight:700}
+.gs5p .g-frame .g-bud{grid-template-columns:1fr 1fr}
+.gs5p .g-nt{border-bottom:1px solid #DDE3EA;padding:8px 0;font-size:13px;line-height:1.35;word-break:break-word}
+.gs5p .g-rb{display:block;background:none;border:0;color:#16335C;font:inherit;font-weight:600;font-size:13px;min-height:36px;padding:0;cursor:pointer}
+.gs5p .g-addrow{display:flex;gap:8px;margin:10px 0}
+.gs5p .g-addrow button.g-btn{white-space:nowrap}
+.gs5p .g-edit{display:flex;gap:6px;flex:1}
+@media(max-width:767px){
+ .gs5p .g-bars,.gs5p .g-bud{grid-template-columns:1fr 1fr}
+ .gs5p .g-form,.gs5p .g-frames{grid-template-columns:1fr}
+ .gs5p .g-tk{flex-wrap:wrap;gap:8px 10px}
+ .gs5p .g-tk .tx{flex:1 1 calc(100% - 80px)}
+ .gs5p .g-tk .g-clip{margin-left:70px}
+ .gs5p .g-req.child .g-tk .g-clip{margin-left:auto}
+ .gs5p .g-req.child{margin-left:22px}
+ .gs5p .g-sub span{display:none}
+ .gs5p .g-tk input[type=checkbox]{width:24px;height:24px;min-height:24px;flex-basis:24px}
+ .gs5p .g-ptabs button{padding:10px 12px}
+}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p{color:#E9EFF9}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-card{background:#0F2340;border-color:rgba(148,178,226,.16);box-shadow:0 10px 30px -12px rgba(0,0,0,.55)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-muted,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-bud dt,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-menu small,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-menu .mh{color:#8193B0}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-foot,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-nt,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-ptabs{border-color:rgba(148,178,226,.16)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-miss{color:#F5B544}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-miss b{background:rgba(245,181,68,.14);border-color:rgba(212,165,55,.55)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-badge{background:rgba(148,178,226,.14);color:#B7C4DA}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-badge.gold{background:#D4A537;color:#1A1203}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p button.g-btn{background:#16335C;border-color:rgba(148,178,226,.28);color:#fff}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p button.g-btn.o{background:transparent;color:#E9EFF9;border-color:rgba(148,178,226,.28)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p button.g-btn.goldb{background:#D4A537;color:#1A1203;border-color:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-bar{background:rgba(148,178,226,.14)}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-bar i{background:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-bar.empty{background:repeating-linear-gradient(45deg,rgba(148,178,226,.16) 0 6px,transparent 6px 12px)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-ph.open{border-color:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-ph.cur{box-shadow:0 0 0 4px rgba(212,165,55,.12),0 0 40px -14px rgba(212,165,55,.6)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p input.g-in,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p select.g-in,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p textarea.g-in{background:rgba(255,255,255,.04);border-color:rgba(148,178,226,.22);color:#E9EFF9}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p input.g-in:disabled{background:rgba(255,255,255,.02)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p select.g-in option{background:#0F2340}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-dots,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-sub,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-clip{background:rgba(255,255,255,.04);border-color:rgba(148,178,226,.22);color:#E9EFF9}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-dots.on{background:rgba(212,165,55,.16);border-color:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-clip.has{background:#0B1F3A;color:#D4A537;border-color:rgba(212,165,55,.45)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-menu{background:#102442;border-color:rgba(148,178,226,.2);color:#E9EFF9;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-menu .mi:hover:not(:disabled){background:rgba(255,255,255,.06)}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-menu .mi:disabled{color:#56698A}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-menu .red{color:#FF6B6B}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-menu hr{border-color:rgba(148,178,226,.16)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-pn .n{color:#8193B0}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-pn .n:before{background:rgba(148,178,226,.2)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-pn .c{background:rgba(148,178,226,.12);border-color:rgba(148,178,226,.22)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-pn .cur{color:#E9EFF9}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-pn .cur .c{background:#0B1F3A;border-color:#0B1F3A;box-shadow:0 0 0 4px #0F2340,0 0 0 7px #D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-pn .done .c{background:#D4A537;color:#1A1203}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-cpbar{background:#0B1F3A;border:1px solid rgba(212,165,55,.3)}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-cpbar b{color:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-note{background:rgba(212,165,55,.10);border-left-color:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-bud>div{background:rgba(255,255,255,.03);border-color:rgba(148,178,226,.16)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-req{background:rgba(255,255,255,.02);border-color:rgba(148,178,226,.18)}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-req.child{border-left-color:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-files{background:rgba(212,165,55,.08);border-top-color:rgba(212,165,55,.25)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-tk input[type=checkbox]{accent-color:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-ptabs button{color:#8193B0}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-ptabs button.on{color:#E9EFF9;border-bottom-color:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-frame{background:transparent;border-color:rgba(212,165,55,.55)}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-frame h4{color:#D4A537}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-rb{color:#B7C4DA}
+
+.gs5-menu{background:#fff;border:1px solid #DDE3EA;border-radius:10px;box-shadow:0 10px 24px rgba(11,31,58,.2);min-width:220px;padding:6px;font-size:13px;color:#0B1F3A;z-index:60}
+.gs5-menu [role=menuitem]{display:block;padding:9px 10px;border-radius:6px;min-height:36px;font-size:13px;line-height:1.2;cursor:pointer}
+.gs5-menu [role=menuitem]:hover,.gs5-menu [role=menuitem][data-highlighted]{background:#F5F7FA}
+.gs5-menu [role=menuitem][data-disabled]{color:#A0AAB8;opacity:1;pointer-events:none}
+.gs5-menu small{display:block;color:#5B6B7F;font-size:11px}
+.gs5-menu .mh{font-weight:700;color:#5B6B7F;font-size:11px;padding:9px 10px}
+.gs5-menu .red{color:#B42318;font-weight:600}.gs5-menu .hr{border-top:1px solid #DDE3EA;margin:4px 0}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5-menu{background:#102442;border-color:rgba(148,178,226,.2);color:#E9EFF9;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5-menu [role=menuitem]:hover,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5-menu [role=menuitem][data-highlighted]{background:rgba(255,255,255,.06)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5-menu [role=menuitem][data-disabled]{color:#56698A}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5-menu small,:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5-menu .mh{color:#8193B0}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5-menu .red{color:#FF6B6B}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5-menu .hr{border-color:rgba(148,178,226,.16)}
+
+.gs5p .g-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 10px;flex-wrap:wrap}
+.gs5p .g-hdr-r{display:inline-flex;gap:6px;align-items:center;flex-shrink:0}
+.gs5p .g-ph:not(.open){cursor:pointer}
+.gs5p .g-tablist{display:flex!important;background:none!important;border-bottom:1px solid #DDE3EA;border-radius:0!important;padding:0!important;height:auto!important;gap:2px;justify-content:flex-start!important;overflow-x:auto;width:100%;margin-top:12px}
+.gs5p .g-tablist [role=tab]{background:none!important;box-shadow:none!important;border-radius:0!important;border-bottom:3px solid transparent;padding:10px 18px!important;font-size:14px!important;color:#5B6B7F;min-height:44px!important;font-weight:500}
+.gs5p .g-tablist [role=tab][data-state=active]{color:#0B1F3A;font-weight:700;border-bottom-color:#C9A227}
+.gs5p .g-sublist{min-height:8px}.gs5p .g-sublist.over{background:#FFF8E1;border-radius:8px}
+.gs5p .g-foot{margin-top:8px}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-tablist{border-color:rgba(148,178,226,.16)}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-tablist [role=tab]{color:#8193B0}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-tablist [role=tab][data-state=active]{color:#E9EFF9}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-sublist.over{background:rgba(201,162,39,.12)}
+
+.gs5p .g-grp{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#5B6B7F;align-self:center;padding:0 6px 0 2px;white-space:nowrap}
+.gs5p .g-grp.sep{margin-left:10px;padding-left:12px;border-left:1px solid #DDE3EA}
+.gs5p .t-task{--ac:#2F6FDE}.gs5p .t-file{--ac:#0E9384}.gs5p .t-note{--ac:#7A5AF8}.gs5p .t-bud{--ac:#B7791F}
+.gs5p .g-ptabs{align-items:center}.gs5p .g-ptabs button::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ac,#5B6B7F);margin-right:7px}
+.gs5p .g-tablist [role=tab]::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ac);margin-right:7px}
+.gs5p .g-tablist [role=tab][data-state=active]{border-bottom-color:var(--ac)!important;color:var(--ac)!important}
+.gs5p .g-pane{border-left:3px solid var(--ac);padding-left:10px}
+.gs5p .g-tedit{gap:8px;align-items:center;flex-wrap:wrap}.gs5p .g-tedit label{display:inline-flex;gap:6px;align-items:center;white-space:nowrap}.gs5p .g-tedit input.g-in{flex:1 1 220px;width:auto}.gs5p .g-tedit select.g-in{width:140px}
+.gs5p .g-emo{display:flex;align-items:center}
+.gs5p .neg{color:#B42318}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-task{--ac:#6EA0FF}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-file{--ac:#3CCBB4}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-note{--ac:#A992FF}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-bud{--ac:#E2B93B}
+:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-grp{color:#8193B0}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-grp.sep{border-color:rgba(148,178,226,.16)}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .neg{color:#FF6B6B}
+`;
