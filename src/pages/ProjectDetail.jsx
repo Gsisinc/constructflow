@@ -393,35 +393,37 @@ export default function ProjectDetail() {
 
       {/* Tabs for detailed views */}
       <Tabs defaultValue="phases" className="w-full sm:w-auto">
-        <TabsList className="w-full sm:w-auto justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-slate-100 rounded-lg">
-          <TabsTrigger value="tracker">Tracker</TabsTrigger>
-          <TabsTrigger value="phases">Phases</TabsTrigger>
-          <TabsTrigger value="submittals">Submittals</TabsTrigger>
-          <TabsTrigger value="rfis">RFIs</TabsTrigger>
-          <TabsTrigger value="punchlist">Punch List</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="forms">Forms</TabsTrigger>
-          <TabsTrigger value="changeorders">Change Orders</TabsTrigger>
-          <TabsTrigger value="safety">Safety</TabsTrigger>
-          <TabsTrigger value="decisions">Decisions</TabsTrigger>
-          <TabsTrigger value="team">Team & Roles</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar</TabsTrigger>
-          <TabsTrigger value="permits">Permits</TabsTrigger>
-          <TabsTrigger value="materials">Materials</TabsTrigger>
-          <TabsTrigger value="financials">Financials</TabsTrigger>
-          <TabsTrigger value="opsdocs">Ops / Field Docs</TabsTrigger>
-          <TabsTrigger value="logistics">Logistics</TabsTrigger>
-          <TabsTrigger value="fieldlogs">Field Logs</TabsTrigger>
-          <TabsTrigger value="resources">Resources</TabsTrigger>
-          <TabsTrigger value="sov">SOV & Pay Apps</TabsTrigger>
-          <TabsTrigger value="client">Client Portal</TabsTrigger>
+        <style>{PD_TABS_CSS}</style>
+        <TabsList className="pd-tabs w-full sm:w-auto justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-slate-100 rounded-lg">
+          <TabsTrigger value="tracker" className="pd-g-w">Tracker</TabsTrigger>
+          <TabsTrigger value="phases" className="pd-g-w">Phases</TabsTrigger>
+          <TabsTrigger value="submittals" className="pd-g-w">Submittals</TabsTrigger>
+          <TabsTrigger value="rfis" className="pd-g-w">RFIs</TabsTrigger>
+          <TabsTrigger value="punchlist" className="pd-g-w">Punch List</TabsTrigger>
+          <TabsTrigger value="documents" className="pd-g-w">Documents</TabsTrigger>
+          <TabsTrigger value="forms" className="pd-g-w">Forms</TabsTrigger>
+          <TabsTrigger value="changeorders" className="pd-g-m">Change Orders</TabsTrigger>
+          <TabsTrigger value="safety" className="pd-g-p">Safety</TabsTrigger>
+          <TabsTrigger value="decisions" className="pd-g-p">Decisions</TabsTrigger>
+          <TabsTrigger value="team" className="pd-g-p">Team & Roles</TabsTrigger>
+          <TabsTrigger value="calendar" className="pd-g-p">Calendar</TabsTrigger>
+          <TabsTrigger value="permits" className="pd-g-p">Permits</TabsTrigger>
+          <TabsTrigger value="materials" className="pd-g-m">Materials</TabsTrigger>
+          <TabsTrigger value="financials" className="pd-g-m">Financials</TabsTrigger>
+          <TabsTrigger value="opsdocs" className="pd-g-p">Ops / Field Docs</TabsTrigger>
+          <TabsTrigger value="logistics" className="pd-g-p pd-new">Logistics</TabsTrigger>
+          <TabsTrigger value="fieldlogs" className="pd-g-p">Field Logs</TabsTrigger>
+          <TabsTrigger value="resources" className="pd-g-p">Resources</TabsTrigger>
+          <TabsTrigger value="sov" className="pd-g-m">SOV & Pay Apps</TabsTrigger>
+          <TabsTrigger value="client" className="pd-g-p">Client Portal</TabsTrigger>
           {project.linked_bid_id && (
-            <Link to={createPageUrl('BidDetail') + `?id=${project.linked_bid_id}&tab=estimate`} className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 underline decoration-dotted">Estimate ↗</Link>
+            <Link to={createPageUrl('BidDetail') + `?id=${project.linked_bid_id}&tab=estimate`} className="pd-lnk px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 underline decoration-dotted">Estimate ↗</Link>
           )}
           {project.linked_bid_id && (
-            <Link to={createPageUrl('BidDetail') + `?id=${project.linked_bid_id}&tab=procurement`} className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 underline decoration-dotted">Procurement ↗</Link>
+            <Link to={createPageUrl('BidDetail') + `?id=${project.linked_bid_id}&tab=procurement`} className="pd-lnk px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 underline decoration-dotted">Procurement ↗</Link>
           )}
         </TabsList>
+        <div className="pd-tabs-legend" aria-hidden="true"><span className="pd-g-w">Work</span><span className="pd-g-m">Money</span><span className="pd-g-p">People &amp; site</span></div>
 
         <TabsContent value="tracker" className="mt-6">
           <DualTrackTracker projectId={projectId} project={project} />
@@ -626,6 +628,33 @@ export default function ProjectDetail() {
   );
 }
 
+// Project tab bar: v5 mockup style (navy row on desktop, 3-column pill grid at <768px). Visual only: same 21 TabsTrigger values,
+// same order, same Estimate/Procurement links. Group accents (no groups in the mockup): Work blue, Money green, People & site purple.
+const PD_DARK = ':is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light)';
+const PD_TABS_CSS = `
+html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;align-items:center!important;gap:4px 2px!important;background:#16335C!important;border-radius:10px!important;padding:4px 12px!important;height:auto!important;overflow:visible!important;width:100%!important}
+html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab],html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>a.pd-lnk{position:relative;color:#CFD8E3!important;background:transparent!important;box-shadow:none!important;border:0!important;border-radius:0!important;border-bottom:3px solid transparent!important;padding:10px 12px!important;font-size:14px!important;font-weight:400!important;min-height:0!important;height:auto!important;line-height:1.2!important;white-space:nowrap;text-decoration:none}
+html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab]::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pdg);margin-right:6px;vertical-align:2px;opacity:.9}
+html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab][data-state=active]{color:#fff!important;border-bottom-color:#C9A227!important}
+html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab].pd-new::after{content:"NEW";font-size:10px;font-weight:700;color:#0B1F3A;background:#C9A227;border-radius:4px;padding:1px 4px;margin-left:4px}
+html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>a.pd-lnk{text-decoration:underline dotted!important;text-underline-offset:4px}
+html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab]:focus-visible,html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>a.pd-lnk:focus-visible{outline:2px solid #C9A227;outline-offset:-2px}
+.pd-g-w{--pdg:#6EA0FF}.pd-g-m{--pdg:#3CCB7F}.pd-g-p{--pdg:#A992FF}
+.pd-tabs-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#5B6B7F;margin:6px 2px 0}
+.pd-tabs-legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--pdg);margin-right:5px;vertical-align:0}
+@media(max-width:767px){
+ html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important;background:#0B1F3A!important;padding:8px 12px!important}
+ html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab],html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>a.pd-lnk{font-size:11px!important;color:#CFD8E3!important;border:1px solid #1E3A5F!important;border-left:3px solid var(--pdg,#1E3A5F)!important;border-radius:6px!important;padding:4px 6px!important;min-height:28px!important;text-align:center;justify-content:center;display:flex!important;align-items:center;white-space:normal;overflow-wrap:anywhere}
+ html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab]::before{display:none}
+ html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab][data-state=active]{background:#C9A227!important;color:#0B1F3A!important;font-weight:700!important;border-color:#C9A227!important}
+ html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab].pd-new{border-color:#C9A227!important;border-left-color:var(--pdg)!important;color:#C9A227!important}
+ html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab].pd-new[data-state=active]{color:#0B1F3A!important}
+ html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>[role=tab].pd-new::after{display:none}
+ html body .pd-tabs.pd-tabs.pd-tabs[role=tablist]>a.pd-lnk{border-style:dashed!important;border-left-style:dashed!important;border-left-width:1px!important;text-decoration:none!important}
+}
+${PD_DARK} .pd-tabs-legend{color:#8193B0}
+`;
+
 // ===================== LOGISTICS tab (v5, inlined: no new imports; uses React, base44, useQuery/useQueryClient, format and AlertDialog already imported) =====================
 const lgParse = (v) => { if (!v) return null; const s = String(v); if (/^\d{4}-\d{2}-\d{2}/.test(s)) { const [y, m, d] = s.slice(0, 10).split('-').map(Number); return new Date(y, m - 1, d); } const d = new Date(s); return Number.isNaN(d.getTime()) ? null : d; };
 const fmtDate = (v, p = 'MMM d, yyyy') => { const d = lgParse(v); return d ? format(d, p) : ''; }; // same rule as src/lib/dates.js (date-only = local)
@@ -666,7 +695,8 @@ const LG_CSS = `
 .gs5l .g-badge.red{background:#FEE4E2;color:#B42318}
 .gs5l button.g-btn{min-height:44px;min-width:44px;height:44px;border:1px solid #1E3A5F;background:#0B1F3A;color:#fff;border-radius:8px;padding:0 14px;font:inherit;font-size:16px;cursor:pointer;line-height:1;flex:0 0 auto}
 .gs5l button.g-btn.o{background:#fff;color:#0B1F3A}
-.gs5l button:disabled{opacity:.55;cursor:not-allowed}
+.gs5l button:disabled{cursor:not-allowed}
+.gs5l button.g-btn:disabled,.gs5l button.g-btn.o:disabled{opacity:1;background:#EEF2F6;color:#3D4B5C;border:1px dashed #8A97A8}
 .gs5l table{width:100%;border-collapse:collapse;font-size:14px}
 .gs5l th,.gs5l td{text-align:left;padding:8px;border-bottom:1px solid #DDE3EA;font-size:14px;line-height:1.3}
 .gs5l th{background:#0B1F3A;color:#fff;font-weight:600}
@@ -690,6 +720,7 @@ ${LG_D} .gs5l .g-miss{color:#F5B544}${LG_D} .gs5l .g-miss b{background:rgba(245,
 ${LG_D} .gs5l .g-badge{background:rgba(148,178,226,.14);color:#B7C4DA}
 ${LG_D} .gs5l button.g-btn{background:#16335C;border-color:rgba(148,178,226,.28);color:#fff}
 ${LG_D} .gs5l button.g-btn.o{background:transparent;color:#E9EFF9;border-color:rgba(148,178,226,.28)}
+${LG_D} .gs5l button.g-btn:disabled,${LG_D} .gs5l button.g-btn.o:disabled{opacity:1;background:rgba(148,178,226,.08);color:#B7C4DA;border:1px dashed rgba(148,178,226,.45)}
 `;
 
 function LG_Pencil({ label, onClick, disabled }) {
