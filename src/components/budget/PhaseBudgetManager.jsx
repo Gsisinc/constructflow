@@ -57,6 +57,15 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
     enabled: !!projectId
   });
 
+  // Save phase budget once on blur/Enter instead of on every keystroke (prevents duplicate PhaseBudget creates). Same mutate payload.
+  const [budgetDraft, setBudgetDraft] = useState(null);
+  const commitBudgetDraft = () => {
+    if (budgetDraft === null) return;
+    const next = parseFloat(budgetDraft) || 0;
+    setBudgetDraft(null);
+    if (next !== (budget?.budgeted_amount || 0)) createOrUpdateBudget.mutate({ budgeted_amount: next });
+  };
+
   const createOrUpdateBudget = useMutation({
     mutationFn: (data) => {
       if (budget) {
@@ -297,9 +306,11 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
                 <div className="flex gap-2">
                   <Input
                     type="number"
-                    value={budget?.budgeted_amount || 0}
-                    onChange={(e) => createOrUpdateBudget.mutate({ budgeted_amount: parseFloat(e.target.value) || 0 })}
-                    disabled={budget?.is_locked}
+                    value={budgetDraft ?? (budget?.budgeted_amount || 0)}
+                    onChange={(e) => setBudgetDraft(e.target.value)}
+                    onBlur={commitBudgetDraft}
+                    onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                    disabled={budget?.is_locked || createOrUpdateBudget.isPending}
                   />
                 </div>
               </div>
