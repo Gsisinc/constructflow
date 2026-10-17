@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Hash, Plus, Send, MessageSquare, ArrowLeft, UserCircle2, Loader2 } from 'lucide-react';
+import { Hash, Plus, Send, MessageSquare, ArrowLeft, UserCircle2, Loader2, PenSquare } from 'lucide-react';
 
 /**
  * Chats — project chat rooms (hosted in SupportChannels.jsx; URL /SupportChannels).
@@ -15,6 +15,13 @@ const NAME_KEY = 'gsis_chat_display_name';
 const POLL_MS = 3000; // 3s while visible (rate-limit relief, Developer 2026-10-15); was 1s per Kemar
 const ROOMS_POLL_MS = 5000;
 const ENTERED_BY = 'Entered by: Ops Manager';
+// Premium gold CTA (mockups/Chief/Premium chats.html .btn-gold) — theme vars only, no hex.
+const GOLD = 'var(--brand-gold, hsl(var(--ring)))';
+const GOLD2 = 'var(--brand-gold-2, var(--brand-gold, hsl(var(--ring))))';
+const GOLD_BTN_STYLE = {
+  background: `linear-gradient(180deg, ${GOLD2}, ${GOLD})`,
+  boxShadow: `0 0 0 1px color-mix(in srgb, ${GOLD2} 45%, transparent) inset, 0 8px 24px -8px color-mix(in srgb, ${GOLD} 65%, transparent)`,
+};
 
 function initials(name) {
   return (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join('');
@@ -55,6 +62,9 @@ export default function SupportChannels() {
   const [nameInput, setNameInput] = useState('');
   const [error, setError] = useState('');
   const scrollRef = useRef(null);
+  const composerRef = useRef(null);
+  const focusComposerPending = useRef(false);
+  const [focusReq, setFocusReq] = useState(0);
 
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
   const orgId = user?.organization_id;
@@ -194,6 +204,33 @@ export default function SupportChannels() {
 
   const changeName = () => { setNameInput(displayName); setAskName(true); };
 
+  // "New message" (UI only): focus the selected room's composer; with no room selected, open the
+  // first room; with no rooms at all, open the existing create-room form. No new requests.
+  const startNewMessage = () => {
+    setError('');
+    if (activeRoom) {
+      setShowRoomsMobile(false);
+    } else if (rooms.length) {
+      setActiveRoomId(rooms[0].id);
+      setShowRoomsMobile(false);
+    } else {
+      setShowRoomsMobile(true);
+      setCreating(true);
+      return;
+    }
+    focusComposerPending.current = true;
+    setFocusReq((n) => n + 1);
+  };
+
+  useEffect(() => {
+    if (!focusComposerPending.current || !activeRoom || showRoomsMobile) return;
+    const el = composerRef.current;
+    if (!el) return;
+    focusComposerPending.current = false;
+    el.focus({ preventScroll: true });
+    if (typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest' });
+  }, [focusReq, activeRoom, showRoomsMobile]);
+
   // Group messages by day
   let lastDay = '';
 
@@ -206,14 +243,26 @@ export default function SupportChannels() {
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Project rooms for the whole crew. Updates every few seconds.</p>
         </div>
-        <button
-          type="button"
-          onClick={changeName}
-          className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-card-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-        >
-          <UserCircle2 className="h-4 w-4 text-ring" />
-          {displayName ? <>Chatting as <b className="font-semibold">{displayName}</b></> : 'Set your name'}
-        </button>
+        <div className="flex w-full sm:w-auto items-center gap-2">
+          <button
+            type="button"
+            onClick={changeName}
+            className="inline-flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-card-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <UserCircle2 className="h-4 w-4 shrink-0 text-ring" />
+            <span className="truncate">{displayName ? <>Chatting as <b className="font-semibold">{displayName}</b></> : 'Set your name'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={startNewMessage}
+            disabled={roomsLoading || !orgId}
+            style={GOLD_BTN_STYLE}
+            className="ml-auto sm:ml-0 inline-flex h-9 shrink-0 items-center gap-2 rounded-[10px] px-3.5 text-[13px] font-semibold whitespace-nowrap text-primary dark:text-primary-foreground transition-all duration-200 hover:-translate-y-px hover:brightness-105 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-60"
+          >
+            <PenSquare className="h-4 w-4" />
+            New message
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -323,6 +372,7 @@ export default function SupportChannels() {
 
               <form onSubmit={submitMessage} className="m-3 sm:m-4 flex items-center gap-2 rounded-2xl border border-border bg-background pl-3 pr-1.5 py-1.5 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20 transition">
                 <input
+                  ref={composerRef}
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   placeholder={`Message #${activeRoom.chat_room_name}`}
