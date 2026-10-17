@@ -64,6 +64,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
       }
       return base44.entities.PhaseBudget.create({ project_id: projectId, phase_name: phaseName, ...data });
     },
+    onError: (err) => toast.error(`Budget not saved: ${err?.response?.data?.message || err?.message || 'Unknown error'}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseBudget'] });
       toast.success('Budget updated');
@@ -72,6 +73,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
 
   const createCostCodeMutation = useMutation({
     mutationFn: (data) => base44.entities.CostCode.create(data),
+    onError: (err) => toast.error(`Cost code not saved: ${err?.response?.data?.message || err?.message || 'Unknown error'}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costCodes'] });
       setShowCostCodeDialog(false);
@@ -82,6 +84,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
 
   const updateCostCodeMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.CostCode.update(id, data),
+    onError: (err) => toast.error(`Cost code not saved: ${err?.response?.data?.message || err?.message || 'Unknown error'}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costCodes'] });
       setShowCostCodeDialog(false);
@@ -92,6 +95,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
 
   const deleteCostCodeMutation = useMutation({
     mutationFn: (id) => base44.entities.CostCode.delete(id),
+    onError: (err) => toast.error(`Cost code delete not saved: ${err?.response?.data?.message || err?.message || 'Unknown error'}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costCodes'] });
       toast.success('Cost code deleted');
@@ -100,6 +104,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
 
   const createChangeOrderMutation = useMutation({
     mutationFn: (data) => base44.entities.PhaseChangeOrder.create(data),
+    onError: (err) => toast.error(`Change order not saved: ${err?.response?.data?.message || err?.message || 'Unknown error'}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseChangeOrders'] });
       setShowChangeOrderDialog(false);
@@ -109,6 +114,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
 
   const createExpenseMutation = useMutation({
     mutationFn: (data) => base44.entities.Expense.create(data),
+    onError: (err) => toast.error(`Expense not saved: ${err?.response?.data?.message || err?.message || 'Unknown error'}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseExpenses'] });
       setShowExpenseDialog(false);
@@ -119,6 +125,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
 
   const updateExpenseMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Expense.update(id, data),
+    onError: (err) => toast.error(`Expense not saved: ${err?.response?.data?.message || err?.message || 'Unknown error'}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseExpenses'] });
       setShowExpenseDialog(false);
@@ -129,6 +136,7 @@ export default function PhaseBudgetManager({ projectId, phaseName }) {
 
   const deleteExpenseMutation = useMutation({
     mutationFn: (id) => base44.entities.Expense.delete(id),
+    onError: (err) => toast.error(`Expense delete not saved: ${err?.response?.data?.message || err?.message || 'Unknown error'}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phaseExpenses'] });
       toast.success('Expense deleted');
