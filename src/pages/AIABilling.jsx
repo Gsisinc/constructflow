@@ -232,12 +232,12 @@ function Logo({ className }) {
 function GSISPageHeader({ title, subtitle, right }) {
   return (
     <div className="rounded-xl overflow-hidden border border-navy-100 shadow-sm bg-white">
-      <div className="bg-gradient-to-r from-navy-900 to-navy-700 text-white px-4 sm:px-6 py-4 flex items-center gap-4">
+      <div className="gs-attn bg-gradient-to-r from-navy-900 to-navy-700 text-white px-4 sm:px-6 py-4 flex items-center gap-4" style={{ color: '#ffffff' }}>
         <Logo className="h-11 w-11 bg-white/95 p-1 rounded-md" />
         <div className="min-w-0">
           <div className="text-[11px] uppercase tracking-[0.18em] text-gold-500 font-semibold">{GSIS.name}</div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight truncate">{title}</h1>
-          {subtitle && <p className="text-[12px] text-navy-200 truncate">{subtitle}</p>}
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight truncate" style={{ color: '#ffffff' }}>{title}</h1>
+          {subtitle && <p className="text-[12px] text-navy-200 truncate" style={{ color: 'rgba(255,255,255,0.8)' }}>{subtitle}</p>}
         </div>
         <div className="ml-auto flex items-center gap-2">{right}</div>
       </div>
@@ -323,8 +323,8 @@ function DocumentPreview({ open, onOpenChange, title, filename, email, children,
           <DialogTitle className="text-[14px] font-bold">Preview · {title}</DialogTitle>
           <span className="ml-2 rounded bg-gold-500/20 text-gold-500 text-[10px] font-bold px-1.5 py-0.5 uppercase tracking-wider">Draft preview</span>
         </DialogHeader>
-        <div className="flex-1 overflow-auto bg-slate-200 p-4">
-          <div ref={ref} className="fin-doc mx-auto bg-white shadow-lg w-full max-w-[816px] p-8 text-[12px] text-slate-800">{children}</div>
+        <div className="flex-1 overflow-auto overflow-x-auto bg-slate-200 p-2 sm:p-4">
+          <div ref={ref} className="fin-doc mx-auto bg-white shadow-lg w-full min-w-[720px] max-w-[816px] p-8 text-[12px] text-slate-800">{children}</div>
         </div>
         <div className="no-print flex flex-wrap items-center gap-2 px-4 py-3 border-t border-navy-100 bg-navy-50">
           <div className="text-[11px] text-navy-700 mr-auto">{footer || 'Review every figure. MISSING marks data that does not exist in MyGSIS yet.'}</div>
@@ -391,10 +391,10 @@ function Card({ title, icon: Icon, children, right, className = '' }) {
   return (
     <div className={`bg-white rounded-xl border border-navy-100 border-t-2 border-t-navy-700 shadow-sm ${className}`}>
       {title && (
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-navy-50">
+        <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-navy-50">
           {Icon && <Icon className="h-4 w-4 text-gold-500" />}
           <h3 className="text-[11px] font-bold uppercase tracking-wider text-navy-900">{title}</h3>
-          <div className="ml-auto">{right}</div>
+          {right && <div className="w-full sm:w-auto sm:ml-auto max-w-full">{right}</div>}
         </div>
       )}
       <div className="p-4">{children}</div>
@@ -544,8 +544,8 @@ function BillingTab({ invoices, payApps, projects, projName }) {
 
   return (
     <Card title={`All invoices & pay apps · ${rows.length}`} icon={Banknote}
-      right={<div className="flex gap-2 no-print">
-        <div className="relative"><Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-navy-300" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search no., client, job" className="h-8 pl-7 pr-2 w-48 rounded-md ring-1 ring-navy-100 focus:ring-2 focus:ring-gold-500 outline-none text-[12px]" /></div>
+      right={<div className="flex flex-wrap gap-2 no-print">
+        <div className="relative flex-1 sm:flex-none"><Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-navy-300" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search no., client, job" className="h-8 pl-7 pr-2 w-full sm:w-48 rounded-md ring-1 ring-navy-100 focus:ring-2 focus:ring-gold-500 outline-none text-[12px]" /></div>
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="h-8 rounded-md ring-1 ring-navy-100 text-[12px] px-2">{['all', 'draft', 'sent', 'overdue', 'submitted', 'paid'].map((s) => <option key={s}>{s}</option>)}</select>
       </div>}>
       <div className="overflow-x-auto">
@@ -689,13 +689,23 @@ function SovTab({ projects, sovs, changeOrders, payApps }) {
   return (
     <div className="space-y-4">
       <Card title="Schedule of values" icon={ListChecks} right={
-        <select value={projectId} onChange={(e) => setPid(e.target.value)} className="no-print h-8 rounded-md ring-1 ring-navy-100 text-[12px] px-2 max-w-[260px]">
+        <select value={projectId} onChange={(e) => setPid(e.target.value)} className="no-print h-10 sm:h-8 w-full sm:w-auto max-w-full sm:max-w-[260px] truncate rounded-md ring-1 ring-navy-100 text-[12px] px-2">
           {withSov.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           {!withSov.length && <option value="">No project has an SOV</option>}
         </select>}>
         {!sov ? <div className="text-slate-500 text-[13px]"><Missing why="no ScheduleOfValues record" /> Create the SOV on the project&apos;s SOV tab first.</div> : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <div className="overflow-x-auto">
+            <div className="min-w-0">
+              <div className="space-y-2 block sm:hidden">{pa.lines.map((l, i) => (
+                <div key={i} className="rounded-lg ring-1 ring-navy-100 p-3 text-[12px] space-y-1">
+                  <div className="font-semibold text-navy-900">{l.no}. {l.description}{l.cost_code && <span className="ml-1 text-[10px] font-normal text-slate-400">{l.cost_code}</span>}</div>
+                  <div className="flex justify-between gap-2"><span className="text-slate-500">Billable Amount</span><Fig value={l.scheduled} source="ScheduleOfValues.line_items[].scheduled_value" /></div>
+                  <div className="flex justify-between gap-2"><span className="text-slate-500">Prev. billed</span><Fig value={l.previous} source="ScheduleOfValues.line_items[].billed_to_date" /></div>
+                  <div className="flex justify-between gap-2"><span className="text-slate-500">Remaining Balance</span><Fig value={(l.scheduled == null || l.previous == null) ? null : roundCents(Number(l.scheduled) - Number(l.previous))} source="billable amount − billed to date" /></div>
+                  <label className="block pt-1"><span className="text-[10px] font-bold uppercase tracking-wider text-navy-700">% complete</span>
+                    <input type="number" inputMode="decimal" min={0} max={100} step="0.5" value={l.pct} onChange={(e) => setEdits((x) => ({ ...x, [sov.id]: { ...(x[sov.id] || {}), [i]: Math.max(0, Math.min(100, Number(e.target.value))) } }))} className="mt-1 w-full h-10 text-right rounded ring-1 ring-navy-100 focus:ring-2 focus:ring-gold-500 outline-none px-2 text-[14px]" /></label>
+                </div>))}</div>
+              <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-[12px]">
                 <thead className="bg-navy-50"><tr><Th>#</Th><Th>Description</Th><Th r>Billable Amount</Th><Th r>% complete</Th><Th r>Prev. billed</Th><Th r>Remaining Balance</Th></tr></thead>
                 <tbody>{pa.lines.map((l, i) => (
@@ -707,13 +717,14 @@ function SovTab({ projects, sovs, changeOrders, payApps }) {
                     <Td r><Fig value={(l.scheduled == null || l.previous == null) ? null : roundCents(Number(l.scheduled) - Number(l.previous))} source="billable amount − billed to date" /></Td>
                   </tr>))}</tbody>
               </table>
-              <div className="flex gap-2 mt-3 no-print">
-                <Button size="sm" variant="outline" disabled={!dirty || saveSov.isPending} onClick={() => saveSov.mutate()} className="gap-1.5"><Save className="h-4 w-4" />Save % complete</Button>
-                <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5 bg-navy-900 hover:bg-navy-700 text-white"><Eye className="h-4 w-4 text-gold-500" />Preview G702 / G703</Button>
-                {pa.sovVsBudget !== null && Math.abs(pa.sovVsBudget) > 0.005 && <span className="text-[11px] text-amber-700 self-center">SOV total differs from Project.budget by {fmtMoney(pa.sovVsBudget)}</span>}
+              </div>
+              <div className="flex flex-wrap gap-2 mt-3 no-print">
+                <Button size="sm" variant="outline" disabled={!dirty || saveSov.isPending} onClick={() => saveSov.mutate()} className="gap-1.5 w-full sm:w-auto"><Save className="h-4 w-4" />Save % complete</Button>
+                <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5 w-full sm:w-auto bg-navy-900 hover:bg-navy-700 text-white"><Eye className="h-4 w-4 text-gold-500" />Preview G702 / G703</Button>
+                {pa.sovVsBudget !== null && Math.abs(pa.sovVsBudget) > 0.005 && <span className="basis-full text-[11px] text-amber-700">SOV total differs from Project.budget by {fmtMoney(pa.sovVsBudget)}</span>}
               </div>
             </div>
-            <div className="rounded-lg ring-1 ring-navy-100 bg-slate-100 p-3 max-h-[560px] overflow-auto">
+            <div className="hidden md:block rounded-lg ring-1 ring-navy-100 bg-slate-100 p-3 max-h-[560px] overflow-auto">
               <div className="text-[10px] font-bold uppercase tracking-wider text-navy-700 mb-2 no-print">Live preview</div>
               <div className="bg-white shadow p-5 origin-top scale-[0.92]"><G702 pa={pa} project={project} appNo={appNo} /><G703 pa={pa} /></div>
             </div>
