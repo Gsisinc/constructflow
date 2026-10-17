@@ -135,13 +135,29 @@ export default function ProjectDetail() {
     enabled: !!projectId,
   });
 
-  // 429 fix: 'clientUpdates' was fetched here but never used on this page; its tab component loads it when opened.
+  const { data: clientUpdates = [] } = useQuery({
+    queryKey: ['clientUpdates', projectId],
+    queryFn: () => base44.entities.ClientUpdate.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
 
-  // 429 fix: 'changeOrders' was fetched here but never used on this page; its tab component loads it when opened.
+  const { data: changeOrders = [] } = useQuery({
+    queryKey: ['changeOrders', projectId],
+    queryFn: () => base44.entities.ChangeOrder.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
 
-  // 429 fix: 'safetyIncidents' was fetched here but never used on this page; its tab component loads it when opened.
+  const { data: safetyIncidents = [] } = useQuery({
+    queryKey: ['safetyIncidents', projectId],
+    queryFn: () => base44.entities.SafetyIncident.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
 
-  // 429 fix: 'decisions' was fetched here but never used on this page; its tab component loads it when opened.
+  const { data: decisions = [] } = useQuery({
+    queryKey: ['decisions', projectId],
+    queryFn: () => base44.entities.ProjectDecision.filter({ project_id: projectId }),
+    enabled: !!projectId,
+  });
 
   const { data: customPhases = [] } = useQuery({
     queryKey: ['customPhases', projectId],
