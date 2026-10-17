@@ -763,7 +763,7 @@ function ProcurementTab({ bidId, bidTitle }) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24 md:pb-0">
       <Card className="bg-card border-border rounded-xl">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
@@ -777,15 +777,46 @@ function ProcurementTab({ bidId, bidTitle }) {
             </div>
           </div>
           <div className="flex flex-col md:flex-row gap-2 pt-2">
-            <Button className={PROC_TAP} disabled={matLines.length === 0} onClick={() => setRfqOpen(true)}>
+            <Button variant="default" className={PROC_TAP} disabled={matLines.length === 0} onClick={() => setRfqOpen(true)}>
               <FileText className="h-4 w-4 mr-2" />Request Quote
             </Button>
-            <Button variant="outline" className={PROC_TAP} disabled={busy || pendingCount === 0} onClick={() => setApplyOpen(true)}>
+            <Button className={`bg-gold-500 text-navy-900 hover:bg-gold-500/90 ${PROC_TAP}`} disabled={busy || pendingCount === 0} onClick={() => setApplyOpen(true)}>
               <ArrowDownToLine className="h-4 w-4 mr-2" />Insert Procurement Prices
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
+        <CardContent>
+          <div className="md:hidden space-y-3">
+            {matLines.map((l) => (
+              <div key={l._idx} className="rounded-xl border border-border bg-card p-3 space-y-2 text-sm">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-semibold text-foreground">{l._idx + 1}. {l.description || l.name}</div>
+                  {l.price_source ? <Badge variant="outline">{l.price_source}</Badge> : null}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><div className="text-xs text-muted-foreground">Qty / unit</div><div className="text-foreground">{l.quantity} {l.unit || 'ea'}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Unit cost</div><div className="text-foreground">{l.unit_cost ? fmtDollars(l.unit_cost) : <Badge variant="destructive">MISSING</Badge>}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Supplier</div><div className="text-foreground break-words">{l.supplier_name || '—'}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Source</div><div className="text-foreground">{l.price_source || '—'}</div></div>
+                  <div className="col-span-2"><div className="text-xs text-muted-foreground">Quote ref</div><div className="text-foreground break-all">{l.quote_ref || '—'}</div></div>
+                </div>
+                <div>
+                  <Label htmlFor={`proc-m-cost-${l._idx}`}>New unit cost</Label>
+                  <Input
+                    id={`proc-m-cost-${l._idx}`}
+                    type="number"
+                    step="0.01"
+                    inputMode="decimal"
+                    className={`w-full ${PROC_TAP}`}
+                    placeholder="—"
+                    value={mapCosts[l._key] ?? ''}
+                    onChange={(e) => setMapCosts((m) => ({ ...m, [l._key]: e.target.value }))}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-muted-foreground">
@@ -825,6 +856,7 @@ function ProcurementTab({ bidId, bidTitle }) {
               ))}
             </tbody>
           </table>
+          </div>
         </CardContent>
       </Card>
 
@@ -866,7 +898,7 @@ function ProcurementTab({ bidId, bidTitle }) {
       </Card>
 
       <Dialog open={rfqOpen} onOpenChange={setRfqOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto bg-card">
           <DialogHeader>
             <DialogTitle>Request Quote</DialogTitle>
             <DialogDescription>Draft only — Kemar sends. Nothing is emailed or saved by the app.</DialogDescription>
@@ -886,9 +918,10 @@ function ProcurementTab({ bidId, bidTitle }) {
           </div>
           <div className="space-y-1 max-h-48 overflow-y-auto border border-border rounded-md p-2">
             {matLines.map((l) => (
-              <label key={l._idx} className={`flex items-center gap-2 text-sm text-foreground ${PROC_TAP}`}>
+              <label key={l._idx} className="flex items-center gap-3 min-h-[44px] cursor-pointer text-sm text-foreground">
                 <input
                   type="checkbox"
+                  className="h-5 w-5 shrink-0"
                   checked={rfqLines.includes(l._idx)}
                   onChange={(e) => setRfqLines((s) => (e.target.checked ? [...s, l._idx] : s.filter((x) => x !== l._idx)))}
                 />
@@ -907,6 +940,9 @@ function ProcurementTab({ bidId, bidTitle }) {
               <Download className="h-4 w-4 mr-2" />Download .txt
             </Button>
           </DialogFooter>
+          <div className="md:hidden sticky bottom-0 -mx-6 -mb-6 px-6 py-3 bg-card border-t border-border">
+            <Button variant="outline" className="w-full min-h-[44px]" onClick={() => setRfqOpen(false)}>Close</Button>
+          </div>
         </DialogContent>
       </Dialog>
 
