@@ -198,7 +198,7 @@ export default function PhaseNavigator({
                       <button className="g-dots sm" aria-label={`Phase menu: ${phase.label}`}>⋯</button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="gs5-menu">
-                      <div className="mh">⋯ menu: {index + 1}. {phase.label}{status === 'current' ? ' (current)' : ''}</div>
+                      <div className="mh">{index + 1}. {phase.label}{status === 'current' ? ' (current)' : ''}</div>
                       <DropdownMenuItem onClick={() => handleSetCurrent(phase)}>📌 Set as Current</DropdownMenuItem>
                       <DropdownMenuItem disabled={!earlier} title={earlier ? undefined : 'Only applies to earlier phases'}
                         onClick={() => { if (earlier && confirm(`Revert the project to "${phase.label}"?`)) handleSetCurrent(phase); }}>
@@ -213,7 +213,7 @@ export default function PhaseNavigator({
                           deleteCustomPhaseMutation.mutate(phase.customPhaseId);
                         }
                       }}>
-                        <span>🗑 Delete Phase<small>Asks to confirm</small></span>
+                        <span>🗑 Delete Phase</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -234,7 +234,6 @@ export default function PhaseNavigator({
             )}
           </div>
         )}
-        <div className="g-muted" style={{ marginTop: 6 }}>Legend: 📌 current (navy + ring) · ✓ completed · 🔒 future.</div>
       </div>
 
       {/* Rename / Edit Phase: same updatePhaseMutation (CustomPhase.update) as Lock/Unlock */}
@@ -491,7 +490,7 @@ const GS5_CSS = `
 .gs5p .g-pn .cur .c{background:#0B1F3A;border-color:#0B1F3A;box-shadow:0 0 0 4px #fff,0 0 0 7px #C9A227}.gs5p .g-pn .cur{color:#0B1F3A;font-weight:700}
 .gs5p .g-pn .done .c{background:#C9A227;color:#0B1F3A}
 .gs5p .g-pn .gate .c{border-color:#C9A227}
-.gs5p .g-cpbar{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#0B1F3A;color:#fff;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:16px}.gs5p .g-cpbar b{color:#C9A227}
+.gs5p .g-cpbar{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#0B1F3A;color:#fff;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:16px;min-width:0;max-width:100%}.gs5p .g-cpbar>span{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;line-height:1.3}.gs5p .g-cpbar>button.g-btn{flex:0 0 auto;white-space:nowrap;margin:0}@media(max-width:480px){.gs5p .g-cpbar{font-size:14px;padding:10px 12px;gap:10px}}.gs5p .g-cpbar b{color:#C9A227}
 .gs5p .g-note{background:#FFF8E1;border-left:4px solid #C9A227;padding:8px 12px;font-size:13px;border-radius:6px;margin-bottom:12px;line-height:1.35}
 .gs5p .g-bars{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0}
 .gs5p .g-bud{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0}.gs5p .g-bud>div{background:#F5F7FA;border:1px solid #DDE3EA;border-radius:8px;padding:8px}
