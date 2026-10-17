@@ -12,7 +12,7 @@ import { Hash, Plus, Send, MessageSquare, ArrowLeft, UserCircle2, Loader2 } from
  */
 const ENTITY = () => base44.entities.ExamResult;
 const NAME_KEY = 'gsis_chat_display_name';
-const POLL_MS = 1000; // Kemar: 1s while visible, never lower
+const POLL_MS = 3000; // 3s while visible (rate-limit relief, Developer 2026-10-15); was 1s per Kemar
 const ROOMS_POLL_MS = 5000;
 const ENTERED_BY = 'Entered by: Ops Manager';
 
