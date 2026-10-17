@@ -272,7 +272,6 @@ export default function PhaseManager({ projectId, currentPhase, project }) {
   return (
     <div className="gs5p">
       <style>{GS5_CSS}</style>
-      <div className="g-note"><b>Unchanged:</b> Tracker and Financials (Budget by Cost Code) stay as they are. The cost/progress bars on each phase come from that phase’s Budget tab and don’t replace it.</div>
 
       {project && (
         <div className="g-card">
@@ -399,7 +398,7 @@ export default function PhaseManager({ projectId, currentPhase, project }) {
             <div className="g-muted">{dates || <>Dates: <V5Miss /></>} · SOV <V5Miss /> · Crew: <V5Miss /></div>
             <div className="g-bars">
               <div>
-                <div className="g-muted">Cost (same numbers as this phase’s Budget tab): spent {v5Money(v5Spent)} + committed {v5Money(v5Committed)} + CO {v5Money(co)} = <b>{v5Money(used)}</b> of budgeted {budgeted !== null ? <b>{v5Money(budgeted)}</b> : <b>—</b>}{budgeted !== null && <> · remaining <b className={budgeted - used < 0 ? 'neg' : ''}>{v5Money(budgeted - used)}</b> ({costPct.toFixed(1)}% used)</>}</div>
+                <div className="g-muted">Cost: spent {v5Money(v5Spent)} + committed {v5Money(v5Committed)} + CO {v5Money(co)} = <b>{v5Money(used)}</b> of budgeted {budgeted !== null ? <b>{v5Money(budgeted)}</b> : <b>—</b>}{budgeted !== null && <> · remaining <b className={budgeted - used < 0 ? 'neg' : ''}>{v5Money(budgeted - used)}</b> ({costPct.toFixed(1)}% used)</>}</div>
                 <div className={cn('g-bar', costPct === null && 'empty', costPct > 100 && 'over')}>{costPct !== null && <i style={{ width: `${Math.min(100, Math.max(0, costPct))}%` }} />}</div>
               </div>
               <div>
@@ -499,14 +498,14 @@ function V5EditPhase({ cp, updatePhaseMutation }) {
         <label className="g-muted">Status<select className="g-in" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>
           <option value="not_started">Not started</option><option value="in_progress">In progress</option><option value="completed">Completed</option>{f.status === 'locked' && <option value="locked">Locked</option>}
         </select></label>
-        <label className="g-muted" title="Coming soon: CustomPhase has no budget-hours field">Budget hrs<input className="g-in" disabled placeholder="— No data yet" /></label>
-        <label className="g-muted" title="Coming soon: CustomPhase has no actual-hours field">Actual hrs<input className="g-in" disabled placeholder="— No data yet" /></label>
+        <label className="g-muted" title="Coming soon">Budget hrs<input className="g-in" disabled placeholder="— No data yet" /></label>
+        <label className="g-muted" title="Coming soon">Actual hrs<input className="g-in" disabled placeholder="— No data yet" /></label>
         <label className="g-muted">% complete<input className="g-in" type="number" min="0" max="100" placeholder="— No data yet" value={f.progress_percent} onChange={(e) => setF({ ...f, progress_percent: e.target.value })} /></label>
       </div>
       <div className="g-muted" style={{ marginTop: 8, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         <label style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><input type="checkbox" checked={f.is_hidden} onChange={(e) => setF({ ...f, is_hidden: e.target.checked })} /> Hidden from tracker</label>
-        <span>Phase key: <code>{cp.phase_name}</code> (fixed: tasks, files, notes and budget are linked by it)</span>
-        <span>Locked: <b>{cp.is_locked ? 'Yes' : 'No'}</b> (use ⋯ Lock/Unlock)</span>
+        <span>Phase key: <code>{cp.phase_name}</code></span>
+        <span>Locked: <b>{cp.is_locked ? 'Yes' : 'No'}</b></span>
         <span>Delays logged: <b>{Array.isArray(cp.delays) ? cp.delays.length : 0}</b></span>
       </div>
       {!f.display_name.trim() && <p className="g-muted" style={{ color: '#B42318', marginTop: 6 }}>Phase name is required.</p>}
@@ -684,7 +683,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle, files =
                 if (confirm(isSub ? 'Delete this sub-requirement?' : 'Delete this requirement and all its sub-requirements?')) {
                   deleteMutation.mutate(req.id);
                 }
-              }}><span>🗑 Delete<small>Asks to confirm</small></span></DropdownMenuItem>
+              }}><span>🗑 Delete</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -710,7 +709,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle, files =
                 <a href={f.file_url} download={f.file_name} target="_blank" rel="noreferrer"><button className="g-btn o" tabIndex={-1}>Download</button></a>
               </React.Fragment>
             ))}
-            <button className="g-btn" onClick={() => onOpenFiles?.()} title="Opens the Files tab (same upload as today)">+ Attach file</button>
+            <button className="g-btn" onClick={() => onOpenFiles?.()} title="Opens the Files tab">+ Attach file</button>
           </div>
         )}
       </div>
@@ -758,7 +757,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle, files =
         </DialogContent>
       </Dialog>
 
-      <div className="g-st" style={{ flexWrap: 'wrap' }}>Task <span className="g-muted">drag ⋮⋮ to reorder · <b>Drag onto a task’s sub-list to make it a sub-task</b> (drag back out to un-nest) · creating a main task auto-creates its file folder</span></div>
+      <div className="g-st" style={{ flexWrap: 'wrap' }}>Task <span className="g-muted">drag ⋮⋮ to reorder · drag onto a task’s sub-list to make it a sub-task</span></div>
 
       {requirements.length === 0 ? (
         <p className="g-muted" style={{ margin: '8px 0 12px' }}>No tasks yet</p>
