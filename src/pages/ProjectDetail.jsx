@@ -772,13 +772,12 @@ function LogisticsTab({ project, calendarEvents = [], customPhases = [] }) {
           <thead><tr><th>Trade</th><th>Item</th><th>Responsible</th><th>Due</th><th>Status</th><th>Phase</th></tr></thead>
           <tbody><tr><td className="empty g-muted" colSpan={6} style={{ textAlign: 'center', padding: 16 }}>No data yet</td></tr></tbody>
         </table>
-        <div className="g-muted" style={{ marginTop: 8 }}>Overdue open rows will show a red indicator.</div>
         <div className="g-muted g-foot">No data yet</div>
       </div>
 
       {/* Risk flags: no fields yet */}
       <div className="g-card">
-        <div className="g-st">Risk flags (bid-time) <LG_Pencil label="risk flags" disabled /></div>
+        <div className="g-st">Risk flags <LG_Pencil label="risk flags" disabled /></div>
         <p className="g-p"><span className="g-badge">No data yet</span></p>
         <p className="g-p g-muted">Live/occupied: <LG_Miss /> · Retrofit: <LG_Miss /></p>
         <p className="g-p g-muted">Delay-pricing factor per flag: <LG_Miss /> · Client portal visibility: <LG_Miss /></p>
