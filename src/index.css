@@ -554,3 +554,7 @@ html.theme-light :is(.gs-attn,.gs-alert)::before, html[data-theme=light] :is(.gs
   main .space-y-4 > .border.border-slate-200.rounded-lg.p-3 .text-lg { font-size: 15px !important; }
   main .space-y-4 > .border.border-slate-200.rounded-lg.p-3 .justify-between.gap-3 { flex-wrap: wrap; gap: 6px !important; }
 }
+
+/* HOTFIX (Developer, 2026-10-17 11:10 PT): the theme script writes an inline navy --primary/--secondary on <html> in dark mode,
+   which made every .text-primary heading/value navy-on-navy. Keep the stylesheet's gold primary in dark mode. Light mode untouched. */
+html.dark, html[data-theme="dark"] { --primary: 42 64% 52% !important; }
