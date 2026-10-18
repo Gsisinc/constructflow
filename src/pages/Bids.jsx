@@ -67,6 +67,17 @@ const PIPELINE_STAGES = [
 const STATUS_TO_STAGE = PIPELINE_STAGES.reduce((m, s) => { s.statuses.forEach((st) => { m[st] = s.key; }); return m; }, {});
 const UNMAPPED_STATUSES = bidStatuses.filter((s) => s !== 'All' && !STATUS_TO_STAGE[s]); // ['lost','no_bid','closed']
 
+// Real-data marker: titles/names that start with "TEST" get a TEST pill (mockup .test chip); the prefix is shown as the pill, not repeated.
+const TEST_RE = /^\s*TEST\b[\s\-–—:·_]*/i;
+const isTestBid = (b) => TEST_RE.test(b.title || '') || TEST_RE.test(b.project_name || '');
+const displayTitle = (b) => {
+  const t = b.title || b.project_name || '';
+  if (!t) return '—';
+  const stripped = t.replace(TEST_RE, '');
+  return stripped || t;
+};
+const hasNum = (v) => v !== null && v !== undefined && v !== '' && !Number.isNaN(Number(v));
+
 const fmtCompact = (v) => {
   const n = Number(v) || 0;
   if (Math.abs(n) >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
@@ -96,6 +107,9 @@ const PIPELINE_CSS = `
 html:not(.dark) .gsis-pipe .kpi.attn{background:linear-gradient(180deg,hsl(var(--brand-navy,214 68% 14%)/.92),hsl(var(--brand-navy,214 68% 14%)));--foreground:0 0% 98%;--muted-foreground:215 25% 78%;--muted:215 45% 26%;--border:215 30% 28%;color:hsl(var(--foreground))}
 .gsis-pipe .pboard{scroll-snap-type:x mandatory}
 .gsis-pipe .pboard>*{scroll-snap-align:start}
+.gsis-test{display:inline-flex;align-items:center;margin-right:6px;padding:1px 6px;border-radius:5px;font-size:9.5px;font-weight:800;letter-spacing:.08em;vertical-align:2px;color:#8F6A12;background:rgba(212,165,55,.16);border:1px solid rgba(212,165,55,.45)}
+.dark .gsis-test{color:#E8C25A;background:rgba(212,165,55,.12);border-color:rgba(212,165,55,.4)}
+.gsis-chips{scrollbar-width:none}.gsis-chips::-webkit-scrollbar{display:none}
 `;
 
 export function BidPipeline({ bids = [], allBids = bids, belowFloorByBid = {}, onOpen, onStatusChange, onAdd, renderActions }) {
@@ -183,7 +197,8 @@ export function BidPipeline({ bids = [], allBids = bids, belowFloorByBid = {}, o
             <div className="mx-1 mb-3 h-[3px] rounded opacity-90" style={{ background: `linear-gradient(90deg, var(--st-${s.key}), transparent)` }} />
             <div className="flex flex-col gap-[9px] min-h-[60px]">
               {s.items.map((bid) => {
-                const prob = s.key === 'won' ? 100 : Math.max(0, Math.min(100, Number(bid.win_probability) || 0));
+                const hasProb = s.key === 'won' || hasNum(bid.win_probability);
+                const prob = s.key === 'won' ? 100 : hasProb ? Math.max(0, Math.min(100, Number(bid.win_probability))) : 0;
                 const probColor = s.key === 'won' ? 'var(--st-won)' : prob >= 50 ? 'var(--pipe-gold)' : 'var(--st-new)';
                 const daysOut = bid.due_date ? Math.ceil((new Date(bid.due_date) - new Date()) / 86400000) : null;
                 const dueSoon = (s.key === 'new' || s.key === 'bidding') && daysOut !== null && daysOut >= 0 && daysOut <= 7;
@@ -196,8 +211,8 @@ export function BidPipeline({ bids = [], allBids = bids, belowFloorByBid = {}, o
                     onClick={() => onOpen?.(bid)} onKeyDown={(e) => { if (e.key === 'Enter') onOpen?.(bid); }}
                     className={`pcard group relative cursor-grab active:cursor-grabbing select-none rounded-[13px] border border-border p-3 text-left ${dragId === bid.id ? 'dragging' : ''} ${flashId === bid.id ? 'won-flash' : ''}`}>
                     <GripVertical className="absolute right-2.5 top-3 h-3.5 w-3.5 text-muted-foreground/60" />
-                    <div className="pr-5 text-[13.5px] font-semibold leading-snug text-foreground line-clamp-2">{bid.title || bid.project_name || 'Untitled bid'}</div>
-                    <div className="mt-0.5 text-xs text-muted-foreground truncate">{bid.client_name || bid.agency || 'No customer'}</div>
+                    <div className="pr-5 text-[13.5px] font-semibold leading-snug text-foreground line-clamp-2">{isTestBid(bid) && <span className="gsis-test">TEST</span>}{displayTitle(bid)}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground truncate">{bid.client_name || bid.agency || '—'}</div>
                     <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                       {bid.division && <TradeChip division={bid.division} label={division?.label || bid.division} />}
                       {dueSoon && <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold" style={{ color: 'var(--st-bidding)', background: 'color-mix(in srgb, var(--st-bidding) 14%, transparent)', border: '1px solid color-mix(in srgb, var(--st-bidding) 35%, transparent)' }}><Flame className="h-3 w-3" />Due soon</span>}
@@ -210,15 +225,15 @@ export function BidPipeline({ bids = [], allBids = bids, belowFloorByBid = {}, o
                       <i className="block h-full rounded" style={{ width: `${prob}%`, background: probColor }} />
                     </div>
                     <div className="mt-2.5 flex items-center gap-2 border-t border-border pt-2.5 text-[11.5px] text-muted-foreground">
-                      <span className="inline-flex items-center gap-1"><FootIcon className="h-3.5 w-3.5" />{s.key === 'won' ? 'Won' : s.key === 'submitted' ? 'Due' : ''} {bid.due_date ? fmtDate(bid.due_date) : 'No date'}</span>
-                      <span>· {prob}%</span>
+                      <span className="inline-flex items-center gap-1"><FootIcon className="h-3.5 w-3.5" />{bid.due_date ? `${s.key === 'won' ? 'Won ' : s.key === 'submitted' ? 'Due ' : ''}${fmtDate(bid.due_date)}` : '—'}</span>
+                      <span>· {hasProb ? `${prob}%` : '—'}</span>
                       {bid.owner_name && <Initials name={bid.owner_name} />}
                     </div>
-                    {(onStatusChange || renderActions) && (
-                      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 empty:hidden" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
-                        {/* Mobile has no drag: keep the status dropdown there */}
-                        {onStatusChange && <div className="xl:hidden"><BidStatusSelect value={bid.status} onChange={(v) => onStatusChange(bid, v)} className="h-8 w-[140px]" /></div>}
-                        {renderActions?.(bid)}
+                    {/* No per-card status dropdown (not in mockup). Desktop: drag between columns.
+                        Touch / <1280px: tap the card -> BidDetail, whose Status card has BidStatusSelect (Won there also auto-creates the project). */}
+                    {renderActions && renderActions(bid) && (
+                      <div className="mt-2.5 flex items-center justify-end gap-2" draggable={false} onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                        {renderActions(bid)}
                       </div>
                     )}
                   </div>
@@ -381,6 +396,15 @@ export default function Bids() {
   const [view, setView] = useState('pipeline'); // 'pipeline' | 'list'
   const [tradeFilter, setTradeFilter] = useState('All');
   const [newBidStatus, setNewBidStatus] = useState(null); // preset status from a column's Add button
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Layout's <main> is the scroll container (overflow-y-auto) and is never reset on route change,
+  // so arriving on Bids from a scrolled page landed mid-page on phones (header/KPIs/trade chips above the fold).
+  useEffect(() => {
+    const scroller = document.querySelector('main');
+    if (scroller && typeof scroller.scrollTo === 'function') scroller.scrollTo({ top: 0 });
+    if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
+  }, []);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -597,8 +621,8 @@ export default function Bids() {
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-5 animate-slide-up">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-5">
+      {/* Header (mockup .ph): SALES eyebrow, "Bid Pipeline", subtitle; actions = search (desktop), Filters, New Bid */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-[hsl(var(--brand-gold,43_67%_47%))] font-bold text-xs mb-2 uppercase tracking-[.14em]">
             <Target className="h-4 w-4" />
@@ -611,12 +635,21 @@ export default function Bids() {
             Drag cards between stages — totals update live.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="relative hidden md:block w-56 lg:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Filter bids…" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 bg-card border-border rounded-xl" aria-label="Search bids" />
+          </div>
+          <Button type="button" variant="outline" onClick={() => setShowFilters((v) => !v)} aria-expanded={showFilters}
+            className="relative h-10 px-3.5 gap-2 rounded-xl border border-border bg-card text-foreground font-semibold">
+            <SlidersHorizontal className="h-4 w-4" />Filters
+            {(statusFilter !== 'All' || searchQuery) && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-[hsl(var(--brand-gold,43_67%_47%))]" />}
+          </Button>
           <Dialog open={showDialog} onOpenChange={(o) => { setShowDialog(o); if (!o) setNewBidStatus(null); }}>
             <DialogTrigger asChild>
               <Button 
                 onClick={() => { setEditingBid(null); setNewBidStatus(null); }}
-                className="h-10 px-4 gap-2 bg-[hsl(var(--brand-navy,214_68%_14%))] text-[hsl(var(--brand-gold,43_67%_47%))] dark:bg-[hsl(var(--brand-gold,43_67%_47%))] dark:text-[hsl(var(--brand-navy,214_68%_14%))] shadow-[0_8px_24px_-10px_hsl(var(--brand-gold,43_67%_47%))] hover:opacity-90 font-semibold"
+                className="h-10 px-4 gap-2 rounded-xl bg-[hsl(var(--brand-navy,214_68%_14%))] text-[hsl(var(--brand-gold,43_67%_47%))] dark:bg-[hsl(var(--brand-gold,43_67%_47%))] dark:text-[hsl(var(--brand-navy,214_68%_14%))] shadow-[0_8px_24px_-10px_hsl(var(--brand-gold,43_67%_47%))] hover:opacity-90 font-semibold"
               >
                 <Plus className="h-5 w-5" />
                 New Bid
@@ -643,83 +676,58 @@ export default function Bids() {
       {/* KPI cards (mockup) — computed from all queried bids */}
       <BidKpis bids={bids} />
 
-      {/* Trade tabs (division) + drag hint + scraper */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="inline-flex max-w-full overflow-x-auto rounded-xl border border-border bg-card p-1" role="tablist" aria-label="Trade">
-          {[{ value: 'All', label: 'All trades' }, ...DIVISIONS.filter((d) => d.value !== 'other' || bids.some((b) => b.division === 'other'))].map((d, i) => (
+      {/* Trade chips (division) + drag hint — mockup .seg row. Replaces the status/trade dropdowns. */}
+      <div className="flex items-center gap-2">
+        <div className="gsis-chips inline-flex max-w-full overflow-x-auto rounded-xl border border-border bg-card p-1" role="tablist" aria-label="Trade">
+          {[{ value: 'All', label: 'All trades' }, ...DIVISIONS.filter((d) => d.value !== 'other' || bids.some((b) => b.division === 'other'))].map((d) => (
             <button key={d.value} type="button" role="tab" aria-selected={tradeFilter === d.value} onClick={() => setTradeFilter(d.value)}
-              className={`${i > 1 ? 'hidden sm:inline-flex' : 'inline-flex'} h-8 items-center whitespace-nowrap px-3 rounded-lg text-[12.5px] font-medium transition-colors ${tradeFilter === d.value ? 'bg-muted text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+              className={`inline-flex flex-shrink-0 h-8 items-center whitespace-nowrap px-3 rounded-lg text-[12.5px] font-medium transition-colors ${tradeFilter === d.value ? 'bg-muted text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
               {d.value === 'fire_alarm' ? 'Fire alarm' : d.value === 'low_voltage' ? 'Low-voltage' : d.label}
             </button>
           ))}
         </div>
-        <span className="hidden xl:inline-flex items-center gap-1.5 text-xs text-muted-foreground ml-auto">
+        <span className="hidden xl:inline-flex items-center gap-1.5 text-xs text-muted-foreground ml-auto whitespace-nowrap">
           <MousePointer2 className="h-3.5 w-3.5" />Drag to move · drop in <b style={{ color: 'var(--st-won, #119A5B)' }}>Won</b> to convert
         </span>
-        <div className="xl:ml-0 ml-auto inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-          <Calendar className="h-3.5 w-3.5" />
-          {scraperStatus?.last_run
-            ? `Scraper ${fmtDate(scraperStatus.last_run, 'MMM d, h:mm a')} · ${scraperStatus.records_added ?? 0} added`
-            : 'Scraper never run · daily 6 AM PT'}
-          <Button size="sm" variant="ghost" className="h-7 px-2" disabled={runScraperMutation.isPending} onClick={() => runScraperMutation.mutate()} title="Run scraper now">
-            {runScraperMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-          </Button>
-        </div>
       </div>
 
-      {/* Search and status filter */}
-      <div className="flex flex-col md:flex-row gap-3 md:items-center">
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search title, client, agency..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-10 bg-card border-border rounded-lg"
-          />
-        </div>
-        {/* Segmented control on desktop (main stages), select on mobile / for all statuses */}
-        <div className="hidden lg:inline-flex rounded-lg border border-border bg-card p-1">
-          {['All', 'review', 'intake', 'off_pricing', 'estimated', 'submitted', 'won', 'lost'].map((status) => (
-            <button
-              key={status}
-              type="button"
-              onClick={() => setStatusFilter(status)}
-              className={`h-8 px-3 rounded-md text-sm font-medium transition-colors ${
-                statusFilter === status ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {bidStatusLabels[status]}
-            </button>
-          ))}
-        </div>
-        <div className="flex flex-wrap items-center gap-2 lg:ml-auto">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-10 rounded-lg border border-border bg-card px-3 text-sm"
-            aria-label="Filter by status"
-          >
+      {/* Filters panel (header "Filters" button): search on phones, status chips, view toggle, scraper. Same state as before. */}
+      {showFilters && (
+        <div className="rounded-2xl border border-border bg-card p-3 space-y-3" data-testid="bid-filters">
+          <div className="relative md:hidden">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Filter bids…" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 bg-card border-border rounded-xl" aria-label="Search bids" />
+          </div>
+          <div className="gsis-chips flex gap-1.5 overflow-x-auto" role="tablist" aria-label="Status">
             {bidStatuses.map((status) => (
-              <option key={status} value={status}>{bidStatusLabels[status] || status}</option>
-            ))}
-          </select>
-          <select value={tradeFilter} onChange={(e) => setTradeFilter(e.target.value)} className="sm:hidden h-10 rounded-lg border border-border bg-card px-2 text-sm" aria-label="Filter by trade">
-            <option value="All">All trades</option>
-            {DIVISIONS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
-          </select>
-          <span className="text-sm text-muted-foreground whitespace-nowrap">{filteredBids.length} shown</span>
-          <div className="inline-flex rounded-lg border border-border bg-card p-1" role="group" aria-label="View">
-            {[{ v: 'pipeline', icon: LayoutGrid, label: 'Pipeline' }, { v: 'list', icon: ListIcon, label: 'List' }].map((o) => (
-              <button key={o.v} type="button" onClick={() => setView(o.v)} title={o.label} aria-pressed={view === o.v}
-                className={`h-8 px-2.5 rounded-md text-sm inline-flex items-center gap-1 ${view === o.v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
-                <o.icon className="h-4 w-4" /><span className="hidden sm:inline">{o.label}</span>
+              <button key={status} type="button" role="tab" aria-selected={statusFilter === status} onClick={() => setStatusFilter(status)}
+                className={`flex-shrink-0 h-8 px-3 rounded-lg border text-[12.5px] font-medium whitespace-nowrap transition-colors ${statusFilter === status ? 'border-transparent bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:text-foreground'}`}>
+                {bidStatusLabels[status] || status}
               </button>
             ))}
           </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-muted-foreground whitespace-nowrap">{filteredBids.length} shown</span>
+            <div className="inline-flex rounded-lg border border-border bg-card p-1" role="group" aria-label="View">
+              {[{ v: 'pipeline', icon: LayoutGrid, label: 'Pipeline' }, { v: 'list', icon: ListIcon, label: 'List' }].map((o) => (
+                <button key={o.v} type="button" onClick={() => setView(o.v)} title={o.label} aria-pressed={view === o.v}
+                  className={`h-8 px-2.5 rounded-md text-sm inline-flex items-center gap-1 ${view === o.v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+                  <o.icon className="h-4 w-4" /><span>{o.label}</span>
+                </button>
+              ))}
+            </div>
+            <div className="ml-auto inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+              <Calendar className="h-3.5 w-3.5" />
+              {scraperStatus?.last_run
+                ? `Scraper ${fmtDate(scraperStatus.last_run, 'MMM d, h:mm a')} · ${scraperStatus.records_added ?? 0} added`
+                : 'Scraper never run · daily 6 AM PT'}
+              <Button size="sm" variant="ghost" className="h-7 px-2" disabled={runScraperMutation.isPending} onClick={() => runScraperMutation.mutate()} title="Run scraper now">
+                {runScraperMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {view === 'pipeline' && filteredBids.length > 0 && (
         <BidPipeline
