@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
+import { useNavigate } from 'react-router-dom';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 
 const AuthContext = createContext();
@@ -17,6 +18,8 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState(null);
   const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
   const loadFinishedRef = useRef(false);
+  // PERF (Fix 2): in-app redirect instead of full reload. AuthProvider is rendered inside <Router> (App.jsx RouteGate).
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadFinishedRef.current = false;
@@ -200,9 +203,9 @@ export const AuthProvider = ({ children }) => {
         // which re-ran checkUserAuth and fed the reload loop. RoleGuard handles disallowed pages client-side.
         const isEntry = segment === 'Home' || segment === 'Login' || segment === 'Landing';
         if (isEntry && role === 'technician') {
-          window.location.replace(`${window.location.origin}${base}/TechnicianPortal`);
+          navigate('/TechnicianPortal', { replace: true }); // Router basename supplies base
         } else if (isEntry && role === 'client') {
-          window.location.replace(`${window.location.origin}${base}/ClientPortal`);
+          navigate('/ClientPortal', { replace: true });
         }
       } catch (_) {}
       return true;
