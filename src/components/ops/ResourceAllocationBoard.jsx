@@ -213,7 +213,8 @@ export default function ResourceAllocationBoard({ organizationId, projectId, pha
   const ROW_MIN = 68;
 
   return (
-    <div className="text-foreground text-sm">
+    <div className="rab-root text-foreground text-sm">
+      <style>{RAB_THEME_CSS}</style>
       {/* .ph */}
       <div className="flex flex-wrap items-end justify-between gap-5 mb-[22px]">
         <div className="min-w-0 relative" style={{ touchAction: "pan-y" }} onTouchStart={onHeadTouchStart} onTouchEnd={onHeadTouchEnd}
@@ -326,7 +327,7 @@ export default function ResourceAllocationBoard({ organizationId, projectId, pha
                       <b className="block text-[13px] leading-tight whitespace-normal [overflow-wrap:normal] sm:truncate">{row.name}</b>
                       <small className="hidden sm:block text-[11px] text-muted-foreground truncate">{row.type === "tech" ? row.email || "Tech" : "Equipment"}</small>
                     </div>
-                    <span className="ml-auto text-[11px] font-bold tabular-nums" style={{ color: utilColor(util) }}>{util}%</span>
+                    <span className="ml-auto shrink-0 whitespace-nowrap text-[11px] font-bold tabular-nums" style={{ color: utilColor(util) }}>{util}%</span>
                   </div>
                   {/* .rb-row */}
                   <div className="relative grid border-b border-border" style={{ gridColumn: "2 / -1", gridTemplateColumns: `repeat(${N}, minmax(0,1fr))`, minHeight: rowH }}>
@@ -395,15 +396,17 @@ export default function ResourceAllocationBoard({ organizationId, projectId, pha
 const GOLD = "var(--brand-gold, hsl(var(--ring)))";
 const GOLD2 = "var(--brand-gold-2, var(--brand-gold, hsl(var(--ring))))";
 const GOLD3 = "color-mix(in srgb, var(--brand-gold-2, var(--brand-gold, hsl(var(--ring)))) 60%, hsl(var(--foreground)))";
-const NAVY = "var(--brand-navy, hsl(var(--primary)))";
+const NAVY = "var(--rab-navy)";
+// Dark theme maps --primary to gold, so navy surfaces use --secondary there.
+const RAB_THEME_CSS = `.rab-root{--rab-navy:var(--brand-navy, hsl(var(--primary)));}html.dark .rab-root,html.theme-dark .rab-root,html[data-theme="dark"] .rab-root{--rab-navy:var(--brand-navy, hsl(var(--secondary)));}`;
 const DANGER = "hsl(var(--destructive))";
 const GREEN = "hsl(var(--success, var(--chart-3)))";
 const AMBER = "hsl(var(--warning, var(--chart-5)))";
 const MUTED = "hsl(var(--muted-foreground))";
 const FG = "hsl(var(--foreground))";
 const mix = (c, pct) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
-const HEAD_BG = "color-mix(in srgb, var(--brand-navy, hsl(var(--primary))) 85%, hsl(var(--card)))";
-const TECH_BG = "color-mix(in srgb, var(--brand-navy, hsl(var(--primary))) 45%, hsl(var(--card)))";
+const HEAD_BG = "color-mix(in srgb, var(--rab-navy) 85%, hsl(var(--card)))";
+const TECH_BG = "color-mix(in srgb, var(--rab-navy) 45%, hsl(var(--card)))";
 const SHADOW = `0 1px 0 ${mix("hsl(var(--foreground))", 4)} inset, 0 10px 30px -12px ${mix("hsl(var(--background))", 55)}, 0 2px 6px -2px ${mix("hsl(var(--background))", 35)}`;
 const PALETTE = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))", "var(--brand-gold, hsl(var(--ring)))"];
 const AV_PALETTE = ["hsl(var(--chart-2))", "hsl(var(--chart-4))", "hsl(var(--chart-5))", "hsl(var(--chart-3))", "hsl(var(--chart-1))"];
