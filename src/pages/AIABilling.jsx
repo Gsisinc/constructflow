@@ -545,10 +545,29 @@ function BillingTab({ invoices, payApps, projects, projName }) {
   return (
     <Card title={`All invoices & pay apps · ${rows.length}`} icon={Banknote}
       right={<div className="flex flex-wrap gap-2 no-print">
-        <div className="relative flex-1 sm:flex-none"><Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-navy-300" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search no., client, job" className="h-8 pl-7 pr-2 w-full sm:w-48 rounded-md ring-1 ring-navy-100 focus:ring-2 focus:ring-gold-500 outline-none text-[12px]" /></div>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className="h-8 rounded-md ring-1 ring-navy-100 text-[12px] px-2">{['all', 'draft', 'sent', 'overdue', 'submitted', 'paid'].map((s) => <option key={s}>{s}</option>)}</select>
+        <div className="relative flex-1 sm:flex-none"><Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-navy-300" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search no., client, job" className="h-10 sm:h-8 pl-7 pr-2 w-full sm:w-48 rounded-md ring-1 ring-navy-100 focus:ring-2 focus:ring-gold-500 outline-none text-[12px]" /></div>
+        <select value={status} onChange={(e) => setStatus(e.target.value)} className="h-10 sm:h-8 rounded-md ring-1 ring-navy-100 text-[12px] px-2">{['all', 'draft', 'sent', 'overdue', 'submitted', 'paid'].map((s) => <option key={s}>{s}</option>)}</select>
       </div>}>
-      <div className="overflow-x-auto">
+      <div className="space-y-2 block sm:hidden">
+        {rows.map((r) => (
+          <div key={r.kind + r.id} className="rounded-lg ring-1 ring-navy-100 p-3 text-[12px] space-y-1">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0"><span className="text-[10px] font-bold uppercase text-navy-500">{r.kind}</span>
+                <div className="font-semibold text-navy-900">{r.no || <Missing why={r.kind === 'Invoice' ? 'SalesInvoice.invoice_number' : 'PayApplication.application_number'} />}</div></div>
+              <StatusPill s={r.status} />
+            </div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">Project</span><span className="text-right">{projName(r.project_id) || <Missing why="project_id empty or not found" />}</span></div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">Client</span><span className="text-right">{r.who || <Missing why={r.kind === 'Invoice' ? 'SalesInvoice.customer_name' : 'Project.client_name'} />}</span></div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">Date</span><span className="text-right"><D d={r.date} /></span></div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">Due</span><span className="text-right">{r.kind === 'Invoice' ? <D d={r.due} /> : <span className="text-slate-400">n/a</span>}</span></div>
+            <div className="flex justify-between gap-2 font-semibold text-navy-900"><span className="text-slate-500 font-normal">Amount</span><Fig value={safeNum(r.amount)} missing={!has(r.amount)} source={r.kind === 'Invoice' ? 'SalesInvoice.total_amount' : 'PayApplication.net_amount_due'} /></div>
+            <button type="button" onClick={() => setDoc(r)} className="mt-1 w-full min-h-[40px] inline-flex items-center justify-center gap-1.5 rounded-md ring-1 ring-navy-100 text-navy-900 font-semibold hover:bg-navy-50"><Eye className="h-4 w-4 text-navy-300" />View {r.kind.toLowerCase()}</button>
+          </div>
+        ))}
+        {!rows.length && <div className="text-slate-400 py-8 text-center text-[13px]">No invoices or pay apps</div>}
+        {rows.length > 0 && <div className="flex justify-between gap-2 rounded-lg bg-navy-900 text-white font-semibold p-3 text-[13px]"><span>Total (listed)</span><span>{fmtMoney(total)}</span></div>}
+      </div>
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-[13px]">
           <thead className="bg-navy-50"><tr><Th>Type</Th><Th>No.</Th><Th>Project</Th><Th>Client</Th><Th>Date</Th><Th>Due</Th><Th>Status</Th><Th r>Amount</Th><Th /></tr></thead>
           <tbody>
@@ -646,7 +665,27 @@ function WipTab({ wipRows }) {
   );
   return (
     <Card title="Work in progress · billed vs earned" icon={Calculator} right={<Button size="sm" onClick={() => setOpen(true)} className="no-print gap-1.5 bg-navy-900 hover:bg-navy-700 text-white"><Eye className="h-4 w-4 text-gold-500" />Preview WIP PDF</Button>}>
-      <div className="overflow-x-auto">{table}</div>
+      <div className="space-y-2 block sm:hidden">
+        {wipRows.map((r) => (
+          <div key={r.id} className="rounded-lg ring-1 ring-navy-100 p-3 text-[12px] space-y-1">
+            <div className="font-semibold text-navy-900">{r.name}</div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">Contract</span><Fig value={r.contract} missing={r.contractMissing} source="Project.budget + Σ ChangeOrder.cost_impact (approved|executed)" why="Project.budget not set" /></div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">EAC</span><Fig value={r.eac} missing={r.eacMissing} source="Project.projected_final_cost, else cost + Project.cost_to_complete" why="No EAC on project" /></div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">Cost to date</span><Fig value={r.cost} source="Σ Expense.amount (all statuses)" /></div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">% complete</span><span className="text-right">{r.eacMissing ? <Missing why="needs EAC" /> : `${(r.pct * 100).toFixed(1)}%`}<SourceTag source="cost to date ÷ EAC, capped at 100%" /></span></div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">Earned</span><Fig value={r.earned} missing={r.eacMissing || r.contractMissing} source="% complete × contract" /></div>
+            <div className="flex justify-between gap-2"><span className="text-slate-500">Billed</span><Fig value={r.billed} source="Σ SalesInvoice.total_amount (status ≠ draft)" /></div>
+            <div className={`flex justify-between gap-2 ${r.overUnder > 0.005 ? 'text-amber-700 font-semibold' : r.overUnder < -0.005 ? 'text-navy-700' : ''}`}><span className="text-slate-500 font-normal">Over / (Under)</span>
+              <span className="text-right">{r.eacMissing ? <Missing why="needs EAC" /> : <>{r.overUnder < 0 ? `(${fmtMoney(-r.overUnder)})` : fmtMoney(r.overUnder)}<span className="ml-1 text-[10px]">{r.overUnder > 0.005 ? 'Over' : r.overUnder < -0.005 ? 'Under' : ''}</span></>}<SourceTag source="billed − earned" /></span></div>
+          </div>
+        ))}
+        {!wipRows.length && <div className="text-slate-400 text-[12px]">No projects</div>}
+        {wipRows.length > 0 && <div className="rounded-lg bg-navy-900 text-white font-semibold p-3 text-[12px] space-y-1">
+          <div>Totals</div>
+          {[['Contract', 'contract'], ['EAC', 'eac'], ['Cost to date', 'cost'], ['Earned', 'earned'], ['Billed', 'billed'], ['Over / (Under)', 'overUnder']].map(([lbl, k]) => <div key={k} className="flex justify-between gap-2"><span className="font-normal">{lbl}</span><span>{fmtMoney(T(k))}</span></div>)}
+        </div>}
+      </div>
+      <div className="hidden sm:block overflow-x-auto">{table}</div>
       <p className="mt-3 text-[11px] text-slate-500">Math matches the fixed WIP report in Job Costing (cost-to-cost). Jobs without an EAC show MISSING instead of 0% complete.</p>
       <DocumentPreview open={open} onOpenChange={setOpen} title="WIP Report" filename={`GSIS-WIP-${todayISO()}.pdf`} email={{ subject: `GSIS WIP Report ${fmtDate(todayISO())}`, body: 'Attached is the current WIP report.' }}>
         <GSISLetterhead docTitle="WIP Report" docDate={fmtDate(todayISO())} />{table}
