@@ -794,6 +794,18 @@ function EstimateForm({ estimate, seed, bid, bidTitle, organizationId, isEditing
         </CardContent>
       </Card>
 
+      {/* Live customer preview: renders from the same in-memory formData as the inputs above (no save/refresh needed) */}
+      <Card className="rounded-xl border-border">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2"><Eye className="h-4 w-4 text-primary" />Customer preview</CardTitle>
+        </CardHeader>
+        <CardContent className="bg-muted/40 p-2 sm:p-4 overflow-x-auto">
+          <div className="min-w-[640px]">
+            <EstimatePreview estimate={formData} bid={pdfBid} />
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Blueprints & Drawing Analysis now live under the Estimate tab */}
       {bid && <DrawingSection bid={bid} organizationId={organizationId} onApplyTakeoff={applyTakeoff} />}
 
