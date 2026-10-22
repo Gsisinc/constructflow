@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { jsPDF } from 'jspdf';
 import { base44 } from '@/api/base44Client';
@@ -795,14 +795,14 @@ function EstimateForm({ estimate, seed, bid, bidTitle, organizationId, isEditing
       </Card>
 
       {/* Live customer preview: renders from the same in-memory formData as the inputs above (no save/refresh needed) */}
-      <Card className="rounded-xl border-border">
+      <Card className="rounded-xl border-border mb-24 md:mb-0">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2"><Eye className="h-4 w-4 text-primary" />Customer preview</CardTitle>
         </CardHeader>
-        <CardContent className="bg-muted/40 p-2 sm:p-4 overflow-x-auto">
-          <div className="min-w-[640px]">
+        <CardContent className="bg-muted/40 p-2 sm:p-4">
+          <FitToWidth width={640}>
             <EstimatePreview estimate={formData} bid={pdfBid} />
-          </div>
+          </FitToWidth>
         </CardContent>
       </Card>
 
@@ -1094,6 +1094,37 @@ function DrawingSection({ bid, organizationId, onApplyTakeoff }) {
   );
 }
 
+// Scale a fixed-width child down to the container width (never up), like a mini PDF.
+function FitToWidth({ width = 640, children }) {
+  const outerRef = useRef(null);
+  const innerRef = useRef(null);
+  const [scale, setScale] = useState(1);
+  const [height, setHeight] = useState(null);
+  useLayoutEffect(() => {
+    const outer = outerRef.current;
+    const inner = innerRef.current;
+    if (!outer || !inner) return undefined;
+    const measure = () => {
+      const s = Math.min(1, (outer.clientWidth || width) / width);
+      setScale(s);
+      setHeight(inner.offsetHeight * s);
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(outer);
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, [width]);
+  return (
+    <div ref={outerRef} className="w-full overflow-hidden" style={height != null ? { height } : undefined}>
+      <div ref={innerRef} style={{ width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 // HTML twin of buildEstimatePdf: same lines, same totals, no internal numbers.
 export function EstimatePreview({ estimate, bid }) {
   const { lines, subtotal, total } = useMemo(() => buildCustomerLines(estimate), [estimate]);
@@ -1118,9 +1149,9 @@ export function EstimatePreview({ estimate, bid }) {
       <div className="h-1 bg-[#C9A227]" />
       <div className="px-6 py-5 space-y-5">
         <div className="grid grid-cols-3 gap-4">
-          <div><p className="text-[9px] font-bold uppercase text-[#C9A227]">Prepared for</p><p className="font-bold text-[12px]">{bid.client_name || bid.agency || bid.gc_name || 'Customer'}</p></div>
-          <div><p className="text-[9px] font-bold uppercase text-[#C9A227]">Project</p><p className="font-bold text-[12px]">{bid.title || bid.project_name || 'Project'}</p>{bid.location && <p className="text-slate-500">{bid.location}</p>}</div>
-          <div><p className="text-[9px] font-bold uppercase text-[#C9A227]">Estimate details</p>
+          <div><p className="text-[9px] font-bold uppercase text-[#C9A227] dark:text-[#7A5F0F]">Prepared for</p><p className="font-bold text-[12px]">{bid.client_name || bid.agency || bid.gc_name || 'Customer'}</p></div>
+          <div><p className="text-[9px] font-bold uppercase text-[#C9A227] dark:text-[#7A5F0F]">Project</p><p className="font-bold text-[12px]">{bid.title || bid.project_name || 'Project'}</p>{bid.location && <p className="text-slate-500">{bid.location}</p>}</div>
+          <div><p className="text-[9px] font-bold uppercase text-[#C9A227] dark:text-[#7A5F0F]">Estimate details</p>
             <p className="flex justify-between"><span className="text-slate-500">Date</span><span>{fmtDateLong(new Date())}</span></p>
             <p className="flex justify-between"><span className="text-slate-500">Valid for</span><span>30 days</span></p>
           </div>
@@ -1135,7 +1166,7 @@ export function EstimatePreview({ estimate, bid }) {
                 <td className="px-2 py-1.5">{i + 1}</td><td className="px-2 py-1.5">{l.description}</td><td className="px-2 py-1.5 text-right">{l.quantity}</td><td className="px-2 py-1.5">{l.unit}</td><td className="px-2 py-1.5 text-right">{fmtMoney(l.unit_price)}</td><td className="px-2 py-1.5 text-right font-bold">{fmtMoney(l.amount)}</td>
               </tr>
             ))}
-            {!lines.length && <tr><td colSpan={6} className="px-2 py-3 text-slate-400">No line items.</td></tr>}
+            {!lines.length && <tr><td colSpan={6} className="px-2 py-3 text-slate-400 dark:text-slate-600">No line items.</td></tr>}
           </tbody>
         </table>
         <div className="ml-auto w-56 space-y-1">
@@ -1146,9 +1177,9 @@ export function EstimatePreview({ estimate, bid }) {
         {notes.length > 0 && (
           <div><p className="font-bold">Notes</p><div className="mb-1 h-0.5 w-10 bg-[#C9A227]" /><ul className="list-disc ml-4 text-slate-600">{notes.map((n, i) => <li key={i}>{n}</li>)}</ul></div>
         )}
-        <div><p className="font-bold">Terms &amp; Conditions</p><div className="mb-1 h-0.5 w-10 bg-[#C9A227]" /><ul className="list-disc ml-4 text-slate-600">{DEFAULT_TERMS.map((n, i) => <li key={i}>{n}</li>)}</ul></div>
+        <div><p className="font-bold">Terms &amp; Conditions</p><div className="mb-1 h-0.5 w-10 bg-[#C9A227]" /><ul className="list-disc ml-4 text-slate-600 dark:text-slate-700">{DEFAULT_TERMS.map((n, i) => <li key={i}>{n}</li>)}</ul></div>
       </div>
-      <div className="mx-6 flex justify-between border-t border-[#C9A227] py-2 text-[9px] text-slate-500"><span>{GSIS_COMPANY.name} | {GSIS_COMPANY.license}</span><span>Page 1 of 1</span></div>
+      <div className="mx-6 flex justify-between border-t border-[#C9A227] py-2 text-[9px] text-slate-500 dark:text-slate-600"><span>{GSIS_COMPANY.name} | {GSIS_COMPANY.license}</span><span>Page 1 of 1</span></div>
     </div>
   );
 }
