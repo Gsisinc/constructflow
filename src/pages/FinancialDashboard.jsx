@@ -8,6 +8,14 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
 const safeNum = (n) => (Number.isFinite(n) ? n : 0);
+// B14-11 A5: PurchaseOrder has no `amount` field; its total lives in `total` (written by PurchaseOrders.jsx POForm).
+// An absent/non-numeric total is null (MISSING), never 0.
+const poTotalOrNull = (po) => {
+  const v = po?.total;
+  if (v === null || v === undefined || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
 
 export default function FinancialDashboard() {
   const [projects, setProjects] = useState([]);
@@ -104,7 +112,11 @@ export function ProjectFinancials({ projectId, project }) {
     .filter(c => c.status === 'pending_review' || c.status === 'client_review' || c.status === 'draft')
     .reduce((s, c) => s + safeNum(c.cost_impact), 0);
   const revisedBudget = originalBudget + approvedCO;
-  const committed = [...data.pos, ...data.subs].reduce((s, r) => s + safeNum(r.total || r.amount || r.value), 0);
+  const poTotals = data.pos.map(poTotalOrNull);
+  const poMissingCount = poTotals.filter((v) => v === null).length;
+  const committedPOs = poTotals.reduce((s, v) => s + (v === null ? 0 : v), 0);
+  const committedSubs = data.subs.reduce((s, r) => s + safeNum(r.total || r.amount || r.value), 0);
+  const committed = committedPOs + committedSubs;
   const actual = data.expenses.filter(e => e.status === 'paid' || e.status === 'approved').reduce((s, e) => s + safeNum(e.amount), 0);
   const costToComplete = safeNum(project?.projected_final_cost) - actual;
   const eac = actual + committed + costToComplete;
@@ -115,7 +127,7 @@ export function ProjectFinancials({ projectId, project }) {
     { label: 'Original Budget (locked estimate)', value: originalBudget, bold: true },
     { label: 'Approved Change Orders', value: approvedCO },
     { label: 'Revised Budget', value: revisedBudget, bold: true },
-    { label: 'Committed (POs + Subcontracts)', value: committed },
+    { label: poMissingCount > 0 ? `Committed (POs + Subcontracts) · ${poMissingCount} PO total MISSING` : 'Committed (POs + Subcontracts)', value: committed },
     { label: 'Actual to Date', value: actual },
     { label: 'Cost to Complete (PM entry)', value: costToComplete },
     { label: 'Estimate at Completion', value: eac, bold: true },
@@ -152,6 +164,9 @@ export function ProjectFinancials({ projectId, project }) {
               </tr>
             </tbody>
           </table>
+          {poMissingCount > 0 && (
+            <p className="text-xs text-amber-600 mt-3">⚠ {poMissingCount} PO{poMissingCount === 1 ? '' : 's'} on this project have no total: MISSING (excluded from Committed, not counted as $0).</p>
+          )}
           {pendingCO > 0 && (
             <p className="text-xs text-amber-600 mt-3">⚠ {fmt(pendingCO)} in pending change orders shown as risk only.</p>
           )}
