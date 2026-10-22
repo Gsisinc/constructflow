@@ -73,6 +73,15 @@ export default function PurchaseInvoices() {
     }
   };
 
+  // B14-11 A3 (client-side only; the PO query above is unchanged).
+  // Hide cancelled POs from the invoice picker, but keep the PO this invoice is already linked to so the select still shows it.
+  const pickerPOs = purchaseOrders.filter((po) => po && (po.status !== 'cancelled' || (editing && po.id === editing.linked_po_id)));
+  const hiddenCancelledCount = purchaseOrders.length - pickerPOs.length;
+  // "POs without a project": count only, from data already loaded. NOTE: loadPOs filters by project_id,
+  // so POs with no project (D1-type) are never returned here; this count can only catch blank/mismatched project_id
+  // values that slip through. A true org-wide count needs a separate PO query (not added; see README A3).
+  const posWithoutProjectCount = purchaseOrders.filter((po) => po && !po.project_id).length;
+
   if (loading && !user) {
     return <div className="p-8 text-slate-500">Loading…</div>;
   }
@@ -117,11 +126,19 @@ export default function PurchaseInvoices() {
                   invoice={editing}
                   rateCards={rateCards}
                   suppliers={suppliers}
-                  purchaseOrders={purchaseOrders}
+                  purchaseOrders={pickerPOs}
+                  invoices={invoices}
                   onSave={handleSave}
                   onCancel={() => { setShowForm(false); setEditing(null); }}
                 />
               </div>
+            </div>
+          )}
+
+          {(hiddenCancelledCount > 0 || posWithoutProjectCount > 0) && (
+            <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 flex flex-wrap gap-x-4 gap-y-1">
+              {hiddenCancelledCount > 0 && <span>{hiddenCancelledCount} cancelled PO{hiddenCancelledCount === 1 ? '' : 's'} hidden from the PO picker</span>}
+              {posWithoutProjectCount > 0 && <span>⚠ POs without a project: {posWithoutProjectCount}</span>}
             </div>
           )}
 
