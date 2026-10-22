@@ -46,6 +46,14 @@
           "total": {
             "type": "number",
             "default": 0
+          },
+          "cost_code": {
+            "type": "string",
+            "description": "Cost code carried from the linked PO line (optional)"
+          },
+          "po_line_id": {
+            "type": "string",
+            "description": "line_id of the matched PurchaseOrder line item (optional)"
           }
         }
       }
@@ -57,6 +65,10 @@
     "tax_amount": {
       "type": "number",
       "default": 0
+    },
+    "shipping_amount": {
+      "type": "number",
+      "description": "Shipping/freight billed on this invoice (optional)"
     },
     "total_amount": {
       "type": "number",
