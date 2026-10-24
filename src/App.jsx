@@ -115,7 +115,8 @@ const AuthenticatedApp = () => {
     if (!(isLoadingPublicSettings || isLoadingAuth)) setShowLoadingFallback(false);
   }, [isLoadingPublicSettings, isLoadingAuth]);
 
-  if (isLoadingPublicSettings || isLoadingAuth) {
+  // ONBOARDING FIX: only block on the first load; a background refresh must not unmount the routes.
+  if ((isLoadingPublicSettings || isLoadingAuth) && !user) {
     return (
       <FullPageStatus
         title="Loading your workspace"
