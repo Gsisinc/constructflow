@@ -7,14 +7,44 @@ import { Input } from '@/components/ui/input';
 import { AlertCircle, Building2, Wrench, UserCheck, Loader2, Search, ChevronRight, User, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/AuthContext';
+
+// inlined (no new file)
+// ONBOARDING FIX (new file: src/hooks/useOnboardingDraft.js)
+// Persists the Onboarding wizard step + typed fields in sessionStorage so a remount
+// (auth refresh, route guard, Layout re-render) never drops the user back to the 3-choice screen.
+
+const KEY = 'mygsis_onboarding_draft';
+
+const read = () => {
+  try { return JSON.parse(sessionStorage.getItem(KEY) || 'null') || {}; } catch (_) { return {}; }
+};
+
+function useOnboardingDraft(initial = { step: 'choice', orgName: '' }) {
+  const [draft, setDraft] = useState(() => ({ ...initial, ...read() }));
+  useEffect(() => {
+    try { sessionStorage.setItem(KEY, JSON.stringify(draft)); } catch (_) {}
+  }, [draft]);
+  const update = useCallback((patch) => setDraft((d) => ({ ...d, ...patch })), []);
+  const clear = useCallback(() => {
+    try { sessionStorage.removeItem(KEY); } catch (_) {}
+    setDraft(initial);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return [draft, update, clear];
+}
+
 
 const SEARCH_DEBOUNCE_MS = 350;
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [step, setStep] = useState('choice'); // choice | create | join
-  const [joinRole, setJoinRole] = useState(null); // 'technician' | 'client'
-  const [orgName, setOrgName] = useState('');
+  // ONBOARDING FIX: step / joinRole / orgName survive a remount (sessionStorage), cleared on success.
+  const { user: authUser, refreshUser } = useAuth();
+  const [draft, updateDraft, clearDraft] = useOnboardingDraft({ step: 'choice', joinRole: null, orgName: '' });
+  const { step, joinRole, orgName } = draft; // step: choice | create | join | profile
+  const setStep = (v) => updateDraft({ step: v });
+  const setJoinRole = (v) => updateDraft({ joinRole: v });
+  const setOrgName = (v) => updateDraft({ orgName: v });
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -36,6 +66,7 @@ export default function Onboarding() {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
         if (currentUser?.organization_id) {
+          clearDraft();
           navigate(createPageUrl('Dashboard'));
         }
       } catch (err) {
@@ -159,11 +190,12 @@ export default function Onboarding() {
     setError('');
   };
 
-  const doRedirect = () => {
+  const doRedirect = async () => {
     if (pendingRedirect) {
+      try { await refreshUser?.(); } catch (_) {} // pick up organization_id + role before leaving
       navigate(createPageUrl(pendingRedirect));
       setPendingRedirect(null);
-      setStep('choice');
+      clearDraft();
     }
   };
 
@@ -236,9 +268,9 @@ export default function Onboarding() {
           <p className="text-[#57534e] text-sm sm:text-base tracking-wide uppercase letter-spacing-wider">
             Let&apos;s get your workspace set up
           </p>
-          {user && (
+          {(user || authUser) && (
             <p className="text-[#78716c] text-xs sm:text-sm mt-3 font-medium">
-              Signed in as <span className="text-[#57534e]">{user.email}</span>
+              Signed in as <span className="text-[#57534e]">{(user || authUser).email}</span>
             </p>
           )}
         </div>
