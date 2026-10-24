@@ -164,11 +164,12 @@ export const AuthProvider = ({ children }) => {
       try { sessionStorage.setItem(PORTAL_ROLE_KEY, 'technician'); } catch (_) {}
     }
 
-    // 5) Fallback: default technician
+    // 5) Fallback (only reached with no org): ONBOARDING FIX - 'pending' (not technician), not persisted.
     if (!role) {
-      role = 'technician';
-      try { sessionStorage.setItem(PORTAL_ROLE_KEY, 'technician'); } catch (_) {}
+      role = 'pending';
     }
+    // ONBOARDING FIX: no org => never technician/client; RoleGuard sends 'pending' to Onboarding.
+    if (!currentUser?.organization_id && role !== 'admin') role = 'pending';
     return role;
   };
 
@@ -251,7 +252,8 @@ export const AuthProvider = ({ children }) => {
       appPublicSettings,
       logout,
       navigateToLogin,
-      checkAppState
+      checkAppState,
+      refreshUser: checkUserAuth // ONBOARDING FIX: safe now that App.jsx keeps routes mounted
     }}>
       {children}
     </AuthContext.Provider>
