@@ -397,6 +397,11 @@ export default function Bids() {
   const [tradeFilter, setTradeFilter] = useState('All');
   const [newBidStatus, setNewBidStatus] = useState(null); // preset status from a column's Add button
   const [showFilters, setShowFilters] = useState(false);
+  // Date sort + date-range filter (applies to pipeline columns and list view). Default: soonest due date first.
+  const [sortBy, setSortBy] = useState('due_asc'); // due_asc | due_desc | added_desc | added_asc
+  const [dateField, setDateField] = useState('due_date'); // field the range filter applies to: due_date | created_date
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   // Layout's <main> is the scroll container (overflow-y-auto) and is never reset on route change,
   // so arriving on Bids from a scrolled page landed mid-page on phones (header/KPIs/trade chips above the fold).
@@ -605,7 +610,22 @@ export default function Bids() {
       bid.client_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       bid.agency?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesTrade = tradeFilter === 'All' || bid.division === tradeFilter;
-    return matchesStatus && matchesSearch && matchesTrade;
+    // Date range: bids with no date on the chosen field are hidden only while a range is set.
+    const dayOf = (v) => (v ? String(v).slice(0, 10) : '');
+    const d = dayOf(bid[dateField]);
+    const matchesDate = (!dateFrom && !dateTo) || (d && (!dateFrom || d >= dateFrom) && (!dateTo || d <= dateTo));
+    return matchesStatus && matchesSearch && matchesTrade && matchesDate;
+  }).sort((a, b) => {
+    // Sort by due date (default, soonest first) or date added. Bids with no date always go last.
+    const key = sortBy.startsWith('due') ? 'due_date' : 'created_date';
+    const asc = sortBy.endsWith('_asc');
+    const ta = a[key] ? new Date(String(a[key]).length <= 10 ? `${a[key]}T00:00:00` : a[key]).getTime() : NaN;
+    const tb = b[key] ? new Date(String(b[key]).length <= 10 ? `${b[key]}T00:00:00` : b[key]).getTime() : NaN;
+    const aNo = Number.isNaN(ta), bNo = Number.isNaN(tb);
+    if (aNo && bNo) return 0;
+    if (aNo) return 1;
+    if (bNo) return -1;
+    return asc ? ta - tb : tb - ta;
   });
 
   const stats = {
@@ -643,7 +663,7 @@ export default function Bids() {
           <Button type="button" variant="outline" onClick={() => setShowFilters((v) => !v)} aria-expanded={showFilters}
             className="relative h-10 px-3.5 gap-2 rounded-xl border border-border bg-card text-foreground font-semibold">
             <SlidersHorizontal className="h-4 w-4" />Filters
-            {(statusFilter !== 'All' || searchQuery) && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-[hsl(var(--brand-gold,43_67%_47%))]" />}
+            {(statusFilter !== 'All' || searchQuery || dateFrom || dateTo) && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-[hsl(var(--brand-gold,43_67%_47%))]" />}
           </Button>
           <Dialog open={showDialog} onOpenChange={(o) => { setShowDialog(o); if (!o) setNewBidStatus(null); }}>
             <DialogTrigger asChild>
@@ -705,6 +725,35 @@ export default function Bids() {
                 {bidStatusLabels[status] || status}
               </button>
             ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-2" data-testid="bid-date-controls">
+            <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">Sort
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label="Sort bids"
+                className="h-8 rounded-lg border border-border bg-card px-2 text-[12.5px] text-foreground">
+                <option value="due_asc">Due date: soonest first</option>
+                <option value="due_desc">Due date: latest first</option>
+                <option value="added_desc">Date added: newest first</option>
+                <option value="added_asc">Date added: oldest first</option>
+              </select>
+            </label>
+            <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">Date
+              <select value={dateField} onChange={(e) => setDateField(e.target.value)} aria-label="Date to filter by"
+                className="h-8 rounded-lg border border-border bg-card px-2 text-[12.5px] text-foreground">
+                <option value="due_date">Due date</option>
+                <option value="created_date">Date added</option>
+              </select>
+            </label>
+            <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">From
+              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} aria-label="From date"
+                className="h-8 rounded-lg border border-border bg-card px-2 text-[12.5px] text-foreground" />
+            </label>
+            <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">To
+              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} aria-label="To date"
+                className="h-8 rounded-lg border border-border bg-card px-2 text-[12.5px] text-foreground" />
+            </label>
+            {(dateFrom || dateTo) && (
+              <button type="button" onClick={() => { setDateFrom(''); setDateTo(''); }} className="h-8 px-2.5 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground">Clear dates</button>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-muted-foreground whitespace-nowrap">{filteredBids.length} shown</span>
