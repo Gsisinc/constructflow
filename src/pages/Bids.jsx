@@ -447,13 +447,11 @@ export default function Bids() {
   const { data: bids = [], isLoading } = useQuery({
     queryKey: ['bids-all', user?.organization_id],
     queryFn: async () => {
-      // Load every bid visible to this org, including legacy records that have no
-      // organization_id set (the 26 imported bids). An $or keeps org-matched records
-      // and unassigned records, so nothing is hidden by the filter.
+      // Strict org isolation (Kemar): only this org's bids. Records with a blank
+      // organization_id are no longer shown. A user with no org sees nothing.
       const orgId = user?.organization_id;
-      const query = orgId
-        ? { $or: [{ organization_id: orgId }, { organization_id: { $in: [null, ''] } }, { organization_id: { $exists: false } }] }
-        : {};
+      if (!orgId) return [];
+      const query = { organization_id: orgId };
       const page = await base44.entities.BidOpportunity.filter(query, { sort: '-created_date', limit: 500 });
       return (page?.items || page || []).filter(b =>
         !b.title?.includes('Downtown Plaza') &&
@@ -540,7 +538,8 @@ export default function Bids() {
     queryKey: ['bid-estimates-all', user?.organization_id],
     queryFn: async () => {
       const orgId = user?.organization_id;
-      const query = orgId ? { organization_id: orgId } : {};
+      if (!orgId) return [];
+      const query = { organization_id: orgId };
       const page = await base44.entities.BidEstimate.filter(query, { limit: 500 });
       return page?.items || page || [];
     },
