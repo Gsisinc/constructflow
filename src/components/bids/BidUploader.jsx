@@ -12,6 +12,28 @@ import { toast } from 'sonner';
 import { loadPolicy, requirePermission } from '@/lib/permissions';
 import { parseLlmJsonResponse } from '@/lib/llmResponse';
 
+// Coerce any list into an array of plain non-empty strings (schema: array<string>).
+function toStringList(values) {
+  if (!Array.isArray(values)) return [];
+  return values
+    .map((v) => {
+      if (typeof v === 'string') return v.trim();
+      if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+      if (v && typeof v === 'object') {
+        const label = v.name || v.title || v.label || v.text || '';
+        const detail = v.date || v.value || v.description || '';
+        if (label && detail) return `${label}: ${detail}`.trim();
+        return String(label || detail || '').trim();
+      }
+      return '';
+    })
+    .filter((v) => typeof v === 'string' && v.length > 0);
+}
+
+function getErrorMessage(err) {
+  return err?.response?.data?.message || err?.data?.message || err?.message || 'Unknown error';
+}
+
 function mergeUnique(values = []) {
   return [...new Set(values.filter(Boolean))];
 }
@@ -219,10 +241,10 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
               location: aiResult.location,
               estimated_value: aiResult.estimated_value,
               due_date: aiResult.due_date,
-              requirements: aiResult.requirements.map((r) => r.text).filter(Boolean),
-              deadlines: aiResult.deadlines,
-              key_points: aiResult.key_points,
-              risk_factors: aiResult.risk_factors,
+              requirements: toStringList(aiResult.requirements.map((r) => r?.text)),
+              deadlines: toStringList(aiResult.deadlines),
+              key_points: toStringList(aiResult.key_points),
+              risk_factors: toStringList(aiResult.risk_factors),
               phases: aiResult.phases
             }
           });
@@ -259,14 +281,15 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
               ? aiResult.deadlines.map((d) => (typeof d === 'string' ? d : `${d.name || 'Deadline'}: ${d.date || ''}`))
               : [])
           );
-          aggregate.key_points.push(...aiResult.key_points);
-          aggregate.risk_factors.push(...aiResult.risk_factors);
+          aggregate.key_points.push(...toStringList(aiResult.key_points));
+          aggregate.risk_factors.push(...toStringList(aiResult.risk_factors));
           aggregate.phases.push(...aiResult.phases);
           if (aiResult.complexity_score > 0) aggregate.complexityScores.push(aiResult.complexity_score);
           if (aiResult.recommended_markup > 0) aggregate.markups.push(aiResult.recommended_markup);
         } catch (err) {
-          console.error('AI processing error for file:', file.name, err);
-          toast.error(`AI analysis failed for ${file.name}`);
+          const errMsg = getErrorMessage(err);
+          console.error('AI processing error for file:', file.name, errMsg, err?.response?.data || err?.data || '', err);
+          toast.error(`AI analysis failed for ${file.name}: ${errMsg}`);
         }
       }
 
@@ -286,13 +309,15 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
       const bidUpdate = {
         ai_analysis: {
           ...existingAi,
+          // Sanitize any declared string-list fields carried over from existing data
+          ...(existingAi.similar_projects !== undefined ? { similar_projects: toStringList(existingAi.similar_projects) } : {}),
           complexity_score: avgComplexity,
-          risk_factors: mergeUnique([...(existingAi.risk_factors || []), ...aggregate.risk_factors]),
+          risk_factors: mergeUnique([...toStringList(existingAi.risk_factors), ...aggregate.risk_factors]),
           recommended_markup: avgMarkup,
-          key_points: mergeUnique([...(existingAi.key_points || []), ...aggregate.key_points]),
-          deadlines: mergeUnique([...(existingAi.deadlines || []), ...aggregate.deadlines]),
-          extracted_requirements: mergeUnique([...(existingAi.extracted_requirements || []), ...aggregate.requirements]),
-          requirements_count: mergeUnique([...(existingAi.extracted_requirements || []), ...aggregate.requirements]).length,
+          key_points: mergeUnique([...toStringList(existingAi.key_points), ...aggregate.key_points]),
+          deadlines: mergeUnique([...toStringList(existingAi.deadlines), ...aggregate.deadlines]),
+          extracted_requirements: mergeUnique([...toStringList(existingAi.extracted_requirements), ...aggregate.requirements]),
+          requirements_count: mergeUnique([...toStringList(existingAi.extracted_requirements), ...aggregate.requirements]).length,
           phases: aggregate.phases.length > 0 ? aggregate.phases : (existingAi.phases || []),
           summary: aggregate.summaries[0] || existingAi.summary || '',
           analyzed_at: new Date().toISOString()
