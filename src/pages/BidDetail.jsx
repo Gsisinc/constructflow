@@ -51,12 +51,24 @@ const isValidDateStr = (v) => {
   return !Number.isNaN(new Date(s.length <= 10 ? `${s}T00:00:00` : s).getTime());
 };
 
+// Bid folders — same constant as Bids.jsx (duplicated; no shared file). Path stored in BidOpportunity.folder.
+export const BID_FOLDER_TREE = [
+  { name: 'Fire Alarm', children: ['ITM', 'Monitoring', 'Design', 'Install'] },
+  { name: 'Low Voltage', children: [] },
+];
+const BID_FOLDER_OPTIONS = BID_FOLDER_TREE.flatMap((r) => [
+  { value: r.name, label: r.name },
+  ...r.children.map((c) => ({ value: `${r.name}/${c}`, label: `${r.name} › ${c}` })),
+]);
+const folderLabel = (f) => String(f || '').split('/').join(' › ');
+
 // Editable bid text fields (all exist on BidOpportunity.jsonc as type string).
 const EDIT_FIELDS = [
   { key: 'client_name', label: 'Client / GC' },
   { key: 'agency', label: 'Agency' },
   { key: 'location', label: 'Location' },
   { key: 'source', label: 'Source' },
+  { key: 'folder', label: 'Folder', select: BID_FOLDER_OPTIONS },
   { key: 'notes', label: 'Notes', multiline: true },
 ];
 
@@ -136,6 +148,7 @@ export default function BidDetail() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
       queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+      queryClient.invalidateQueries({ queryKey: ['bids'] });
       setShowEditDetails(false);
       toast.success('Bid details saved');
     },
@@ -390,13 +403,18 @@ export default function BidDetail() {
         <DialogContent className="w-[calc(100vw-1.5rem)] max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit bid details</DialogTitle>
-            <DialogDescription>Update client, agency, location, source and notes.</DialogDescription>
+            <DialogDescription>Update client, agency, location, source, folder and notes.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            {EDIT_FIELDS.map(({ key, label, multiline }) => (
+            {EDIT_FIELDS.map(({ key, label, multiline, select }) => (
               <div key={key} className="space-y-1">
                 <Label htmlFor={`edit-${key}`}>{label}</Label>
-                {multiline ? (
+                {select ? (
+                  <select id={`edit-${key}`} className="w-full min-h-[44px] rounded-md border border-input bg-background px-3 text-sm" value={editForm[key] ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))}>
+                    <option value="">Unfiled</option>
+                    {select.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                ) : multiline ? (
                   <Textarea id={`edit-${key}`} rows={5} className="w-full" value={editForm[key] ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))} />
                 ) : (
                   <Input id={`edit-${key}`} className="w-full min-h-[44px]" value={editForm[key] ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))} />
@@ -1221,6 +1239,7 @@ function BidOverviewPanel({ bid, documents = [], statusColors = {} }) {
           </div>
           <dl className="space-y-1.5 text-sm">
             {bid.source ? <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Source</dt><dd className="font-medium text-right break-words min-w-0">{bid.source}</dd></div> : null}
+            <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Folder</dt><dd className="font-medium text-right break-words min-w-0">{bid.folder ? folderLabel(bid.folder) : 'Unfiled'}</dd></div>
             <div className="flex justify-between"><dt className="text-muted-foreground">Created</dt><dd className="font-medium">{safeDate(bid.created_date)}</dd></div>
             <div className="flex justify-between"><dt className="text-muted-foreground">Due</dt><dd className="font-medium">{isValidDateStr(bid.due_date) ? safeDate(bid.due_date) : '—'}</dd></div>
             <div className="flex justify-between"><dt className="text-muted-foreground">Last updated</dt><dd className="font-medium">{safeDate(bid.updated_date)}</dd></div>
