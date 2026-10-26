@@ -324,9 +324,8 @@ export default function Dashboard() {
   const { data: bidList = [], isLoading: loadingBids } = useQuery({
     queryKey: ['dash-bids-list', orgId],
     queryFn: async () => {
-      const query = orgId
-        ? { $or: [{ organization_id: orgId }, { organization_id: { $in: [null, ''] } }, { organization_id: { $exists: false } }] }
-        : {};
+      // Strict org isolation (Kemar): only this org's bids; blank-org bids are not counted.
+      const query = { organization_id: orgId };
       const page = await base44.entities.BidOpportunity.filter(query, { sort: '-created_date', limit: 500, fields: ['id', 'status', 'estimated_value', 'title', 'project_name', 'client_name', 'division', 'due_date', 'created_date', 'updated_date'] }); // DRAFT: extra fields so the pipeline needs no second bid read
       return (page?.items || page || []);
     },
