@@ -86,6 +86,26 @@ const isValidDateStr = (v) => {
 };
 // Clean numeric/date fields before create/update: blank or NaN never goes to the API (fixes 422).
 // Only touches keys already present. Create: drop the key. Update: send null to clear.
+
+// Bid folders (path stored in BidOpportunity.folder, e.g. "Fire Alarm/ITM"; '' = Unfiled). No Folder entity.
+export const BID_FOLDER_TREE = [
+  { name: 'Fire Alarm', children: ['ITM', 'Monitoring', 'Design', 'Install'] },
+  { name: 'Low Voltage', children: [] },
+];
+// Flat option list for pickers: roots then "Root/Child" paths.
+export const BID_FOLDER_OPTIONS = BID_FOLDER_TREE.flatMap((r) => [
+  { value: r.name, label: r.name },
+  ...r.children.map((c) => ({ value: `${r.name}/${c}`, label: `${r.name} › ${c}` })),
+]);
+const folderOf = (bid) => String(bid?.folder || '').trim();
+// sel: 'All' | 'Unfiled' | 'Root' | 'Root/Child'. Root includes all its children.
+const matchesFolder = (bid, sel) => {
+  if (sel === 'All') return true;
+  const f = folderOf(bid);
+  if (sel === 'Unfiled') return !f;
+  return f === sel || f.startsWith(sel + '/');
+};
+const folderLabel = (f) => String(f || '').split('/').join(' › ');
 const BID_NUM_FIELDS = ['estimated_value', 'win_probability'];
 const cleanBidPayload = (data, forUpdate = false) => {
   const out = { ...data };
@@ -97,6 +117,11 @@ const cleanBidPayload = (data, forUpdate = false) => {
   });
   if ('due_date' in out && !isValidDateStr(out.due_date)) {
     if (forUpdate) out.due_date = null; else delete out.due_date;
+  }
+  // folder: blank -> omitted on create, cleared with '' on update.
+  if ('folder' in out) {
+    const f = String(out.folder ?? '').trim();
+    if (f) out.folder = f; else if (forUpdate) out.folder = ''; else delete out.folder;
   }
   return out;
 };
@@ -238,6 +263,7 @@ export function BidPipeline({ bids = [], allBids = bids, belowFloorByBid = {}, o
                     <div className="mt-0.5 text-xs text-muted-foreground truncate">{bid.client_name || bid.agency || '—'}</div>
                     <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                       {bid.division && <TradeChip division={bid.division} label={division?.label || bid.division} />}
+                      {folderOf(bid) && <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground" data-testid="bid-folder-badge">{folderLabel(bid.folder)}</span>}
                       {dueSoon && <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold" style={{ color: 'var(--st-bidding)', background: 'color-mix(in srgb, var(--st-bidding) 14%, transparent)', border: '1px solid color-mix(in srgb, var(--st-bidding) 35%, transparent)' }}><Flame className="h-3 w-3" />Due soon</span>}
                       {belowFloorByBid[bid.id] && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-500/15 px-2 py-0.5 text-[11px] text-amber-800 dark:text-amber-300"><AlertTriangle className="h-3 w-3" />Below floor</span>
@@ -425,6 +451,11 @@ export default function Bids() {
   const [dateField, setDateField] = useState('due_date'); // field the range filter applies to: due_date | created_date
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  // Folder filter + bulk assign (list view)
+  const [folderFilter, setFolderFilter] = useState('All'); // All | Unfiled | Root | Root/Child
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [bulkFolder, setBulkFolder] = useState('');
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   // Layout's <main> is the scroll container (overflow-y-auto) and is never reset on route change,
   // so arriving on Bids from a scrolled page landed mid-page on phones (header/KPIs/trade chips above the fold).
@@ -636,7 +667,7 @@ export default function Bids() {
     const dayOf = (v) => (isValidDateStr(v) ? String(v).slice(0, 10) : '');
     const d = dayOf(bid[dateField]);
     const matchesDate = (!dateFrom && !dateTo) || (d && (!dateFrom || d >= dateFrom) && (!dateTo || d <= dateTo));
-    return matchesStatus && matchesSearch && matchesTrade && matchesDate;
+    return matchesStatus && matchesSearch && matchesTrade && matchesDate && matchesFolder(bid, folderFilter);
   }).sort((a, b) => {
     // Sort by due date (default, soonest first) or date added. Bids with no date always go last.
     const key = sortBy.startsWith('due') ? 'due_date' : 'created_date';
@@ -649,6 +680,52 @@ export default function Bids() {
     if (bNo) return -1;
     return asc ? ta - tb : tb - ta;
   });
+
+  // Folder chip counts (all bids, not narrowed by other filters).
+  const folderCounts = useMemo(() => {
+    const c = { All: bids.length, Unfiled: bids.filter((b) => !folderOf(b)).length };
+    BID_FOLDER_TREE.forEach((r) => {
+      c[r.name] = bids.filter((b) => matchesFolder(b, r.name)).length;
+      r.children.forEach((ch) => { const p = `${r.name}/${ch}`; c[p] = bids.filter((b) => matchesFolder(b, p)).length; });
+    });
+    return c;
+  }, [bids]);
+
+  // Quick assign: single bid via the existing update mutation path.
+  const assignFolder = (bid, folder) => {
+    if ((folder || '') === folderOf(bid)) return;
+    updateBidMutation.mutate({ id: bid.id, data: { folder: folder || '' } });
+  };
+  // Bulk assign: sequential awaited updates.
+  const shownIds = filteredBids.map((b) => b.id);
+  const allShownSelected = shownIds.length > 0 && shownIds.every((id) => selectedIds.includes(id));
+  const toggleSelected = (id) => setSelectedIds((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
+  const toggleSelectAllShown = () => setSelectedIds(allShownSelected ? selectedIds.filter((id) => !shownIds.includes(id)) : [...new Set([...selectedIds, ...shownIds])]);
+  const applyBulkFolder = async () => {
+    if (!selectedIds.length || bulkFolder === '') return;
+    const target = bulkFolder === '__unfiled__' ? '' : bulkFolder;
+    setBulkBusy(true);
+    let ok = 0; let failed = 0;
+    for (const id of selectedIds) {
+      try { await base44.entities.BidOpportunity.update(id, { folder: target }); ok += 1; } catch (e) { failed += 1; }
+    }
+    queryClient.invalidateQueries({ queryKey: ['bids'] });
+    queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+    setBulkBusy(false);
+    setSelectedIds([]);
+    setBulkFolder('');
+    if (failed) toast.warning(`Moved ${ok} bid(s) to ${target ? folderLabel(target) : 'Unfiled'} · ${failed} failed`);
+    else toast.success(`Moved ${ok} bid(s) to ${target ? folderLabel(target) : 'Unfiled'}`);
+  };
+  const folderRoot = folderFilter.split('/')[0];
+  const showFaChildren = BID_FOLDER_TREE.some((r) => r.name === folderRoot && r.children.length);
+  const FolderChip = ({ value, label, small }) => (
+    <button type="button" role="tab" aria-selected={folderFilter === value} onClick={() => setFolderFilter(value)}
+      className={`inline-flex flex-shrink-0 min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 ${small ? 'text-[12px]' : 'text-[13px] font-medium'} transition-colors ${folderFilter === value ? 'border-transparent bg-primary text-primary-foreground' : 'border-border bg-card text-muted-foreground hover:text-foreground'}`}>
+      {label}
+      <span className={`rounded-full px-1.5 text-[11px] tabular-nums ${folderFilter === value ? 'bg-primary-foreground/20' : 'bg-muted'}`}>{folderCounts[value] ?? 0}</span>
+    </button>
+  );
 
   const stats = {
     total: bids.length,
@@ -800,6 +877,20 @@ export default function Bids() {
         </div>
       )}
 
+      {/* Folder bar: All / Unfiled / roots; children of the selected root shown as subchips. Combines with all other filters; sort unchanged. */}
+      <div className="space-y-2" data-testid="bid-folder-bar">
+        <div className="gsis-chips flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Folder">
+          <FolderChip value="All" label="All" />
+          <FolderChip value="Unfiled" label="Unfiled" />
+          {BID_FOLDER_TREE.map((r) => <FolderChip key={r.name} value={r.name} label={r.name} />)}
+        </div>
+        {showFaChildren && (
+          <div className="gsis-chips flex gap-2 overflow-x-auto pb-1 pl-3" role="tablist" aria-label={`${folderRoot} subfolders`}>
+            {BID_FOLDER_TREE.find((r) => r.name === folderRoot).children.map((ch) => <FolderChip key={ch} value={`${folderRoot}/${ch}`} label={ch} small />)}
+          </div>
+        )}
+      </div>
+
       {view === 'pipeline' && filteredBids.length > 0 && (
         <BidPipeline
           bids={filteredBids}
@@ -808,7 +899,13 @@ export default function Bids() {
           onAdd={(status) => { setEditingBid(null); setNewBidStatus(status); setShowDialog(true); }}
           onOpen={(bid) => navigate(createPageUrl('BidDetail') + `?id=${bid.id}`)}
           onStatusChange={(bid, v) => { if (v === 'won') handleMarkWon(bid); else tagBidMutation.mutate({ id: bid.id, status: v }); }}
-          renderActions={(bid) => (bid.linked_project_id ? (
+          renderActions={(bid) => (<>
+            <select value={folderOf(bid)} onChange={(e) => assignFolder(bid, e.target.value)} aria-label="Move to folder" title="Move to folder"
+              className="mr-auto h-8 max-w-[140px] rounded-lg border border-border bg-card px-1.5 text-[11.5px] text-foreground">
+              <option value="">Move to… (Unfiled)</option>
+              {BID_FOLDER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            {bid.linked_project_id ? (
             <Button size="sm" variant="ghost" className="h-8 px-2 text-xs text-emerald-700 dark:text-emerald-300 gap-1"
               onClick={() => navigate(createPageUrl('ProjectDetail') + `?id=${bid.linked_project_id}`)}>
               <Briefcase className="h-3.5 w-3.5" /> Project
@@ -818,11 +915,30 @@ export default function Bids() {
               disabled={convertToProjectMutation.isPending} onClick={() => convertToProjectMutation.mutate(bid)}>
               <ArrowRight className="h-3.5 w-3.5" /> Convert
             </Button>
-          ) : null)}
+          ) : null}
+          </>)}
         />
       )}
 
       {/* Bids List */}
+      {view === 'list' && filteredBids.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card p-2.5" data-testid="bid-bulk-folder">
+          <label className="inline-flex min-h-[44px] items-center gap-2 px-1 text-sm text-foreground">
+            <input type="checkbox" className="h-5 w-5" checked={allShownSelected} onChange={toggleSelectAllShown} aria-label="Select all shown" />
+            Select all shown
+          </label>
+          <span className="text-xs text-muted-foreground">{selectedIds.length} selected</span>
+          <select value={bulkFolder} onChange={(e) => setBulkFolder(e.target.value)} aria-label="Move selected to folder"
+            className="min-h-[44px] flex-1 min-w-[160px] sm:flex-none rounded-lg border border-border bg-card px-2 text-sm text-foreground">
+            <option value="">Move selected to folder…</option>
+            <option value="__unfiled__">Unfiled (clear folder)</option>
+            {BID_FOLDER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          <Button type="button" className="min-h-[44px]" disabled={bulkBusy || !selectedIds.length || bulkFolder === ''} onClick={applyBulkFolder}>
+            {bulkBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Apply'}
+          </Button>
+        </div>
+      )}
       {(view === 'list' || filteredBids.length === 0) && (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {filteredBids.length === 0 ? (
@@ -848,6 +964,10 @@ export default function Bids() {
             >
               <CardContent className="p-5 space-y-4">
                 <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex items-start gap-2">
+                    <label className="-m-2 flex h-11 w-11 flex-shrink-0 items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                      <input type="checkbox" className="h-5 w-5" checked={selectedIds.includes(bid.id)} onChange={() => toggleSelected(bid.id)} aria-label="Select bid" />
+                    </label>
                   <div className="min-w-0">
                     <h3 className="text-base font-semibold text-primary leading-snug line-clamp-2 group-hover:underline">
                       {bid.title || bid.project_name || 'Untitled bid'}
@@ -856,6 +976,8 @@ export default function Bids() {
                       <Building2 className="h-3.5 w-3.5 flex-shrink-0" />
                       {bid.client_name || bid.agency || 'No customer'}
                     </p>
+                    {folderOf(bid) && <Badge variant="outline" className="mt-1.5 rounded-full px-2 py-0.5 text-[11px] font-normal text-muted-foreground">{folderLabel(bid.folder)}</Badge>}
+                  </div>
                   </div>
                   <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                     <Badge className={`${statusColors[bid.status] || 'bg-muted text-foreground'} rounded-full px-2.5 py-0.5 text-[11px] font-semibold`}>
@@ -889,6 +1011,13 @@ export default function Bids() {
                 </dl>
 
                 <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                  <label className="flex w-full items-center gap-2 text-xs text-muted-foreground">Folder
+                    <select value={folderOf(bid)} onChange={(e) => assignFolder(bid, e.target.value)} aria-label="Folder"
+                      className="min-h-[44px] flex-1 rounded-lg border border-border bg-card px-2 text-sm text-foreground">
+                      <option value="">Unfiled</option>
+                      {BID_FOLDER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </select>
+                  </label>
                   <BidStatusSelect
                     value={bid.status}
                     onChange={(v) => { if (v === 'won') handleMarkWon(bid); else tagBidMutation.mutate({ id: bid.id, status: v }); }}
@@ -941,6 +1070,7 @@ function BidForm({ bid, onSubmit, initialStatus }) {
     scope_of_work: '',
     location: '',
     url: '',
+    folder: '',
     win_probability: 50
   });
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -1206,6 +1336,18 @@ function BidForm({ bid, onSubmit, initialStatus }) {
         </div>
       </div>
       <div>
+        <label className="text-sm font-semibold">Folder</label>
+        <select
+          value={formData.folder || ''}
+          onChange={(e) => setFormData({ ...formData, folder: e.target.value })}
+          className="w-full border rounded p-2 min-h-[44px]"
+          aria-label="Folder"
+        >
+          <option value="">Unfiled</option>
+          {BID_FOLDER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+      </div>
+      <div>
         <label className="text-sm font-semibold">Owner</label>
         <Input
           value={formData.owner_name || ''}
@@ -1240,7 +1382,7 @@ function BidForm({ bid, onSubmit, initialStatus }) {
       </div>
       </div>
       )}
-      <Button onClick={() => onSubmit({ ...formData, source_files: uploadedFiles })} className="w-full sm:w-auto bg-primary hover:bg-primary/90 mt-4">
+      <Button onClick={() => onSubmit({ ...formData, folder: formData.folder || '', source_files: uploadedFiles })} className="w-full sm:w-auto bg-primary hover:bg-primary/90 mt-4">
         {bid ? 'Update Bid' : 'Create Bid'}
       </Button>
     </div>
