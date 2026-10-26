@@ -43,11 +43,30 @@ const statusColors = {
   closed: 'bg-muted text-foreground'
 };
 
+// Valid bid date: yyyy-MM-dd..., year >= 1990, parses. Rejects '0000-00-00' and other junk.
+const isValidDateStr = (v) => {
+  if (!v) return false;
+  const s = String(v);
+  if (!/^\d{4}-\d{2}-\d{2}/.test(s) || Number(s.slice(0, 4)) < 1990) return false;
+  return !Number.isNaN(new Date(s.length <= 10 ? `${s}T00:00:00` : s).getTime());
+};
+
+// Editable bid text fields (all exist on BidOpportunity.jsonc as type string).
+const EDIT_FIELDS = [
+  { key: 'client_name', label: 'Client / GC' },
+  { key: 'agency', label: 'Agency' },
+  { key: 'location', label: 'Location' },
+  { key: 'source', label: 'Source' },
+  { key: 'notes', label: 'Notes', multiline: true },
+];
+
 export default function BidDetail() {
   const [user, setUser] = useState(null);
   const [bidId, setBidId] = useState(null);
   const [showRfqDialog, setShowRfqDialog] = useState(false);
   const [rfqEmails, setRfqEmails] = useState('');
+  const [showEditDetails, setShowEditDetails] = useState(false);
+  const [editForm, setEditForm] = useState({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -112,6 +131,34 @@ export default function BidDetail() {
     onError: (e) => toast.error('Status update failed: ' + (e.message || ''))
   });
 
+  const editDetailsMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.BidOpportunity.update(id, data),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['bid', bidId] });
+      queryClient.invalidateQueries({ queryKey: ['bids-all'] });
+      setShowEditDetails(false);
+      toast.success('Bid details saved');
+    },
+    onError: (e) => toast.error('Save failed: ' + (e.message || ''))
+  });
+
+  const openEditDetails = () => {
+    const init = {};
+    EDIT_FIELDS.forEach(({ key }) => { init[key] = bid?.[key] ?? ''; });
+    setEditForm(init);
+    setShowEditDetails(true);
+  };
+
+  const saveEditDetails = () => {
+    const changed = {};
+    EDIT_FIELDS.forEach(({ key }) => {
+      const next = editForm[key] ?? '';
+      if (next !== (bid?.[key] ?? '')) changed[key] = next;
+    });
+    if (!Object.keys(changed).length) { setShowEditDetails(false); return; }
+    editDetailsMutation.mutate({ id: bid.id, data: changed });
+  };
+
   const analysis = useMemo(() => normalizeAiAnalysis(bid?.ai_analysis, documents), [bid?.ai_analysis, documents]);
 
   if (!bid || !user) {
@@ -139,6 +186,10 @@ export default function BidDetail() {
         </div>
 
         <div className="flex gap-2">
+          <Button variant="outline" onClick={openEditDetails} className="gap-2 min-h-[44px] sm:min-h-0" title="Edit details">
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Edit details</span>
+          </Button>
           {bid.linked_project_id ? (
             <Button onClick={() => navigate(createPageUrl('ProjectDetail') + `?id=${bid.linked_project_id}`)} className="gap-2">
               <ArrowLeft className="h-4 w-4 rotate-180" />
@@ -169,7 +220,7 @@ export default function BidDetail() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard icon={<Calendar className="h-8 w-8 text-amber-600 dark:text-amber-300" />} label="Due Date" value={bid.due_date ? format(new Date(String(bid.due_date).slice(0, 10) + 'T00:00:00'), 'MMM d, yyyy') : 'Not set'} />
+        <StatCard icon={<Calendar className="h-8 w-8 text-amber-600 dark:text-amber-300" />} label="Due Date" value={isValidDateStr(bid.due_date) ? format(new Date(String(bid.due_date).slice(0, 10) + 'T00:00:00'), 'MMM d, yyyy') : 'Not set'} />
         <StatCard icon={<DollarSign className="h-8 w-8 text-green-600 dark:text-green-300" />} label="Estimated Value" value={fmtDollars(bid.estimated_value || bid.value || 0)} />
         <StatCard icon={<TrendingUp className="h-8 w-8 text-primary" />} label="Win Probability" value={`${Number(bid.win_probability || 0)}%`} />
         <div className="md:col-span-2 lg:col-span-4">
@@ -334,6 +385,33 @@ export default function BidDetail() {
         </TabsContent>
 
       </Tabs>
+
+      <Dialog open={showEditDetails} onOpenChange={setShowEditDetails}>
+        <DialogContent className="w-[calc(100vw-1.5rem)] max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit bid details</DialogTitle>
+            <DialogDescription>Update client, agency, location, source and notes.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            {EDIT_FIELDS.map(({ key, label, multiline }) => (
+              <div key={key} className="space-y-1">
+                <Label htmlFor={`edit-${key}`}>{label}</Label>
+                {multiline ? (
+                  <Textarea id={`edit-${key}`} rows={5} className="w-full" value={editForm[key] ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))} />
+                ) : (
+                  <Input id={`edit-${key}`} className="w-full min-h-[44px]" value={editForm[key] ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))} />
+                )}
+              </div>
+            ))}
+          </div>
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2">
+            <Button variant="outline" className="w-full sm:w-auto min-h-[44px]" onClick={() => setShowEditDetails(false)}>Cancel</Button>
+            <Button className="w-full sm:w-auto min-h-[44px]" disabled={editDetailsMutation.isPending} onClick={saveEditDetails}>
+              {editDetailsMutation.isPending ? 'Saving...' : 'Save'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showRfqDialog} onOpenChange={setShowRfqDialog}>
         <DialogContent className="max-w-md">
@@ -1013,7 +1091,7 @@ const PHASES = [
 ];
 
 const safeDate = (d) => {
-  if (!d) return '—';
+  if (!isValidDateStr(d)) return '—';
   try { return fmtDate(d); } catch (e) { return String(d).slice(0, 10); }
 };
 
@@ -1048,7 +1126,7 @@ function BidOverviewPanel({ bid, documents = [], statusColors = {} }) {
   const facts = [
     { icon: Building2, label: 'Customer / GC', value: bid.client_name || bid.agency || '—', sub: bid.client_name && bid.agency && bid.agency !== bid.client_name ? bid.agency : null },
     { icon: MapPin, label: 'Location', value: bid.location || '—' },
-    { icon: CalendarClock, label: 'Due date', value: bid.due_date ? safeDate(bid.due_date) : 'Not set' },
+    { icon: CalendarClock, label: 'Due date', value: isValidDateStr(bid.due_date) ? safeDate(bid.due_date) : 'Not set' },
     { icon: Layers, label: 'Division', value: DIVISION_LABELS[bid.division] || bid.division || '—' },
     { icon: User, label: 'Owner', value: bid.owner_name || '—' },
     { icon: CircleDollarSign, label: 'Estimated value', value: fmtDollars(bid.estimated_value || bid.value || 0) },
@@ -1142,8 +1220,9 @@ function BidOverviewPanel({ bid, documents = [], statusColors = {} }) {
             <div className="rounded-lg bg-accent p-3"><FolderOpen className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))]" /><p className="mt-1 text-xl font-bold text-primary">{documents.length}</p><p className="text-xs text-muted-foreground">Documents</p></div>
           </div>
           <dl className="space-y-1.5 text-sm">
+            {bid.source ? <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Source</dt><dd className="font-medium text-right break-words min-w-0">{bid.source}</dd></div> : null}
             <div className="flex justify-between"><dt className="text-muted-foreground">Created</dt><dd className="font-medium">{safeDate(bid.created_date)}</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Due</dt><dd className="font-medium">{bid.due_date ? safeDate(bid.due_date) : '—'}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted-foreground">Due</dt><dd className="font-medium">{isValidDateStr(bid.due_date) ? safeDate(bid.due_date) : '—'}</dd></div>
             <div className="flex justify-between"><dt className="text-muted-foreground">Last updated</dt><dd className="font-medium">{safeDate(bid.updated_date)}</dd></div>
             {latest && <div className="flex justify-between"><dt className="text-muted-foreground">Estimate saved</dt><dd className="font-medium">{safeDate(latest.updated_date || latest.created_date)}</dd></div>}
           </dl>
