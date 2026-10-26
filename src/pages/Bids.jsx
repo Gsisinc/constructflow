@@ -77,6 +77,29 @@ const displayTitle = (b) => {
   return stripped || t;
 };
 const hasNum = (v) => v !== null && v !== undefined && v !== '' && !Number.isNaN(Number(v));
+// Valid bid date: yyyy-MM-dd..., year >= 1990, parses. Rejects '0000-00-00' and other junk.
+const isValidDateStr = (v) => {
+  if (!v) return false;
+  const s = String(v);
+  if (!/^\d{4}-\d{2}-\d{2}/.test(s) || Number(s.slice(0, 4)) < 1990) return false;
+  return !Number.isNaN(new Date(s.length <= 10 ? `${s}T00:00:00` : s).getTime());
+};
+// Clean numeric/date fields before create/update: blank or NaN never goes to the API (fixes 422).
+// Only touches keys already present. Create: drop the key. Update: send null to clear.
+const BID_NUM_FIELDS = ['estimated_value', 'win_probability'];
+const cleanBidPayload = (data, forUpdate = false) => {
+  const out = { ...data };
+  BID_NUM_FIELDS.forEach((k) => {
+    if (!(k in out)) return;
+    if (hasNum(out[k])) out[k] = Number(out[k]);
+    else if (forUpdate) out[k] = null;
+    else delete out[k];
+  });
+  if ('due_date' in out && !isValidDateStr(out.due_date)) {
+    if (forUpdate) out.due_date = null; else delete out.due_date;
+  }
+  return out;
+};
 
 const fmtCompact = (v) => {
   const n = Number(v) || 0;
@@ -200,7 +223,7 @@ export function BidPipeline({ bids = [], allBids = bids, belowFloorByBid = {}, o
                 const hasProb = s.key === 'won' || hasNum(bid.win_probability);
                 const prob = s.key === 'won' ? 100 : hasProb ? Math.max(0, Math.min(100, Number(bid.win_probability))) : 0;
                 const probColor = s.key === 'won' ? 'var(--st-won)' : prob >= 50 ? 'var(--pipe-gold)' : 'var(--st-new)';
-                const daysOut = bid.due_date ? Math.ceil((new Date(bid.due_date) - new Date()) / 86400000) : null;
+                const daysOut = isValidDateStr(bid.due_date) ? Math.ceil((new Date(bid.due_date) - new Date()) / 86400000) : null;
                 const dueSoon = (s.key === 'new' || s.key === 'bidding') && daysOut !== null && daysOut >= 0 && daysOut <= 7;
                 const division = DIVISIONS.find((d) => d.value === bid.division);
                 const FootIcon = s.key === 'won' ? Trophy : s.key === 'submitted' ? Send : Calendar;
@@ -225,7 +248,7 @@ export function BidPipeline({ bids = [], allBids = bids, belowFloorByBid = {}, o
                       <i className="block h-full rounded" style={{ width: `${prob}%`, background: probColor }} />
                     </div>
                     <div className="mt-2.5 flex items-center gap-2 border-t border-border pt-2.5 text-[11.5px] text-muted-foreground">
-                      <span className="inline-flex items-center gap-1"><FootIcon className="h-3.5 w-3.5" />{bid.due_date ? `${s.key === 'won' ? 'Won ' : s.key === 'submitted' ? 'Due ' : ''}${fmtDate(bid.due_date)}` : '—'}</span>
+                      <span className="inline-flex items-center gap-1"><FootIcon className="h-3.5 w-3.5" />{isValidDateStr(bid.due_date) ? `${s.key === 'won' ? 'Won ' : s.key === 'submitted' ? 'Due ' : ''}${fmtDate(bid.due_date)}` : '—'}</span>
                       <span>· {hasProb ? `${prob}%` : '—'}</span>
                       {bid.owner_name && <Initials name={bid.owner_name} />}
                     </div>
@@ -279,7 +302,7 @@ const monthEnds = (n = 9) => {
   const now = new Date();
   return Array.from({ length: n }, (_, i) => new Date(now.getFullYear(), now.getMonth() - (n - 1 - i) + 1, 0, 23, 59, 59));
 };
-const ts = (d) => (d ? new Date(d).getTime() : NaN);
+const ts = (d) => (isValidDateStr(d) ? new Date(d).getTime() : NaN);
 // Decision date for won/lost: no award-date field exists on BidOpportunity in this file, so use updated_date (fallback created_date).
 const decidedAt = (b) => ts(b.awarded_date || b.updated_date || b.created_date);
 
@@ -447,7 +470,7 @@ export default function Bids() {
   const createBidMutation = useMutation({
     // Entered by: Sales
     mutationFn: (data) => base44.entities.BidOpportunity.create({ 
-      ...data, 
+      ...cleanBidPayload(data), 
       organization_id: user.organization_id 
     }),
     onSuccess: async (bid, data) => {
@@ -470,7 +493,7 @@ export default function Bids() {
   });
 
   const updateBidMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.BidOpportunity.update(id, data),
+    mutationFn: ({ id, data }) => base44.entities.BidOpportunity.update(id, cleanBidPayload(data, true)),
     onSuccess: async (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
       queryClient.invalidateQueries({ queryKey: ['bids-all'] });
@@ -611,7 +634,7 @@ export default function Bids() {
       bid.agency?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesTrade = tradeFilter === 'All' || bid.division === tradeFilter;
     // Date range: bids with no date on the chosen field are hidden only while a range is set.
-    const dayOf = (v) => (v ? String(v).slice(0, 10) : '');
+    const dayOf = (v) => (isValidDateStr(v) ? String(v).slice(0, 10) : '');
     const d = dayOf(bid[dateField]);
     const matchesDate = (!dateFrom && !dateTo) || (d && (!dateFrom || d >= dateFrom) && (!dateTo || d <= dateTo));
     return matchesStatus && matchesSearch && matchesTrade && matchesDate;
@@ -619,8 +642,8 @@ export default function Bids() {
     // Sort by due date (default, soonest first) or date added. Bids with no date always go last.
     const key = sortBy.startsWith('due') ? 'due_date' : 'created_date';
     const asc = sortBy.endsWith('_asc');
-    const ta = a[key] ? new Date(String(a[key]).length <= 10 ? `${a[key]}T00:00:00` : a[key]).getTime() : NaN;
-    const tb = b[key] ? new Date(String(b[key]).length <= 10 ? `${b[key]}T00:00:00` : b[key]).getTime() : NaN;
+    const ta = isValidDateStr(a[key]) ? new Date(String(a[key]).length <= 10 ? `${a[key]}T00:00:00` : a[key]).getTime() : NaN;
+    const tb = isValidDateStr(b[key]) ? new Date(String(b[key]).length <= 10 ? `${b[key]}T00:00:00` : b[key]).getTime() : NaN;
     const aNo = Number.isNaN(ta), bNo = Number.isNaN(tb);
     if (aNo && bNo) return 0;
     if (aNo) return 1;
@@ -854,7 +877,7 @@ export default function Bids() {
                   </div>
                   <div className="flex items-center gap-2 min-w-0">
                     <CalendarClock className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))] flex-shrink-0" />
-                    <div className="min-w-0"><dt className="text-xs text-muted-foreground">Due</dt><dd className="font-semibold text-primary">{bid.due_date ? fmtDate(bid.due_date) : '—'}</dd></div>
+                    <div className="min-w-0"><dt className="text-xs text-muted-foreground">Due</dt><dd className="font-semibold text-primary">{isValidDateStr(bid.due_date) ? fmtDate(bid.due_date) : '—'}</dd></div>
                   </div>
                   <div className="flex items-center gap-2 min-w-0">
                     <MapPin className="h-4 w-4 text-[hsl(var(--brand-gold,43_67%_47%))] flex-shrink-0" />
@@ -983,8 +1006,8 @@ function BidForm({ bid, onSubmit, initialStatus }) {
       agency: aiPreview.agency || prev.agency,
       client_name: aiPreview.client_name || aiPreview.agency || prev.client_name,
       location: aiPreview.location || prev.location,
-      estimated_value: aiPreview.estimated_value || prev.estimated_value,
-      due_date: aiPreview.due_date || prev.due_date,
+      estimated_value: hasNum(aiPreview.estimated_value) && Number(aiPreview.estimated_value) > 0 ? Number(aiPreview.estimated_value) : prev.estimated_value,
+      due_date: isValidDateStr(aiPreview.due_date) ? String(aiPreview.due_date).slice(0, 10) : prev.due_date,
       description: aiPreview.description || prev.description,
       scope_of_work: aiPreview.scope_of_work || aiPreview.description || prev.scope_of_work
     }));
@@ -1049,7 +1072,7 @@ function BidForm({ bid, onSubmit, initialStatus }) {
                   {aiPreview.title && <div><span className="text-muted-foreground">Title:</span> <span className="font-medium">{aiPreview.title}</span></div>}
                   {aiPreview.agency && <div><span className="text-muted-foreground">Agency:</span> <span className="font-medium">{aiPreview.agency}</span></div>}
                   {aiPreview.estimated_value > 0 && <div><span className="text-muted-foreground">Value:</span> <span className="font-medium">{fmtDollars(aiPreview.estimated_value)}</span></div>}
-                  {aiPreview.due_date && <div><span className="text-muted-foreground">Due:</span> <span className="font-medium">{aiPreview.due_date}</span></div>}
+                  {isValidDateStr(aiPreview.due_date) && <div><span className="text-muted-foreground">Due:</span> <span className="font-medium">{aiPreview.due_date}</span></div>}
                   {aiPreview.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{aiPreview.location}</span></div>}
                 </div>
               </div>
@@ -1133,7 +1156,7 @@ function BidForm({ bid, onSubmit, initialStatus }) {
           <Input
             type="number"
             value={formData.estimated_value}
-            onChange={(e) => setFormData({ ...formData, estimated_value: parseFloat(e.target.value) })}
+            onChange={(e) => setFormData({ ...formData, estimated_value: hasNum(e.target.value) ? parseFloat(e.target.value) : '' })}
             placeholder="0.00"
           />
         </div>
@@ -1154,7 +1177,7 @@ function BidForm({ bid, onSubmit, initialStatus }) {
             min="0"
             max="100"
             value={formData.win_probability}
-            onChange={(e) => setFormData({ ...formData, win_probability: parseInt(e.target.value) })}
+            onChange={(e) => setFormData({ ...formData, win_probability: hasNum(e.target.value) ? parseInt(e.target.value, 10) : '' })}
           />
         </div>
       </div>
