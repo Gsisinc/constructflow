@@ -16,6 +16,16 @@ function mergeUnique(values = []) {
   return [...new Set(values.filter(Boolean))];
 }
 
+// Valid bid date: yyyy-MM-dd..., year >= 1990, parses. Rejects '0000-00-00' and other junk.
+const isValidDateStr = (v) => {
+  if (!v) return false;
+  const s = String(v);
+  if (!/^\d{4}-\d{2}-\d{2}/.test(s) || Number(s.slice(0, 4)) < 1990) return false;
+  return !Number.isNaN(new Date(s.length <= 10 ? `${s}T00:00:00` : s).getTime());
+};
+// AI-extracted due date: keep only valid dates with year >= 2000, else ''.
+const cleanAiDueDate = (v) => (isValidDateStr(v) && Number(String(v).slice(0, 4)) >= 2000 ? String(v).slice(0, 10) : '');
+
 function normalizeAnalysisPayload(payload = {}) {
   const data = parseLlmJsonResponse(payload);
   return {
@@ -23,8 +33,8 @@ function normalizeAnalysisPayload(payload = {}) {
     project_name: data.project_name || data.title || '',
     agency: data.agency || data.client_name || '',
     location: data.location || '',
-    estimated_value: Number(data.estimated_value || 0),
-    due_date: data.due_date || '',
+    estimated_value: Number(data.estimated_value || 0) || 0,
+    due_date: cleanAiDueDate(data.due_date),
     description: data.description || data.scope_summary || '',
     summary: data.summary || '',
     // Analysis fields
@@ -137,7 +147,7 @@ export default function BidUploader({ bidId, organizationId, onUploadComplete })
 2. agency: The issuing agency, client, or organization name
 3. location: Project location (city, state, address)
 4. estimated_value: Estimated contract value in USD (number only, no symbols)
-5. due_date: Bid submission deadline in YYYY-MM-DD format
+5. due_date: Bid submission deadline in YYYY-MM-DD format (use empty string if not found, never 0000-00-00)
 6. description: Comprehensive scope of work summary (3-5 sentences)
 7. summary: One-paragraph executive summary of the bid opportunity
 8. requirements: Array of ALL bid submission and technical requirements [{text, category (legal/financial/technical/compliance/other), priority (high/medium/low)}]
@@ -240,7 +250,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
           if (aiResult.agency && !aggregate.agency) aggregate.agency = aiResult.agency;
           if (aiResult.location && !aggregate.location) aggregate.location = aiResult.location;
           if (aiResult.estimated_value > 0 && !aggregate.estimated_value) aggregate.estimated_value = aiResult.estimated_value;
-          if (aiResult.due_date && !aggregate.due_date) aggregate.due_date = aiResult.due_date;
+          if (cleanAiDueDate(aiResult.due_date) && !aggregate.due_date) aggregate.due_date = cleanAiDueDate(aiResult.due_date);
           if (aiResult.description && !aggregate.description) aggregate.description = aiResult.description;
           if (aiResult.summary) aggregate.summaries.push(aiResult.summary);
           aggregate.requirements.push(...aiResult.requirements.map((r) => r.text).filter(Boolean));
@@ -297,7 +307,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation.`,
       if (aggregate.agency && !existing.client_name) { bidUpdate.client_name = aggregate.agency; fieldsUpdated.push('client_name'); }
       if (aggregate.location && !existing.location) { bidUpdate.location = aggregate.location; fieldsUpdated.push('location'); }
       if (aggregate.estimated_value > 0 && !existing.estimated_value) { bidUpdate.estimated_value = aggregate.estimated_value; fieldsUpdated.push('estimated_value'); }
-      if (aggregate.due_date && !existing.due_date) { bidUpdate.due_date = aggregate.due_date; fieldsUpdated.push('due_date'); }
+      if (cleanAiDueDate(aggregate.due_date) && !isValidDateStr(existing.due_date)) { bidUpdate.due_date = aggregate.due_date; fieldsUpdated.push('due_date'); }
       if (aggregate.description && !existing.description) { bidUpdate.description = aggregate.description; fieldsUpdated.push('description'); }
       if (aggregate.description && !existing.scope_of_work) { bidUpdate.scope_of_work = aggregate.description; fieldsUpdated.push('scope_of_work'); }
 
