@@ -5,6 +5,10 @@
     "organization_id": {
       "type": "string"
     },
+    "folder": {
+      "type": "string",
+      "description": "Folder path e.g. Fire Alarm/ITM. Empty or missing = Unfiled"
+    },
     "title": {
       "type": "string"
     },
