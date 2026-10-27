@@ -350,6 +350,11 @@ export default function BidDetail() {
         </TabsContent>
 
         <TabsContent value="documents" className="space-y-4">
+          <AttachFilesCard
+            bidId={bid.id}
+            organizationId={user.organization_id}
+            onAttached={() => queryClient.invalidateQueries({ queryKey: ['bidDocuments', bidId] })}
+          />
           <BidUploader
             bidId={bid.id}
             organizationId={user.organization_id}
@@ -379,6 +384,11 @@ export default function BidDetail() {
                         <Button size="sm" variant="outline" onClick={() => doc.file_url && window.open(doc.file_url, '_blank')}>
                           View
                         </Button>
+                        {doc.file_url && (
+                          <Button size="sm" variant="outline" asChild>
+                            <a href={doc.file_url} download={doc.name || undefined} target="_blank" rel="noopener noreferrer"><Download className="h-4 w-4 mr-1" />Download</a>
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -466,6 +476,57 @@ export default function BidDetail() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+// Plain "Attach file": stores the file on this bid as a BidDocument (no AI, no field auto-fill).
+// Reuses the existing BidDocument entity, so no schema change.
+const ATTACH_ACCEPT = '.md,.csv,.docx,.pdf,.xlsx,.txt';
+const ATTACH_EXTS = ['md', 'csv', 'docx', 'pdf', 'xlsx', 'txt'];
+function AttachFilesCard({ bidId, organizationId, onAttached }) {
+  const inputRef = useRef(null);
+  const [busy, setBusy] = useState(false);
+  const handleFiles = async (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!files.length || !bidId || !organizationId) return;
+    setBusy(true);
+    let ok = 0;
+    for (const file of files) {
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      if (!ATTACH_EXTS.includes(ext)) { toast.error(`${file.name}: only .md .csv .docx .pdf .xlsx .txt are accepted`); continue; }
+      try {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        await base44.entities.BidDocument.create({
+          bid_opportunity_id: bidId,
+          organization_id: organizationId,
+          name: file.name,
+          file_url,
+          file_type: ext,
+          file_size: file.size,
+          ai_processed: false,
+        });
+        ok += 1;
+      } catch (err) {
+        toast.error(`${file.name}: attach failed (${err?.message || 'error'})`);
+      }
+    }
+    if (ok) { toast.success(`Attached ${ok} file${ok > 1 ? 's' : ''}`); onAttached && onAttached(); }
+    setBusy(false);
+  };
+  return (
+    <Card>
+      <CardContent className="p-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-foreground">Attach files</p>
+          <p className="text-xs text-muted-foreground">Stored on this bid as-is (.md, .csv, .docx, .pdf, .xlsx). No AI processing.</p>
+        </div>
+        <input ref={inputRef} type="file" multiple accept={ATTACH_ACCEPT} className="hidden" onChange={handleFiles} />
+        <Button size="sm" variant="outline" disabled={busy} onClick={() => inputRef.current && inputRef.current.click()}>
+          <Upload className="h-4 w-4 mr-2" />{busy ? 'Attaching...' : 'Attach file'}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
