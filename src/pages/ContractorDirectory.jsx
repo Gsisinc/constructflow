@@ -10,6 +10,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, Search, Loader2, Building2, Upload, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/lib/AuthContext';
+
+// Division tags exist in two stored formats: ["fire_alarm","low_voltage"] and ["fire_alarm|low_voltage"].
+// Normalise both so filters and badges work the same for every record.
+const normDivs = (v) => Array.from(new Set((Array.isArray(v) ? v : []).flatMap(x => String(x).split('|')).map(x => x.trim()).filter(Boolean)));
 
 const COUNTIES = ['Alameda', 'Contra Costa', 'El Dorado', 'Marin', 'Napa', 'Placer', 'Sacramento', 'San Francisco', 'San Mateo', 'Santa Clara', 'Solano', 'Sonoma', 'Yolo', 'Yuba', 'Butte', 'Shasta', 'Humboldt', 'Mendocino', 'Other'];
 const REGIONS = ['Bay Area', 'Sacramento', 'North State', 'Wine Country', 'Sierra', 'Other'];
@@ -28,10 +33,18 @@ export default function ContractorDirectory() {
   const [importing, setImporting] = useState(false);
   const fileRef = useRef(null);
   const qc = useQueryClient();
+  const { user } = useAuth();
+  const orgId = user?.organization_id;
 
   const { data: contractors = [], isLoading } = useQuery({
-    queryKey: ['contractors-list'],
-    queryFn: async () => (await base44.entities.Contractor.filter({}, { sort: 'name', limit: 500 }))?.items || [],
+    queryKey: ['contractors-list', orgId],
+    queryFn: async () => {
+      // Strict org isolation (Kemar): only this org's contractors; blank-org originals are no longer listed.
+      if (!orgId) return [];
+      const rows = (await base44.entities.Contractor.filter({ organization_id: orgId }, { sort: 'name', limit: 500 }))?.items || [];
+      return rows.map(c => ({ ...c, division_fit: normDivs(c.division_fit) }));
+    },
+    enabled: !!orgId,
   });
 
   const filtered = useMemo(() => contractors.filter(c => {
@@ -52,6 +65,7 @@ export default function ContractorDirectory() {
       const rows = parseCsv(text);
       if (!rows.length) { toast.error('No rows found in CSV'); setImporting(false); return; }
       const records = rows.map(r => ({
+        organization_id: orgId,
         name: r.name, website: r.website, city: r.city, county: r.county, region: r.region,
         cslb_license: r.cslb_license, classification: r.classification, phone: r.phone, email: r.email,
         source_link: r.source_link,
@@ -145,12 +159,12 @@ export default function ContractorDirectory() {
         </CardContent>
       </Card>
 
-      <ContractorDialog open={showCreate} onOpenChange={setShowCreate} editing={editing} onSaved={() => qc.invalidateQueries({ queryKey: ['contractors-list'] })} />
+      <ContractorDialog open={showCreate} onOpenChange={setShowCreate} editing={editing} orgId={orgId} onSaved={() => qc.invalidateQueries({ queryKey: ['contractors-list'] })} />
     </div>
   );
 }
 
-function ContractorDialog({ open, onOpenChange, editing, onSaved }) {
+function ContractorDialog({ open, onOpenChange, editing, orgId, onSaved }) {
   const blank = { name: '', website: '', city: '', county: '', region: '', cslb_license: '', classification: '', phone: '', email: '', source_link: '', division_fit: [], status: 'active', notes: '' };
   const [form, setForm] = useState(blank);
   const [saving, setSaving] = useState(false);
@@ -163,7 +177,7 @@ function ContractorDialog({ open, onOpenChange, editing, onSaved }) {
     setSaving(true);
     try {
       if (editing) await base44.entities.Contractor.update(editing.id, form);
-      else await base44.entities.Contractor.create(form);
+      else await base44.entities.Contractor.create({ ...form, organization_id: orgId });
       toast.success(editing ? 'Updated' : 'Created'); onSaved(); onOpenChange(false);
     } catch (e) { toast.error('Failed: ' + (e.message || 'error')); }
     setSaving(false);
