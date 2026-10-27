@@ -14,11 +14,14 @@ import { useAuth } from '@/lib/AuthContext';
 
 // Division tags exist in two stored formats: ["fire_alarm","low_voltage"] and ["fire_alarm|low_voltage"].
 // Normalise both so filters and badges work the same for every record.
-const normDivs = (v) => Array.from(new Set((Array.isArray(v) ? v : []).flatMap(x => String(x).split('|')).map(x => x.trim()).filter(Boolean)));
+const DIV_ALIASES = { fire_marshals: 'fire_marshal', fire_alarm_companies: 'fire_alarm_company', electrical_companies: 'electrical_company' };
+const canonDiv = (x) => { const k = String(x).trim().toLowerCase().replace(/[\s-]+/g, '_'); return DIV_ALIASES[k] || k; };
+const normDivs = (v) => Array.from(new Set((Array.isArray(v) ? v : []).flatMap(x => String(x).split('|')).map(canonDiv).filter(Boolean)));
+const divLabel = (d) => ({ fire_marshal: 'Fire Marshals', fire_alarm_company: 'Fire Alarm Companies', electrical_company: 'Electrical Companies' }[d] || String(d).replace(/_/g, ' '));
 
 const COUNTIES = ['Alameda', 'Contra Costa', 'El Dorado', 'Marin', 'Napa', 'Placer', 'Sacramento', 'San Francisco', 'San Mateo', 'Santa Clara', 'Solano', 'Sonoma', 'Yolo', 'Yuba', 'Butte', 'Shasta', 'Humboldt', 'Mendocino', 'Other'];
 const REGIONS = ['Bay Area', 'Sacramento', 'North State', 'Wine Country', 'Sierra', 'Other'];
-const DIVISIONS = ['fire_alarm', 'low_voltage', 'drone', 'software', 'other'];
+const DIVISIONS = ['fire_alarm', 'low_voltage', 'drone', 'software', 'other', 'fire_marshal', 'fire_alarm_company', 'electrical_company'];
 const STATUSES = ['active', 'prospect', 'do_not_use', 'inactive'];
 const statusColor = { active: 'bg-green-100 text-green-700', prospect: 'bg-blue-100 text-blue-700', do_not_use: 'bg-red-100 text-red-700', inactive: 'bg-slate-100 text-slate-600' };
 
@@ -69,7 +72,7 @@ export default function ContractorDirectory() {
         name: r.name, website: r.website, city: r.city, county: r.county, region: r.region,
         cslb_license: r.cslb_license, classification: r.classification, phone: r.phone, email: r.email,
         source_link: r.source_link,
-        division_fit: (r.division_fit || '').split('|').map(s => s.trim()).filter(Boolean),
+        division_fit: normDivs((r.division_fit || '').split('|')),
         status: r.status || 'active', notes: r.notes,
       })).filter(r => r.name);
       const res = await base44.entities.Contractor.bulkCreate(records);
@@ -113,7 +116,7 @@ export default function ContractorDirectory() {
               <option value="all">All Counties</option>{COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <select className="border rounded-lg px-3 py-2 text-sm bg-white" value={fDivision} onChange={(e) => setFDivision(e.target.value)}>
-              <option value="all">All Divisions</option>{DIVISIONS.map(d => <option key={d} value={d}>{d.replace('_', ' ')}</option>)}
+              <option value="all">All Divisions</option>{DIVISIONS.map(d => <option key={d} value={d}>{divLabel(d)}</option>)}
             </select>
             <select className="border rounded-lg px-3 py-2 text-sm bg-white" value={fStatus} onChange={(e) => setFStatus(e.target.value)}>
               <option value="all">All Statuses</option>{STATUSES.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
@@ -144,7 +147,7 @@ export default function ContractorDirectory() {
                     {c.phone && <p>{c.phone}</p>}
                     {c.email && <p className="truncate">{c.email}</p>}
                     {c.division_fit?.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1">{c.division_fit.map(d => <Badge key={d} variant="outline" className="text-[10px]">{d.replace('_',' ')}</Badge>)}</div>
+                      <div className="flex flex-wrap gap-1 pt-1">{c.division_fit.map(d => <Badge key={d} variant="outline" className="text-[10px]">{divLabel(d)}</Badge>)}</div>
                     )}
                   </div>
                   <div className="mt-3 flex gap-2">
@@ -223,7 +226,7 @@ function ContractorDialog({ open, onOpenChange, editing, orgId, onSaved }) {
             <Label>Division Fit</Label>
             <div className="flex flex-wrap gap-2 mt-1">
               {DIVISIONS.map(d => (
-                <button key={d} type="button" onClick={() => toggleDiv(d)} className={`text-xs px-2.5 py-1 rounded-full border ${form.division_fit.includes(d) ? 'bg-primary text-primary-foreground border-primary' : 'bg-white text-slate-600 border-slate-300'}`}>{d.replace('_',' ')}</button>
+                <button key={d} type="button" onClick={() => toggleDiv(d)} className={`text-xs px-2.5 py-1 rounded-full border ${form.division_fit.includes(d) ? 'bg-primary text-primary-foreground border-primary' : 'bg-white text-slate-600 border-slate-300'}`}>{divLabel(d)}</button>
               ))}
             </div>
           </div>
