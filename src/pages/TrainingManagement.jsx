@@ -4723,9 +4723,9 @@ const PRACTICE = {
     "title": "FireCode • Demo walkthrough",
     "steps": [
       {
-        "title": "1. Open Systems dashboard",
-        "body": "Open FireCode at the live link. Confirm the heading Systems dashboard. The verified dashboard shows Dashboard and Projects in the sidebar and discipline cards including Fire alarm. FireCode is separate software, not a MYGSIS tab.",
-        "task": "Confirm the actual heading before continuing.",
+        "title": "1. Sign in, then open Systems dashboard",
+        "body": "Open FireCode at the live link. If you are not already signed in, the page shows Welcome to FireCode Architect and Sign in to continue. The sign-in controls are Continue with Google, Email, Password, Sign in, Forgot password?, and Need an account? Sign up. Sign in with your authorized FireCode account. Do not use Forgot password? or Sign up during practice unless you were given an account. After you are signed in, confirm the heading Systems dashboard. The verified dashboard shows Dashboard and Projects in the sidebar and discipline cards including Fire alarm. FireCode is separate software, not a MYGSIS tab.",
+        "task": "If you see the sign-in page, sign in with your authorized account, then confirm the Systems dashboard heading. If you cannot sign in, stop and report MISSING.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode"
       },
