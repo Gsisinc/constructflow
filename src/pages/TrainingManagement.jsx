@@ -4724,77 +4724,77 @@ const PRACTICE = {
     "steps": [
       {
         "title": "1. Sign in, then open Systems dashboard",
-        "body": "Open FireCode at the live link. If you are not already signed in, the page shows Welcome to FireCode Architect and Sign in to continue. The sign-in controls are Continue with Google, Email, Password, Sign in, Forgot password?, and Need an account? Sign up. Sign in with your authorized FireCode account. Do not use Forgot password? or Sign up during practice unless you were given an account. After you are signed in, confirm the heading Systems dashboard. The verified dashboard shows Dashboard and Projects in the sidebar and discipline cards including Fire alarm. FireCode is separate software, not a MYGSIS tab.",
+        "body": "Open FireCode at the live link. If you are not already signed in, the page shows Welcome to FireCode Architect and Sign in to continue. The sign-in controls are Continue with Google, Email, Password, Sign in, Forgot password?, and Need an account? Sign up. Sign in with your authorized FireCode account. Do not use Forgot password? or Sign up during practice unless you were given an account. After you are signed in, confirm the heading Systems dashboard and the Welcome back greeting (the live app may add your name). FireCode is separate software, not a MYGSIS tab.",
         "task": "If you see the sign-in page, sign in with your authorized account, then confirm the Systems dashboard heading. If you cannot sign in, stop and report MISSING.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode"
       },
       {
-        "title": "2. Find an isolated demo context",
-        "body": "Use Demo mode if you see that control. Do not open existing client project cards. The sources do not verify a Demo mode button label or its click-path. If no isolated demo context is clearly available, stop here and record MISSING; do not upload or create work in a client context.",
-        "task": "Confirm a genuine demo-only context, or pause and report the missing demo entry.",
+        "title": "2. Read the Systems dashboard without opening jobs",
+        "body": "On Systems dashboard, the subtext is: Pick a discipline to open its project workspace, or start a new project. Use Projects in the sidebar to browse everything by system type. The sidebar lists SYSTEMS Designer; under SYSTEMS: Dashboard, Projects, and Project setup; under DISCIPLINES: Fire alarm, Access control, Video surveillance, Audio visual, Structured cabling, and Networking & wireless. A red + New project button is at the top right. A Fire alarm discipline card is present and shows 23 device types. Look only. Do not open the Fire alarm card (that opens a live project list), do not open Projects, and do not click + New project.",
+        "task": "Confirm the Systems dashboard heading, Welcome back greeting, sidebar groups, and + New project button without clicking them or opening a discipline card.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode"
       },
       {
-        "title": "3. Start only a demo practice project",
-        "body": "Only after an isolated demo context is confirmed, use + New project on Systems dashboard or the Fire alarm projects hub. Follow only the project-setup controls you actually see; their exact field labels are not documented in the verified screenshots. Do not open named client projects or invent an ID URL. If demo isolation is not confirmed, do not create anything.",
-        "task": "Use a non-client practice project only; otherwise stop without saving.",
+        "title": "3. Isolated demo context is MISSING",
+        "body": "As of this signed-in check, there is no Demo mode on the live app. The words demo, practice, sandbox, and sample do not appear on the Systems dashboard, Fire alarm Projects list, Project setup, or New project form. There is no isolated practice context. Project names that include TEST or E2E still sit in the same account as real client jobs. Nothing separates practice from live work.",
+        "task": "Treat isolated demo context as MISSING. Do not look for a Demo mode control that is not there, and do not treat a TEST or E2E name as a sandbox.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode"
       },
       {
-        "title": "4. Upload a practice blueprint from the canvas",
-        "body": "Inside that confirmed demo-only project, the verified tabs include Floor Plan and Plans. Open Plans and read: “Upload a PDF or image from the canvas tab to create selectable sheets.” Use Floor Plan (the canvas tab) and only the upload controls actually visible there. The exact upload-control label is not documented in these screenshots. Use only a permitted practice/demo blueprint, never a failing real client PDF. If you cannot find the upload control in demo mode, stop and report MISSING.",
-        "task": "Upload only in confirmed demo mode using a real visible control, or record the blocked step.",
+        "title": "4. Do not open Projects or named job cards",
+        "body": "Do not open Projects in the sidebar and do not open any named job cards. Opening them is live client work. If that list were opened, it is headed Fire alarm projects, with the subtext: Floor plans and layouts for this discipline. Open a card to work in the designer, or start a new project. Practice must stay off that list.",
+        "task": "Stay on Systems dashboard. Do not open Projects and do not open any named job card.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode"
       },
       {
-        "title": "5. Preview and assign the uploaded sheet",
-        "body": "In the demo project, open Plans. The heading is Floor Plans and the prompt is “Select an uploaded sheet to preview and assign it.” Select your uploaded practice sheet. Follow the visible help to assign a page using plan type Floor Plan, Fire Alarm, or Architectural; choose only controls actually present. No upload means no preview result—do not claim otherwise.",
-        "task": "Confirm the intended sheet and floor assignment using the actual preview.",
+        "title": "5. New project labels exist — do not create a project",
+        "body": "The live New project screen uses the URL pattern /project/new?discipline=fire_alarm and the heading New project. Those labels are listed so you can recognize the screen, not as an instruction to open it. Do not click + New project during practice, and do not create or save a project. Creating would write into the same live account as real jobs.",
+        "task": "Do not open New project and do not create or save a project.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode"
       },
       {
-        "title": "6. Review the floor and placement",
-        "body": "Open Floor Plan and pick the corresponding floor in the left FLOOR list. Review the blueprint and any existing devices/annotations against the practice source. Auto-Place Devices is a verified control, but use it only in the isolated demo if authorized, then inspect the result rather than assume it is correct. No source here establishes a successful result for any client job.",
-        "task": "Identify one actual placement discrepancy or record that no result is available.",
+        "title": "6. Upload blueprint labels exist — do not upload",
+        "body": "On the live New project screen, the upload section is titled Start from a blueprint (auto-fill) and has a red Upload blueprint button. The helper text is: Upload your plan set — single sheet or full multi-sheet PDF (or an image). We read the title block and cover sheet and fill in the project details below. You can edit anything after. Do not click Upload blueprint. Uploading would write into the same live account as real jobs.",
+        "task": "Recognize the Upload blueprint label only. Do not click it and do not upload a file.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode"
       },
       {
-        "title": "7. Check available review tabs",
-        "body": "In the demo project, open Calculations and, if relevant, Simulation and Riser Diagram. These tab labels are verified; their exact run/review controls are not documented in these screenshots. Use only controls you see and review whatever actual results are shown. This next action is not documented in a source I can verify; open FireCode demo mode and use only controls you see. Missing or failing results remain MISSING/FAIL, not a passed design.",
-        "task": "Record actual findings and the qualified review still required; do not invent a pass.",
+        "title": "7. New project fields exist — do not fill or submit",
+        "body": "On the live New project screen, the required-info banner lists Project name, Address, Occupancy group, Adopted code edition, and AHJ / code official contact. The form shows Project Name (required), Address (required), Primary discipline (required), Owner Name, Installer / integrator, AHJ / code official contact (required), Jurisdiction (AHJ), and a Building has smoke control checkbox. Other visible buttons are Use TBD, Preview Code Analysis, and Fill 5 required fields; those were seen only and were not clicked. Do not fill, submit, or save this form.",
+        "task": "Do not fill or submit the New project form. Use only controls that are actually visible if you already see this screen, and stop rather than completing it.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode"
       },
       {
-        "title": "8. Keep demo output separate from approval",
-        "body": "Return to Plans or Floor Plan and review the demo sheet and captions. Save and Export PDF are verified controls, but use them only in confirmed demo mode with permission to retain the practice artifact. Do not submit, stamp or describe the output as approved, and do not use real client PDFs as successful demos. Return to Training in the original MYGSIS tab for the practice quiz; official progress is unchanged.",
-        "task": "State what you actually completed and list any missing demo/upload/review controls.",
+        "title": "8. Stop — this is not a passed design",
+        "body": "Plans, Floor Plan, Calculations, Simulation, Riser Diagram, Save, and Export PDF were not seen as controls on this check (they may appear inside the designer). Do not invent those labels or assume they are present. Use only controls that are actually visible, and do not treat any result as a passed design. Isolated demo context is MISSING, so practice stops here: do not open named client projects, do not click Upload blueprint, and do not create or save a project. Return to Training in the original MYGSIS tab for the practice quiz; official progress is unchanged.",
+        "task": "Stop without creating, uploading, or opening a job. Record that isolated demo context is MISSING and that this practice is not a passed design.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode"
       }
     ],
     "quiz": [
       {
-        "question": "What if no Demo mode or isolated demo context is visible?",
+        "question": "Is there a Demo mode or isolated practice context on the live FireCode app?",
         "choices": [
-          "Stop before creating/uploading and report MISSING; never open client cards for practice.",
-          "Use any named client project.",
-          "Assume a client project is a demo."
+          "No. As of this check there is no Demo mode; isolated demo context is MISSING. Do not create, upload, or open named jobs.",
+          "Yes, any TEST or E2E project name is a safe sandbox.",
+          "Yes, open a named client project to practice."
         ],
         "answer": 0
       },
       {
-        "question": "What upload guidance is verified?",
+        "question": "What should you do with New project and Upload blueprint?",
         "choices": [
-          "Plans says to upload a PDF or image from the canvas tab; use only visible controls.",
-          "A verified button named Import Demo Success.",
-          "The player generates a passed client PDF."
+          "Recognize those live labels only. Do not click Upload blueprint and do not create or save a project, because that writes into the same account as real jobs.",
+          "Upload a practice blueprint so the form auto-fills.",
+          "Click + New project and save a sample job."
         ],
         "answer": 0
       },
@@ -4808,7 +4808,7 @@ const PRACTICE = {
         "answer": 0
       }
     ],
-    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). /workspace/Firecode-Architect/01-dashboard-preview.png; 05-projects-hub.png; 08-plans.png (editor preview screenshots, not a new live verification); /workspace/GSIS/Reference/PUSH-LAYOUTFIX3-2026-11-05/PUSH-STATUS.md (published root Systems dashboard); demo-mode entry and setup/upload control labels MISSING.",
+    "source": "Live FireCode Architect signed-in check 2026-11-06 at https://observant-fire-code-flow.base44.app/ (Systems dashboard labels, no Demo mode, Fire alarm projects headings, New project / Upload blueprint labels and form fields). Unsigned-in login page verified 2026-11-06: Welcome to FireCode Architect; Sign in to continue; Continue with Google; Email; Password; Sign in; Forgot password?; Need an account? Sign up. Designer controls Plans, Floor Plan, Calculations, Simulation, Riser Diagram, Save, and Export PDF were not seen and remain unverified.",
     "author": "GSIS-authored live-software walkthrough"
   }
 };
@@ -4827,7 +4827,7 @@ const PATHS = SOURCE_PATHS.filter(p => !p.path_id.includes('CSLB')).map(p => ({
 const FIRE_DESIGN_COURSE = {
   course_id: 'CRS-FIRE-DESIGN', title: 'FireCode • Demo walkthrough', brand: 'GSIS Internal',
   link: '', cost: 'internal', kind: 'interactive',
-  notes: 'GSIS-authored captioned demo-only walkthrough. Demo entry and undocumented controls must be verified before use; not design approval or enrollment.',
+  notes: 'GSIS-authored captioned walkthrough of live FireCode. As of the 2026-11-06 signed-in check there is no Demo mode and no isolated practice context. Look-only: do not open named jobs, do not click Upload blueprint, and do not create or save a project. Not design approval or enrollment.',
 };
 const CATALOG = [...SEED_COURSES, ...LV_SOP_COURSES, FIRE_DESIGN_COURSE];
 const COURSE_BY_ID = Object.fromEntries(CATALOG.map(c => [c.course_id, c]));
