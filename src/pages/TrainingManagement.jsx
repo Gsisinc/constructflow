@@ -1914,2141 +1914,2906 @@ const PRACTICE = {
     "title": "MYGSIS • Everyone’s operating workflow",
     "steps": [
       {
-        "title": "Know your workspace",
-        "body": "Use the documented MYGSIS sidebar: Dashboard, Schedule, Ops Dashboard, Resource Board and Chats. Sales & Estimating contains Bids, Leads, Contractor Directory, Estimates and Rate Card. Projects and Documents follow. Billing/WIP and Suppliers/Purchase Orders serve office teams. Technician and client portals have separate menus. This is an October 21 documented map, not a new live verification.",
-        "task": "Choose which workspace your role uses in the practice field."
+        "title": "1. Start with your live workspace",
+        "body": "Open Dashboard in the left sidebar. Confirm you are in the correct organization/login before opening job information. The office sidebar includes Schedule, Ops Dashboard, Resource Board, Bids, Leads, Contractor Directory, Estimates, Rate Card, Projects, Documents, Training and Billing. Visibility depends on your login. If your sidebar shows Chats, that is team chat; no Chats URL is assumed here.",
+        "task": "Identify your division and the job/task you are permitted to review.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard"
       },
       {
-        "title": "Start in Bids",
-        "body": "Open Bids → the relevant opportunity → Overview. Read the bid manual, drawings, specifications and addenda. Write the division/domain, assumptions and missing information before pricing. Never guess missing quantities.",
-        "task": "Practice: note one missing scope item."
+        "title": "2. Locate your bid",
+        "body": "In the left sidebar under Sales & Estimating, open Bids. Use “Search by title, client, or agency...” to find a bid you can already see and open it. Select Overview and read the scope. Do not change Status or award a real bid during practice.",
+        "task": "Identify the bid and one missing scope item in the practice notes.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Trace drawings to the BOQ",
-        "body": "Inside the bid, use Drawings, Drawing Analysis and BOQ. Check every AI quantity against sheets and specifications. Drawing Analysis documents an Export CSV action. A dedicated Takeoff tab is draft-only; do not rely on it as a live feature.",
-        "task": "Practice: record a drawing sheet reference."
+        "title": "3. Read the source documents",
+        "body": "Open Bids, open the same visible bid, then select Documents. Under Uploaded Documents, use View on an available document. Read the relevant scope, specifications and addenda. If no documents exist, record MISSING instead of inventing quantities.",
+        "task": "Find the current source revision and a scope reference.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Estimate and supplier quotes",
-        "body": "Open Estimate and Procurement inside the bid. Procurement supports quote upload and Insert Procurement Prices with confirmation in the documented map. RFQ copy/download is a draft workflow, not an email send. Review price sources before any live confirmation.",
-        "task": "Practice: choose a quote reference to attach to a material line."
+        "title": "4. Trace a drawing to quantities",
+        "body": "Open Bids, open your visible bid and select Drawings. Compare its sheets with Drawing Analysis, then select BOQ. Read Description, Qty, Unit and Category. AI output must be checked against the source sheets; do not run or apply a takeoff merely to pass practice.",
+        "task": "Compare one available quantity with its sheet; record unresolved differences.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "From award to Projects",
-        "body": "The documented award flow creates a linked project with estimate budget/materials. Use Projects to check scope, approved value, milestones and Materials/Logistics. Do not award a real bid in this demonstration.",
-        "task": "Practice: list what must be checked before kickoff."
+        "title": "5. Review the estimate without sending",
+        "body": "Open Bids, open the same record and select Estimate. Read Estimate Details, Labor, Materials & Line Items and Notes. Compare the source quantities and costs. Do not use Send to Client, Send RFQ or change bid Status during practice.",
+        "task": "Record a cost-source question for the estimator.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Prepare the field handoff",
-        "body": "Use the job packet: scope for this visit, drawings, site contact, confirmed parts delivery and safety notes. If delivery is not confirmed, the packet must say DO NOT ROLL. Log only actual site facts and photos.",
-        "task": "Practice: write the correct parts-gate decision."
+        "title": "6. Locate your project",
+        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
+        "task": "Identify the correct project without creating a new job.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "File every partner/vendor email",
-        "body": "Company-wide rule: identify the partner/vendor → open or create its own folder → apply vendor/partner, division/domain, job/bid and topic tags → move the thread and attachments into that folder → sort by job/topic and date → verify it is findable and nothing is left loose in the inbox. Folder names and tags below are a proposed demonstration, not an existing mailbox. Outlook authentication is still required for live filing. No messages have been filed by this mockup.",
-        "task": "Practice choosing a vendor folder and a topic tag below."
+        "title": "7. Prepare the dispatch evidence",
+        "body": "Open Projects, open the chosen visible project and select Ops / Field Docs. Click New Ops Doc. In New Ops / Field Doc, choose the appropriate Type, enter Title *, Linked Phase and Notes, and select approved File attachments (stored privately). Notes must identify visit scope, source drawings, site access, safety and delivery proof. If delivery is not confirmed, write DO NOT ROLL and escalate. Click Create only on an authorized training record; otherwise Cancel. Verify any saved title and attachments in Ops / Field Docs.",
+        "task": "Prepare a packet from real evidence or explicitly list MISSING items; never claim a delivery or visit occurred.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Find your Training",
-        "body": "Training Management and Technician Training are documented pages; the expanded company catalog, multi-division/domain assignment and this internal player are planned/demo enhancements. Open My Training here: MYGSIS and Safety are required for every person. Manufacturer courses open outside this player.",
-        "task": "Practice: open My Training after the walkthrough; do not enroll."
+        "title": "8. Keep Outlook filing separate",
+        "body": "Open Documents in MYGSIS to locate the related job evidence with Search name… and All Projects. Partner/vendor email filing is an Outlook rule, not a MYGSIS screen: in Outlook, file the thread in that partner/vendor’s own folder and sort/tag it by job, division/domain, topic and date. MYGSIS does not autofile mail. Do not send mail during practice.",
+        "task": "Identify the correct job document here and the partner/vendor folder needed in Outlook; no mail is sent by this player.",
+        "open_path": "/Documents",
+        "open_label": "Documents"
       },
       {
-        "title": "Evidence, verification and billing",
-        "body": "Certificates are uploaded for manager verification after real completion; the upload here is only a filename preview. Billing uses signed scope, approved change orders and proof of milestone progress. No course completion, invoice or mail is created by this demo.",
-        "task": "Practice: name one proof document you would provide."
+        "title": "9. Reconcile billing evidence",
+        "body": "Open Billing in the left sidebar under Billing. Use Search project or client… to find the project. Read Contract, Billed, Retention Held, Outstanding and Status. Compare them with the approved scope and project evidence; do not generate an invoice or payment merely for practice.",
+        "task": "Record one evidence discrepancy or confirm the figures you actually checked.",
+        "open_path": "/Billing",
+        "open_label": "Billing"
       },
       {
-        "title": "Close the loop",
-        "body": "Save approved job documents in the correct project folder, link supporting evidence and escalate missing/conflicting information. End this internal practice with a quiz. No live feature availability is claimed beyond the cited dated map.",
-        "task": "Practice: write the next owner and one unresolved item."
+        "title": "10. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "Which bid area contains material quantities?",
+        "question": "Where do you find bid quantities?",
         "choices": [
-          "BOQ, supported by Drawings and Drawing Analysis.",
-          "A verified dedicated Takeoff tab.",
-          "The bank portal."
+          "Open Bids, an accessible record, then BOQ; verify against Drawings.",
+          "Open a Procurement tab inside Bid Detail.",
+          "Open a guessed project-id URL."
         ],
         "answer": 0
       },
       {
-        "question": "Where does a supplier email belong?",
+        "question": "Where are partner/vendor emails filed?",
         "choices": [
-          "In that supplier’s own folder, tagged and sorted.",
-          "Loose in the inbox.",
-          "In any unrelated job folder."
+          "In that partner/vendor’s own Outlook folder; MYGSIS does not autofile mail.",
+          "MYGSIS automatically files every vendor message.",
+          "Send the thread to a random folder."
         ],
         "answer": 0
       },
       {
-        "question": "Parts delivery has no proof. What should the packet say?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "DO NOT ROLL; escalate.",
-          "Send the crew anyway.",
-          "Mark delivery confirmed."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "MYGSIS-Live-vs-Draft-Map_2026-10-21.md; MYGSIS-Training-Tab-Spec_2026-11-05.md; field-operations-all-divisions; Kemar email rule, Nov 6, 2026.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test).",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-ADMIN-DESIGNER": {
     "course_id": "CRS-ADMIN-DESIGNER",
     "title": "System Designer • Design to submittal",
     "steps": [
       {
-        "title": "Confirm scope and authority",
-        "body": "Read the drawings, spec and AHJ requirements. Identify Fire, Low Voltage, GSIS Aerial or Software and the domain. Separate design responsibility from install scope; list missing site information and required qualified signatures.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "1. Locate your bid",
+        "body": "In the left sidebar under Sales & Estimating, open Bids. Use “Search by title, client, or agency...” to find a bid you can already see and open it. Select Overview and read the scope. Do not change Status or award a real bid during practice.",
+        "task": "Identify the bid and one missing scope item in the practice notes.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Build the design basis",
-        "body": "Record building/site constraints, system sequence, manufacturer equipment and sources. Treat undocumented values as MISSING; draft an RFI instead of assuming a real measurement.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "2. Read the source documents",
+        "body": "Open Bids, open the same visible bid, then select Documents. Under Uploaded Documents, use View on an available document. Read the relevant scope, specifications and addenda. If no documents exist, record MISSING instead of inventing quantities.",
+        "task": "Find the current source revision and a scope reference.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Prepare layout and schedules",
-        "body": "Use the bid Designer/Drawings context documented in MYGSIS. FireCode is an example within the shared Software-building framework; exact current FireCode screen actions are a planned/demo workflow here and must be verified before use. Trace device locations and schedules to source sheets.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "3. Open the actual design context",
+        "body": "Open Bids, open the visible record and select Designer. Confirm Designer Controls is present. This is MYGSIS drawing markup, not a FireCode workspace. If the tab or controls are absent for your login, stop and report that difference rather than substituting another screen.",
+        "task": "Locate Classification and Search symbols without modifying a client layout.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Calculate and check",
-        "body": "For fire alarm, prepare battery and voltage-drop calculations and check circuit loads against listed manufacturer data and applicable NFPA 72 requirements. This overview is not an engineered design or a substitute for qualified review.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "4. Prepare a permitted practice drawing",
+        "body": "In the same bid’s Designer tab, use Classification to choose the applicable discipline. Only on an authorized training record, use Upload blank drawing / blueprint with a non-client training image/PDF you are allowed to upload. Uploading stores a file immediately. If no authorized training record exists, inspect only and record the blocker.",
+        "task": "Confirm the training drawing is the intended sheet before placing anything.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Perform visual coordination",
-        "body": "Review every sheet for readable symbols, tags, riser consistency, conflicts and alignment with the equipment list. Flag unverified layout or missing data; a calculation pass alone is not visual approval.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "5. Place and check one symbol",
+        "body": "In the same bid’s Designer tab, enter a term in Search symbols, select an actual listed symbol and click the drawing to place it. Use Symbol Count Summary to check the count, and Undo to reverse a practice placement. Do this only in the authorized training layout, never a live client design.",
+        "task": "Locate the symbol and compare the count before and after Undo.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Assemble review package",
-        "body": "Compile plans, riser, sequence, data sheets and required calculations. Route to the qualified design/signature reviewer. No unqualified stamp or approval is implied.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "6. Caption and retain an authorized layout",
+        "body": "In the same bid’s Designer tab, choose Note, enter text in “Type note text, then click on drawing” and place the note on the training drawing. Verify the annotation. Save designer layout writes to that bid: use it only with explicit authorization for the training record. PNG and PDF are available exports, not design approval.",
+        "task": "Save only an approved training revision; otherwise leave the client record unchanged.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "AHJ review and revisions",
-        "body": "Prepare the AHJ submittal for authorized review and approval; do not submit here. Track comments and revision dates, reconcile resubmittals and distribute only the approved construction set.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "7. Separate FireCode and qualified design review",
+        "body": "Open Bids, your visible record, then Designer to compare the markup context. FireCode Architect is separate software; it is not inside MYGSIS. FireCode demo training is the separate Fire → Design course. A stamped engineering review and AHJ approval cannot be completed by this markup tab. Do not invent calculation, stamping or approval controls.",
+        "task": "Record the external design/review dependencies in your practice notes.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Handoff and closeout",
-        "body": "Give PM and Ops the approved documents and dependencies. Capture field revisions for as-builts and retain calculations, test reports and owner training evidence.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "8. File supporting evidence",
+        "body": "Open Projects, open the chosen record and select Documents. To file an authorized training document, click Add Document, enter Name *, choose Type and Date, select File (stored privately), and enter Notes identifying its source/revision. Click Add only if authorized to store it; otherwise Cancel. Reopen Documents and use Open on the saved row to verify it.",
+        "task": "Complete one permitted evidence filing, or record why saving is blocked. Never upload confidential material as a training sample.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "9. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "A required equipment value has no source. What next?",
+        "question": "Which live bid tab contains MYGSIS drawing markup?",
         "choices": [
-          "Mark MISSING and resolve it before design approval.",
-          "Invent a typical value.",
-          "Hide the blank."
+          "Designer, with Designer Controls.",
+          "A FireCode workspace inside MYGSIS.",
+          "Procurement."
         ],
         "answer": 0
       },
       {
-        "question": "Who can authorize/sign the design?",
+        "question": "Does saving a designer layout approve the engineering?",
         "choices": [
-          "The appropriately qualified authorized reviewer.",
-          "Anyone who took this demo.",
-          "The mockup automatically."
+          "No; qualified review and required approvals remain separate.",
+          "Yes, it stamps the drawing.",
+          "Yes, it submits to the AHJ."
         ],
         "answer": 0
       },
       {
-        "question": "What happens after this practice walkthrough?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "gsis-new-bid-workflow; schedule-of-values-and-billing, FA design-build and closeout; MYGSIS dated map. FireCode detailed UI is planned/demo.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). BidDetail.jsx; components/bids/DrawingDesignerTab.jsx; components/projects/DocumentsTab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-ADMIN-ESTIMATOR": {
     "course_id": "CRS-ADMIN-ESTIMATOR",
     "title": "Estimator • Scope to reviewed estimate",
     "steps": [
       {
-        "title": "Read the whole bid",
-        "body": "Read manual, drawings, specifications and addenda. Start assumptions/missing lists and a compliance matrix. Trace device counts and materials to [DWG] and [SPEC] references.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "1. Locate your bid",
+        "body": "In the left sidebar under Sales & Estimating, open Bids. Use “Search by title, client, or agency...” to find a bid you can already see and open it. Select Overview and read the scope. Do not change Status or award a real bid during practice.",
+        "task": "Identify the bid and one missing scope item in the practice notes.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Clear scope responsibility",
-        "body": "PM and Ops resolve conduit, trenching, sitework and adjacent trades before pricing. Check by-others language and referenced sections. Exclude other-trade scope unless assigned to GSIS. Draft RFIs for unclear items.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "2. Read the source documents",
+        "body": "Open Bids, open the same visible bid, then select Documents. Under Uploaded Documents, use View on an available document. Read the relevant scope, specifications and addenda. If no documents exist, record MISSING instead of inventing quantities.",
+        "task": "Find the current source revision and a scope reference.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Build the takeoff",
-        "body": "Count devices, implied materials, point-to-point cable, waste and spares from sources. Compare Sales and Procurement independent takeoffs until reconciled; do not use unverified AI counts as final quantities.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "3. Trace a drawing to quantities",
+        "body": "Open Bids, open your visible bid and select Drawings. Compare its sheets with Drawing Analysis, then select BOQ. Read Description, Qty, Unit and Category. AI output must be checked against the source sheets; do not run or apply a takeoff merely to pass practice.",
+        "task": "Compare one available quantity with its sheet; record unresolved differences.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Load phase labor",
-        "body": "Use PM/Ops phases and requirements. Ops prices hours per requirement with GSIS labor units and the Rate Card, including prevailing wage when required. Tag sources and do not invent labor rates.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "4. Check the rate source",
+        "body": "Open Rate Card under Sales & Estimating. Use Search items… to find an applicable existing item. Read the recorded rate and its context; do not substitute a guessed price or modify the company rate card during practice.",
+        "task": "Record the source rate reference and any missing quote or labor input.",
+        "open_path": "/RateCard",
+        "open_label": "Rate Card"
       },
       {
-        "title": "Review quote validity and tiers",
-        "body": "Use the newer approved new-bid workflow: 30% negotiated/design-build, 25% competitive, 20% floor tier. That workflow calls these material markup tiers. The older Rate Card separately describes project margins and older material markup rules: do not confuse markup with margin; flag the conflict for review. Record 3–5% standard escalation cushion, up to 10% for volatile items like copper, and quote validity per that workflow.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "5. Enter a source-backed estimate line",
+        "body": "Open Bids, open the authorized training record and select Estimate. If it is empty, use Create Estimate; otherwise use Edit. Under Materials & Line Items use Add Item. Fill Name, Description, Qty, Unit and Unit $ from an approved training source; use Cost Code only if known. Inspect Labor and the summary. If not authorized to edit this record, inspect only.",
+        "task": "Reconcile one permitted line to the source quantity and quote; never invent prices.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "File every partner/vendor email",
-        "body": "Company-wide rule: identify the partner/vendor → open or create its own folder → apply vendor/partner, division/domain, job/bid and topic tags → move the thread and attachments into that folder → sort by job/topic and date → verify it is findable and nothing is left loose in the inbox. Folder names and tags below are a proposed demonstration, not an existing mailbox. Outlook authentication is still required for live filing. No messages have been filed by this mockup.",
-        "task": "Practice choosing a vendor folder and a topic tag below."
+        "title": "6. Save and verify only permitted work",
+        "body": "In the same bid’s Estimate tab, review Notes and the totals before Save. Save only the authorized training estimate, then reopen Estimate to verify it. Use Cancel instead on client records without edit authority. Do not use Send to Client or Send RFQ and do not award the bid.",
+        "task": "Confirm the saved line and total match the approved input, or record the blocked edit.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Build complete cost backup",
-        "body": "Include freight, labor, lifts/equipment, small tools, subcontractors, design, permits, general conditions, wage fringe, warranty reserve, bonds, allowances, contingency, overhead and margin. Missing prices stay MISSING.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "7. Find the estimate from the index",
+        "body": "Open Estimates under Sales & Estimating. Filter with Bid or Project and use Open on the matching record. Verify the version you reviewed, rather than creating duplicate estimates.",
+        "task": "Locate the reviewed estimate or note that no linked version is available.",
+        "open_path": "/Estimates",
+        "open_label": "Estimates"
       },
       {
-        "title": "Review and handoff",
-        "body": "Give Sales priced materials and backup; run risk analysis and Accounting review. Chief final review then Kemar approval precede any submission. After award the approved amount is the control budget.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "What clears before any labor/material price?",
+        "question": "Where do you add a line in Bid Detail?",
         "choices": [
-          "PM/Ops scope-responsibility gate.",
-          "Automatic submission.",
-          "Skipping other trades."
+          "Estimate → Edit (or Create Estimate) → Materials & Line Items → Add Item.",
+          "A dedicated Procurement tab.",
+          "Billing → Award."
         ],
         "answer": 0
       },
       {
-        "question": "Can markup and margin be treated as identical?",
+        "question": "What if a price has no source?",
         "choices": [
-          "No; use the documented rule and escalate conflicting guidance.",
-          "Yes, always.",
-          "Only for copper."
+          "Record it as MISSING and resolve it before approval.",
+          "Invent a typical price.",
+          "Send the bid anyway."
         ],
         "answer": 0
       },
       {
-        "question": "Where does a supplier email belong?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "In that supplier’s own folder, tagged and sorted.",
-          "Loose in the inbox.",
-          "In any unrelated job folder."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "gsis-new-bid-workflow (approved Oct 24); 01-Rate-Card.md conflict noted, not silently resolved; Sales.md; Kemar email rule.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). BidDetail.jsx; EstimateEditor.jsx; Estimates.jsx; RateCard.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-ADMIN-SALES": {
     "course_id": "CRS-ADMIN-SALES",
     "title": "Sales • Proposal, SOV and risk",
     "steps": [
       {
-        "title": "Intake and classify",
-        "body": "Confirm division/domain and a GO opportunity. Read the full bid package, assumptions, missing items and compliance matrix. Do not promise scope or pricing before team review.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "1. Find the lead",
+        "body": "Open Leads under Sales & Estimating. Enter a known company/contact in Search leads… and use All Stages to review the pipeline. Use an existing visible lead rather than creating a duplicate.",
+        "task": "Locate the actual lead and read its current stage.",
+        "open_path": "/Leads",
+        "open_label": "Leads"
       },
       {
-        "title": "Collect the team handoffs",
-        "body": "Collect PM phases, Ops labor and reconciled Procurement takeoff/quotes. Every number needs [DWG], [SPEC], [RATE CARD], [QUOTE] or [KEMAR] support.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "2. Prepare the follow-up without sending",
+        "body": "In Leads, choose Edit on a permitted lead. Read Company, Contact Name *, Stage, Follow-up Date and Notes. For an authorized training record, enter a source-backed follow-up date and next action in Notes, then Save and reopen Edit to verify. Otherwise Cancel. Do not send email from practice.",
+        "task": "Verify the saved next action or record the lack of edit authorization.",
+        "open_path": "/Leads",
+        "open_label": "Leads"
       },
       {
-        "title": "Draft the proposal",
-        "body": "Use the right field/software proposal template. Define scope, inclusions, exclusions and deliverables. Keep internal cost and markup backup out of customer-facing documents.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "3. Check the contractor context",
+        "body": "Open Contractor Directory under Sales & Estimating. Search name or license… to locate the known company. Review its available company/contact details; do not invent contact information or add a duplicate record.",
+        "task": "Match the company to the opportunity using existing evidence.",
+        "open_path": "/ContractorDirectory",
+        "open_label": "Contractor Directory"
       },
       {
-        "title": "Build the SOV",
-        "body": "Build internal cost backup first. Tie milestone values to real events and the backup. Percentages must total 100 and values equal contract price; no invented front-load limit.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "4. Locate your bid",
+        "body": "In the left sidebar under Sales & Estimating, open Bids. Use “Search by title, client, or agency...” to find a bid you can already see and open it. Select Overview and read the scope. Do not change Status or award a real bid during practice.",
+        "task": "Identify the bid and one missing scope item in the practice notes.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Run risk review",
-        "body": "Price risks as contingency or clarify/exclude them. Verify terms, retention, dependencies and scope gaps. Deviating customer terms require Kemar review, not silent acceptance.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "5. Read the source documents",
+        "body": "Open Bids, open the same visible bid, then select Documents. Under Uploaded Documents, use View on an available document. Read the relevant scope, specifications and addenda. If no documents exist, record MISSING instead of inventing quantities.",
+        "task": "Find the current source revision and a scope reference.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "File every partner/vendor email",
-        "body": "Company-wide rule: identify the partner/vendor → open or create its own folder → apply vendor/partner, division/domain, job/bid and topic tags → move the thread and attachments into that folder → sort by job/topic and date → verify it is findable and nothing is left loose in the inbox. Folder names and tags below are a proposed demonstration, not an existing mailbox. Outlook authentication is still required for live filing. No messages have been filed by this mockup.",
-        "task": "Practice choosing a vendor folder and a topic tag below."
+        "title": "6. Review the proposed price",
+        "body": "Open Bids, open the chosen record and select Estimate. Review Estimate Details and Notes against the client scope and exclusions. Do not use Send to Client, Send RFQ or an award/status change during practice.",
+        "task": "Write one commercial question to resolve before an authorized proposal release.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Route approval",
-        "body": "Accounting checks margin, contingency and phase SOV. Chief final review then Kemar OK are required. This mockup sends no proposal, invoice, RFQ or email.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "7. Check the billing handoff",
+        "body": "Open Projects, open an existing permitted project and select SOV & Pay Apps. Read Schedule of Values, Retention %, Billable Amount and % Complete. This review is not authorization to Generate Pay App or change billing. A bid with no project cannot complete this project step yet; note that dependency.",
+        "task": "Match the signed scope to the billing milestones if an accessible project exists.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Handoff award",
-        "body": "After signing, pass approved estimate, SOV, scope and risks to PM/Accounting as the control budget. Log the approved record in DualTrack using the documented process.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "8. Keep Outlook filing separate",
+        "body": "Open Documents in MYGSIS to locate the related job evidence with Search name… and All Projects. Partner/vendor email filing is an Outlook rule, not a MYGSIS screen: in Outlook, file the thread in that partner/vendor’s own folder and sort/tag it by job, division/domain, topic and date. MYGSIS does not autofile mail. Do not send mail during practice.",
+        "task": "Identify the correct job document here and the partner/vendor folder needed in Outlook; no mail is sent by this player.",
+        "open_path": "/Documents",
+        "open_label": "Documents"
+      },
+      {
+        "title": "9. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "What belongs in a customer proposal?",
+        "question": "Where is the lead follow-up date?",
         "choices": [
-          "Scope and milestone SOV, not internal cost backup.",
-          "Internal supplier margin sheet.",
-          "Unapproved terms."
+          "Leads → Edit → Follow-up Date.",
+          "A guessed Chats URL.",
+          "Bid Detail → Procurement."
         ],
         "answer": 0
       },
       {
-        "question": "Before submission, whose approval is required?",
+        "question": "Can practice send the client proposal?",
         "choices": [
-          "Kemar after team/Chief review.",
-          "No approval.",
-          "The mockup."
+          "No. Do not send mail or award real bids during practice.",
+          "Yes, Next sends it.",
+          "Yes, the quiz approves the bid."
         ],
         "answer": 0
       },
       {
-        "question": "Where does a supplier email belong?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "In that supplier’s own folder, tagged and sorted.",
-          "Loose in the inbox.",
-          "In any unrelated job folder."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "Sales.md; gsis-new-bid-workflow; schedule-of-values-and-billing; Kemar email rule.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Leads.jsx; ContractorDirectory.jsx; BidDetail.jsx; ScheduleOfValuesTab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-ADMIN-OPS": {
     "course_id": "CRS-ADMIN-OPS",
     "title": "Ops Manager • Dispatch to daily log",
     "steps": [
       {
-        "title": "Read the approved job",
-        "body": "Check signed scope, approved milestones, PM phases and requirements. Confirm what belongs to GSIS before calculating field labor.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "1. Read the actual ops workload",
+        "body": "Open Ops Dashboard in the left sidebar. Review Progress per Project, Targets vs Actual (Phases) and Upcoming Phases — What’s Next. Record the project and phase needing attention; a chart is not proof of completed field work.",
+        "task": "Identify the next visible phase to verify.",
+        "open_path": "/OpsDashboard",
+        "open_label": "Ops Dashboard"
       },
       {
-        "title": "Price and plan labor",
-        "body": "Use labor units × Rate Card per requirement/phase; include prevailing wage where required. Do not invent hours, dates or staffing commitments.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "2. Locate your project",
+        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
+        "task": "Identify the correct project without creating a new job.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Build tomorrow’s dispatch packet",
-        "body": "Include address, site contact, scope for the visit, drawings, parts list, delivery proof, safety notes, lifts/access and dependencies.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "3. Check materials before dispatch",
+        "body": "Open Projects, open the chosen record and select Materials. Compare the listed quantities and supplier information with actual delivery evidence. A Materials entry is not proof of delivery. If there is no proof, record DO NOT ROLL and escalate.",
+        "task": "Identify the missing delivery evidence or the source that confirms receipt.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Enforce the parts gate",
-        "body": "If delivery is not confirmed, label DO NOT ROLL and escalate. Do not imply a truck can roll merely because a PO exists.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "4. Review resource capacity",
+        "body": "Open Resource Board in the left sidebar. Its heading is Resource Allocation. Use Today and the week arrows to find the relevant period on the Allocation board. Check visible conflict badges. Do not click Assign to book a real crew merely for practice.",
+        "task": "Identify a potential conflict and the affected job without altering assignments.",
+        "open_path": "/ResourceBoard",
+        "open_label": "Resource Board"
       },
       {
-        "title": "File every partner/vendor email",
-        "body": "Company-wide rule: identify the partner/vendor → open or create its own folder → apply vendor/partner, division/domain, job/bid and topic tags → move the thread and attachments into that folder → sort by job/topic and date → verify it is findable and nothing is left loose in the inbox. Folder names and tags below are a proposed demonstration, not an existing mailbox. Outlook authentication is still required for live filing. No messages have been filed by this mockup.",
-        "task": "Practice choosing a vendor folder and a topic tag below."
+        "title": "5. Check the scheduled visit",
+        "body": "Open Schedule in the left sidebar (this opens Calendar). Use All Projects to select the project and review the visible visit dates. Do not Add Event or change a real appointment during practice.",
+        "task": "Compare the visit date with parts readiness and crew availability.",
+        "open_path": "/Calendar",
+        "open_label": "Schedule"
       },
       {
-        "title": "Write factual closeout notes",
-        "body": "Record arrival, who was met, work-order scope, findings, work done and next needs from actual notes/photos. Facts only, calm and no blame.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "6. Prepare the dispatch evidence",
+        "body": "Open Projects, open the chosen visible project and select Ops / Field Docs. Click New Ops Doc. In New Ops / Field Doc, choose the appropriate Type, enter Title *, Linked Phase and Notes, and select approved File attachments (stored privately). Notes must identify visit scope, source drawings, site access, safety and delivery proof. If delivery is not confirmed, write DO NOT ROLL and escalate. Click Create only on an authorized training record; otherwise Cancel. Verify any saved title and attachments in Ops / Field Docs.",
+        "task": "Prepare a packet from real evidence or explicitly list MISSING items; never claim a delivery or visit occurred.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Handle turnaways",
-        "body": "If work cannot be done, record facts, time on site and who confirmed. Draft closure/payment request for review; do not send it from training.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "7. Review field evidence",
+        "body": "Open Projects, open the same visible record and select Field Logs. Read only existing visit evidence; then return to Ops / Field Docs and compare the packet with recorded facts. Do not mark a visit complete or invent a photo, hours or result.",
+        "task": "Record a real open item and its responsible owner in the practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Publish the daily handoff internally",
-        "body": "Prepare the DualTrack daily log with real photos and open items, report to Chief and give PM/Accounting the evidence needed for follow-up. Demo practice does not create a live log.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "Is a PO enough to clear delivery?",
+        "question": "How is Schedule opened by a walkthrough link?",
         "choices": [
-          "No; delivery confirmation with proof is required.",
-          "Yes.",
-          "Only for fire alarm."
+          "The Schedule sidebar label opens the Calendar page.",
+          "A made-up Schedule page URL.",
+          "The Procurement tab."
         ],
         "answer": 0
       },
       {
-        "question": "Closeout notes should contain:",
+        "question": "What if delivery lacks proof?",
         "choices": [
-          "Actual notes/photos and facts.",
-          "Guessed arrival times.",
-          "Blame."
+          "DO NOT ROLL; escalate before dispatch.",
+          "Materials listed means delivered.",
+          "Send the crew anyway."
         ],
         "answer": 0
       },
       {
-        "question": "Where does a supplier email belong?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "In that supplier’s own folder, tagged and sorted.",
-          "Loose in the inbox.",
-          "In any unrelated job folder."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "Ops-Manager.md; field-operations-all-divisions; gsis-new-bid-workflow; Kemar email rule.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). OpsDashboard.jsx; ResourceAllocationBoard.jsx; Calendar.jsx; OpsDocDialog.jsx; ProjectMaterials.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-ADMIN-ACCOUNTING": {
     "course_id": "CRS-ADMIN-ACCOUNTING",
     "title": "Accounting • Evidence to invoice and AR",
     "steps": [
       {
-        "title": "Gather approved inputs",
-        "body": "Read the signed proposal, approved change orders, contract terms, SOV and milestone/closeout proof. Never infer completion from a schedule alone.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "1. Find the billing row",
+        "body": "Open Billing under Billing in the left sidebar. Use Search project or client… and the All / Unbilled / Partial / Complete filter to locate the permitted project. Read Contract, Billed, Retention Held, Outstanding and Status.",
+        "task": "Record the figures shown for one actual project without changing them.",
+        "open_path": "/Billing",
+        "open_label": "Billing"
       },
       {
-        "title": "Reconcile the SOV",
-        "body": "Milestone percentages total 100; values equal the approved contract. Check internal cost backup and approved changes. Track retention separately.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "2. Locate your project",
+        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
+        "task": "Identify the correct project without creating a new job.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Draft progress billing",
-        "body": "Bill only actual achieved progress with proof. Milestone 1 at signing follows the approved contract and applicable law; flag residential/public-works compliance. Do not independently change contract terms.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "3. Review approved changes and evidence",
+        "body": "In Projects, open the chosen record, then Change Orders. Read the existing approvals and compare them with Documents. Practice does not authorize a change order, invoice or collection email. If approval evidence is absent, record MISSING.",
+        "task": "Identify which scope changes have evidence and which need approval.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Check invoice math and terms",
-        "body": "Invoice totals must reconcile to contract plus approved changes, prior billing and retention. Show the standard 2% prompt-pay discount and date five days from invoice date only per approved terms. No invented date in this demo.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "4. Reconcile the SOV",
+        "body": "In the chosen project, open SOV & Pay Apps. Read Schedule of Values, Retention %, Description, Cost Code, Billable Amount, % Complete, Billed to Date and Remaining Balance. Compare the total with the approved contract. Investigate a total-mismatch warning before any billing.",
+        "task": "Check one milestone against its signed scope and progress evidence.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "File every partner/vendor email",
-        "body": "Company-wide rule: identify the partner/vendor → open or create its own folder → apply vendor/partner, division/domain, job/bid and topic tags → move the thread and attachments into that folder → sort by job/topic and date → verify it is findable and nothing is left loose in the inbox. Folder names and tags below are a proposed demonstration, not an existing mailbox. Outlook authentication is still required for live filing. No messages have been filed by this mockup.",
-        "task": "Practice choosing a vendor folder and a topic tag below."
+        "title": "5. Prepare authorized SOV inputs",
+        "body": "In SOV & Pay Apps on an authorized training project, use Add line and fill Description, Cost Code, Billable Amount and % Complete from approved evidence. Confirm Retention % from the contract. Save SOV only with explicit training-record edit authority; reopen the tab to verify. Otherwise inspect without changing any inputs.",
+        "task": "Record the checked total and any mismatch; never invent a price or completion percentage.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Prepare collections follow-up",
-        "body": "Draft reminders at 15 and 30 days past due based on verified dates. Kemar approves/sends every invoice and reminder. No email is sent from this course.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "6. Review rather than issue a pay application",
+        "body": "In the same project’s SOV & Pay Apps, scroll to Pay Applications. Review existing App #, Period, Earned, Retention, Net Due and Status. Generate Pay App writes a billing record: do not use it during practice or imply the player submits or collects payment.",
+        "task": "Reconcile an available application or note that no authorized application exists.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Log expenses",
-        "body": "Record uploaded receipts by real job and category. Reconcile evidence; do not log in to a bank, move money or store bank account numbers.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "7. File supporting evidence",
+        "body": "Open Projects, open the chosen record and select Documents. To file an authorized training document, click Add Document, enter Name *, choose Type and Date, select File (stored privately), and enter Notes identifying its source/revision. Click Add only if authorized to store it; otherwise Cancel. Reopen Documents and use Open on the saved row to verify it.",
+        "task": "Complete one permitted evidence filing, or record why saving is blocked. Never upload confidential material as a training sample.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Prepare monthly summary",
-        "body": "Summarize invoiced, collected, outstanding by customer and expenses by job. Give PM cost-to-complete feedback and Chief the reviewed AR list.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "8. Keep Outlook filing separate",
+        "body": "Open Documents in MYGSIS to locate the related job evidence with Search name… and All Projects. Partner/vendor email filing is an Outlook rule, not a MYGSIS screen: in Outlook, file the thread in that partner/vendor’s own folder and sort/tag it by job, division/domain, topic and date. MYGSIS does not autofile mail. Do not send mail during practice.",
+        "task": "Identify the correct job document here and the partner/vendor folder needed in Outlook; no mail is sent by this player.",
+        "open_path": "/Documents",
+        "open_label": "Documents"
+      },
+      {
+        "title": "9. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "What supports a progress invoice?",
+        "question": "Where is the project SOV?",
         "choices": [
-          "Proof of achieved milestone progress and approved contract.",
-          "Only the planned date.",
-          "A training score."
+          "Projects → an accessible project → SOV & Pay Apps.",
+          "A guessed WIP sidebar label.",
+          "Bid Detail → Procurement."
         ],
         "answer": 0
       },
       {
-        "question": "Can Accounting move money in this workflow?",
+        "question": "Does a listed milestone prove it is billable?",
         "choices": [
-          "No.",
-          "Yes, without approval.",
-          "The player does it."
+          "No; check signed scope, approvals and progress evidence.",
+          "Yes, any row can be billed.",
+          "Yes, finishing practice sends the invoice."
         ],
         "answer": 0
       },
       {
-        "question": "Where does a supplier email belong?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "In that supplier’s own folder, tagged and sorted.",
-          "Loose in the inbox.",
-          "In any unrelated job folder."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "Accounting.md; accounting-and-billing-all-divisions; schedule-of-values-and-billing; Kemar email rule.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Billing.jsx; ProjectDetail.jsx; ScheduleOfValuesTab.jsx; DocumentsTab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-ADMIN-PM": {
     "course_id": "CRS-ADMIN-PM",
     "title": "Project Manager • Signed job to closeout",
     "steps": [
       {
-        "title": "Open the signed job",
-        "body": "Create/check the DualTrack job from signed proposal and approved estimate: job number, division/domain, customer, site, value, scope and exclusions. This is a practice checklist, not a live write.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "1. Locate your project",
+        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
+        "task": "Identify the correct project without creating a new job.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Build phased milestones",
-        "body": "Match the division: FA design/approval/rough-in/trim/programming/pre-test/AHJ/closeout; LV testing/training; DR flight/report visits; SW discovery/build/test/launch/training.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "2. Review the phase handoff",
+        "body": "In the chosen project, open Tracker, then Phases. Compare the visible scope/phase status with signed job documents. Do not advance a phase or alter a client milestone just to finish practice.",
+        "task": "Identify the next gate and the document it needs.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Coordinate logistics and labor",
-        "body": "Work with Ops on phase requirements, dependencies, access and parts confirmation. A missing delivery blocks dispatch. Never commit a customer schedule without approval.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "3. Draft a real RFI in the correct place",
+        "body": "In the chosen project, open RFIs and click New RFI. Read Subject *, Question *, Category, Priority, Status and Directed To. For an authorized training project, enter a source-referenced question and click Create, then verify it appears in RFIs. Otherwise use Cancel. Do not send mail or invent missing site facts.",
+        "task": "Complete an authorized training RFI or record the exact unresolved question without saving.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Track submittals and RFIs",
-        "body": "Draft required submittals and RFIs; track responses with actual dates and responsible owners. Escalate missing authority or scope information.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "4. Track the submittal package",
+        "body": "In the chosen project, select Submittals and New Submittal. Fill Title *, Submittal #, Spec Section, Type, Status, Required Date and Description from an approved training package. Create only on a permitted training record, then verify the entry; otherwise Cancel. This does not submit to the AHJ or confer approval.",
+        "task": "Locate the package reference and its real review dependency.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Control changes",
-        "body": "Out-of-scope work becomes a change-order draft before work starts. Kemar approval is required. Keep the approved control budget and SOV reconciled.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "5. File supporting evidence",
+        "body": "Open Projects, open the chosen record and select Documents. To file an authorized training document, click Add Document, enter Name *, choose Type and Date, select File (stored privately), and enter Notes identifying its source/revision. Click Add only if authorized to store it; otherwise Cancel. Reopen Documents and use Open on the saved row to verify it.",
+        "task": "Complete one permitted evidence filing, or record why saving is blocked. Never upload confidential material as a training sample.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "File every partner/vendor email",
-        "body": "Company-wide rule: identify the partner/vendor → open or create its own folder → apply vendor/partner, division/domain, job/bid and topic tags → move the thread and attachments into that folder → sort by job/topic and date → verify it is findable and nothing is left loose in the inbox. Folder names and tags below are a proposed demonstration, not an existing mailbox. Outlook authentication is still required for live filing. No messages have been filed by this mockup.",
-        "task": "Practice choosing a vendor folder and a topic tag below."
+        "title": "6. Check change and team ownership",
+        "body": "In the same project, open Change Orders and review approved changes, then Team & Roles to identify the responsible people. Do not approve a change or modify access during practice.",
+        "task": "Match one open item with the person responsible for resolving it.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Prepare Friday status",
-        "body": "Report schedule, open RFIs, change orders and risks every Friday. Save the status and route it to Chief; this course schedules or sends nothing.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "7. Reconcile schedule and materials",
+        "body": "Open the project’s Calendar tab, then Materials. Compare the visible work dates with actual parts evidence. Use Ops / Field Docs to review the handoff packet; missing delivery proof means DO NOT ROLL and escalation, not a guessed dispatch.",
+        "task": "Record one readiness blocker or a verified evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Close out and hand off",
-        "body": "Collect as-builts, test reports, photos, warranty and training sign-off. Hand approved evidence to Accounting for final invoice; do not mark incomplete milestones complete.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "8. Check closeout and billing evidence",
+        "body": "Open the project’s Punch List, Documents and SOV & Pay Apps tabs. Check that unresolved punch items, approved closeout files and supported progress agree before anyone issues billing. Do not Generate Pay App or mark a client job complete for practice.",
+        "task": "Record the next closeout action and owner.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "9. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "Out-of-scope work requires:",
+        "question": "Which control begins a project RFI?",
         "choices": [
-          "A reviewed change-order draft before work starts.",
-          "No documentation.",
-          "An invented allowance."
+          "Projects → accessible record → RFIs → New RFI.",
+          "Bids → Procurement → Email.",
+          "The practice quiz creates one."
         ],
         "answer": 0
       },
       {
-        "question": "Friday status includes:",
+        "question": "What does a submittal training entry mean?",
         "choices": [
-          "Schedule, RFIs, change orders and risks.",
-          "Only a completion claim.",
-          "Bank credentials."
+          "It is a record only; external submission/approval is separate.",
+          "It automatically approves the engineering.",
+          "It enrolls the designer."
         ],
         "answer": 0
       },
       {
-        "question": "Where does a supplier email belong?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "In that supplier’s own folder, tagged and sorted.",
-          "Loose in the inbox.",
-          "In any unrelated job folder."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "Project-Manager.md; project-management-all-divisions; schedule-of-values-and-billing; Kemar email rule.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). ProjectDetail.jsx; RFITab.jsx; SubmittalsTab.jsx; DocumentsTab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-ADMIN-PROCUREMENT": {
     "course_id": "CRS-ADMIN-PROCUREMENT",
     "title": "Procurement • Independent takeoff to delivery",
     "steps": [
       {
-        "title": "Read source documents independently",
-        "body": "Use the drawings/specs, including implied materials. Build an independent takeoff before comparing with Sales. Quantities must have source references.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "1. Locate your bid",
+        "body": "In the left sidebar under Sales & Estimating, open Bids. Use “Search by title, client, or agency...” to find a bid you can already see and open it. Select Overview and read the scope. Do not change Status or award a real bid during practice.",
+        "task": "Identify the bid and one missing scope item in the practice notes.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Reconcile discrepancies",
-        "body": "Compare independent takeoff against Sales device/material lists. Resolve every discrepancy together and record the agreed list before pricing.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "2. Read the source documents",
+        "body": "Open Bids, open the same visible bid, then select Documents. Under Uploaded Documents, use View on an available document. Read the relevant scope, specifications and addenda. If no documents exist, record MISSING instead of inventing quantities.",
+        "task": "Find the current source revision and a scope reference.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Source vendor pricing",
-        "body": "Use identified parts, quantities and documented supplier quotes. Record freight, availability, quote date/validity and lead times; gaps stay MISSING. RFQs here are drafts only.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "3. Trace a drawing to quantities",
+        "body": "Open Bids, open your visible bid and select Drawings. Compare its sheets with Drawing Analysis, then select BOQ. Read Description, Qty, Unit and Category. AI output must be checked against the source sheets; do not run or apply a takeoff merely to pass practice.",
+        "task": "Compare one available quantity with its sheet; record unresolved differences.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "Review escalation and tier",
-        "body": "Record the approved workflow’s escalation cushion (3–5% standard; up to 10% volatile copper) and 30/25/20% markup tier as applicable. Distinguish margin and note conflicts with older Rate Card guidance for review.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "4. Review the actual estimate, not an invented tab",
+        "body": "Open Bids, open the chosen visible record and select Estimate. Compare Materials & Line Items with the BOQ and source documents. There is no dedicated Procurement tab in the verified Bid Detail source; do not look for Insert Procurement Prices there. Use only the controls actually visible to your login.",
+        "task": "Identify the material line and quote information you still need.",
+        "open_path": "/Bids",
+        "open_label": "Bids"
       },
       {
-        "title": "File every partner/vendor email",
-        "body": "Company-wide rule: identify the partner/vendor → open or create its own folder → apply vendor/partner, division/domain, job/bid and topic tags → move the thread and attachments into that folder → sort by job/topic and date → verify it is findable and nothing is left loose in the inbox. Folder names and tags below are a proposed demonstration, not an existing mailbox. Outlook authentication is still required for live filing. No messages have been filed by this mockup.",
-        "task": "Practice choosing a vendor folder and a topic tag below."
+        "title": "5. Check supplier records only when available",
+        "body": "Suppliers is registered in local pages.config but was not on the verified live office sidebar. Open this screen only if it appears for your login; otherwise skip it and report unavailable. On Suppliers use Search suppliers… and inspect an existing supplier’s Edit form for Name *, Category, Contact, Payment Terms and Notes; Cancel without changing client data.",
+        "task": "Verify an existing supplier reference; do not invent vendor contacts.",
+        "open_path": "/Suppliers",
+        "open_label": "Suppliers"
       },
       {
-        "title": "Return the priced material handoff",
-        "body": "Give Sales the reconciled priced BOM, quote references and open risks. In documented MYGSIS, Procurement within the bid supports quote upload and confirmed price insertion; do not execute live updates here.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "6. Inspect a purchase order without placing one",
+        "body": "PurchaseOrders is registered locally but was not on the verified live office sidebar. Open it only if it appears for your login; otherwise report unavailable. On Purchase Orders, inspect an existing order with Edit. Review Project *, Vendor *, Line Items, Tax, Shipping and Notes, then Cancel. Do not Create, Update, Void or send an order during practice.",
+        "task": "Compare an existing PO with its approved quote; practice is not purchase approval.",
+        "open_path": "/PurchaseOrders",
+        "open_label": "Purchase Orders"
       },
       {
-        "title": "Prepare PO drafts",
-        "body": "Prepare vendor-specific PO drafts linked to the real project and approved materials. No order or payment occurs in this mockup; release requires actual authorization.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "7. Locate your project",
+        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
+        "task": "Identify the correct project without creating a new job.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Track delivery evidence",
-        "body": "Track actual delivery and attach proof for Ops. A sent PO is not delivery confirmation. Escalate delays and preserve vendor correspondence in its own tagged folder.",
-        "task": "Review the scenario, enter your decision, then continue."
+        "title": "8. Record materials with source evidence",
+        "body": "In the permitted project, select Materials and Add Material. Read Material Name *, Category, Quantity, Unit, Unit Cost ($), Supplier, Description and Notes. Only on an authorized training record, enter source-backed material details and click Add Material, then verify the row. Otherwise Cancel. This records a material, not a delivery or purchase.",
+        "task": "Preserve quote/date references in Notes and never mark unproven delivery as confirmed.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "9. Prepare the dispatch evidence",
+        "body": "Open Projects, open the chosen visible project and select Ops / Field Docs. Click New Ops Doc. In New Ops / Field Doc, choose the appropriate Type, enter Title *, Linked Phase and Notes, and select approved File attachments (stored privately). Notes must identify visit scope, source drawings, site access, safety and delivery proof. If delivery is not confirmed, write DO NOT ROLL and escalate. Click Create only on an authorized training record; otherwise Cancel. Verify any saved title and attachments in Ops / Field Docs.",
+        "task": "Prepare a packet from real evidence or explicitly list MISSING items; never claim a delivery or visit occurred.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "10. Keep Outlook filing separate",
+        "body": "Open Documents in MYGSIS to locate the related job evidence with Search name… and All Projects. Partner/vendor email filing is an Outlook rule, not a MYGSIS screen: in Outlook, file the thread in that partner/vendor’s own folder and sort/tag it by job, division/domain, topic and date. MYGSIS does not autofile mail. Do not send mail during practice.",
+        "task": "Identify the correct job document here and the partner/vendor folder needed in Outlook; no mail is sent by this player.",
+        "open_path": "/Documents",
+        "open_label": "Documents"
+      },
+      {
+        "title": "11. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "When should takeoffs be reconciled?",
+        "question": "Is Procurement a verified Bid Detail tab?",
         "choices": [
-          "Before final pricing and handoff.",
-          "After ordering everything.",
-          "Never."
+          "No; use BOQ, Estimate and Documents, and only available registered screens.",
+          "Yes, always click Procurement.",
+          "Yes, it auto-inserts quote prices."
         ],
         "answer": 0
       },
       {
-        "question": "Does a prepared PO authorize purchase here?",
+        "question": "When may you open Suppliers or Purchase Orders for these steps?",
         "choices": [
-          "No; this is a draft-only practice.",
-          "Yes.",
-          "Only if the score is high."
+          "Only if those screens appear for your login; they were not in the verified live sidebar.",
+          "Everyone must find them in the sidebar.",
+          "A guessed detail ID bypasses permissions."
         ],
         "answer": 0
       },
       {
-        "question": "Where does a supplier email belong?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "In that supplier’s own folder, tagged and sorted.",
-          "Loose in the inbox.",
-          "In any unrelated job folder."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "Procurement.md; gsis-new-bid-workflow; MYGSIS dated map; Kemar email rule.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-SAFETY-CALOSHA": {
-    "course_id": "CRS-SAFETY-CALOSHA",
-    "title": "Safety • Cal/OSHA orientation",
-    "steps": [
-      {
-        "title": "Identify hazards",
-        "body": "Review site safety requirements and the applicable Cal/OSHA program with a competent supervisor. This orientation awards no external safety credential.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Confirm controls",
-        "body": "Identify PPE, access and work controls before field activity.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Escalate unsafe work",
-        "body": "Stop unsafe work and contact the responsible supervisor; never improvise compliance.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Document the briefing",
-        "body": "Record actual safety briefing evidence after attendance.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Track evidence",
-        "body": "A verified certificate needs its issuer and actual expiry, never a made-up renewal.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Review before dispatch",
-        "body": "Confirm the current safety requirements for each job.",
-        "task": "Review the scenario, enter your decision, then continue."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "Can this internal orientation award an external credential?",
-        "choices": [
-          "No; actual external evidence and verification are required.",
-          "Yes automatically.",
-          "A click is sufficient."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What if source information is missing?",
-        "choices": [
-          "Mark MISSING and escalate.",
-          "Invent it.",
-          "Ignore it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "GSIS internal orientation/demo; field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing. Detailed external credential/regulated training must be independently verified.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-SAFETY-JHA": {
-    "course_id": "CRS-SAFETY-JHA",
-    "title": "Safety • Job-hazard analysis",
-    "steps": [
-      {
-        "title": "Read the visit scope",
-        "body": "Use the real dispatch scope and site conditions.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Break work into tasks",
-        "body": "Identify the planned sequence with the supervisor.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Identify hazards",
-        "body": "Review work at height, electrical exposure, access and other actual hazards.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Select controls",
-        "body": "Use supervisor-approved controls and PPE; this is not a substitute for qualified training.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Brief the crew",
-        "body": "Confirm understanding before work starts.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Update on change",
-        "body": "Stop and revise the JHA if conditions change.",
-        "task": "Review the scenario, enter your decision, then continue."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "Can this internal orientation award an external credential?",
-        "choices": [
-          "No; actual external evidence and verification are required.",
-          "Yes automatically.",
-          "A click is sufficient."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What if source information is missing?",
-        "choices": [
-          "Mark MISSING and escalate.",
-          "Invent it.",
-          "Ignore it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "GSIS internal orientation/demo; field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing. Detailed external credential/regulated training must be independently verified.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-SAFETY-FIRSTAID": {
-    "course_id": "CRS-SAFETY-FIRSTAID",
-    "title": "Safety • First-aid readiness",
-    "steps": [
-      {
-        "title": "Know the emergency plan",
-        "body": "Confirm site emergency contacts, location and response plan.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Locate resources",
-        "body": "Identify first-aid kits and trained responders.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Recognize your limits",
-        "body": "Seek emergency help; only trained personnel provide care within their training.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Protect the scene",
-        "body": "Do not enter unsafe conditions.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Document facts",
-        "body": "Follow supervisor incident-reporting instructions.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Verify qualifications",
-        "body": "Upload actual external certification after training. This orientation does not confer first-aid certification.",
-        "task": "Review the scenario, enter your decision, then continue."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "Can this internal orientation award an external credential?",
-        "choices": [
-          "No; actual external evidence and verification are required.",
-          "Yes automatically.",
-          "A click is sufficient."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What if source information is missing?",
-        "choices": [
-          "Mark MISSING and escalate.",
-          "Invent it.",
-          "Ignore it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "GSIS internal orientation/demo; field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing. Detailed external credential/regulated training must be independently verified.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-FA-NICET-ORIENTATION": {
-    "course_id": "CRS-FA-NICET-ORIENTATION",
-    "title": "NICET • Optional Fire Alarm credential planning",
-    "steps": [
-      {
-        "title": "Identify the goal",
-        "body": "Select a relevant Fire Alarm credential objective; no certification is implied.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Verify requirements",
-        "body": "Confirm current official eligibility and exam requirements directly before applying. No application URL is invented here.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Collect evidence",
-        "body": "Identify actual experience and required verifications.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Plan study",
-        "body": "Use available manufacturer education without assuming eligibility/contact-hour acceptance.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Seek approval",
-        "body": "Any fee or registration requires actual authorization.",
-        "task": "Review the scenario, enter your decision, then continue."
-      },
-      {
-        "title": "Track only verified results",
-        "body": "Record credential evidence and real expiration after verification; none exists in this mockup.",
-        "task": "Review the scenario, enter your decision, then continue."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "Can this internal orientation award an external credential?",
-        "choices": [
-          "No; actual external evidence and verification are required.",
-          "Yes automatically.",
-          "A click is sufficient."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What if source information is missing?",
-        "choices": [
-          "Mark MISSING and escalate.",
-          "Invent it.",
-          "Ignore it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What happens after this practice walkthrough?",
-        "choices": [
-          "Tracker remains not started; evidence and verification are separate.",
-          "Everyone is marked complete automatically.",
-          "Manufacturer enrollment is purchased."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "GSIS internal orientation/demo; field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing. Detailed external credential/regulated training must be independently verified.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-SOFTWARE-FRAMEWORK": {
-    "course_id": "CRS-SOFTWARE-FRAMEWORK",
-    "title": "Software • One framework for every GSIS app",
-    "steps": [
-      {
-        "title": "Intake one approved outcome",
-        "body": "Write acceptance criteria, affected pages/entities, roles and what success looks like. Use this same process for FireCode Architect, DualTrack, MYGSIS, GSIS Aerial / Aerial Command Center, ITM and future apps.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "Map the workflow and protect records",
-        "body": "List what changes, what stays, what could break and existing records affected. Never delete fields/entities/records or change roles/visibility without direct authorization. Product examples use the same framework, not separate silos.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "Plan and source the change",
-        "body": "Write a small plan with sources, assumptions, missing inputs and test cases. Choose the approved toolchain. Base44 projects use the authorized builder/editor; repository work uses the approved source-control workflow. No sign-in or code deployment is performed here.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "Build in a controlled preview",
-        "body": "Make the smallest approved change and keep a dated change log. Use sample/fake data, preserve existing records and avoid exposing private details. A FireCode calculation feature and an ITM inspection form follow this same build discipline.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "Test every acceptance criterion",
-        "body": "Test with the designated GSIS Test User, not a real person. Check success, empty, failure and permission states; record pass/fail and evidence. Aerial deliverable QA and MYGSIS assignment validation are examples of applying the same test gate.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "Verify mobile and regression behavior",
-        "body": "Review the phone-sized view and desktop. Retest nearby features, data integrity, navigation and accessibility. For FireCode, inspect drawings/PDFs visually as well as numerical results; for DualTrack, reconcile totals and saved records.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "Review risk and request release approval",
-        "body": "Submit change log, test evidence, unresolved defects and risk to Chief/Kemar. Publishing requires the appropriate explicit approval and shared-save coordination. This walkthrough never publishes Base44 or any app.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "Publish only when authorized; verify live",
-        "body": "After real release authorization, use the approved release process, verify the live result with sample evidence and keep a rollback plan. Do not claim a preview is production. There is no release action in this course.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "Close out, monitor and reuse",
-        "body": "Record what changed, what was tested, what is broken, decisions needed and the next owner. Route approved bugs through intake. Reuse this lifecycle for every current and future GSIS product rather than creating product silos.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "How many software-building frameworks are needed here?",
-        "choices": [
-          "One shared framework applied to every GSIS app.",
-          "One isolated framework per product.",
-          "No test framework."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "What is required before a real production release?",
-        "choices": [
-          "Recorded testing, reviewed risk and explicit release authorization.",
-          "Only a preview screenshot.",
-          "A training score."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Does finishing this demo change recorded training progress?",
-        "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "developer-dualtrack-feature-work; GSIS role-sheet mobile/test guardrails; Kemar taxonomy correction Nov 6, 2026. This internal practice does not change or publish any application.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). BidDetail.jsx; pages.config.js; Suppliers.jsx; PurchaseOrders.jsx; ProjectMaterials.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-FIRE-ITM": {
     "course_id": "CRS-FIRE-ITM",
     "title": "Fire • Itm workflow",
     "steps": [
       {
-        "title": "Confirm contract and system",
-        "body": "Read the approved inspection/testing/maintenance contract, system records and site requirements. Identify actual scope, frequencies and required qualified personnel; do not invent a code interval.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible Fire ITM job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Prepare the visit",
-        "body": "Build the visit plan and dispatch packet; coordinate access, impairment notifications and required safety controls with the responsible qualified lead.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved inspection scope, prior inspection reports, device inventory and actual test authorization. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Check parts and readiness",
-        "body": "Verify equipment, approved procedures and actual delivery evidence. Missing critical requirements must be escalated before dispatch.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan Fire ITM. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Perform documented work only",
-        "body": "Follow approved procedures and listed manufacturer requirements. This internal walkthrough is not authorization to inspect or a substitute for required training.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. A dedicated inspection/test execution workflow was not verified in live MYGSIS; the separate ITM app is not a tab of this project. Do not invent inspection checkboxes or a test-pass control. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Record results and deficiencies",
-        "body": "Record actual observations/test evidence. Separate deficiency repair quotes from the contracted inspection; do not fabricate test passes.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual inspection findings, device references, deficiencies and reviewer signoff; no invented passes. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Closeout and billing handoff",
-        "body": "Deliver the reviewed inspection report through approved channels; hand proof to PM/Accounting. Repairs need separate approval before work.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the Fire ITM reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the Fire ITM evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "What if required source information or authorization is missing?",
+        "question": "Where do you file and reopen the job evidence?",
         "choices": [
-          "Mark MISSING and escalate before affected work.",
-          "Guess a typical value.",
-          "Bypass the gate."
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
         ],
         "answer": 0
       },
       {
-        "question": "What supports closeout?",
+        "question": "What if the specialist workflow is not available in MYGSIS?",
         "choices": [
-          "Actual reviewed work/test evidence.",
-          "A demo click.",
-          "An unverified promise."
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
         ],
         "answer": 0
       },
       {
-        "question": "Does finishing this demo change recorded training progress?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing FA ITM/service/closeout; existing manufacturer training paths. High-level internal SOP only.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing FA ITM/service/closeout; existing manufacturer training paths. High-level internal SOP only.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-FIRE-SERVICE": {
     "course_id": "CRS-FIRE-SERVICE",
     "title": "Fire • Service workflow",
     "steps": [
       {
-        "title": "Intake the service request",
-        "body": "Record actual symptoms, system, location and customer-authorized scope. Missing facts stay MISSING.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible Fire service job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Review records and safety",
-        "body": "Read available drawings, service history and manufacturer instructions. Coordinate impairment/safety requirements with the qualified lead.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check reported fault, approved service scope, existing records and authorized impairment/testing plan. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Prepare dispatch",
-        "body": "Confirm access, diagnostic equipment, needed parts and delivery proof; DO NOT ROLL when required delivery is not confirmed.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan Fire service. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Diagnose without guessing",
-        "body": "Use the approved diagnostic workflow and source-backed findings. Do not bypass life-safety requirements or claim unknown faults are fixed.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. MYGSIS does not provide verified live panel diagnostics in these screens. Fault investigation and testing happen with qualified personnel and approved equipment/software outside this player. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Control repairs and changes",
-        "body": "Draft out-of-scope repair/change work for approval before proceeding. Record installed parts and actual work only.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check reported fault versus actual findings, work performed and unresolved deficiencies. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Test and closeout",
-        "body": "Document qualified testing, restoration, findings, photos and open items; hand evidence to PM/Accounting for the approved service invoice.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the Fire service reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the Fire service evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "What if required source information or authorization is missing?",
+        "question": "Where do you file and reopen the job evidence?",
         "choices": [
-          "Mark MISSING and escalate before affected work.",
-          "Guess a typical value.",
-          "Bypass the gate."
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
         ],
         "answer": 0
       },
       {
-        "question": "What supports closeout?",
+        "question": "What if the specialist workflow is not available in MYGSIS?",
         "choices": [
-          "Actual reviewed work/test evidence.",
-          "A demo click.",
-          "An unverified promise."
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
         ],
         "answer": 0
       },
       {
-        "question": "Does finishing this demo change recorded training progress?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing FA ITM/service/closeout; existing manufacturer training paths. High-level internal SOP only.",
-    "author": "GSIS-authored internal demo"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing FA ITM/service/closeout; existing manufacturer training paths. High-level internal SOP only.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-FIRE-PROGRAMMING": {
     "course_id": "CRS-FIRE-PROGRAMMING",
     "title": "Fire • Programming workflow",
     "steps": [
       {
-        "title": "Confirm authority and scope",
-        "body": "Read the approved sequence, system model, software access and authorized programming scope. Partner-gated tools remain gated.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible Fire programming job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Review approved documents",
-        "body": "Reconcile device/point lists, drawings, interface requirements and manufacturer instructions. Missing software or license access is a stop/escalate item.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check panel model/firmware, approved sequence of operations, device/point list, authorized software access and existing backup. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Protect the baseline",
-        "body": "Use the approved backup and change-control process before any live system work. This lesson performs no panel connection or software write.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan Fire programming. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Configure against approved sequence",
-        "body": "Use manufacturer-supported tools only with actual authorization. Trace every intended change to the approved sequence and point list.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Panel programming, uploads/downloads and reacceptance testing are not live MYGSIS controls. Use only authorized manufacturer software and qualified procedures outside MYGSIS; never invent a Programming tab or program a real system during practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Test and reconcile",
-        "body": "Qualified personnel verify every affected function/interface and document results. Do not infer a test pass from a successful file save.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check pre/post backups, configuration comparisons, test evidence and unresolved exceptions. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Handoff records",
-        "body": "Retain reviewed program backup, test evidence and open issues in the job closeout package. No system completion is invented.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the Fire programming reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the Fire programming evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "What if required source information or authorization is missing?",
+        "question": "Where do you file and reopen the job evidence?",
         "choices": [
-          "Mark MISSING and escalate before affected work.",
-          "Guess a typical value.",
-          "Bypass the gate."
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
         ],
         "answer": 0
       },
       {
-        "question": "What supports closeout?",
+        "question": "What if the specialist workflow is not available in MYGSIS?",
         "choices": [
-          "Actual reviewed work/test evidence.",
-          "A demo click.",
-          "An unverified promise."
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
         ],
         "answer": 0
       },
       {
-        "question": "Does finishing this demo change recorded training progress?",
+        "question": "Does finishing this practice mark official completion?",
         "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing FA ITM/service/closeout; existing manufacturer training paths. High-level internal SOP only.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-AERIAL-SOP-PROGRESS": {
-    "course_id": "CRS-AERIAL-SOP-PROGRESS",
-    "title": "GSIS Aerial • Construction Progress Reports SOP",
-    "steps": [
-      {
-        "title": "1. Scope and deliverables",
-        "body": "Confirm visit cadence, contract length, boundary and fixed photo/video viewpoints. Preserve the same plan between visits for comparable progress records.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "2. Airspace, authority and access",
-        "body": "Confirm the site/boundary from a source, qualified Part 107 pilot and current requirements; check controlled airspace/LAANC, restrictions and hazards with the responsible pilot. Site permission, access, badging and safety must be resolved. Do not invent authorizations or certificate numbers.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "3. Mission and equipment readiness",
-        "body": "Confirm approved mission plan, weather, equipment, launch area and JHA. The Matrice 4E has no thermal; equipment/accuracy gaps require a decision before flight. Flights needing authorization/waiver require Kemar review.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "4. Capture and on-site data check",
-        "body": "Capture the agreed fixed-vantage photos and video, then check coverage on site.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "5. Process and quality-check",
-        "body": "Compare to the prior approved visit; write factual change-since-last-visit notes and attach the photo set / agreed video.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "6. Report limitations",
-        "body": "State: “Deliverables are for visual documentation and approximate measurement; they are not a land survey.” California survey-boundary/legal-elevation/certified-volume work requires an appropriately licensed survey professional. Never invent accuracy, acreage or flight time.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "7. Deliver reviewed outputs",
-        "body": "Deliver the reviewed progress report on the approved visit cadence; record actual customer acceptance and retention terms.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "8. Archive and job handoff",
-        "body": "Keep actual flight/maintenance logs, source imagery, QA, deliverables, customer acceptance and stated retention period in the job folder. Give PM/Accounting the evidence for the applicable visit or one-time billing milestone; this demo sends nothing.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "What is common to every GSIS Aerial service SOP?",
-        "choices": [
-          "Scope → airspace/access → plan/readiness → capture → QA → limitations → delivery → archive.",
-          "Fly first; ask later.",
-          "Skip data checks."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Can approximate visual deliverables be called a certified land survey?",
-        "choices": [
-          "No; survey work requires an appropriately licensed professional.",
-          "Yes, if the model looks good.",
-          "A demo quiz certifies it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Does finishing this demo change recorded training progress?",
-        "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-AERIAL-SOP-ORTHO": {
-    "course_id": "CRS-AERIAL-SOP-ORTHO",
-    "title": "GSIS Aerial • Orthomosaic Mapping SOP",
-    "steps": [
-      {
-        "title": "1. Scope and deliverables",
-        "body": "Confirm mapped boundary, required georeferencing, accuracy and requested outputs; price/use ground control only when agreed.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "2. Airspace, authority and access",
-        "body": "Confirm the site/boundary from a source, qualified Part 107 pilot and current requirements; check controlled airspace/LAANC, restrictions and hazards with the responsible pilot. Site permission, access, badging and safety must be resolved. Do not invent authorizations or certificate numbers.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "3. Mission and equipment readiness",
-        "body": "Confirm approved mission plan, weather, equipment, launch area and JHA. The Matrice 4E has no thermal; equipment/accuracy gaps require a decision before flight. Flights needing authorization/waiver require Kemar review.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "4. Capture and on-site data check",
-        "body": "Collect the approved mapping image coverage with the qualified pilot; verify overlap/coverage against the mission plan without inventing flight settings.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "5. Process and quality-check",
-        "body": "Process and inspect the georeferenced orthomosaic; check coverage/artifacts and the agreed coordinate/accuracy basis. GeoTIFF/KML and requested DSM/DTM/contours are documented outputs.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "6. Report limitations",
-        "body": "State: “Deliverables are for visual documentation and approximate measurement; they are not a land survey.” California survey-boundary/legal-elevation/certified-volume work requires an appropriately licensed survey professional. Never invent accuracy, acreage or flight time.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "7. Deliver reviewed outputs",
-        "body": "Deliver only the contracted map formats and stated accuracy; preserve source data and reviewed QA evidence.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "8. Archive and job handoff",
-        "body": "Keep actual flight/maintenance logs, source imagery, QA, deliverables, customer acceptance and stated retention period in the job folder. Give PM/Accounting the evidence for the applicable visit or one-time billing milestone; this demo sends nothing.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "What is common to every GSIS Aerial service SOP?",
-        "choices": [
-          "Scope → airspace/access → plan/readiness → capture → QA → limitations → delivery → archive.",
-          "Fly first; ask later.",
-          "Skip data checks."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Can approximate visual deliverables be called a certified land survey?",
-        "choices": [
-          "No; survey work requires an appropriately licensed professional.",
-          "Yes, if the model looks good.",
-          "A demo quiz certifies it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Does finishing this demo change recorded training progress?",
-        "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-AERIAL-SOP-3D": {
-    "course_id": "CRS-AERIAL-SOP-3D",
-    "title": "GSIS Aerial • 3D Models SOP",
-    "steps": [
-      {
-        "title": "1. Scope and deliverables",
-        "body": "Confirm model/mesh/point-cloud scope, viewing requirements and approximate-versus-survey accuracy.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "2. Airspace, authority and access",
-        "body": "Confirm the site/boundary from a source, qualified Part 107 pilot and current requirements; check controlled airspace/LAANC, restrictions and hazards with the responsible pilot. Site permission, access, badging and safety must be resolved. Do not invent authorizations or certificate numbers.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "3. Mission and equipment readiness",
-        "body": "Confirm approved mission plan, weather, equipment, launch area and JHA. The Matrice 4E has no thermal; equipment/accuracy gaps require a decision before flight. Flights needing authorization/waiver require Kemar review.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "4. Capture and on-site data check",
-        "body": "Capture imagery suitable for the approved 3D plan and check coverage of required surfaces on site.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "5. Process and quality-check",
-        "body": "Process and inspect the mesh/point cloud for gaps, artifacts and agreed accuracy. OBJ/FBX/PLY and LAS/LAZ are documented examples, not a promise every tool exports every format.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "6. Report limitations",
-        "body": "State: “Deliverables are for visual documentation and approximate measurement; they are not a land survey.” California survey-boundary/legal-elevation/certified-volume work requires an appropriately licensed survey professional. Never invent accuracy, acreage or flight time.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "7. Deliver reviewed outputs",
-        "body": "Deliver the contracted model formats/viewer with reviewed limitations and acceptance evidence.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "8. Archive and job handoff",
-        "body": "Keep actual flight/maintenance logs, source imagery, QA, deliverables, customer acceptance and stated retention period in the job folder. Give PM/Accounting the evidence for the applicable visit or one-time billing milestone; this demo sends nothing.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "What is common to every GSIS Aerial service SOP?",
-        "choices": [
-          "Scope → airspace/access → plan/readiness → capture → QA → limitations → delivery → archive.",
-          "Fly first; ask later.",
-          "Skip data checks."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Can approximate visual deliverables be called a certified land survey?",
-        "choices": [
-          "No; survey work requires an appropriately licensed professional.",
-          "Yes, if the model looks good.",
-          "A demo quiz certifies it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Does finishing this demo change recorded training progress?",
-        "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-AERIAL-SOP-STOCKPILE": {
-    "course_id": "CRS-AERIAL-SOP-STOCKPILE",
-    "title": "GSIS Aerial • Stockpile Volumes SOP",
-    "steps": [
-      {
-        "title": "1. Scope and deliverables",
-        "body": "Confirm piles, boundary, baseline and whether relative approximate quantities meet the customer need.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "2. Airspace, authority and access",
-        "body": "Confirm the site/boundary from a source, qualified Part 107 pilot and current requirements; check controlled airspace/LAANC, restrictions and hazards with the responsible pilot. Site permission, access, badging and safety must be resolved. Do not invent authorizations or certificate numbers.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "3. Mission and equipment readiness",
-        "body": "Confirm approved mission plan, weather, equipment, launch area and JHA. The Matrice 4E has no thermal; equipment/accuracy gaps require a decision before flight. Flights needing authorization/waiver require Kemar review.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "4. Capture and on-site data check",
-        "body": "Capture the approved coverage of each identified pile with safe access and clear pile identification.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "5. Process and quality-check",
-        "body": "Review base surfaces and pile boundaries, calculate approximate volumes and check QA. Do not certify legal/survey quantities without a qualified licensed surveyor.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "6. Report limitations",
-        "body": "State: “Deliverables are for visual documentation and approximate measurement; they are not a land survey.” California survey-boundary/legal-elevation/certified-volume work requires an appropriately licensed survey professional. Never invent accuracy, acreage or flight time.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "7. Deliver reviewed outputs",
-        "body": "Deliver a reviewed PDF + CSV volume report with assumptions and actual measurement limitations.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "8. Archive and job handoff",
-        "body": "Keep actual flight/maintenance logs, source imagery, QA, deliverables, customer acceptance and stated retention period in the job folder. Give PM/Accounting the evidence for the applicable visit or one-time billing milestone; this demo sends nothing.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "What is common to every GSIS Aerial service SOP?",
-        "choices": [
-          "Scope → airspace/access → plan/readiness → capture → QA → limitations → delivery → archive.",
-          "Fly first; ask later.",
-          "Skip data checks."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Can approximate visual deliverables be called a certified land survey?",
-        "choices": [
-          "No; survey work requires an appropriately licensed professional.",
-          "Yes, if the model looks good.",
-          "A demo quiz certifies it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Does finishing this demo change recorded training progress?",
-        "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-AERIAL-SOP-INSPECTIONS": {
-    "course_id": "CRS-AERIAL-SOP-INSPECTIONS",
-    "title": "GSIS Aerial • Roof / Site / Infrastructure Inspections SOP",
-    "steps": [
-      {
-        "title": "1. Scope and deliverables",
-        "body": "Confirm roof/site/infrastructure scope and requested visual observations. The documented Matrice 4E has no thermal; thermal or lidar requests are equipment gaps.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "2. Airspace, authority and access",
-        "body": "Confirm the site/boundary from a source, qualified Part 107 pilot and current requirements; check controlled airspace/LAANC, restrictions and hazards with the responsible pilot. Site permission, access, badging and safety must be resolved. Do not invent authorizations or certificate numbers.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "3. Mission and equipment readiness",
-        "body": "Confirm approved mission plan, weather, equipment, launch area and JHA. The Matrice 4E has no thermal; equipment/accuracy gaps require a decision before flight. Flights needing authorization/waiver require Kemar review.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "4. Capture and on-site data check",
-        "body": "Capture the agreed RGB photos/video safely; do not promise inaccessible, concealed or thermal findings.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "5. Process and quality-check",
-        "body": "Review observations, annotate factual findings and preserve image references. Do not turn visual observations into unsupported engineering conclusions.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "6. Report limitations",
-        "body": "State: “Deliverables are for visual documentation and approximate measurement; they are not a land survey.” California survey-boundary/legal-elevation/certified-volume work requires an appropriately licensed survey professional. Never invent accuracy, acreage or flight time.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "7. Deliver reviewed outputs",
-        "body": "Deliver the reviewed annotated PDF and contracted imagery with limitations and unresolved access/equipment gaps.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "8. Archive and job handoff",
-        "body": "Keep actual flight/maintenance logs, source imagery, QA, deliverables, customer acceptance and stated retention period in the job folder. Give PM/Accounting the evidence for the applicable visit or one-time billing milestone; this demo sends nothing.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "What is common to every GSIS Aerial service SOP?",
-        "choices": [
-          "Scope → airspace/access → plan/readiness → capture → QA → limitations → delivery → archive.",
-          "Fly first; ask later.",
-          "Skip data checks."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Can approximate visual deliverables be called a certified land survey?",
-        "choices": [
-          "No; survey work requires an appropriately licensed professional.",
-          "Yes, if the model looks good.",
-          "A demo quiz certifies it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Does finishing this demo change recorded training progress?",
-        "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-AERIAL-SOP-ASBUILT": {
-    "course_id": "CRS-AERIAL-SOP-ASBUILT",
-    "title": "GSIS Aerial • As-Built Documentation SOP",
-    "steps": [
-      {
-        "title": "1. Scope and deliverables",
-        "body": "Confirm the existing-condition/closeout area, agreed documentation outputs and accuracy; this is documented in GSIS service descriptions, not a new trade.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "2. Airspace, authority and access",
-        "body": "Confirm the site/boundary from a source, qualified Part 107 pilot and current requirements; check controlled airspace/LAANC, restrictions and hazards with the responsible pilot. Site permission, access, badging and safety must be resolved. Do not invent authorizations or certificate numbers.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "3. Mission and equipment readiness",
-        "body": "Confirm approved mission plan, weather, equipment, launch area and JHA. The Matrice 4E has no thermal; equipment/accuracy gaps require a decision before flight. Flights needing authorization/waiver require Kemar review.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "4. Capture and on-site data check",
-        "body": "Capture approved existing-condition imagery and available matching control/source references; no hidden-condition claim is implied.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "5. Process and quality-check",
-        "body": "Coordinate the captured model/point cloud with the agreed as-built documentation purpose. Verify coverage and limitations; Matterport capability is still unconfirmed in source material.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "6. Report limitations",
-        "body": "State: “Deliverables are for visual documentation and approximate measurement; they are not a land survey.” California survey-boundary/legal-elevation/certified-volume work requires an appropriately licensed survey professional. Never invent accuracy, acreage or flight time.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "7. Deliver reviewed outputs",
-        "body": "Deliver only agreed documented formats for coordination/closeout, with the non-survey disclaimer and no unsupported BIM/Matterport capability promise.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "8. Archive and job handoff",
-        "body": "Keep actual flight/maintenance logs, source imagery, QA, deliverables, customer acceptance and stated retention period in the job folder. Give PM/Accounting the evidence for the applicable visit or one-time billing milestone; this demo sends nothing.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "What is common to every GSIS Aerial service SOP?",
-        "choices": [
-          "Scope → airspace/access → plan/readiness → capture → QA → limitations → delivery → archive.",
-          "Fly first; ask later.",
-          "Skip data checks."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Can approximate visual deliverables be called a certified land survey?",
-        "choices": [
-          "No; survey work requires an appropriately licensed professional.",
-          "Yes, if the model looks good.",
-          "A demo quiz certifies it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Does finishing this demo change recorded training progress?",
-        "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-AERIAL-SOP-REALESTATE": {
-    "course_id": "CRS-AERIAL-SOP-REALESTATE",
-    "title": "GSIS Aerial • Real Estate Media SOP",
-    "steps": [
-      {
-        "title": "1. Scope and deliverables",
-        "body": "Confirm property boundaries, client permission/privacy limits and contracted media. Aerials, HDR, video, 3D tours and floor plans appear in GSIS service descriptions; confirm actual equipment/capability before promising each.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "2. Airspace, authority and access",
-        "body": "Confirm the site/boundary from a source, qualified Part 107 pilot and current requirements; check controlled airspace/LAANC, restrictions and hazards with the responsible pilot. Site permission, access, badging and safety must be resolved. Do not invent authorizations or certificate numbers.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "3. Mission and equipment readiness",
-        "body": "Confirm approved mission plan, weather, equipment, launch area and JHA. The Matrice 4E has no thermal; equipment/accuracy gaps require a decision before flight. Flights needing authorization/waiver require Kemar review.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "4. Capture and on-site data check",
-        "body": "Capture only authorized property/media within the agreed flight and access plan. Do not assume interior/3D-tour equipment is available.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "5. Process and quality-check",
-        "body": "Review image/video quality, privacy, completeness and requested edits. Flag unverified Matterport or floor-plan capability rather than fabricate delivery.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "6. Report limitations",
-        "body": "State: “Deliverables are for visual documentation and approximate measurement; they are not a land survey.” California survey-boundary/legal-elevation/certified-volume work requires an appropriately licensed survey professional. Never invent accuracy, acreage or flight time.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "7. Deliver reviewed outputs",
-        "body": "Deliver approved media and agreed sharing/retention terms; record acceptance without inventing property results or marketing claims.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      },
-      {
-        "title": "8. Archive and job handoff",
-        "body": "Keep actual flight/maintenance logs, source imagery, QA, deliverables, customer acceptance and stated retention period in the job folder. Give PM/Accounting the evidence for the applicable visit or one-time billing milestone; this demo sends nothing.",
-        "task": "Practice only: record your decision and the supporting evidence; do not execute live actions."
-      }
-    ],
-    "quiz": [
-      {
-        "question": "What is common to every GSIS Aerial service SOP?",
-        "choices": [
-          "Scope → airspace/access → plan/readiness → capture → QA → limitations → delivery → archive.",
-          "Fly first; ask later.",
-          "Skip data checks."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Can approximate visual deliverables be called a certified land survey?",
-        "choices": [
-          "No; survey work requires an appropriately licensed professional.",
-          "Yes, if the model looks good.",
-          "A demo quiz certifies it."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Does finishing this demo change recorded training progress?",
-        "choices": [
-          "No. Official progress stays 0% / not started.",
-          "Yes, it automatically completes everything.",
-          "It enrolls everyone."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.",
-    "author": "GSIS-authored internal demo"
-  },
-  "CRS-LV-SOP-CCTV": {
-    "course_id": "CRS-LV-SOP-CCTV",
-    "title": "CCTV — Video surveillance workflow",
-    "steps": [
-      {
-        "title": "CCTV — Video surveillance workflow",
-        "body": "# CCTV — Video surveillance workflow\n\nProject spec section: 28 23 00. Engine: `js/placementRules.js` (`RULES.cctv`). Tests: `js/placementRules.test.js`."
-      },
-      {
-        "title": "Read room names off the plan and classify each room (byType).",
-        "body": "Read room names off the plan and classify each room (byType)."
-      },
-      {
-        "title": "Look up PPF/purpose per type; no type match means no camera (defaultNone).",
-        "body": "Look up PPF/purpose per type; no type match means no camera (defaultNone)."
-      },
-      {
-        "title": "Place: entries face the door from inside; corridors at the polygon diameter ends plus one every 90 ft; open areas at the corner overview with the best aim.",
-        "body": "Place: entries face the door from inside; corridors at the polygon diameter ends plus one every 90 ft; open areas at the corner overview with the best aim."
-      },
-      {
-        "title": "Clip the cone to the room/envelope visibility and the PPF-limited range.",
-        "body": "Clip the cone to the room/envelope visibility and the PPF-limited range."
-      },
-      {
-        "title": "Home-run Cat 6A to the nearest TR; ≤295 ft or propose an IDF.",
-        "body": "Home-run Cat 6A to the nearest TR; ≤295 ft or propose an IDF."
-      },
-      {
-        "title": "Size storage: bitrate × retention × 1.2.",
-        "body": "Size storage: bitrate × retention × 1.2."
-      },
-      {
-        "title": "Rules table",
-        "body": "| Rule | Value | Status | Source |\n|---|---|---|---|\n| cctv.sensor_px_h | 2688 | ASSUMED | ASSUMED: typical 4 MP sensor 2688x1520 (spec says \"Fixed 4 MP\"; model TBD) |\n| cctv.hfov_min_deg | 28 | ASSUMED | ASSUMED varifocal tele limit (model TBD) |\n| cctv.hfov_max_deg | 105 | ASSUMED | ASSUMED varifocal wide limit (model TBD) |\n| cctv.mount_ft | 10 | ASSUMED | ASSUMED mounting height 10 ft AFF (verify against A2.0/A2.1 RCP ceiling heights) |\n| cctv.corridor_seg_ft | 90 | ASSUMED | Standards Manual cheat sheet §1.3 / CCTV-08 \"corridors: camera at both ends\"; ≤45 ft per camera ASSUMED |\n| cctv.entry | ppf=80, place=face_door_ext, n=1 | SOURCED | Project spec 28 23 00 §1.4 area table row \"Building entries/vestibules\" (PPF 80) + Manual CCTV-13 Identify |\n| cctv.lobby | ppf=40, place=corner_overview, perSf=1250 | SOURCED (part) | Project spec 28 23 00 §1.4 area table row \"Public lobbies/waiting\" (PPF 40) / count per 1,250 sf ASSUMED |\n| cctv.reception | ppf=80, place=corner_overview, n=1 | SOURCED | Project spec 28 23 00 §1.4 area table row \"Public service counters\" (PPF 80) |\n| cctv.treasurer | ppf=80, place=corner_overview, perSf=1250 | SOURCED (part) | Project spec 28 23 00 §1.4 area table row \"Public service counters / cash handling\" / counter location not shown on A1.1; camera aims at room centre — INPUT NEEDED |\n| cctv.corridor | ppf=20, place=corridor_ends | SOURCED | Project spec 28 23 00 §1.4 area table row \"Corridors\" (PPF 20) + Manual CCTV-08 both ends |\n| cctv.stair | ppf=40, place=face_door_from_outside, n=1 | SOURCED | Project spec 28 23 00 §1.4 area table row \"Corridors/stairs\" (PPF 40 at stair doors) |\n| cctv.landing | ppf=40, place=corner_overview, n=1 | SOURCED | Project spec 28 23 00 §1.4 area table row \"...elevator landings\" (PPF 40) |\n| cctv.server | ppf=80, place=face_door_in, n=1 | SOURCED | Project spec 28 23 00 §1.4 area table row \"IT/records/high-value\" + Manual CCTV-13 |\n| cctv.it | ppf=80, place=face_door_in, n=1, only=['030' | SOURCED | Project spec 28 23 00 §1.4 area table row \"IT/records/high-value\" (030 IT WORKSPACE listed) |\n| cctv.records | ppf=80, place=face_door_in, n=1 | SOURCED | Project spec 28 23 00 §1.4 area table row \"IT/records/high-value\" |\n| cctv.mail | ppf=80, place=face_door_in, n=1 | SOURCED | Project spec 28 23 00 §1.4 area table row \"IT/records/high-value\" (136 MAIL ROOM) |\n| cctv.garage | ppf=40, place=corner_overview, perSf=1250 | SOURCED | Project spec 28 23 00 §1.4 area table row \"Garage/loading\" (PPF 40) |\n| cctv.cafeteria | ppf=20, place=center_360, n=1 | SOURCED | Project spec 28 23 00 §1.4 area table row \"Cafeteria/break\" (138, not 139 KITCHEN) |\n| cctv.restroom | n=0 | ASSUMED | Manual cheat sheet §1.3: no cameras in restrooms (privacy) — ASSUMED rule, consistent with spec table (restrooms not listed) |\n| cctv.defaultNone | {} | SOURCED | Project spec 28 23 00 §1.4 area table: room type not listed in the area table -> no camera |"
-      }
-    ],
-    "quiz": [
-      {
-        "question": "Does finishing this practice change official training progress?",
-        "choices": [
-          "No. Official progress stays unchanged.",
-          "Yes."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "/workspace/GSIS/Reference/LV-Workflows/LV-Workflow-CCTV-Video.md",
-    "author": "GSIS source document; verbatim practice conversion"
-  },
-  "CRS-LV-SOP-ACCESS": {
-    "course_id": "CRS-LV-SOP-ACCESS",
-    "title": "AC — Access control workflow",
-    "steps": [
-      {
-        "title": "AC — Access control workflow",
-        "body": "# AC — Access control workflow\n\nProject spec section: 28 13 00. Engine: `js/placementRules.js` (`RULES.ac`). Tests: `js/placementRules.test.js`."
-      },
-      {
-        "title": "Find controlled doors with doorRules AC-R1..R10 (exterior, IT/MDF, secure suites).",
-        "body": "Find controlled doors with doorRules AC-R1..R10 (exterior, IT/MDF, secure suites)."
-      },
-      {
-        "title": "Assign a device set per door: reader, lock, REX, DPS, intercom (where the rule says).",
-        "body": "Assign a device set per door: reader, lock, REX, DPS, intercom (where the rule says)."
-      },
-      {
-        "title": "Run each door end to end: TR panel → reader/lock/REX/DPS/intercom, tagged with the door no.",
-        "body": "Run each door end to end: TR panel → reader/lock/REX/DPS/intercom, tagged with the door no."
-      },
-      {
-        "title": "PSU sizing: (locks × lock_a + readers × reader_a) × 1.3; battery for 4 h × 1.25.",
-        "body": "PSU sizing: (locks × lock_a + readers × reader_a) × 1.3; battery for 4 h × 1.25."
-      },
-      {
-        "title": "If a door needed by a rule isn't on the plan, mark it INPUT NEEDED and don't invent it.",
-        "body": "If a door needed by a rule isn't on the plan, mark it INPUT NEEDED and don't invent it."
-      },
-      {
-        "title": "Rules table",
-        "body": "| Rule | Value | Status | Source |\n|---|---|---|---|\n| ac.reader_aff_in | 42 | SOURCED | Manual §2.3 (ADA 15–48 in; GSIS 42 in) + spec 28 13 00 §1.3.E |\n| ac.psu_margin | 1.3 | SOURCED | Manual §2.3 lock PSU +30% margin |\n| ac.battery_h | 4 | SOURCED | Spec 28 13 00 §1.6.E 4-hour standby |\n| ac.lock_a | 0.5 | ASSUMED | ASSUMED 0.5 A @24 VDC per electrified lock/ELR — replace with 08 71 00 hardware cut sheets |\n| ac.reader_a | 0.15 | ASSUMED | ASSUMED 0.15 A per OSDP reader (model TBD) |\n| ac.panels | {'0': ['031', '042B'], '1': ['042B'], '2 | SOURCED | Spec 28 13 00 §1.2.B controllers in 031, 042B, 250 [VERIFY] |\n| AC-R1 | 100 reader+elr+autoop+dps+rex+intercom | SOURCED | Project spec 28 13 00 §1.4 door table row \"Main entry pair\"; video intercom ASSUMED (not in spec) |\n| AC-R2 | 142,146 reader+elr+autoop+dps+rex | SOURCED | Project spec 28 13 00 §1.4 door table row \"South/East entry\" (146 ENTRY VESTIBULE treated as 145 ENTRY outer door — VERIFY) |\n| AC-R3 | 144 dps+rex | SOURCED | Project spec 28 13 00 §1.4 door table row \"Exit vestibule\" (monitored, no reader) |\n| AC-R4 | 031 keypad+lock+dps+rex | SOURCED | Project spec 28 13 00 §1.4 door table row \"Server room\" (card + PIN) |\n| AC-R5 | 026,030 reader+lock+dps+rex | SOURCED | Project spec 28 13 00 §1.4 door table row \"IT\"; DPS/REX per Manual §2.3 default |\n| AC-R6 | 148,159 reader+lock+dps+rex | SOURCED | Project spec 28 13 00 §1.4 door table row \"Treasurer\" |\n| AC-R7 | 050,165,209,224 reader+lock+dps+rex | SOURCED | Project spec 28 13 00 §1.4 door table row \"Records\" |\n| AC-R8 | 136 reader+lock+dps+rex | SOURCED | Project spec 28 13 00 §1.4 door table row \"Mail\" |\n| AC-R9 |  reader+lock+dps+rex | SOURCED | Project spec 28 13 00 §1.4 door table row \"Public/staff separation\" |\n| AC-R10 | 042B,042A,012,022A reader+lock+dps+rex | SOURCED | Project spec 28 13 00 §1.4 door table row \"Telecom/electrical\" |\n| ac.innerTypes | ['office', 'support', 'restroom'] | ASSUMED | ASSUMED: doors from a secure room into its own inner offices/storage are not controlled (suite interior) |\n| ac.stairNote | {} | ASSUMED | Stair re-entry / FA release: spec §1.6.D [VERIFY existing FA]; Manual: NOT FOUND -> no stair doors controlled |\n| ac.doorNumbering | {} | ASSUMED | ASSUMED: A8.0 Door Schedule not in provided set; door no. = room it swings into + suffix |"
-      }
-    ],
-    "quiz": [
-      {
-        "question": "Does finishing this practice change official training progress?",
-        "choices": [
-          "No. Official progress stays unchanged.",
-          "Yes."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "/workspace/GSIS/Reference/LV-Workflows/LV-Workflow-AC-Access.md",
-    "author": "GSIS source document; verbatim practice conversion"
-  },
-  "CRS-LV-SOP-AV": {
-    "course_id": "CRS-LV-SOP-AV",
-    "title": "AV — Audio-visual workflow",
-    "steps": [
-      {
-        "title": "AV — Audio-visual workflow",
-        "body": "# AV — Audio-visual workflow\n\nProject spec section: (none in set). Engine: `js/placementRules.js` (`RULES.av`). Tests: `js/placementRules.test.js`."
-      },
-      {
-        "title": "NO AV spec in the bid set, so the whole program is ASSUMED.",
-        "body": "NO AV spec in the bid set, so the whole program is ASSUMED."
-      },
-      {
-        "title": "Display size from DISCAS: farthest viewer ≤ 6 × image height (AV-03..07).",
-        "body": "Display size from DISCAS: farthest viewer ≤ 6 × image height (AV-03..07)."
-      },
-      {
-        "title": "Video bar ≤300 sf, otherwise codec + DSP + ceiling mic; speakers for 90° coverage at 9 ft ceiling.",
-        "body": "Video bar ≤300 sf, otherwise codec + DSP + ceiling mic; speakers for 90° coverage at 9 ft ceiling."
-      },
-      {
-        "title": "Amplifier = taps × 1.5 (AV-17).",
-        "body": "Amplifier = taps × 1.5 (AV-17)."
-      },
-      {
-        "title": "Rules table",
-        "body": "| Rule | Value | Status | Source |\n|---|---|---|---|\n| av.eh | 0.03 | SOURCED | Manual AV-03..07 DISCAS/BDM: FV ≤ 6 × IH (3% element height) |\n| av.sizes_in | [55, 65, 75, 85, 98] | ASSUMED | ASSUMED commercial display sizes (model TBD) |\n| av.ceiling_ft | 9 | ASSUMED | ASSUMED 9 ft ceiling — verify on A2.0/A2.1 RCP |\n| av.ear_ft | 4 | SOURCED | Manual AV-13 (seated ear height 4 ft) |\n| av.spk_cov_deg | 90 | ASSUMED | ASSUMED 90° conical ceiling speaker (model TBD) |\n| av.mic_cov_sf | 900 | ASSUMED | Manual AV-21..24 ceiling mic array ≈30x30 ft pickup (ASSUMED value) |\n| av.videobar_max_sf | 300 | ASSUMED | ASSUMED: rooms ≤ 300 sf use all-in-one video bar |\n| av.amp_factor | 1.5 | SOURCED | Manual AV-17 amp = taps × 1.5 |\n| av.tap_w | 2 | ASSUMED | ASSUMED 2 W tap per 70 V speaker |\n| av.als_sf_per_seat | 15 | ASSUMED | ASSUMED occupant load 15 sf/seat (CBC Table 1004.5 unconcentrated) for ALS count |\n| av.program | {} | ASSUMED | No AV spec section in the project set -> entire AV program is ASSUMED and needs Kemar/Owner confirmation |"
-      }
-    ],
-    "quiz": [
-      {
-        "question": "Does finishing this practice change official training progress?",
-        "choices": [
-          "No. Official progress stays unchanged.",
-          "Yes."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "/workspace/GSIS/Reference/LV-Workflows/LV-Workflow-AV-Audio-visual.md",
-    "author": "GSIS source document; verbatim practice conversion"
-  },
-  "CRS-LV-SOP-NET": {
-    "course_id": "CRS-LV-SOP-NET",
-    "title": "NW — Networking / Wi-Fi workflow",
-    "steps": [
-      {
-        "title": "NW — Networking / Wi-Fi workflow",
-        "body": "# NW — Networking / Wi-Fi workflow\n\nProject spec section: 27 21 00. Engine: `js/placementRules.js` (`RULES.wifi`). Tests: `js/placementRules.test.js`."
-      },
-      {
-        "title": "AP count per room from the §1.4 coverage table (open office sf, conference dedicated, cafeteria minimum).",
-        "body": "AP count per room from the §1.4 coverage table (open office sf, conference dedicated, cafeteria minimum)."
-      },
-      {
-        "title": "Spacing 40–60 ft honeycomb (NW-18/19); skip noAP room types.",
-        "body": "Spacing 40–60 ft honeycomb (NW-18/19); skip noAP room types."
-      },
-      {
-        "title": "PoE budget: AP 30 W, camera 15.4 W (ASSUMED) → switch PoE class.",
-        "body": "PoE budget: AP 30 W, camera 15.4 W (ASSUMED) → switch PoE class."
-      },
-      {
-        "title": "Rules table",
-        "body": "| Rule | Value | Status | Source |\n|---|---|---|---|\n| wifi.cell_ft | 50 | SOURCED | Manual NW-18 (AP spacing 40–60 ft) + NW-19 honeycomb |\n| wifi.open_office_sf | 2000 | SOURCED | Project spec 27 21 00 §1.4 coverage table row \"Open office\" 1 WAP per ~2,000 sf |\n| wifi.conf_dedicated_sf | 300 | SOURCED | Project spec 27 21 00 §1.4 coverage table row \"Conference\" dedicated WAP in 130 and rooms > 300 sf |\n| wifi.cafeteria_min | 1 | SOURCED | Project spec 27 21 00 §1.4 coverage table row \"Cafeteria\" 1 WAP minimum |"
-      }
-    ],
-    "quiz": [
-      {
-        "question": "Does finishing this practice change official training progress?",
-        "choices": [
-          "No. Official progress stays unchanged.",
-          "Yes."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "/workspace/GSIS/Reference/LV-Workflows/LV-Workflow-NW-Networking.md",
-    "author": "GSIS source document; verbatim practice conversion"
-  },
-  "CRS-LV-SOP-CABLING": {
-    "course_id": "CRS-LV-SOP-CABLING",
-    "title": "SC — Structured cabling workflow",
-    "steps": [
-      {
-        "title": "SC — Structured cabling workflow",
-        "body": "# SC — Structured cabling workflow\n\nProject spec section: 27 10 00 / 27 21 00. Engine: `js/placementRules.js` (`RULES.data`). Tests: `js/placementRules.test.js`."
-      },
-      {
-        "title": "Classify rooms; open areas get 1 two-port outlet per 100 sf work area (SC-05/06).",
-        "body": "Classify rooms; open areas get 1 two-port outlet per 100 sf work area (SC-05/06)."
-      },
-      {
-        "title": "Device ports: AP 2 × Cat 6A, camera/AC/AV 1 each.",
-        "body": "Device ports: AP 2 × Cat 6A, camera/AC/AV 1 each."
-      },
-      {
-        "title": "Route to the nearest TR; link ≤295 ft (SC-01) or propose an IDF.",
-        "body": "Route to the nearest TR; link ≤295 ft (SC-01) or propose an IDF."
-      },
-      {
-        "title": "Patch panels = ceil(ports × 1.1 / 24); switches per 48 ports.",
-        "body": "Patch panels = ceil(ports × 1.1 / 24); switches per 48 ports."
-      },
-      {
-        "title": "Rules table",
-        "body": "| Rule | Value | Status | Source |\n|---|---|---|---|\n| data.port_per_outlet | 2 | SOURCED | Manual SC-05 (≥2 ports per work area) |\n| data.work_area_sf | 100 | SOURCED | Manual SC-06 (~100 sf per work area) |\n| data.max_link_ft | 295 | SOURCED | Manual SC-01 (TIA 568: 90 m permanent link) |\n| data.office | outlets=2 | ASSUMED | SC-05 min 1 work area; 2nd outlet on opposite wall ASSUMED (GSIS default) |\n| data.open_office | perWA=1 | SOURCED | SC-05 + SC-06: 1 two-port outlet per 100 sf work area; locations pending furniture plan |\n| data.it | perWA=1 | SOURCED | SC-05 + SC-06 |\n| data.reception | perWA=1 | SOURCED | SC-05 + SC-06 |\n| data.treasurer | perWA=1 | SOURCED | SC-05 + SC-06 |\n| data.conference | outlets=2 | ASSUMED | ASSUMED: 1 display wall + 1 table/floor box (AV coordination) |\n| data.workroom | outlets=2 | ASSUMED | ASSUMED: copier + workstation |\n| data.lobby | outlets=1 | ASSUMED | ASSUMED: reception/signage outlet |\n| data.cafeteria | outlets=1 | ASSUMED | ASSUMED |\n| data.kitchen | outlets=1 | ASSUMED | ASSUMED |\n| data.mail | outlets=1 | ASSUMED | ASSUMED |\n| data.records | outlets=1 | ASSUMED | ASSUMED |\n| data.devicePorts | {'camera': 1, 'ap': 2, 'acpanel': 1, 'displa | SOURCED | AP 2 x Cat 6A: spec 27 21 00 §3.1.A (TSB-162-A); others 1 per device Manual §8.3 (ASSUMED defaults) |"
-      }
-    ],
-    "quiz": [
-      {
-        "question": "Does finishing this practice change official training progress?",
-        "choices": [
-          "No. Official progress stays unchanged.",
-          "Yes."
-        ],
-        "answer": 0
-      }
-    ],
-    "source": "/workspace/GSIS/Reference/LV-Workflows/LV-Workflow-SC-Structured.md",
-    "author": "GSIS source document; verbatim practice conversion"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing FA ITM/service/closeout; existing manufacturer training paths. High-level internal SOP only.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-MON-DACT-GUIDE": {
     "course_id": "CRS-MON-DACT-GUIDE",
     "title": "GSIS Monitoring/DACT programming & central-station handoff",
     "steps": [
       {
-        "title": "GSIS Technician Programming Training Guide",
-        "body": "# GSIS Technician Programming Training Guide\nGolden State Integrated Systems (GSIS), Kemar McKenzie, Owner. California C-10 / C-7 contractor.\nVersion 1.0, 2026-10-23. Fire alarm comes first, then low voltage.\n\n> **How to use this guide.** Build the whole program on paper or in a spreadsheet before you open any manufacturer software. At the panel, you only enter data and check it. Each system's own file in `systems/` shows where the build goes in that system's software or menus, with manual page references. Sources are listed in `Sources.md`. Blank templates are in `templates/`.\n\n> **Rules we follow.** We use only legal, public documents. We never use pirated software, cracked keys, or shared dealer logins. If a manufacturer requires a partner login or factory training, we get it or we hire an authorized partner. We always back up the existing panel program before changing anything.\n\n> **Code basis.** California currently adopts NFPA 72, 2022 edition, through the CFC and CBC. NFPA offers free read-only access at https://www.nfpa.org/codes-and-standards/nfpa-72-standard-development/72. Section numbers below are from NFPA 72-2022. Check each one against your own copy before you cite it on a submittal.\n\n---"
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible Monitoring / DACT handoff job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "1.1 Why we program off-panel",
-        "body": "- The time you spend at the panel is mostly typing and testing, not design work, so there is less downtime and less impairment time (NFPA 72 Ch. 10, impairments).\n- A second tech can check the build before it goes into the panel.\n- The build matches the documentation NFPA 72 requires: Ch. 7 minimum documentation, the record of completion (7.8.2), and the site-specific software record (7.5.7 / 23.2.2).\n- The same build carries over between makes. Only the data-entry step changes."
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved monitoring worksheet, panel model, central-station requirements and authorized access; keep account secrets out of practice notes. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "1.2 Inputs you must have",
-        "body": "1. **Job sheet** (`templates/Job-Sheet-and-SOO.md`), including the panel model, firmware, software version, and who holds software access.\n2. **Sequence of operations (SOO)** from the stamped drawings or spec. If there is none, write one and get it approved by the engineer of record or the AHJ.\n3. **Device list and drawings**, with every device located and given an address.\n4. **Existing program backup** for add-ons. Without it you cannot do incremental programming safely.\n5. **Monitoring data** from the central station: account number, receiver numbers or IPs, format, and the code list."
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan Monitoring / DACT handoff. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "1.3 The build (eight deliverables)",
-        "body": "| # | Deliverable | Template | What \"done\" means | NFPA 72-2022 |\n|---|---|---|---|---|\n| 1 | Device-to-point map: address, type, label, zone, location | `01_Device-Point-Map.csv` | Every drawing device has exactly one unique address. Labels fit the panel's character limit. | 7.2, 7.5 |\n| 2 | Zones and groups | `02_Zones-Groups.csv` | No zone mixes types (alarm with supervisory, or latching with nonlatching) | 10.18 (annunciation zones) |\n| 3 | Cause-and-effect matrix | `03_Cause-Effect-Matrix.csv` | Every SOO line has a row, and every output has at least one driver | 23.8, Ch. 21 |\n| 4 | NAC, relay, and control outputs | `04_Outputs-NAC-Relay.csv` | Load calculation done, sync protocol matches the appliances, silenceable/latching marked | Ch. 18, 21 |\n| 5 | Supervision and trouble | `05_Supervision-Trouble.csv` | Every pathway and power source is supervised and reported | 12.6, 10.6 |\n| 6 | Monitoring/DACT: account and event codes | `06_Monitoring-DACT.csv` | Central station has confirmed the codes and there are two paths | Ch. 26 (26.6) |\n| 7 | Timers: verification, silence inhibit, PAS, AC-fail delay | `07_Timers.csv` | Each value is inside the manual's UL-permitted range and approved by the AHJ | 23.8.5.4 (verification), 23.8.1.3 (PAS) |\n| 8 | Verification and test plan | `08_Test-Plan.csv` | One line for every device and every C&E row, with the expected result | Ch. 14 (14.4.2 reacceptance), Table 14.4.3.2 |"
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Live central-station provisioning, DACT programming and signal verification are not MYGSIS screens. They require the authorized panel software and central station separately; this player must not send a signal, change an account or invent a receiver value. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "1.4 Logic rules that apply to every make",
-        "body": "- **Inputs → groups → outputs.** Every make maps inputs to outputs through some group object: correlation groups (Edwards iO), rules/cause-effect (EST3/EST4), control-by-event/CBE (Notifier, Fire-Lite, Gamewell), output groups (Silent Knight/Farenhyt), custom control (Simplex), or I/O mapping (Potter). Write your C&E matrix with neutral column names, then translate it for the make you're on.\n- **Count and delay.** \"2 detectors to release\" or \"cross-zone\" means a count greater than 1. Write it in the C&E as `Count_Required`.\n- **Verification** applies only to smoke detectors, never to pull stations, waterflow, or heat detectors (23.8.5.4).\n- **PAS** needs approval from the AHJ and staff trained to respond. Acknowledge within 15 s, investigate within up to 180 s (23.8.1.3).\n- **Waterflow** sounds the general alarm. Do not let it be silenced unless the AHJ allows it, and many panels have a \"waterflow silenceable\" option for this. Check it.\n- **Supervisory signals** (tamper, low air, duct detector where specified as supervisory) never turn on evacuation NACs.\n- **Duct detectors** shut down HVAC (21.7) and report as alarm or supervisory, depending on the spec and the CMC.\n- **Elevator recall**: primary floor, alternate floor, and machine room/hoistway/shunt trip handled separately (21.3, 21.4). Write each one as its own output.\n- **Silence and reset**: mark every output as silenceable or not, and latching or not.\n- **CO**: CO signals use a separate signal (temporal-4). Do not drive fire evacuation outputs with CO supervisory signals."
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check approved event mapping, actual receipt confirmations and open test exceptions; never invent account numbers. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "1.5 Entering the build (any make)",
-        "body": "1. Back up the panel: upload the database or print the configuration report. Name the file `JOB_PANEL_YYYY-MM-DD_PRE.ext`.\n2. Enter your build in the software (preferred) or at the keypad.\n3. Download it to the panel. Print or export the configuration report and **diff it line by line against your build**.\n4. Walk-test every changed or new device. Then do functional tests of every C&E row and check that the central station received each signal.\n5. After a software change, do reacceptance testing per NFPA 72 14.4.2: test all functions the change affects, plus a sample of devices it doesn't. Check the exact sample size in your copy.\n6. Save `..._POST` and file it with the record of completion (7.8.2). Put the software version and firmware on the record (23.2.2).\n\n---"
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the Monitoring / DACT handoff reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Part 2 — Worked example: small Edwards iO64R add-on",
-        "body": "**Scenario (training example; the addresses are made up).** An existing iO64R serves a one-story office. The add-on is a new 2-room training wing, a new fire sprinkler riser, and a new rooftop AHU. The panel has one loop and existing devices at 1-001 to 1-018. The manual is the iO64/iO1000 Technical Reference Manual, P/N 3102350-EN Rev 009 (page numbers are the manual's printed numbers)."
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the Monitoring / DACT handoff evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "2.1 Sequence of operations",
-        "body": "1. Smoke detector in the new wing: alarm verification **on**. Then general alarm on all NACs, recall elevator (none on site), report to the central station as Fire Alarm.\n2. Manual pull at the wing exit: general alarm with no verification, report as Fire Alarm.\n3. New riser waterflow (via monitor module): general alarm, NACs **not silenceable**, report as Waterflow.\n4. New riser control-valve tamper: supervisory only, no NACs, report as Supervisory.\n5. AHU duct smoke detector: supervisory per the spec. Shut down the AHU through a relay module and report as Supervisory.\n6. New NAC extender circuit in the wing: follows the general alarm, silenceable unless waterflow caused the alarm.\n7. Any trouble in the wing: trouble at the panel and report as Trouble."
-      },
-      {
-        "title": "2.2 Device-to-point map (excerpt of `01_Device-Point-Map.csv`)",
-        "body": "| Loop-Addr | Device | Device type to program | Label (2×20) | Zone | Corr. groups | Location |\n|---|---|---|---|---|---|---|\n| 1-019 | Addressable photo smoke (model per iO compatibility list) | Smoke alarm verified | TRAIN RM 101 / SMOKE | 3 | 001 | Rm 101 ceiling |\n| 1-020 | Addressable photo smoke | Smoke alarm verified | TRAIN RM 102 / SMOKE | 3 | 001 | Rm 102 ceiling |\n| 1-021 | Addressable pull station | Pull station | WING EXIT / PULL | 3 | 001 | East exit door |\n| 1-022 | Monitor module | Waterflow | RISER 2 / WATERFLOW | 4 | 001, 002 | Riser room |\n| 1-023 | Monitor module | Supervisory latching (tamper) | RISER 2 / TAMPER OS&Y | 5 | — | Riser room |\n| 1-024 | Duct smoke detector + interface | Supervisory latching (duct) | AHU-3 / DUCT SMOKE | 6 | 003 | Roof AHU-3 return |\n| 1-025 | Relay module | Relay (output) | AHU-3 / SHUTDOWN RLY | — | 003 (output) | AHU-3 controller |\n| 1-026 | Supervised output module | NAC riser (output) | WING / NAC-EXT | — | 001 (output) | Wing corridor |"
-      },
-      {
-        "title": "2.3 Zones",
-        "body": "| Zone | Type | Label | Members |\n|---|---|---|---|\n| 3 | Alarm | TRAINING WING | 1-019, 1-020, 1-021 |\n| 4 | Waterflow | RISER 2 FLOW | 1-022 |\n| 5 | Supervisory | RISER 2 TAMPER | 1-023 |\n| 6 | Supervisory | AHU-3 DUCT | 1-024 |\nRule (manual p. 95, Table 26): do not mix device types and zone types."
-      },
-      {
-        "title": "2.4 Correlation groups (iO's cause-and-effect object)",
-        "body": "| Group | Inputs | Outputs | Count | Delay | Note |\n|---|---|---|---|---|---|\n| 001 (general alarm, a fast group) | Zone 3, 1-022, existing alarm zones | Panel NAC1–NAC4, 1-026 | 1 | 0 | Auto programming puts alarm devices and panel NACs here (p. 40). Groups 001–025 are the fast groups (p. 93). |\n| 002 (waterflow) | 1-022 | 1-026 | 1 | 0 | iO sets silenceability **per output device type**, for example *Continuous (nonsilenceable)* or *Relay (nonsilenceable)* (device-type worksheet, p. 226). If the spec wants only waterflow to be non-silenceable, confirm the method with Edwards tech support before you build it. |\n| 003 (AHU shutdown) | 1-024 | 1-025 | 1 | 0 | Supervisory input drives the relay only, with no NAC |"
-      },
-      {
-        "title": "2.5 Cause-and-effect matrix (excerpt)",
-        "body": "| Input | NAC1-4 | 1-026 NAC-EXT | 1-025 AHU RLY | Panel alarm relay | Panel supv relay | Dialer | Silenceable |\n|---|---|---|---|---|---|---|---|\n| 1-019/020 smoke (verified) | X | X | | X | | Fire alarm (CID 111) | Y |\n| 1-021 pull | X | X | | X | | Fire alarm (CID 115) | Y |\n| 1-022 waterflow | X | X | | X | | Waterflow (CID 113) | **N** |\n| 1-023 tamper | | | | | X | Supervisory (CID 203/200) | n/a |\n| 1-024 duct | | | X | | X | Supervisory (CID 200) | n/a |\n| Any trouble | | | | | | Trouble (CID 3xx) | n/a |"
-      },
-      {
-        "title": "2.6 Timers",
-        "body": "| Timer | Value | Where in iO manual |\n|---|---|---|\n| Alarm verification | Smoke only. Do not combine with cross-zone, and keep the activation count ≤ 2 for cross-zoning (p. 88). | Device type \"verified\" (p. 53 device types; UL table p. 37) |\n| Reset inhibit (iO's inhibit timer; blocks silence/reset until it expires) | Off or 1 min per spec | Panel Operation programming (option descriptions p. 126; operation p. 164) |\n| AC fail delay | Range 0–15 h. **UL-permitted 1–3 h**, default 3 h (p. 37) | Panel Operation programming (p. 126) |\n| PAS | Not used unless the AHJ approves | n/a |"
-      },
-      {
-        "title": "2.7 Monitoring/DACT",
-        "body": "Account number, receivers, and Contact ID codes come from the central station. Enter them under Central monitoring station device programming (p. 110) and set per-device Event notification (Table 26, p. 95). Factory defaults include trouble CID 321 to 327 for NACs and test CID 600 (defaults, pp. 44–45). Override these if the central station asks you to."
-      },
-      {
-        "title": "2.8 Entering it on the iO64R",
-        "body": "1. Take a backup with iO-CU (MyEddie download, partner access) or print the System Configuration and Device Details reports (Ch. 4, pp. 179–185).\n2. Install the devices and set addresses 1-019 to 1-026.\n3. Use **incremental programming** (p. 77) or *Adding and removing devices* (p. 79). **Do not run auto programming** on an existing system, because it rebuilds the defaults and wipes custom groups (pp. 71–76).\n4. Device programming (p. 94): type, label, zone, event notification. Zone programming (p. 104). Correlation group programming (p. 87).\n5. Print the Correlation Group Configuration and Zone reports (p. 183–184) and diff them against 2.4 and 2.3.\n6. Run the walk test (pp. 176, 195). **Pitfalls:** walk test runs only the mainboard NACs, not addressable NAC devices such as 1-026, and alarm verification is bypassed during walk test (p. 177). Test 1-026 and verification functionally, then functional C&E tests, then SA-DACT testing (p. 194) with the central station on the line."
-      },
-      {
-        "title": "2.9 Test plan (excerpt)",
-        "body": "| Step | Device | Method | Expected | CS signal |\n|---|---|---|---|---|\n| 1 | 1-019 | Canned smoke | Verify cycle, then alarm, NACs on, alarm relay | Fire alarm, zone 3 |\n| 2 | 1-021 | Pull | Immediate alarm (no verify) | Fire alarm |\n| 3 | 1-022 | Flow test via inspector's test | Alarm; Silence does not silence NAC-EXT | Waterflow |\n| 4 | 1-023 | Close OS&Y 2 turns | Supervisory, no NACs | Supervisory |\n| 5 | 1-024 | Duct detector test | Supervisory, AHU-3 stops | Supervisory |\n| 6 | Open loop / NAC-EXT | Lift a wire | Trouble at the panel | Trouble |\n| 7 | Reacceptance | Test a sample of unaffected existing devices per 14.4.2 | Unchanged behavior | as programmed |\n\n**If GSIS has no iO-CU access:** either use the front panel (fully supported, Ch. 2) or hire the local Edwards partner (Quality Sound, Stockton) to back up and download the program while GSIS does the field work. See `../../Vendors/Edwards/Edwards-Master-List_2026-10-23.md`.\n\n---"
-      },
-      {
-        "title": "Part 3 — Access-model summary",
-        "body": "| System | Docs | Programming software | Access model |\n|---|---|---|---|\n| Edwards iO64/iO1000/iO64R | Public (distributor-hosted PDFs). Official copies on MyEddie. | iO-CU (MyEddie) | **Dealer/partner login** for the software. Front-panel programming open. Online factory cert (80% pass). |\n| Edwards EST3/EST3X | Public (distributor-hosted) | 3-SDU | **Dealer login + factory training + USB key + PIN** |\n| Edwards EST4 | Public (distributor-hosted TRM, User Guide) | 4-CU | **Dealer login + factory training**. Panel issues a Remote Write access code. License details not published. |\n| Notifier | Free (Honeywell eDAM) | VeriFire Tools | **Free download. Offline editing open.** Upload/download needs a **CLSS license (paid) + factory training**. Sold through engineered distributors. |\n| Fire-Lite | Free | FS-Tools | **Free download / open**. Front panel open. |\n| Silent Knight | Free | SKSS (5670) | **Free download / open**. Check that your SKSS version supports your panel. |\n| Honeywell (Farenhyt IFP, Pro-Watch/WIN-PAK) | Free (some links broken) | SKSS/FS-Tools; Pro-Watch | Fire: **open**. Pro-Watch/WIN-PAK: **dealer + license**. |\n| Gamewell-FCI | Distributor-hosted | CAMWorks (S3), E3 tools | **Factory training required** (S3 is factory-certified-installer only) |\n| Simplex | JCI docs portal (indexes public; some docs restricted) | ES Panel Programmer | **Factory/JCI only.** Software restricted to Simplex/JCI and authorized partners. Licensed. |\n| Potter | Free | Fire Panel Programmer | **Free download / open** |\n| Genetec | Free (TechDoc Hub) | Security Center / Synergis | **Free docs. Software licensed through partners (CPP).** Certification recommended. |\n| Verkada | Free (help.verkada.com) | Verkada Command (cloud) | **Open docs.** Needs a Command org plus device licenses. Partner program for resale. |\n| Leviton | Free | n/a (cabling) | **Open**. Warranty needs a certified installer (NIN). |\n| CommScope | Free | n/a (cabling) | **Open**. SYSTIMAX warranty needs PartnerPRO certification. |\n| Hikvision | Free | iVMS-4200, Hik-Connect | **Free download.** **NDAA §889 PROHIBITED for federal work** |\n| Dahua | Free (some official links block automated access) | SmartPSS Lite, DSS | **Free download.** **NDAA §889 PROHIBITED for federal work** |\n\n> **NDAA Section 889 flag.** FAR 52.204-25 (https://www.acquisition.gov/far/52.204-25) prohibits federal agencies and federal contractors from providing or using video surveillance equipment and services from Hikvision and Dahua (and Hytera, Huawei, ZTE). Do not quote or install Hikvision or Dahua on federal, federally funded, or critical-infrastructure work. Examples are ports (including the Port of Stockton), utilities, water/wastewater, and DoD/DHS sites. Ask the owner about federal funding on every bid, and record the answer on the job sheet.\n\n---"
-      },
-      {
-        "title": "Part 4 — Low voltage: applying the same method",
-        "body": "The same \"build first, enter second\" method applies. These are the build deliverables:\n| Fire alarm deliverable | LV equivalent |\n|---|---|\n| Device-to-point map | **Camera/door/port schedule**: ID, model, IP/VLAN, MAC, location, switch port, PoE budget, NVR channel or controller port |\n| Zones/groups | **Areas, sites, camera groups, door groups** |\n| Cause & effect | **Event-to-action rules**: door forced → camera bookmark + alert; motion → record; fire alarm relay → unlock egress doors (NFPA 72 21.8 / CBC 1010) |\n| Supervision | Camera offline, NVR disk/RAID health, controller tamper, PSU fail |\n| Monitoring | Alert recipients, VMS/central-station integration |\n| Timers | Door unlock (strike) time, door-held-open time, pre-/post-record, retention days |\n| Test plan | Per-camera view/recording/retention check, per-door credential/REX/DPI/forced/held test, cable certification report |\n\nLV templates: reuse `01_Device-Point-Map.csv` (put IP, VLAN, and switch port in the Notes column) or copy `templates/09_LV-Device-Schedule.csv`.\n\n---"
-      },
-      {
-        "title": "Part 5 — Per-system sections",
-        "body": "- Fire: [Edwards iO](systems/Edwards-iO.md) · [Edwards EST3/EST3X](systems/Edwards-EST3.md) · [Edwards EST4](systems/Edwards-EST4.md) · [Notifier](systems/Notifier.md) · [Fire-Lite](systems/Fire-Lite.md) · [Silent Knight](systems/Silent-Knight.md) · [Gamewell-FCI](systems/Gamewell-FCI.md) · [Simplex](systems/Simplex.md) · [Honeywell (Farenhyt/Pro-Watch)](systems/Honeywell.md) · [Potter](systems/Potter.md)\n- LV: [Genetec](systems/Genetec.md) · [Verkada](systems/Verkada.md) · [Hikvision](systems/Hikvision.md) · [Dahua](systems/Dahua.md) · [Leviton](systems/Leviton.md) · [CommScope](systems/CommScope.md)"
-      },
-      {
-        "title": "Part 6 — Gaps (no public documentation found)",
-        "body": "- Edwards **iO-CU help**, **3-SDU Help (P/N 180653)**, and **4-CU help** are not public. They are in-app or on MyEddie only.\n- Edwards iO-CU license or key requirement is not published. The EST4 4-CU license model is not published.\n- Simplex **ES Panel Programmer's Manual (574-849)** and the 4007ES Programmer's Manual (579-1167) are only on third-party mirror sites, not official public pages. We do not cite them as authoritative.\n- Gamewell-FCI **CAMWorks** help is only on third-party mirror sites. S3 programming needs factory certification.\n- Notifier VeriFire Tools help is in-app only.\n- Dahua official manual PDFs (dahuasecurity.com / material.dahuasecurity.com) returned **HTTP 403** to automated checks on 2026-10-23. They may open in a browser.\n- Honeywell Pro-Watch 5.0 Installation Guide PDF link returned **404**. The WIN-PAK product page is listed instead.\n- Verkada has no offline programming file. The build is entered directly in the cloud.\n- Stockton Fire's local programming/acceptance rules are not published (carried over from the Edwards master list)."
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "Does finishing this practice change official training progress?",
+        "question": "Where do you file and reopen the job evidence?",
         "choices": [
-          "No. Official progress stays unchanged.",
-          "Yes."
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "/workspace/GSIS/Training/Programming-Guide/GSIS-Programming-Guide.md",
-    "author": "GSIS source document; verbatim practice conversion"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: /workspace/GSIS/Training/Programming-Guide/GSIS-Programming-Guide.md. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-LV-SOP-CCTV": {
+    "course_id": "CRS-LV-SOP-CCTV",
+    "title": "CCTV — Video surveillance workflow",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible CCTV job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved camera schedule, coverage/privacy requirements, network/PoE/storage design and current drawing revision. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan CCTV. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Camera/VMS configuration and live-view/retention testing are not MYGSIS project controls. Use authorized manufacturer tools separately; project-specific placement assumptions are not universal design rules. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check camera IDs, actual view/recording/retention evidence, network references and privacy exceptions. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the CCTV reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the CCTV evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: /workspace/GSIS/Reference/LV-Workflows/LV-Workflow-CCTV-Video.md. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-LV-SOP-ACCESS": {
+    "course_id": "CRS-LV-SOP-ACCESS",
+    "title": "AC — Access control workflow",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible access control job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved door schedule, hardware/egress design, power interfaces and current access requirements. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan access control. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Credential provisioning, unlock commands and controller programming are not verified MYGSIS controls. Use authorized manufacturer software separately; never unlock a real door for practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check door IDs, actual REX/DPI/forced/held test evidence and approved life-safety interface results. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the access control reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the access control evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: /workspace/GSIS/Reference/LV-Workflows/LV-Workflow-AC-Access.md. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-LV-SOP-AV": {
+    "course_id": "CRS-LV-SOP-AV",
+    "title": "AV — Audio-visual workflow",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible audio visual job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved room/equipment list, signal diagram, control requirements and source drawings. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan audio visual. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. AV device/control programming and live commissioning are outside the verified MYGSIS project screens. Use authorized equipment/software separately, not an invented AV commissioning tab. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check room references, signal/audio/video tests, control results and unresolved user requirements. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the audio visual reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the audio visual evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: /workspace/GSIS/Reference/LV-Workflows/LV-Workflow-AV-Audio-visual.md. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-LV-SOP-NET": {
+    "course_id": "CRS-LV-SOP-NET",
+    "title": "NW — Networking / Wi-Fi workflow",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible networking / Wi-Fi job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved topology, AP locations, switch/PoE requirements and network plan; do not put passwords in practice. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan networking / Wi-Fi. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. MYGSIS is not the network controller. Network provisioning, survey measurements and security changes use authorized tools separately; do not invent a Wi-Fi analyzer screen. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual survey/configuration evidence, measured coverage and unresolved security or capacity exceptions. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the networking / Wi-Fi reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the networking / Wi-Fi evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: /workspace/GSIS/Reference/LV-Workflows/LV-Workflow-NW-Networking.md. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-LV-SOP-CABLING": {
+    "course_id": "CRS-LV-SOP-CABLING",
+    "title": "SC — Structured cabling workflow",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible structured cabling job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved drop/cable schedule, telecom-room drawings, labeling scheme and specified certification requirements. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan structured cabling. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Cable certification and instrument measurements are not MYGSIS screens. Use approved field test equipment separately; do not treat drawing estimates or ASSUMED outlet counts as test results. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual cable IDs, source drawings, instrument reports and failed or untested links. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the structured cabling reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the structured cabling evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: /workspace/GSIS/Reference/LV-Workflows/LV-Workflow-SC-Structured.md. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-AERIAL-SOP-PROGRESS": {
+    "course_id": "CRS-AERIAL-SOP-PROGRESS",
+    "title": "GSIS Aerial • Construction Progress Reports SOP",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible construction progress reporting job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved repeat-view plan, visit scope, prior report and pilot/site authorization. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan construction progress reporting. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Flight planning/airspace authorization, aircraft control and photogrammetry processing are not verified live MYGSIS workflows. Use the qualified pilot and authorized external tools separately. MYGSIS does not issue flight approval, generate an orthomosaic/3D mesh or certify survey accuracy. No flight is authorized by practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check dated photos, matching viewpoints, captions, actual changes and unresolved site items. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the construction progress reporting reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the construction progress reporting evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-AERIAL-SOP-ORTHO": {
+    "course_id": "CRS-AERIAL-SOP-ORTHO",
+    "title": "GSIS Aerial • Orthomosaic Mapping SOP",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible orthomosaic mapping job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved boundary, accuracy/coordinate requirements, GCP requirements and pilot/site authorization. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan orthomosaic mapping. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Flight planning/airspace authorization, aircraft control and photogrammetry processing are not verified live MYGSIS workflows. Use the qualified pilot and authorized external tools separately. MYGSIS does not issue flight approval, generate an orthomosaic/3D mesh or certify survey accuracy. No flight is authorized by practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check coverage gaps, coordinate/scale checks and measured accuracy; do not claim a land survey. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the orthomosaic mapping reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the orthomosaic mapping evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-AERIAL-SOP-3D": {
+    "course_id": "CRS-AERIAL-SOP-3D",
+    "title": "GSIS Aerial • 3D Models SOP",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible 3D modeling job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved model extent, deliverable format, capture requirements and pilot/site authorization. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan 3D modeling. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Flight planning/airspace authorization, aircraft control and photogrammetry processing are not verified live MYGSIS workflows. Use the qualified pilot and authorized external tools separately. MYGSIS does not issue flight approval, generate an orthomosaic/3D mesh or certify survey accuracy. No flight is authorized by practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual reconstruction completeness, missing surfaces, coordinate/scale checks and review caveats. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the 3D modeling reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the 3D modeling evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-AERIAL-SOP-STOCKPILE": {
+    "course_id": "CRS-AERIAL-SOP-STOCKPILE",
+    "title": "GSIS Aerial • Stockpile Volumes SOP",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible stockpile volumes job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved pile boundaries, base-surface method, accuracy requirements and pilot/site authorization. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan stockpile volumes. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Flight planning/airspace authorization, aircraft control and photogrammetry processing are not verified live MYGSIS workflows. Use the qualified pilot and authorized external tools separately. MYGSIS does not issue flight approval, generate an orthomosaic/3D mesh or certify survey accuracy. No flight is authorized by practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual pile/base definitions, units, calculations and uncertainty; never invent a volume. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the stockpile volumes reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the stockpile volumes evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-AERIAL-SOP-INSPECTIONS": {
+    "course_id": "CRS-AERIAL-SOP-INSPECTIONS",
+    "title": "GSIS Aerial • Roof / Site / Infrastructure Inspections SOP",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible roof / site / infrastructure inspection job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved inspection scope, safe access/capture plan, permitted sensor capability and pilot/site authorization. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan roof / site / infrastructure inspection. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Flight planning/airspace authorization, aircraft control and photogrammetry processing are not verified live MYGSIS workflows. Use the qualified pilot and authorized external tools separately. MYGSIS does not issue flight approval, generate an orthomosaic/3D mesh or certify survey accuracy. No flight is authorized by practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual photo locations, observed defects and inaccessible areas; no unsupported thermal or engineering claim. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the roof / site / infrastructure inspection reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the roof / site / infrastructure inspection evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-AERIAL-SOP-ASBUILT": {
+    "course_id": "CRS-AERIAL-SOP-ASBUILT",
+    "title": "GSIS Aerial • As-Built Documentation SOP",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible as-built documentation job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved capture extent, current drawings, delivery standard and pilot/site authorization. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan as-built documentation. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Flight planning/airspace authorization, aircraft control and photogrammetry processing are not verified live MYGSIS workflows. Use the qualified pilot and authorized external tools separately. MYGSIS does not issue flight approval, generate an orthomosaic/3D mesh or certify survey accuracy. No flight is authorized by practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual site-to-drawing differences, date/location references and unresolved verification items. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the as-built documentation reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the as-built documentation evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-AERIAL-SOP-REALESTATE": {
+    "course_id": "CRS-AERIAL-SOP-REALESTATE",
+    "title": "GSIS Aerial • Real Estate Media SOP",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible real estate media job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved property access, shot list, privacy restrictions and pilot/site authorization. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan real estate media. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Flight planning/airspace authorization, aircraft control and photogrammetry processing are not verified live MYGSIS workflows. Use the qualified pilot and authorized external tools separately. MYGSIS does not issue flight approval, generate an orthomosaic/3D mesh or certify survey accuracy. No flight is authorized by practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual media coverage, requested formats, privacy exclusions and rights to distribute. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the real estate media reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the real estate media evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: gsis-estimate-drone-services; Drone/README.md; Drone/Drone-Service-Descriptions_REDO_2026-10-27.md; Drone/Drone-Marketing-Copy_REDO_2026-10-27.md; Drone/Deliverables-Format-Sources_2026-10-23.md. As-builts and real estate are documented service categories; unverified capabilities are flagged.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-AER-GSIS-SOP": {
     "course_id": "CRS-AER-GSIS-SOP",
     "title": "GSIS Aerial flight ops + job closeout SOP",
     "steps": [
       {
-        "title": "GSIS Drone Services Package: README",
-        "body": "# GSIS Drone Services Package: README\nBuilt 2026-10-20 by Grok Bot (knowledgeWork) for Kemar McKenzie. Division: DR Drone Services. DRAFT. Nothing was sent to anyone."
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible aerial flight ops and closeout job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Files",
-        "body": "| File | What it is |\n|---|---|\n| `GSIS-Drone-Services-Package.pdf` | THE deliverable, 25 pages: Part 1 Client info packet (pp. 1-3), Part 2 Service pages (pp. 4-9), Part 3 Department needs checklist (pp. 10-12, INTERNAL ONLY), Part 4 Cut sheets (p. 13 index, pp. 14-25 DJI manufacturer documents) |\n| `source/GSIS-Drone-Services-Package.html` | Editable source: cover, client packet, cut-sheet index page, and styles |\n| `source/build.py` | Editable source: service-page content and needs-list rows (edit the lists, then rebuild) |\n| `source/merge.sh` | Rebuild: runs build.py, renders with Chrome, stamps footers/page numbers, appends cut sheets |\n| `source/package_built.html` | Generated HTML (don't edit; rebuilt by merge.sh) |\n| `assets/gsis-logo.png` | GSIS logo, 730x705 high-res copy of /workspace/mygsis/src/assets/logo.png (same art as 04-Templates/gsis-logo.png) |\n| `assets/DJI_Matrice-4-Series_Specs_enterprise.dji.com_2026-10-20.pdf` | Official DJI spec page, printed from https://enterprise.dji.com/matrice-4-series/specs (DJI does not publish a spec-sheet PDF; cookie banner and site footer hidden, content unchanged) |\n| `assets/DJI_Matrice-4-Series_In-the-Box.pdf` | Official DJI PDF, https://dl.djicdn.com/downloads/DJI_Matrice_4_Series/20260331/DJI_Matrice_4_Series_In_the_Box.pdf |\n\n**Before emailing prospects:** send only pages 1-9 (`qpdf GSIS-Drone-Services-Package.pdf --pages . 1-9 -- client.pdf`). Part 3 is internal. Fill the [FILL]s first."
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved mission scope, current pilot/aircraft/insurance evidence, site permissions and applicable airspace authorizations. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Where each fact came from",
-        "body": "| Fact | Source |\n|---|---|\n| Company name, owner Kemar McKenzie President/CEO, C-7 + C-10, License #1150625 | 00-Standing-Orders.md; 02-Vocabulary.md [KEMAR 2026-10-14] |\n| Four divisions (FA, LV, DR, SW) | 00-Standing-Orders.md; voice call c18881d8 (Kemar) |\n| Address 601 Brannan Island Road, Isleton, CA 95641; gsistech.com; 209-200-1073 | 04-Templates/Proposal-Field.md header. NOTE: Master Supplier List says \"street address not on file\", so Kemar should confirm the street address |\n| Five service lines | Task brief; staged skill gsis_skills_staged/gsis-estimate-drone-services.md |\n| Deliverables menu (photo set/video, orthomosaic, 3D mesh/point cloud, DSM/DTM/contours, stockpile volumes, progress report, sharing link) | Staged Estimate - Drone Services skill, Step 2 |\n| Process (intake, airspace/LAANC check, site access, mission planning, setup + safety brief, processing/QA, report, delivery) | Estimate - Drone Services skill (both versions); 05-Labor-Units.md Drone rows |\n| Report contents (site, date, weather, changes since last visit, captions, open items) | Kemar-Files/01M4XZZCCK2Z5VCRX7C356XQVW (AI Agents Plan, SkyReport) |\n| Billing milestones (10% setup + 90% per visit; 15/35/35/15 one-time) | schedule-of-values-and-billing skill, DR patterns |\n| Weather reschedules no change; not-a-land-survey wording; GCPs only if requested; thermal/lidar excluded | Staged Estimate skill Steps 5 and 7 |\n| DJI Matrice 4E, no thermal | Estimate - Drone Services skill [KEMAR 2026-10-14] |\n| Pix4D, DroneDeploy, DJI Enterprise, Skydio, Autel, Advexure, Drone Nerds as candidate suppliers; DJI public-sector flag | 03-Suppliers/GSIS_ALL_Master-Supplier-List_2026-10-14.md |\n| Part 107 recurrent every 24 months; B4UFLY | Staged Estimate skill |\n| FAA registration, Remote ID, 107.9 accident report; Part 108 not final; FCC Covered List | faa.gov Part 107 page; web search 2026-10-20 (flyusi.org, fcc.gov FAQ). These are requirements, not GSIS facts |\n| Northern California construction as first market; prospect segments | gsis-prospect-database-outreach skill; Prospects/NorCal-Drone-Prospects_*.csv; NorCal-Prospects_2026-10-15.md; voice call 1018019c |\n| Drone loaded rate $250/hr (INTERNAL ONLY, PROVISIONAL) | 01-Rate-Card.md. Kept OUT of all customer-facing pages |\n| Drone labor units (2.0 planning, 0.75 setup, 1.0 photo set, 1.0 per 20 ac mapping, 2.0 processing QA, 2.0 3D QA, 1.5 report, 1.0 per pile group) | 05-Labor-Units.md: starting defaults, NOT Kemar-confirmed. Internal only, not in the PDF |\n| Drive \"Drone Flights\" folder planned; SkyReport bot planned | AI Agents Plan (Kemar-Files) |\n| MYGSIS drone template null; 32 drone prospects imported with filter | 06-bots/developer/Batch13-Plan.md; SAVE-LOCK.md 2026-10-17 |\n\nChecked with no drone content: /workspace/uploads (does not exist), Jobs/ (only TEST-FA-001), Kemar-Files docs other than the two above. Google Drive was not searched (it was out of scope)."
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan aerial flight ops and closeout. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Open [FILL] gaps (Kemar)",
-        "body": "1. FAA Part 107 certificate number, holder, and recurrent date (no source; Supplier List marks it MISSING)\n2. Drone insurance (aviation liability, hull) and GL carrier/limits/COI\n3. All customer prices: per visit, one-time setup, mapping, 3D, stockpile, inspection (Rate Card Drone section is all [FILL])\n4. Flight/processing/report hours by site size; travel rate and minimum trip charge\n5. Turnaround times for every service\n6. Deliverable file formats (these depend on which processing software is picked: Pix4D vs DroneDeploy vs other)\n7. GSIS email address ({{GSIS_EMAIL}})\n8. Data retention period and sharing/hosting platform\n9. Matrice 4E FAA registration number, Remote ID, serial; batteries/accessories list\n10. Who flies (remote pilot in command), visual observer, processing staff\n11. Software cut sheets: pending product selection (Pix4D / DroneDeploy listed only as candidates); other equipment list [FILL]\n12. Confirm the street address (template vs Supplier List conflict)\n13. Missing forms: progress report template, client intake form, pre-flight checklist / JHA, flight and maintenance logs, LAANC/waiver log, delivery acceptance form, ops manual, privacy policy\n14. Marketing proof: sample deliverables from practice flights, case studies, references (none exist; none were invented)"
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. Flight planning/airspace authorization, aircraft control and photogrammetry processing are not verified live MYGSIS workflows. Use the qualified pilot and authorized external tools separately. MYGSIS does not issue flight approval, generate an orthomosaic/3D mesh or certify survey accuracy. No flight is authorized by practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Compliance to confirm",
-        "body": "- Any flight needing LAANC or a waiver needs Kemar's approval (skill).\n- Survey-grade claims need a licensed CA land surveyor.\n- DJI and public-sector clients: check agency restrictions before bidding (Supplier List flag).\n- The Drone rate is provisional until the first real job.\n\nConfidence: Medium. Structure and process are well sourced, but credentials, insurance, prices, turnaround and formats are all open [FILL]s."
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual flight/capture log, deliverable QA, unresolved issues and acceptance evidence; no invented credentials or pricing. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
       },
       {
-        "title": "Update 2026-10-23 (deliverables + DRAFT pricing)",
-        "body": "- Backups: `GSIS-Drone-Services-Package_v-before-deliverables.pdf`, `source/*_v-before-deliverables.*`.\n- pp 1-9: \"What you receive\" blocks with vendor-verified formats (`Deliverables-Format-Sources_2026-10-23.md`); turnaround `[FILL] business days`; retention `[FILL] days`.\n- DRAFT prices on pp 3-9 with red removable marker (`<span class=\"draft\">`, defined by `DP` in build.py and inline in the HTML). Rationale: `DRAFT-Pricing_2026-10-23.md`.\n- Client-only export: `GSIS-Drone-Services-Package_CLIENT-pp1-9.pdf`. pp 10-25 text unchanged.\n- merge.sh falls back to `overlay_merge.py` (pypdf in /tmp/venv) when qpdf is missing.\n- PNG renders: `renders/page-01..09.png`."
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the aerial flight ops and closeout reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the aerial flight ops and closeout evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "Does finishing this practice change official training progress?",
+        "question": "Where do you file and reopen the job evidence?",
         "choices": [
-          "No. Official progress stays unchanged.",
-          "Yes."
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
         ],
         "answer": 0
       }
     ],
-    "source": "/workspace/GSIS/Drone/README.md",
-    "author": "GSIS source document; verbatim practice conversion"
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: /workspace/GSIS/Drone/README.md. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-SAFETY-CALOSHA": {
+    "course_id": "CRS-SAFETY-CALOSHA",
+    "title": "Safety • Cal/OSHA orientation",
+    "steps": [
+      {
+        "title": "1. Locate your project",
+        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
+        "task": "Identify the correct project without creating a new job.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Locate the approved safety source",
+        "body": "In the selected project, open Documents and use Open on an existing safety document. Check approved site safety plan, applicable training/qualifications and actual hazard information. Missing evidence stays MISSING.",
+        "task": "Identify the current source for Cal/OSHA job readiness.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Read the actual Safety screen",
+        "body": "In the same project, select Safety. Review Total Incidents, Open, Critical and Resolved, and use All Status to filter existing records. Do not create a fictitious incident or treat an empty list as proof that no hazards exist.",
+        "task": "Locate the visible status filter and review any relevant existing record.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize what is not a live safety workflow",
+        "body": "Keep the selected project’s Safety tab open. Cal/OSHA course certification and a full policy-training workflow are not provided by the MYGSIS incident screen. This practice is not certification or authority for regulated work. Use Documents for supporting evidence, not a fabricated software workflow.",
+        "task": "Record the missing workflow or outside qualification needed.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Inspect the incident reporting fields",
+        "body": "In the project’s Safety tab, choose Report Incident. Read Incident Type, Severity, Description, Location, Incident Date, Status and Investigation Notes. For this exercise choose Cancel without filing a fake report. For a genuine incident use the authorized site reporting process; practice is not approval to change a client record.",
+        "task": "Find the fields needed for accurate reporting, then Cancel.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File supporting evidence",
+        "body": "Open Projects, open the chosen record and select Documents. To file an authorized training document, click Add Document, enter Name *, choose Type and Date, select File (stored privately), and enter Notes identifying its source/revision. Click Add only if authorized to store it; otherwise Cancel. Reopen Documents and use Open on the saved row to verify it.",
+        "task": "Complete one permitted evidence filing, or record why saving is blocked. Never upload confidential material as a training sample.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "What does the project Safety tab manage?",
+        "choices": [
+          "Safety incident records; it is not a substitute for qualifications or site procedures.",
+          "Automatic Cal/OSHA certification.",
+          "Emergency dispatch from the quiz."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Should a learner file a fictional incident on a client job?",
+        "choices": [
+          "No; inspect the form and Cancel.",
+          "Yes, to pass practice.",
+          "Yes, then delete the evidence."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). ProjectDetail.jsx; components/safety/SafetyManager.jsx; DocumentsTab.jsx. Original policy reference: GSIS internal orientation/demo; field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing. Detailed external credential/regulated training must be independently verified.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-SAFETY-JHA": {
+    "course_id": "CRS-SAFETY-JHA",
+    "title": "Safety • Job-hazard analysis",
+    "steps": [
+      {
+        "title": "1. Locate your project",
+        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
+        "task": "Identify the correct project without creating a new job.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Locate the approved safety source",
+        "body": "In the selected project, open Documents and use Open on an existing safety document. Check approved task scope, site conditions, hazards, controls and responsible reviewers. Missing evidence stays MISSING.",
+        "task": "Identify the current source for job-hazard analysis.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Read the actual Safety screen",
+        "body": "In the same project, select Safety. Review Total Incidents, Open, Critical and Resolved, and use All Status to filter existing records. Do not create a fictitious incident or treat an empty list as proof that no hazards exist.",
+        "task": "Locate the visible status filter and review any relevant existing record.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize what is not a live safety workflow",
+        "body": "Keep the selected project’s Safety tab open. A dedicated JHA editor/approval flow was not verified in MYGSIS. Prepare and obtain qualified review of the JHA separately, then file the approved document; do not invent a JHA button. Use Documents for supporting evidence, not a fabricated software workflow.",
+        "task": "Record the missing workflow or outside qualification needed.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Inspect the incident reporting fields",
+        "body": "In the project’s Safety tab, choose Report Incident. Read Incident Type, Severity, Description, Location, Incident Date, Status and Investigation Notes. For this exercise choose Cancel without filing a fake report. For a genuine incident use the authorized site reporting process; practice is not approval to change a client record.",
+        "task": "Find the fields needed for accurate reporting, then Cancel.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File supporting evidence",
+        "body": "Open Projects, open the chosen record and select Documents. To file an authorized training document, click Add Document, enter Name *, choose Type and Date, select File (stored privately), and enter Notes identifying its source/revision. Click Add only if authorized to store it; otherwise Cancel. Reopen Documents and use Open on the saved row to verify it.",
+        "task": "Complete one permitted evidence filing, or record why saving is blocked. Never upload confidential material as a training sample.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "What does the project Safety tab manage?",
+        "choices": [
+          "Safety incident records; it is not a substitute for qualifications or site procedures.",
+          "Automatic Cal/OSHA certification.",
+          "Emergency dispatch from the quiz."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Should a learner file a fictional incident on a client job?",
+        "choices": [
+          "No; inspect the form and Cancel.",
+          "Yes, to pass practice.",
+          "Yes, then delete the evidence."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). ProjectDetail.jsx; components/safety/SafetyManager.jsx; DocumentsTab.jsx. Original policy reference: GSIS internal orientation/demo; field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing. Detailed external credential/regulated training must be independently verified.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-SAFETY-FIRSTAID": {
+    "course_id": "CRS-SAFETY-FIRSTAID",
+    "title": "Safety • First-aid readiness",
+    "steps": [
+      {
+        "title": "1. Locate your project",
+        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
+        "task": "Identify the correct project without creating a new job.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Locate the approved safety source",
+        "body": "In the selected project, open Documents and use Open on an existing safety document. Check approved emergency/site plan, first-aid resources and actual responder qualifications. Missing evidence stays MISSING.",
+        "task": "Identify the current source for first-aid readiness.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Read the actual Safety screen",
+        "body": "In the same project, select Safety. Review Total Incidents, Open, Critical and Resolved, and use All Status to filter existing records. Do not create a fictitious incident or treat an empty list as proof that no hazards exist.",
+        "task": "Locate the visible status filter and review any relevant existing record.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize what is not a live safety workflow",
+        "body": "Keep the selected project’s Safety tab open. MYGSIS does not provide first-aid certification, emergency dispatch or a verified first-aid readiness checklist. In an emergency follow the site emergency plan; this player is not an emergency service. Use Documents for supporting evidence, not a fabricated software workflow.",
+        "task": "Record the missing workflow or outside qualification needed.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Inspect the incident reporting fields",
+        "body": "In the project’s Safety tab, choose Report Incident. Read Incident Type, Severity, Description, Location, Incident Date, Status and Investigation Notes. For this exercise choose Cancel without filing a fake report. For a genuine incident use the authorized site reporting process; practice is not approval to change a client record.",
+        "task": "Find the fields needed for accurate reporting, then Cancel.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File supporting evidence",
+        "body": "Open Projects, open the chosen record and select Documents. To file an authorized training document, click Add Document, enter Name *, choose Type and Date, select File (stored privately), and enter Notes identifying its source/revision. Click Add only if authorized to store it; otherwise Cancel. Reopen Documents and use Open on the saved row to verify it.",
+        "task": "Complete one permitted evidence filing, or record why saving is blocked. Never upload confidential material as a training sample.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "What does the project Safety tab manage?",
+        "choices": [
+          "Safety incident records; it is not a substitute for qualifications or site procedures.",
+          "Automatic Cal/OSHA certification.",
+          "Emergency dispatch from the quiz."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Should a learner file a fictional incident on a client job?",
+        "choices": [
+          "No; inspect the form and Cancel.",
+          "Yes, to pass practice.",
+          "Yes, then delete the evidence."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). ProjectDetail.jsx; components/safety/SafetyManager.jsx; DocumentsTab.jsx. Original policy reference: GSIS internal orientation/demo; field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing. Detailed external credential/regulated training must be independently verified.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-FA-NICET-ORIENTATION": {
+    "course_id": "CRS-FA-NICET-ORIENTATION",
+    "title": "NICET • Optional Fire Alarm credential planning",
+    "steps": [
+      {
+        "title": "1. Locate your project",
+        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
+        "task": "Identify the correct project without creating a new job.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the credential requirement",
+        "body": "In the chosen project’s Documents tab, use Open on an existing specification or credential requirement. Identify the exact required qualification and role; do not infer that everyone needs the same credential.",
+        "task": "Record the source requirement without inventing a certificate number.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Separate planning from official enrollment",
+        "body": "Open Training in the sidebar and locate the NICET orientation in Catalog. This internal planning course is not the official NICET application, exam or certification. Those workflows are not in live MYGSIS. Do not enroll, pay or claim a credential during practice.",
+        "task": "Identify which official outside requirement still needs confirmation.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      },
+      {
+        "title": "4. Check recorded evidence, not assumptions",
+        "body": "Open the project’s Documents tab and inspect any existing qualification evidence with Open. Check the actual holder, scope and dates in the document; missing evidence remains MISSING. Do not copy private identity information into practice notes.",
+        "task": "Record whether evidence is available, not an invented pass.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. File supporting evidence",
+        "body": "Open Projects, open the chosen record and select Documents. To file an authorized training document, click Add Document, enter Name *, choose Type and Date, select File (stored privately), and enter Notes identifying its source/revision. Click Add only if authorized to store it; otherwise Cancel. Reopen Documents and use Open on the saved row to verify it.",
+        "task": "Complete one permitted evidence filing, or record why saving is blocked. Never upload confidential material as a training sample.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. Review the official training status separately",
+        "body": "Open Training. If your login shows My Training, read the assigned official status without changing it. Assignment is not enrollment, and internal practice does not make a person NICET certified. Manufacturer/external courses remain link-outs with no automatic enrollment.",
+        "task": "Return to the practice quiz without altering official records.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where is NICET official enrollment completed?",
+        "choices": [
+          "Outside MYGSIS through the official process; this internal practice does not enroll anyone.",
+          "The Next button enrolls the learner.",
+          "The project Safety tab awards certification."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). TrainingManagement.jsx; DocumentsTab.jsx; original credential planning reference: GSIS internal orientation/demo; field-operations-all-divisions; project-management-all-divisions; schedule-of-values-and-billing. Detailed external credential/regulated training must be independently verified.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-SOFTWARE-FRAMEWORK": {
+    "course_id": "CRS-SOFTWARE-FRAMEWORK",
+    "title": "Software • One framework for every GSIS app",
+    "steps": [
+      {
+        "title": "1. Find the correct job",
+        "body": "Open Projects in the MYGSIS sidebar. Use Search projects... to find a visible GSIS software delivery job and open it. Confirm the project before selecting Documents. Use an authorized training record for edits; otherwise inspect only. Never substitute a client job for a training sample.",
+        "task": "Identify the job and the document that establishes its scope.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "2. Read the required source package",
+        "body": "In the chosen project, select Documents. Use Open on an existing source file and check approved user story, acceptance criteria, data/access constraints and test plan. Record missing inputs instead of inventing them. A policy checklist does not certify a person or approve work.",
+        "task": "Record a source revision and one missing or confirmed input.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "3. Prepare the work safely",
+        "body": "In the same project, open Ops / Field Docs and review its existing packet; then open Safety to check recorded hazards/incidents. Use the source documents to plan GSIS software delivery. Do not operate equipment, impair a system, fly, change credentials or start testing solely because a walkthrough says Next.",
+        "task": "Identify the prerequisite approval or readiness evidence before field work.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "4. Recognize the live software boundary",
+        "body": "Open the same project’s Documents tab to collect the supporting files. MYGSIS project screens are not the Base44 software builder or source-control system. Coding, Test User execution, deployment and publishing use the authorized external development tools separately; no verified build/publish control exists in these MYGSIS tabs. Do not invent one or publish from practice. This course walks through MYGSIS job preparation and evidence filing, not an invented integrated tool. If the required external workflow cannot be verified, stop that action and record MISSING.",
+        "task": "Name the external tool/qualified person and any undocumented next action.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "5. Review the actual results",
+        "body": "In the chosen project, use Documents → Open to inspect an available result file. Check actual acceptance-criterion results, desktop/mobile evidence, failure/permission cases and unresolved bugs; never claim unrun tests passed. Preserve ASSUMED, VERIFY and INPUT NEEDED qualifications. If results do not exist or fail review, record that honestly; do not describe a client result as a passed demo.",
+        "task": "Write one evidence-based review finding or a MISSING result.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "6. File permitted evidence and verify it",
+        "body": "In the chosen project’s Documents tab, click Add Document. For an authorized training artifact, fill Name *, Type, Date and Notes with the GSIS software delivery reference; select File (stored privately), then Add. Reopen the row with Open and confirm the right file/revision. Otherwise Cancel. Do not upload sensitive credentials or client data for practice.",
+        "task": "Complete one authorized filing or explain the blocker in practice notes.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "7. Close the handoff without false completion",
+        "body": "In the chosen project, select Ops / Field Docs and Field Logs. Compare only actual recorded work with the GSIS software delivery evidence, and use RFIs to inspect unresolved questions. If a permitted training RFI is needed, use New RFI, fill Subject * and Question *, then Create only with edit authority; otherwise Cancel. Practice never sends mail or marks official completion.",
+        "task": "Record the next owner, unresolved issue and evidence reference.",
+        "open_path": "/Projects",
+        "open_label": "Projects"
+      },
+      {
+        "title": "8. Return to required training",
+        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
+        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Where do you file and reopen the job evidence?",
+        "choices": [
+          "Projects → an accessible project → Documents → Add Document; verify the row with Open.",
+          "Inside an invented specialist tab.",
+          "The quiz uploads results automatically."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What if the specialist workflow is not available in MYGSIS?",
+        "choices": [
+          "Use the authorized external tool separately and record any undocumented or missing action.",
+          "Invent a button name.",
+          "Treat a failed client PDF as a passed demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). Original discipline/policy source retained as reference: developer-dualtrack-feature-work; GSIS role-sheet mobile/test guardrails; Kemar taxonomy correction Nov 6, 2026. This internal practice does not change or publish any application.. ProjectDetail.jsx; DocumentsTab.jsx; OpsDocsTab.jsx; SafetyManager.jsx; RFITab.jsx.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-FIRE-DESIGN": {
+    "course_id": "CRS-FIRE-DESIGN",
+    "title": "FireCode • Demo walkthrough",
+    "steps": [
+      {
+        "title": "1. Open Systems dashboard",
+        "body": "Open FireCode at the live link. Confirm the heading Systems dashboard. The verified dashboard shows Dashboard and Projects in the sidebar and discipline cards including Fire alarm. FireCode is separate software, not a MYGSIS tab.",
+        "task": "Confirm the actual heading before continuing.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode"
+      },
+      {
+        "title": "2. Find an isolated demo context",
+        "body": "Use Demo mode if you see that control. Do not open existing client project cards. The sources do not verify a Demo mode button label or its click-path. If no isolated demo context is clearly available, stop here and record MISSING; do not upload or create work in a client context.",
+        "task": "Confirm a genuine demo-only context, or pause and report the missing demo entry.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode"
+      },
+      {
+        "title": "3. Start only a demo practice project",
+        "body": "Only after an isolated demo context is confirmed, use + New project on Systems dashboard or the Fire alarm projects hub. Follow only the project-setup controls you actually see; their exact field labels are not documented in the verified screenshots. Do not open named client projects or invent an ID URL. If demo isolation is not confirmed, do not create anything.",
+        "task": "Use a non-client practice project only; otherwise stop without saving.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode"
+      },
+      {
+        "title": "4. Upload a practice blueprint from the canvas",
+        "body": "Inside that confirmed demo-only project, the verified tabs include Floor Plan and Plans. Open Plans and read: “Upload a PDF or image from the canvas tab to create selectable sheets.” Use Floor Plan (the canvas tab) and only the upload controls actually visible there. The exact upload-control label is not documented in these screenshots. Use only a permitted practice/demo blueprint, never a failing real client PDF. If you cannot find the upload control in demo mode, stop and report MISSING.",
+        "task": "Upload only in confirmed demo mode using a real visible control, or record the blocked step.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode"
+      },
+      {
+        "title": "5. Preview and assign the uploaded sheet",
+        "body": "In the demo project, open Plans. The heading is Floor Plans and the prompt is “Select an uploaded sheet to preview and assign it.” Select your uploaded practice sheet. Follow the visible help to assign a page using plan type Floor Plan, Fire Alarm, or Architectural; choose only controls actually present. No upload means no preview result—do not claim otherwise.",
+        "task": "Confirm the intended sheet and floor assignment using the actual preview.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode"
+      },
+      {
+        "title": "6. Review the floor and placement",
+        "body": "Open Floor Plan and pick the corresponding floor in the left FLOOR list. Review the blueprint and any existing devices/annotations against the practice source. Auto-Place Devices is a verified control, but use it only in the isolated demo if authorized, then inspect the result rather than assume it is correct. No source here establishes a successful result for any client job.",
+        "task": "Identify one actual placement discrepancy or record that no result is available.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode"
+      },
+      {
+        "title": "7. Check available review tabs",
+        "body": "In the demo project, open Calculations and, if relevant, Simulation and Riser Diagram. These tab labels are verified; their exact run/review controls are not documented in these screenshots. Use only controls you see and review whatever actual results are shown. This next action is not documented in a source I can verify; open FireCode demo mode and use only controls you see. Missing or failing results remain MISSING/FAIL, not a passed design.",
+        "task": "Record actual findings and the qualified review still required; do not invent a pass.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode"
+      },
+      {
+        "title": "8. Keep demo output separate from approval",
+        "body": "Return to Plans or Floor Plan and review the demo sheet and captions. Save and Export PDF are verified controls, but use them only in confirmed demo mode with permission to retain the practice artifact. Do not submit, stamp or describe the output as approved, and do not use real client PDFs as successful demos. Return to Training in the original MYGSIS tab for the practice quiz; official progress is unchanged.",
+        "task": "State what you actually completed and list any missing demo/upload/review controls.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "What if no Demo mode or isolated demo context is visible?",
+        "choices": [
+          "Stop before creating/uploading and report MISSING; never open client cards for practice.",
+          "Use any named client project.",
+          "Assume a client project is a demo."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "What upload guidance is verified?",
+        "choices": [
+          "Plans says to upload a PDF or image from the canvas tab; use only visible controls.",
+          "A verified button named Import Demo Success.",
+          "The player generates a passed client PDF."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes, the player completes CourseAssignment records.",
+          "Yes, manufacturer enrollment is automatic."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test). /workspace/Firecode-Architect/01-dashboard-preview.png; 05-projects-hub.png; 08-plans.png (editor preview screenshots, not a new live verification); /workspace/GSIS/Reference/PUSH-LAYOUTFIX3-2026-11-05/PUSH-STATUS.md (published root Systems dashboard); demo-mode entry and setup/upload control labels MISSING.",
+    "author": "GSIS-authored live-software walkthrough"
   }
 };
 
-// Display/assignment mapping corrections only; SOURCE_PATHS stays unchanged.
+// Display/assignment mapping corrections; add the internal FireCode demo to the existing Fire Design path.
 const ACCESS_MOTO = new Set(['CRS-MOTO-032', 'CRS-MOTO-033', 'CRS-MOTO-034', 'CRS-MOTO-035', 'CRS-MOTO-036', 'CRS-MOTO-037', 'CRS-MOTO-045', 'CRS-MOTO-047']);
 const PATHS = SOURCE_PATHS.filter(p => !p.path_id.includes('CSLB')).map(p => ({
   ...p,
@@ -4056,9 +4821,15 @@ const PATHS = SOURCE_PATHS.filter(p => !p.path_id.includes('CSLB')).map(p => ({
     ...p.course_ids.filter(id => p.path_id !== 'PATH-MOTO-AVIGILON' || !ACCESS_MOTO.has(id)),
     ...(p.path_id === 'PATH-ACCESS' ? [...ACCESS_MOTO] : []),
     ...LV_SOP_COURSES.filter(c => c.path_id === p.path_id).map(c => c.course_id),
+    ...(p.division === 'Fire' && p.domain === 'Design' ? ['CRS-FIRE-DESIGN'] : []),
   ])],
 }));
-const CATALOG = [...SEED_COURSES, ...LV_SOP_COURSES];
+const FIRE_DESIGN_COURSE = {
+  course_id: 'CRS-FIRE-DESIGN', title: 'FireCode • Demo walkthrough', brand: 'GSIS Internal',
+  link: '', cost: 'internal', kind: 'interactive',
+  notes: 'GSIS-authored captioned demo-only walkthrough. Demo entry and undocumented controls must be verified before use; not design approval or enrollment.',
+};
+const CATALOG = [...SEED_COURSES, ...LV_SOP_COURSES, FIRE_DESIGN_COURSE];
 const COURSE_BY_ID = Object.fromEntries(CATALOG.map(c => [c.course_id, c]));
 const LOGIN_EMAIL = 'kemar@gsistech.com';
 const emailKey = email => String(email || '').trim().toLowerCase();
@@ -4066,6 +4837,22 @@ const isDone = a => a.status === 'completed' || a.status === 'passed';
 const isInternal = c => !!PRACTICE[c.course_id] || c.kind === 'interactive' || c.brand === 'GSIS Internal' || c.cost === 'internal';
 const isGated = c => c.cost === 'paid' || c.cost === 'partner';
 const safeURL = value => /^https?:\/\//i.test(value || '') ? value : null;
+
+const WALKTHROUGH_PAGES = new Set(['Dashboard', 'Calendar', 'OpsDashboard', 'ResourceBoard', 'Bids', 'Leads', 'ContractorDirectory', 'Estimates', 'RateCard', 'Projects', 'Documents', 'TrainingManagement', 'Billing', 'Suppliers', 'PurchaseOrders']);
+function walkthroughURL(value) {
+  if (typeof value !== 'string') return null;
+  const raw = value.startsWith('/') && !value.startsWith('//') ? `https://mygsis.com${value}` : value;
+  const candidate = safeURL(raw);
+  if (!candidate) return null;
+  try {
+    const url = new URL(candidate);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.port || url.search || url.hash) return null;
+    if (candidate === 'https://observant-fire-code-flow.base44.app/') return candidate;
+    if (!/^https?:\/\/mygsis\.com\/[A-Za-z]+$/.test(candidate) || url.hostname !== 'mygsis.com' || !WALKTHROUGH_PAGES.has(url.pathname.slice(1))) return null;
+    return `https://mygsis.com${url.pathname}`;
+  } catch { return null; }
+}
+
 const pathLabel = p => p.domain || p.skill_area || p.path_id;
 const coursesForPaths = paths => [...new Set(paths.flatMap(p => p.course_ids))].map(id => COURSE_BY_ID[id]).filter(Boolean);
 const selectionPaths = (divisions, domains, overlays) => PATHS.filter(p =>
@@ -4290,7 +5077,7 @@ export default function TrainingManagement({ view } = {}) {
     </main>
     <Dialog open={!!practiceId} onOpenChange={open => { if (!open) setPracticeId(null); }}>
       <DialogContent className="gsis-training w-[calc(100vw-24px)] max-w-3xl max-h-[90dvh] overflow-y-auto p-4 sm:p-6">
-        <DialogHeader><DialogTitle>{practiceId ? COURSE_BY_ID[practiceId]?.title : 'Internal practice'}</DialogTitle><DialogDescription>Local-only internal practice. Nothing here changes official training progress.</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>{practiceId ? COURSE_BY_ID[practiceId]?.title : 'Internal practice'}</DialogTitle><DialogDescription>Captioned live-app walkthrough. The player does not change official progress; actions in the live tab may save real data.</DialogDescription></DialogHeader>
         {practiceId && <PracticePlayer key={practiceId} course={PRACTICE[practiceId]} />}
       </DialogContent>
     </Dialog>
@@ -4430,19 +5217,33 @@ function PracticePlayer({ course }) {
   const [notes, setNotes] = useState({});
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const steps = course?.steps || [];
   const quiz = course?.quiz || [];
   const hasQuiz = quiz.length > 0;
   const onQuiz = stepIndex === steps.length && hasQuiz;
   const step = steps[stepIndex];
+  const openURL = walkthroughURL(step?.open_path);
   const score = quiz.filter((q, i) => answers[i] === q.answer).length;
   const allAnswered = quiz.every((_, i) => Number.isInteger(answers[i]));
-  return <section className="t-stack" aria-label="Internal practice player">
-    <p className="t-notice">Local practice only. Official progress stays unchanged. Internal orientation is not a manufacturer certification or authority to perform regulated work.</p>
-    <p className="t-muted" aria-live="polite">{onQuiz ? 'Practice quiz' : `Step ${stepIndex + 1} of ${steps.length}`}</p>
-    {step && <article className="t-card">
+  useEffect(() => {
+    if (!playing || !step) return;
+    const timer = window.setTimeout(() => {
+      if (stepIndex < steps.length - 1) setStepIndex(i => i + 1);
+      else { setPlaying(false); if (hasQuiz) setStepIndex(steps.length); }
+    }, 8000);
+    return () => window.clearTimeout(timer);
+  }, [playing, stepIndex, steps.length, hasQuiz, step]);
+  const goTo = index => { setPlaying(false); setStepIndex(index); };
+  return <section className="t-stack" aria-label="Captioned interactive walkthrough">
+    <p className="t-notice">These captioned steps walk through live MYGSIS (or the named live app). Complete the action in the opened tab; this player does not change official progress. Assignment is not enrollment. Do not award a real bid, send mail, purchase or enroll in manufacturer courses during practice. Only edit an authorized training record; live-tab actions can save real data. Internal orientation is not certification or authority to perform regulated work.</p>
+    <p className="t-muted">Interactive video = these visible captions and live-app prompts, not a recording or generated UI. Play auto-advances every 8 seconds; pause before doing an action in the live tab. Notes remain local and unsaved.</p>
+    <div className="t-actions"><button type="button" className="t-primary" aria-pressed={playing} disabled={!step} onClick={() => setPlaying(p => !p)}>{playing ? 'Pause' : 'Play walkthrough'}</button><span role="status">{playing ? 'Playing captions · 8 seconds per step' : 'Paused · follow at your own pace'}</span></div>
+    <p className="t-notice" aria-live="polite">{onQuiz ? 'Practice quiz' : `Step ${stepIndex + 1} of ${steps.length}`}</p>
+    {step && <article className="t-card" aria-label={`Step ${stepIndex + 1} caption`}>
       <h2>{step.title}</h2><div className="t-pre">{step.body}</div>
-      {step.task && <div className="t-notice"><strong>Practice task</strong><p>{step.task}</p><label>Practice notes (not saved)<textarea value={notes[stepIndex] || ''} onChange={e => setNotes({ ...notes, [stepIndex]: e.target.value })} /></label></div>}
+      {openURL ? <div className="t-actions t-section"><a className="t-button t-primary" href={openURL} target="_blank" rel="noopener noreferrer" onClick={() => setPlaying(false)}>Open {step.open_label || 'this screen'} in live app ↗</a></div> : <p className="t-notice">No verified live-screen link is available for this step. Do not guess a URL.</p>}
+      {step.task && <div className="t-notice"><strong>Live-screen task / caption prompt</strong><p>{step.task}</p><label>Practice notes (not saved)<textarea value={notes[stepIndex] || ''} onFocus={() => setPlaying(false)} onChange={e => setNotes({ ...notes, [stepIndex]: e.target.value })} /></label></div>}
     </article>}
     {onQuiz && <section className="t-card">
       <h2>Practice quiz</h2>
@@ -4450,8 +5251,8 @@ function PracticePlayer({ course }) {
       <button className="t-primary" disabled={!allAnswered} onClick={() => setChecked(true)}>Check practice answers</button>
       {checked && <p className="t-notice" role="status">Practice score: {score} / {quiz.length}. {score === quiz.length ? 'Practice finished.' : 'Review the source steps and try again.'} Official training progress is unchanged.</p>}
     </section>}
-    {!hasQuiz && stepIndex === steps.length - 1 && <p className="t-notice">End of documented practice. No quiz was supplied. Official progress is unchanged.</p>}
-    <div className="t-actions"><button disabled={stepIndex === 0} onClick={() => setStepIndex(i => Math.max(0, i - 1))}>Back</button><button className="t-primary" disabled={stepIndex >= steps.length - (hasQuiz ? 0 : 1)} onClick={() => setStepIndex(i => i + 1)}>{hasQuiz && stepIndex === steps.length - 1 ? 'Next: practice quiz' : 'Next'}</button></div>
+    {!hasQuiz && stepIndex === steps.length - 1 && <p className="t-notice">End of practice. Official progress is unchanged.</p>}
+    <div className="t-actions"><button disabled={stepIndex === 0} onClick={() => goTo(Math.max(0, stepIndex - 1))}>Back</button><button className="t-primary" disabled={stepIndex >= steps.length - (hasQuiz ? 0 : 1)} onClick={() => goTo(stepIndex + 1)}>{hasQuiz && stepIndex === steps.length - 1 ? 'Next: practice quiz' : 'Next'}</button></div>
     {course?.source && <p className="t-source">Documented source: {course.source}</p>}
   </section>;
 }
