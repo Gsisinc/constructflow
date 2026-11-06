@@ -4087,12 +4087,12 @@ function localDate() {
 const STYLES = `
 .gsis-training{--tn:#0B1F3A;--tg:#C9A227;--ti:#172b46;--tm:#536780;color:var(--ti);background:#f4f6fa;padding:16px;min-height:100vh;min-width:0;max-width:100%;font:14px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;overflow-wrap:anywhere}
 .gsis-training *{box-sizing:border-box;min-width:0}
-.gsis-training h1{font-size:29px;line-height:1.2;font-weight:800;margin:0 0 8px;letter-spacing:-.6px}
-.gsis-training h2{font-size:19px;font-weight:750;margin:0 0 12px}.gsis-training h3{font-size:16px;font-weight:700;margin:0 0 8px}
+.gsis-training h1{font-size:29px;line-height:1.2;font-weight:800;margin:0 0 8px;letter-spacing:-.6px;color:#fff}.gsis-training .t-card h1,.gsis-training h2,.gsis-training h3,.gsis-training h4,.gsis-training h5,.gsis-training h6,.gsis-training legend{color:var(--tn)}
+.gsis-training h2{font-size:19px;font-weight:750;margin:0 0 12px;color:var(--tn)}.gsis-training h3{font-size:16px;font-weight:700;margin:0 0 8px;color:var(--tn)}
 .gsis-training p{margin:6px 0 12px}.gsis-training .t-wrap{max-width:1240px;margin:auto}
-.gsis-training .t-hero{background:var(--tn);color:white;border-bottom:4px solid var(--tg);border-radius:14px;padding:22px;margin-bottom:18px}
+.gsis-training .t-hero{background:var(--tn);color:white;border-bottom:4px solid var(--tg);border-radius:14px;padding:22px;margin-bottom:18px}.gsis-training .t-hero h1{color:#fff}
 .gsis-training .t-hero p{color:#d1dbe7;margin-bottom:0}.gsis-training .t-eyebrow{font-size:11px;letter-spacing:2px;font-weight:750;color:#e6ce79;text-transform:uppercase;margin-bottom:9px}
-.gsis-training .t-card{background:white;border:1px solid #dce4ee;border-radius:12px;padding:16px;box-shadow:0 2px 6px #0b1f3a05}
+.gsis-training .t-card{background:white;border:1px solid #dce4ee;border-radius:12px;padding:16px;box-shadow:0 2px 6px #0b1f3a05;color:var(--ti)}
 .gsis-training .t-course{display:flex;flex-direction:column;gap:8px;height:100%}.gsis-training .t-course .t-actions{margin-top:auto}
 .gsis-training .t-muted{color:var(--tm);font-size:13px}.gsis-training .t-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
 .gsis-training .t-stack{display:grid;gap:18px}.gsis-training .t-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
