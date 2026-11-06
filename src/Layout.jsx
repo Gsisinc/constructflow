@@ -78,6 +78,7 @@ const navGroups = [
   { items: [
     { name: 'Projects', icon: FolderKanban, page: 'Projects' },
     { name: 'Documents', icon: FileStack, page: 'Documents' },
+    { name: 'Training', icon: BookOpen, page: 'TrainingManagement' },
   ]},
   { label: 'Billing', items: [
     { name: 'Billing', icon: Banknote, page: 'Billing' },
