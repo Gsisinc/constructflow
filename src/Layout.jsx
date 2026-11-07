@@ -126,11 +126,15 @@ const technicianSecondaryNav = [
 
 // Client/stakeholder portal: projects they can see, documents, messages, support
 const clientPrimaryNav = [
-  { name: 'Dashboard', icon: LayoutDashboard, page: 'ClientPortal' },
-  { name: 'Projects', icon: FolderKanban, page: 'Projects' },
-  { name: 'Documents', icon: FileStack, page: 'Documents' },
-  { name: 'Support', icon: Wrench, page: 'ServiceDesk' },
+  { name: 'Overview', icon: LayoutDashboard, page: 'ClientPortal', clientView: 'overview' },
+  { name: 'Projects', icon: FolderKanban, page: 'ClientPortal', clientView: 'projects' },
+  { name: 'Invoices', icon: FileText, page: 'ClientPortal', clientView: 'invoices' },
+  { name: 'Change Orders', icon: FileText, page: 'ClientPortal', clientView: 'change-orders' },
+  { name: 'Documents', icon: FileStack, page: 'ClientPortal', clientView: 'documents' },
+  { name: 'Service Requests', icon: Wrench, page: 'ClientPortal', clientView: 'service-requests' },
+  { name: 'Messages', icon: FileText, page: 'ClientPortal', clientView: 'messages' },
 ];
+
 
 function UserMenu({ user, onLogout }) {
   return (
@@ -170,7 +174,10 @@ function SidebarNavItem({ item, isActive, onNavigate }) {
   const Icon = item.icon;
   return (
     <Link
-      to={createPageUrl(item.page)}
+          to={item.clientView
+      ? `${createPageUrl('ClientPortal')}?view=${encodeURIComponent(item.clientView)}`
+      : createPageUrl(item.page)}
+
       onClick={onNavigate}
       title={item.name}
       className={cn(
@@ -307,6 +314,7 @@ export default function Layout({ children, currentPageName }) {
   // Auth guard: no org -> onboarding (handled once auth is ready)
   useEffect(() => {
     if (!user) return;
+    if (currentPageName === 'ClientPortal') return;
     // FIX (tech loop): technicians/clients cannot open Onboarding (RoleGuard bounces them to their portal),
     // so redirecting them there ping-pongs forever when organization_id is missing. Admin-only redirect.
     if (user.role === 'technician' || user.role === 'client') return;
@@ -421,7 +429,18 @@ export default function Layout({ children, currentPageName }) {
     return `${h} ${s}% ${l}%`;
   }
 
-  // Full-bleed pages (no sidebar): Home, Onboarding, Landing (marketing website)
+    // ClientPortal owns its full-viewport navy/gold chrome, including admin preview.
+  // Do not mount office sidebar/header/MegaMenu/CommandPalette/AgentChat/bottom nav.
+  if (currentPageName === 'ClientPortal') {
+    return <>{children}</>;
+  }
+
+  // The seven client destinations are ClientPortal search views, not office pages.
+  if (user?.role === 'client') {
+    return <Navigate to={`${createPageUrl('ClientPortal')}?view=overview`} replace />;
+  }
+
+// Full-bleed pages (no sidebar): Home, Onboarding, Landing (marketing website)
   if (isHomePage || isOnboardingPage || isLandingPage) {
     return children;
   }
@@ -587,14 +606,21 @@ export default function Layout({ children, currentPageName }) {
               <SidebarNavItem item={{ name: 'Settings', icon: Settings, page: 'Settings' }} isActive={currentPageName === 'Settings'} onNavigate={handleNavigateFromSidebar} />
             </>
           ) : user?.role === 'client' ? (
-            <>
-              {clientPrimaryNav.map((item) => (
-                <SidebarNavItem key={item.page} item={item} isActive={currentPageName === item.page} onNavigate={handleNavigateFromSidebar} />
-              ))}
-              <div className="h-px bg-white/10 my-2 sm:my-3" />
-              <SidebarNavItem item={{ name: 'Settings', icon: Settings, page: 'Settings' }} isActive={currentPageName === 'Settings'} onNavigate={handleNavigateFromSidebar} />
-            </>
-          ) : (
+          <>
+            {clientPrimaryNav.map((item) => {
+              const rawView = new URLSearchParams(location.search).get('view') || 'overview';
+              const activeView = rawView === 'project' ? 'projects' : rawView;
+              return (
+                <SidebarNavItem
+                  key={item.clientView}
+                  item={item}
+                  isActive={currentPageName === 'ClientPortal' && item.clientView === activeView}
+                  onNavigate={handleNavigateFromSidebar}
+                />
+              );
+            })}
+          </>
+       ) : (
             <>
           {navGroups.map((group, gi) => (
             <React.Fragment key={gi}>
