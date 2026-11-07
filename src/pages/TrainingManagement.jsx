@@ -7335,16 +7335,18 @@ function LiveSpotlight({ url, target }) {
       try {
         const iframe = frame.current;
         const doc = iframe?.contentDocument;
-        if (!doc || !iframe?.contentWindow) { fail('Live screen cannot be inspected. Use the new-tab live link and caption.'); return; }
+        if (!iframe) return;
+        if (!doc || !iframe.contentWindow) { missing('Waiting for the live screen.'); return; }
         if (doc.URL === 'about:blank') return;
-        // A redirect must not turn the preview into an unverified destination.
         const current = new URL(doc.URL);
+        const pageText = doc.body?.innerText || '';
+        const signInShell = /\/login\/?$/i.test(current.pathname) || !!doc.querySelector('input[type="password"]') || /\bcontinue with google\b/i.test(pageText);
+        if (signInShell) {
+          missing('Waiting for the signed-in live screen. Sign-in controls are not used in this player.');
+          return;
+        }
         if (current.origin !== 'https://mygsis.com' || !walkthroughURL(current.href) || /\/(TrainingManagement|TechnicianTraining)\/?$/.test(current.pathname)) {
           fail('This destination cannot be spotlighted here. Use the new-tab live link and caption.'); return;
-        }
-        const text = doc.body?.innerText || '';
-        if (/\b(sign[ -]?in|log[ -]?in|continue with google)\b/i.test(text) || /(?:^|\n)\s*welcome[!.,]?\s*(?:\n|$)/i.test(text) || doc.querySelector('input[type="password"]')) {
-          fail('Sign-in screen detected. No sign-in controls are used. Open the live app in a new tab.'); return;
         }
         if (attachedDoc !== doc) {
           detach(); attachedDoc = doc;
@@ -7378,8 +7380,8 @@ function LiveSpotlight({ url, target }) {
     setBox(null); setUnavailable(false); setStatus('MISSING: Waiting for the live screen.');
     const timer = window.setInterval(inspect, 750);
     const timeout = window.setTimeout(() => {
-      if (!attachedDoc) fail('Live preview did not become available. Use the new-tab live link and caption.');
-    }, 12000);
+      if (!attachedDoc) fail('Live preview did not become available, or a sign-in screen is still showing. Sign-in controls are not used. Open the live app in a new tab.');
+    }, 20000);
     frame.current?.addEventListener('load', inspect);
     const element = frame.current;
     return () => { stopped = true; window.clearInterval(timer); window.clearTimeout(timeout); element?.removeEventListener('load', inspect); detach(); };
