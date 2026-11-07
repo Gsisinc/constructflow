@@ -1648,11 +1648,11 @@ const SEED_COURSES = [
   },
   {
     "course_id": "CRS-MYGSIS-CORE",
-    "title": "MYGSIS • Everyone’s operating workflow",
+    "title": "MYGSIS • Office / admin walkthrough",
     "brand": "GSIS Internal",
     "link": "",
     "cost": "internal",
-    "notes": "GSIS-authored live dashboard tour: section-by-section, button-by-button, with jump-to and two modes (silent live prompts, or video when recorded). Video not recorded yet. Practice does not change official progress.",
+    "notes": "Office/admin live walkthrough: 149 verified section-by-section interior prompts restored from the November 6 live inventory tour, with office-only jump-to. Other office roles share this tour. Silent live prompts or a real recording when attached. Video not recorded yet. Practice does not change official progress.",
     "kind": "interactive"
   },
   {
@@ -1909,9 +1909,9 @@ const LV_SOP_COURSES = [
 ];
 
 const PRACTICE = {
-  "CRS-MYGSIS-CORE":   {
+  "CRS-MYGSIS-CORE": {
     "course_id": "CRS-MYGSIS-CORE",
-    "title": "MYGSIS • Everyone’s operating workflow",
+    "title": "MYGSIS • Office / admin walkthrough",
     "video_url": "",
     "steps": [
       {
@@ -2735,7 +2735,7 @@ const PRACTICE = {
       },
       {
         "title": "92. Required for everyone",
-        "body": "The four verified titles are MYGSIS • Everyone's operating workflow; Safety • Cal/OSHA orientation; Safety • Job-hazard analysis; Safety • First-aid readiness. These form the Required for everyone section.",
+        "body": "The four verified titles are MYGSIS • Office / admin walkthrough; Safety • Cal/OSHA orientation; Safety • Job-hazard analysis; Safety • First-aid readiness. These form the Required for everyone section.",
         "task": "Look at Required for everyone in the live app without changing anything.",
         "open_path": "/TrainingManagement",
         "open_label": "Training",
@@ -2753,7 +2753,7 @@ const PRACTICE = {
       },
       {
         "title": "94. Catalog sections",
-        "body": "Browse the catalog includes Manufacturer training, GSIS SOP / workflow, System Designer • Design to submittal, Fire Alarm Design • FireCode walkthrough and Low Voltage Design • FireCode walkthrough. These labels do not verify every linked course control. FireCode has no Demo mode.",
+        "body": "Browse the catalog includes Manufacturer training, GSIS SOP / workflow, System Designer • Design to submittal and Fire Alarm Design • FireCode walkthrough as inventoried headings. These labels do not verify the linked courses, their controls or any Demo mode in a live external app.",
         "task": "Look at the catalog headings without launching another course.",
         "open_path": "/TrainingManagement",
         "open_label": "Training",
@@ -3286,7 +3286,8 @@ const PRACTICE = {
       }
     ],
     "source": "Live signed-in MYGSIS inventory 2026-11-06 at https://mygsis.com (Dashboard and every sidebar index page). Greeting pattern and date are live. Detail tabs and some view-tab interiors were not opened and remain MISSING.",
-    "author": "GSIS-authored live-software walkthrough"
+    "author": "GSIS-authored live-software walkthrough",
+    "audience": "office"
   },
   "CRS-ADMIN-DESIGNER": {
     "course_id": "CRS-ADMIN-DESIGNER",
@@ -5997,7 +5998,7 @@ const PRACTICE = {
     "steps": [
       {
         "title": "1. Understand the practice boundary",
-        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Assumptions: no later deployment match is assumed. Missing information: post-creation live verification, upload-to-create runtime, rendered submittal dialog and PDF viewer evidence. No Demo mode exists. Live mode uses silent on-screen prompts only; video mode is optional and independent, with video not recorded yet. The empty video slot awaits real-site screen recordings narrated by Kemar in his own voice; no generated footage or cloned voice. Practice does not write official MYGSIS completion. Creating/uploading in FireCode writes real data in the same live account as real jobs. This is software orientation, not code approval or permission to sign/seal.",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Assumptions: no later deployment match is assumed. Missing information: post-creation live verification, upload-to-create runtime, rendered submittal dialog and PDF viewer evidence. No Demo mode exists. Live mode uses silent on-screen prompts only; video mode is optional and independent, with video not recorded yet. The empty video slot awaits real-site screen recordings narrated by Chief in the assistant's own voice — not Kemar's voice and not a clone of Kemar. No generated footage is used. Practice does not write official MYGSIS completion. Creating/uploading in FireCode writes real data in the same live account as real jobs. This is software orientation, not code approval or permission to sign/seal.",
         "task": "Read the safety boundary. If you lack an authorized practice blueprint and permission to create practice data, stop before upload or creation.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode",
@@ -6422,7 +6423,7 @@ const PRACTICE = {
     "steps": [
       {
         "title": "1. Understand the practice boundary",
-        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Assumptions: no later deployment match is assumed. Missing information: post-creation live verification, upload-to-create runtime, rendered submittal dialog and PDF viewer evidence. No Demo mode exists. Live mode uses silent on-screen prompts only; video mode is optional and independent, with video not recorded yet. The empty video slot awaits real-site screen recordings narrated by Kemar in his own voice; no generated footage or cloned voice. Practice does not write official MYGSIS completion. Creating/uploading in FireCode writes real data in the same live account as real jobs. This is software orientation, not code approval or permission to sign/seal.",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Assumptions: no later deployment match is assumed. Missing information: post-creation live verification, upload-to-create runtime, rendered submittal dialog and PDF viewer evidence. No Demo mode exists. Live mode uses silent on-screen prompts only; video mode is optional and independent, with video not recorded yet. The empty video slot awaits real-site screen recordings narrated by Chief in the assistant's own voice — not Kemar's voice and not a clone of Kemar. No generated footage is used. Practice does not write official MYGSIS completion. Creating/uploading in FireCode writes real data in the same live account as real jobs. This is software orientation, not code approval or permission to sign/seal.",
         "task": "Read the safety boundary. If you lack an authorized practice blueprint and permission to create practice data, stop before upload or creation.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
         "open_label": "FireCode",
@@ -6884,6 +6885,246 @@ const PRACTICE = {
     ],
     "source": "FIRECODE-DESIGN-LABELS-2026-11-06.md: supplied live signed-in check 2026-11-06 (America/Los_Angeles, PST) for login, Systems dashboard and New project (section 1); FireCode UI source and designer chrome screenshots for later screens (sections 4–13, 16, 19). Later screens were not re-verified live on a newly created project. Current SubmittalPackage flow is source-traced only, not the older standalone modal. Assumptions: none about deployment matching source. Missing information is called out in steps. SW training support for FA and LV; compliance check: this is UI training, not engineering approval, a permit, a professional seal or AHJ acceptance.",
     "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-MYGSIS-TECH": {
+    "course_id": "CRS-MYGSIS-TECH",
+    "title": "MYGSIS • Technician sidebar walkthrough",
+    "audience": "technician",
+    "video_url": "",
+    "steps": [
+      {
+        "title": "1. Dashboard",
+        "body": "This is a look-only orientation. Do not create, save, send, approve, pay, upload, assign, enroll, delete or change settings during practice. Silent prompts, spotlight, Next and audience-only jump-to guide you; no spoken narration in live mode. Practice never writes official completion. This walkthrough contains only the verified technician sidebar. Dashboard opens TechnicianPortal, not the office Company Overview. The primary technician destinations are Dashboard, Calendar, Tasks and Time Cards.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/TechnicianPortal",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Dashboard"
+      },
+      {
+        "title": "2. Calendar",
+        "body": "Calendar is the technician sidebar label. Do not substitute the office label Schedule or infer event controls.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/Calendar",
+        "open_label": "Calendar",
+        "area": "Calendar",
+        "spotlight": "Calendar"
+      },
+      {
+        "title": "3. Tasks",
+        "body": "Tasks opens TaskTracker. No task creation, completion or status change is included in this orientation.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/TaskTracker",
+        "open_label": "Tasks",
+        "area": "Tasks",
+        "spotlight": "Tasks"
+      },
+      {
+        "title": "4. Time Cards",
+        "body": "Time Cards opens TimeCards. Do not enter or submit time during practice.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/TimeCards",
+        "open_label": "Time Cards",
+        "area": "Time Cards",
+        "spotlight": "Time Cards"
+      },
+      {
+        "title": "5. Modules & Training",
+        "body": "Modules & Training is under My tools and opens TechnicianTraining. Your default required MYGSIS walkthrough is this technician-only tour, not the office CORE tour. Official assignments remain separate from unsaved practice.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/TechnicianTraining",
+        "open_label": "Modules & Training",
+        "area": "Modules & Training",
+        "spotlight": "Modules & Training"
+      },
+      {
+        "title": "6. Directory",
+        "body": "Directory is a verified My tools item. Locate it in the technician sidebar. MISSING: an explicit route mapping and page-control inventory in the supplied evidence; use the actual sidebar only, never a guessed URL.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/TechnicianPortal",
+        "open_label": "Technician Dashboard",
+        "area": "Directory",
+        "spotlight": "Directory"
+      },
+      {
+        "title": "7. AI Agents (onsite help)",
+        "body": "AI Agents (onsite help) is the verified My tools label and opens AIAgents. Do not infer an office/admin permission from this destination.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/AIAgents",
+        "open_label": "AI Agents (onsite help)",
+        "area": "AI Agents (onsite help)",
+        "spotlight": "AI Agents (onsite help)"
+      },
+      {
+        "title": "8. Pay Stub",
+        "body": "Pay Stub is a verified My tools item. Locate the sidebar label only; do not expose pay details during training. MISSING: explicit route mapping and page controls in the supplied evidence.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/TechnicianPortal",
+        "open_label": "Technician Dashboard",
+        "area": "Pay Stub",
+        "spotlight": "Pay Stub"
+      },
+      {
+        "title": "9. Request Time Off",
+        "body": "Request Time Off is a verified My tools item. Locate its label; do not submit a request during practice. MISSING: explicit route mapping and page controls in the supplied evidence.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/TechnicianPortal",
+        "open_label": "Technician Dashboard",
+        "area": "Request Time Off",
+        "spotlight": "Request Time Off"
+      },
+      {
+        "title": "10. Settings",
+        "body": "Technicians also have a fixed Settings item. Observe only; no account changes. This is the end of the technician walkthrough. No office/admin destinations are included.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/Settings",
+        "open_label": "Settings",
+        "area": "Settings",
+        "spotlight": "Settings"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "answer": 0,
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes. Finishing practice automatically marks official completion.",
+          "Yes, if someone assigned the course before you practiced."
+        ]
+      }
+    ],
+    "source": "B23: live role/sidebar inventory 2026-11-06 (PST); client portal screenshots verified ~6:12 PM PST supersede the older client-picker inventory. Index/sidebar orientation only; no unverified page controls taught.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-MYGSIS-CLIENT": {
+    "course_id": "CRS-MYGSIS-CLIENT",
+    "title": "MYGSIS • Client portal walkthrough",
+    "audience": "client",
+    "video_url": "",
+    "steps": [
+      {
+        "title": "1. Client portal chrome",
+        "body": "This is a look-only orientation. Do not create, save, send, approve, pay, upload, assign, enroll, delete or change settings during practice. Silent prompts, spotlight, Next and audience-only jump-to guide you; no spoken narration in live mode. Practice never writes official completion. The live client portal has its own navy/gold chrome. Desktop navigation contains only Overview, Projects, Invoices, Change Orders, Documents, Service Requests and Messages. No office sidebar, client project-picker or Training item is taught here. This walkthrough lives in the office TrainingManagement catalog for staff to play/share, not in a new client Training destination.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=overview",
+        "open_label": "Overview",
+        "area": "Overview",
+        "spotlight": "Overview"
+      },
+      {
+        "title": "2. Welcome and four KPIs",
+        "body": "The home view welcomes the signed-in user and shows Active projects, Unread updates, Open invoices and COs awaiting you. Read current values only; no sample projects, amounts or milestones are supplied.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=overview",
+        "open_label": "Overview",
+        "area": "Overview",
+        "spotlight": "Welcome"
+      },
+      {
+        "title": "3. No Projects Found",
+        "body": "No Projects Found is the honest state when this signed-in account has no project linked by client_email. This is what the verified office preview shows today. Do not select an unrelated office job or expect sample jobs. Project detail appears only when a project is linked to that client account; contact GSIS if you expected one.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=overview",
+        "open_label": "Overview",
+        "area": "Overview",
+        "spotlight": "No Projects Found"
+      },
+      {
+        "title": "4. Latest updates and Needs your action",
+        "body": "Latest updates and Needs your action are home sections. They can be empty. Read only published client information and actual pending actions; this practice does not approve change orders or pay invoices.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=overview",
+        "open_label": "Overview",
+        "area": "Overview",
+        "spotlight": "Latest updates"
+      },
+      {
+        "title": "5. Phone navigation",
+        "body": "On a phone, the navy header has a section selector for all seven destinations. The fixed bottom navigation contains Home, Projects, Invoices and Messages; Home means Overview. Use the selector for Change Orders, Documents and Service Requests as well. The gold + Service request action remains available; do not submit a request during training. Desktop instead shows its seven-destination sidebar. A desktop-sized training frame may not show phone-only chrome.",
+        "task": "At phone width, locate the header selector and four bottom destinations. If phone chrome is not visible at this width, record MISSING rather than guessing a highlight.",
+        "open_path": "/ClientPortal?view=overview",
+        "open_label": "Overview",
+        "area": "Overview",
+        "spotlight": "Home"
+      },
+      {
+        "title": "6. Your linked projects",
+        "body": "Projects is a dedicated client view. It only shows projects linked to this client account. If none are linked, keep the No Projects Found state and continue; there is no project-picker or sample job to use.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=projects",
+        "open_label": "Projects",
+        "area": "Projects",
+        "spotlight": "Projects"
+      },
+      {
+        "title": "7. Conditional project detail",
+        "body": "When a linked project exists and you select it, the project page has a hero with real project information and tabs Overview, Photos, Documents, Change orders, Invoices and Messages. Missing project details are not fabricated. No Calendar tab or office financial internals are taught. This step does not fabricate a project id or deep-link into an unrelated project.",
+        "task": "If a project is linked to your client account, open only that project and observe its hero and six tabs. If none is linked, skip this conditional observation and keep No Projects Found. The automatic frame remains on the Projects view; no detail highlight is promised.",
+        "open_path": "/ClientPortal?view=projects",
+        "open_label": "Projects",
+        "area": "Projects",
+        "spotlight": "Projects"
+      },
+      {
+        "title": "8. Invoices / Your invoices",
+        "body": "Invoices has its own ?view=invoices destination. The live desktop headings Invoices and Your invoices are verified. No invoices available is valid when no linked invoice exists. Do not invent an invoice amount or payment control. Any real invoice action is outside this look-only practice.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=invoices",
+        "open_label": "Invoices",
+        "area": "Invoices",
+        "spotlight": "Your invoices"
+      },
+      {
+        "title": "9. Change Orders",
+        "body": "Change Orders is a dedicated client destination, also reachable from the phone section selector. Read only the account’s actual records or empty state. This walkthrough does not approve, request changes, sign or create anything.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=change-orders",
+        "open_label": "Change Orders",
+        "area": "Change Orders",
+        "spotlight": "Change Orders"
+      },
+      {
+        "title": "10. Documents",
+        "body": "Documents is the dedicated client destination, not the office Documents page. Observe only files actually made available to the linked client projects; do not upload or share during practice.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=documents",
+        "open_label": "Documents",
+        "area": "Documents",
+        "spotlight": "Documents"
+      },
+      {
+        "title": "11. Service Requests",
+        "body": "Service Requests is a dedicated destination. The phone also has a gold + Service request action; desktop shows + New service request. Locate the action without submitting a form. If no project is linked, do not invent a project or ticket.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=service-requests",
+        "open_label": "Service Requests",
+        "area": "Service Requests",
+        "spotlight": "Service Requests"
+      },
+      {
+        "title": "12. Messages",
+        "body": "Messages is a dedicated destination and one of the four phone bottom-nav items. Observe only existing client conversations or their empty state. Do not send a message. End of client orientation; official completion remains unchanged.",
+        "task": "Observe only, then choose Next. If a label is absent, record MISSING; do not invent a replacement.",
+        "open_path": "/ClientPortal?view=messages",
+        "open_label": "Messages",
+        "area": "Messages",
+        "spotlight": "Messages"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Does finishing this practice mark official completion?",
+        "answer": 0,
+        "choices": [
+          "No. Practice does not change official progress; assignment is not enrollment.",
+          "Yes. Finishing practice automatically marks official completion.",
+          "Yes, if someone assigned the course before you practiced."
+        ]
+      }
+    ],
+    "source": "B23: live role/sidebar inventory 2026-11-06 (PST); client portal screenshots verified ~6:12 PM PST supersede the older client-picker inventory. Index/sidebar orientation only; no unverified page controls taught.",
+    "author": "GSIS-authored live-software walkthrough"
   }
 };
 
@@ -6909,7 +7150,19 @@ const LV_DESIGN_COURSE = {
   link: '', cost: 'internal', kind: 'interactive',
   notes: 'GSIS-authored live FireCode walkthrough for Access control, Video surveillance, Audio visual, Structured cabling, and Networking & wireless. Two modes: silent live prompts, or video when recorded. Video not recorded yet. No Demo mode. Do not open named client jobs. Structured cabling and Networking & wireless URL slugs are MISSING. Practice does not change official progress.',
 };
-const CATALOG = [...SEED_COURSES, ...LV_SOP_COURSES, FIRE_DESIGN_COURSE, LV_DESIGN_COURSE];
+// Audience tours are catalog-only source: no seed writes, enrollments or completion writes.
+const AUDIENCE_COURSES = ['CRS-MYGSIS-TECH', 'CRS-MYGSIS-CLIENT'].map(id => ({
+  course_id: id, title: PRACTICE[id].title, brand: 'GSIS Internal', link: '', cost: 'internal', kind: 'interactive',
+  notes: id === 'CRS-MYGSIS-CLIENT'
+    ? 'Live client portal orientation for office staff to play/share. Clients have no Training sidebar item. Video not recorded yet. Practice does not change official progress.'
+    : 'Technician-only orientation: primary navigation, My tools and fixed Settings. No office CORE/admin areas. Video not recorded yet. Practice does not change official progress.',
+}));
+const CATALOG = [...SEED_COURSES, ...LV_SOP_COURSES, FIRE_DESIGN_COURSE, LV_DESIGN_COURSE, ...AUDIENCE_COURSES];
+const MYGSIS_TOUR_IDS = new Set(['CRS-MYGSIS-CORE', 'CRS-MYGSIS-TECH', 'CRS-MYGSIS-CLIENT']);
+// Keep legacy official records intact; resolve only the practice card for this audience.
+const audienceCourse = (course, techMode) => techMode && course?.course_id === 'CRS-MYGSIS-CORE' ? COURSE_BY_ID['CRS-MYGSIS-TECH'] : course;
+const courseVisibleToAudience = (course, techMode) => !!course && (!techMode || !MYGSIS_TOUR_IDS.has(course.course_id) || course.course_id === 'CRS-MYGSIS-TECH');
+const pathsForAudience = (paths, techMode) => paths.map(path => ({ ...path, course_ids: path.course_ids.map(id => techMode && id === 'CRS-MYGSIS-CORE' ? 'CRS-MYGSIS-TECH' : id) }));
 const COURSE_BY_ID = Object.fromEntries(CATALOG.map(c => [c.course_id, c]));
 const LOGIN_EMAIL = 'kemar@gsistech.com';
 const emailKey = email => String(email || '').trim().toLowerCase();
@@ -6918,7 +7171,7 @@ const isInternal = c => !!PRACTICE[c.course_id] || c.kind === 'interactive' || c
 const isGated = c => c.cost === 'paid' || c.cost === 'partner';
 const safeURL = value => /^https?:\/\//i.test(value || '') ? value : null;
 
-const WALKTHROUGH_PAGES = new Set(['Dashboard', 'Calendar', 'OpsDashboard', 'ResourceBoard', 'Bids', 'Leads', 'ContractorDirectory', 'Estimates', 'RateCard', 'Projects', 'Documents', 'TrainingManagement', 'Billing', 'Suppliers', 'PurchaseOrders', 'SupportChannels', 'WIPReport', 'Settings', 'RolePermissions', 'UserApprovals', 'AIAgents', 'AlertSettings', 'TemplateLibrary', 'AuditTrail', 'ServiceDesk']);
+const WALKTHROUGH_PAGES = new Set(['Dashboard', 'Calendar', 'OpsDashboard', 'ResourceBoard', 'Bids', 'Leads', 'ContractorDirectory', 'Estimates', 'RateCard', 'Projects', 'Documents', 'TrainingManagement', 'Billing', 'Suppliers', 'PurchaseOrders', 'SupportChannels', 'WIPReport', 'Settings', 'RolePermissions', 'UserApprovals', 'AIAgents', 'AlertSettings', 'TemplateLibrary', 'AuditTrail', 'ServiceDesk', 'TechnicianPortal', 'TaskTracker', 'TimeCards', 'TechnicianTraining', 'ClientPortal']);
 function walkthroughURL(value) {
   if (typeof value !== 'string') return null;
   const raw = value.startsWith('/') && !value.startsWith('//') ? `https://mygsis.com${value}` : value;
@@ -6926,7 +7179,15 @@ function walkthroughURL(value) {
   if (!candidate) return null;
   try {
     const url = new URL(candidate);
-    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.port || url.search || url.hash) return null;
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.port || url.hash) return null;
+    // Only the seven verified client ?view= destinations may have query parameters.
+    if (url.pathname === '/ClientPortal') {
+      const views = new Set(['overview', 'projects', 'invoices', 'change-orders', 'documents', 'service-requests', 'messages']);
+      const params = [...url.searchParams.entries()];
+      if (url.origin !== 'https://mygsis.com' || (url.search && (params.length !== 1 || params[0][0] !== 'view' || !views.has(params[0][1])))) return null;
+      return `https://mygsis.com/ClientPortal${url.search}`;
+    }
+    if (url.search) return null;
     if (candidate === 'https://observant-fire-code-flow.base44.app/') return candidate;
     if (!/^https?:\/\/mygsis\.com\/[A-Za-z]+$/.test(candidate) || url.hostname !== 'mygsis.com' || !WALKTHROUGH_PAGES.has(url.pathname.slice(1))) return null;
     return `https://mygsis.com${url.pathname}`;
@@ -7086,7 +7347,14 @@ export default function TrainingManagement({ view } = {}) {
   const reads = techMode ? [personalAssignmentsQuery, profileQuery] : [levelsQuery, coursesQuery, assignmentsQuery, techniciansQuery];
   const readError = reads.some(q => q.isError);
   const reading = !!org?.id && reads.some(q => q.isLoading);
-  const onPractice = id => { if (!isGated(COURSE_BY_ID[id]) && PRACTICE[id]) setPracticeId(id); };
+  const onPractice = id => {
+    const course = audienceCourse(COURSE_BY_ID[id], techMode);
+    if (authLoaded && courseVisibleToAudience(course, techMode) && !isGated(course) && PRACTICE[course.course_id]) setPracticeId(course.course_id);
+  };
+  // A role/view change must never leave an office/client tour open in technician mode.
+  useEffect(() => {
+    if (techMode && practiceId && MYGSIS_TOUR_IDS.has(practiceId) && practiceId !== 'CRS-MYGSIS-TECH') setPracticeId(null);
+  }, [techMode, practiceId]);
   async function copyLogin() {
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
@@ -7094,10 +7362,14 @@ export default function TrainingManagement({ view } = {}) {
       setMessage(`Copied login email: ${LOGIN_EMAIL}`);
     } catch (_) { setMessage(`Copy manually: ${LOGIN_EMAIL}`); }
   }
-  const renderCourse = course => <CourseCard key={course.course_id} course={course} onPractice={onPractice} onCopyLogin={copyLogin} />;
+  const renderCourse = original => {
+    const course = audienceCourse(original, techMode);
+    if (!courseVisibleToAudience(course, techMode)) return null;
+    return <CourseCard key={course.course_id} course={course} onPractice={onPractice} onCopyLogin={copyLogin} />;
+  };
   const domainPaths = PATHS.filter(p => p.layer === 'division' && p.division === division && p.domain === domain);
   const domainCourses = coursesForPaths(domainPaths);
-  const requiredPaths = PATHS.filter(p => REQUIRED_PATHS.includes(p.path_id));
+  const requiredPaths = pathsForAudience(PATHS.filter(p => REQUIRED_PATHS.includes(p.path_id)), techMode);
   const tabs = [...(techMode ? [['my', 'My Training']] : []), ['catalog', 'Catalog'], ...(canAssign ? [['assign', 'Assign']] : []), ...(!techMode ? [['technicians', 'Technicians']] : []), ['progress', 'Progress']];
   return <div className="gsis-training">
     <style>{STYLES}</style>
@@ -7116,11 +7388,11 @@ export default function TrainingManagement({ view } = {}) {
       {message && <div className="t-notice" role="status">{message}</div>}
       <section className="t-card t-overlay" aria-labelledby="required-training">
         <h2 id="required-training">Required for everyone</h2>
-        <p className="t-muted">MYGSIS how-to + Safety are required overlays, not a fifth division. Included with every assignment.</p>
-        <div className="t-grid">{coursesForPaths(requiredPaths).map(renderCourse)}</div>
+        <p className="t-muted">MYGSIS how-to + Safety are required overlays, not a fifth division. Your MYGSIS walkthrough matches your audience: {techMode ? 'technician only' : 'office / admin; other office roles share this tour'}.</p>
+        {(authLoaded || view === 'tech') ? <div className="t-grid">{coursesForPaths(requiredPaths).map(renderCourse)}</div> : <p role="status">Loading your audience-specific walkthrough…</p>}
       </section>
       <nav className="t-tabs" aria-label="Training views">{tabs.map(([key, label]) => <button key={key} aria-pressed={tab === key} onClick={() => setTab(key)}>{label}</button>)}</nav>
-      {tab === 'catalog' && <section aria-label="Training catalog">
+      {tab === 'catalog' && authLoaded && <section aria-label="Training catalog">
         <div className="t-card">
           <h2>Browse the catalog</h2>
           <div className="t-pickers">
@@ -7130,11 +7402,16 @@ export default function TrainingManagement({ view } = {}) {
           <p className="t-muted">{division} / {domain} · {domainCourses.length} documented catalog items</p>
         </div>
         <CourseGroups courses={domainCourses} renderCourse={renderCourse} />
-        <details className="t-card t-section">
+        {!techMode && <section className="t-card t-section" aria-label="Audience walkthroughs">
+          <h2>Audience walkthroughs</h2>
+          <p className="t-muted">Office roles share the office tour above. Preview the technician tour or play/share the client portal walkthrough through your approved process. Clients have no Training navigation item; no messages or links are sent by this catalog.</p>
+          <div className="t-grid">{AUDIENCE_COURSES.map(renderCourse)}</div>
+        </section>}
+        {!techMode && <details className="t-card t-section">
           <summary className="t-check">Optional administrative skills & NICET orientation</summary>
           <p className="t-muted">Assignable overlays. Not extra divisions or external credentials.</p>
           {PATHS.filter(p => ['admin', 'credential'].includes(p.layer)).map(p => <section key={p.path_id} className="t-section"><h3>{pathLabel(p)}</h3><CourseGroups courses={coursesForPaths([p])} renderCourse={renderCourse} /></section>)}
-        </details>
+        </details>}
         <p className="t-muted t-section">Bundled documented catalog: {CATALOG.length} courses. Existing organization data retained: {storedCourses.length} TrainingCourse rows / {(levelsQuery.data || []).length} CourseLevel rows.</p>
       </section>}
       {tab === 'assign' && canAssign && <AssignPanel org={org} user={user} technicians={technicians} assignments={allAssignments} storedCourses={storedCourses} readsReady={!!org?.id && !reading && !readError} />}
@@ -7168,8 +7445,9 @@ export default function TrainingManagement({ view } = {}) {
               <h2>{p.division ? `${p.division} / ` : ''}{pathLabel(p)}</h2>
               <ProgressBar label={p.path_id} assignments={assigned} />
               <div className="t-grid t-section">{assigned.map(a => {
-                const course = COURSE_BY_ID[resolveCourseId(a, storedCourses)];
-                return <div className="t-stack" key={a.id}><CourseCard course={course} onPractice={onPractice} onCopyLogin={copyLogin} /><p className="t-muted">Official status: {a.status || 'assigned'}{a.due_date ? ` · Due ${a.due_date}` : ''}</p></div>;
+                const originalCourse = COURSE_BY_ID[resolveCourseId(a, storedCourses)];
+                const course = audienceCourse(originalCourse, techMode);
+                return <div className="t-stack" key={a.id}>{courseVisibleToAudience(course, techMode) ? <CourseCard course={course} onPractice={onPractice} onCopyLogin={copyLogin} /> : <p>Practice is not offered for this audience. Official assignment retained.</p>}{originalCourse?.course_id === 'CRS-MYGSIS-CORE' && <p className="t-muted">Legacy office CORE assignment retained unchanged. Use the technician-only walkthrough for practice; no official completion is transferred.</p>}<p className="t-muted">Official status: {a.status || 'assigned'}{a.due_date ? ` · Due ${a.due_date}` : ''}</p></div>;
               })}</div>
             </section>;
           })}
@@ -7217,6 +7495,7 @@ function CourseCard({ course, onPractice, onCopyLogin }) {
 }
 function filterAssignments(assignments, paths, storedCourses) {
   const ids = new Set(paths.flatMap(p => p.course_ids));
+  if (ids.has('CRS-MYGSIS-CORE')) ids.add('CRS-MYGSIS-TECH'); // Count real audience assignments without rewriting legacy records.
   return assignments.filter(a => ids.has(resolveCourseId(a, storedCourses)));
 }
 function ProgressBar({ label, assignments }) {
@@ -7239,7 +7518,7 @@ function AssignPanel({ org, user, technicians, assignments, storedCourses, reads
   const createAssignmentMutation = useMutation({
     mutationFn: data => base44.entities.CourseAssignment.create(data),
   });
-  const selectedPaths = selectionPaths(selectedDivisions, selectedDomains, selectedOverlays);
+  const selectedPaths = pathsForAudience(selectionPaths(selectedDivisions, selectedDomains, selectedOverlays), true);
   const selectedCourses = coursesForPaths(selectedPaths);
   const selectedPeople = technicians.filter(t => selectedTechs.includes(emailKey(t.email)));
   const existing = new Set(assignments.map(a => `${emailKey(a.technician_email)}::${resolveCourseId(a, storedCourses)}`));
@@ -7434,14 +7713,14 @@ function PracticePlayer({ course }) {
   }, [playing, phase, stepIndex, steps.length, hasQuiz, step]);
   return <section className="t-stack" aria-label="Video and live spotlight practice">
     <p className="t-notice">These captioned steps walk through live MYGSIS (or the named live app). This player does not change official progress. Assignment is not enrollment. Do not award a real bid, send mail, purchase or enroll in manufacturer courses during practice. Only edit an authorized training record; live-tab and iframe actions can save real data. Internal orientation is not certification or authority to perform regulated work.</p>
-    <p className="t-muted">Watch a real screen recording when Kemar has recorded it with his own narration, and/or follow the live spotlight walkthrough. No generated UI or AI voice is used. Play auto-advances live captions every 8 seconds; pause before any live action. Notes remain local and unsaved.</p>
-    {phase === 'choice' && <section className="t-card"><h2>Choose how to practice</h2><p>Live mode: silent on-screen prompts, spotlight and Next — no voice or spoken narration. Video mode: a real screen recording with Kemar’s own recorded narration, when available.</p><div className="t-choice">
+    <p className="t-muted">Watch a real screen recording when a narrated walkthrough has been attached, and/or follow the live spotlight walkthrough. Recordings are real-site screen recordings narrated by Chief in the assistant's own voice — not Kemar's voice and not a clone of Kemar. No stand-in footage or generated UI is used. Play auto-advances live captions every 8 seconds; pause before any live action. Notes remain local and unsaved.</p>
+    {phase === 'choice' && <section className="t-card"><h2>Choose how to practice</h2><p>Live mode: silent on-screen prompts, spotlight and Next — no voice or spoken narration. Video mode: a real-site screen recording narrated by Chief in the assistant's own voice, when a video file is attached. This is not Kemar's voice and not a clone of Kemar.</p><div className="t-choice">
       <button onClick={() => chooseVideo(false)}>Watch video first</button>
       <button className="t-primary" onClick={startLive}>Skip to live walkthrough</button>
       <button onClick={() => chooseVideo(true)}>Watch video only</button>
     </div></section>}
     {phase === 'video' && <section className="t-card"><h2>Video mode — recorded walkthrough</h2>
-      {videoURL ? <><video className="t-recording" controls src={videoURL} onEnded={afterVideo} onError={() => setVideoError(true)} /><p className="t-muted">Real course recording. Playback does not change official progress.</p>{videoError && <p role="status" className="t-notice">The recording could not be played. You can continue without it or return to the choices.</p>}</> : <div className="t-notice"><strong>Video not recorded yet.</strong><p>The recording must be a screen recording of the live MYGSIS website with Kemar’s own narration. No stand-in video, generated UI, or synthesized audio is used.</p></div>}
+      {videoURL ? <><video className="t-recording" controls src={videoURL} onEnded={afterVideo} onError={() => setVideoError(true)} /><p className="t-muted">Real course recording. Playback does not change official progress.</p>{videoError && <p role="status" className="t-notice">The recording could not be played. You can continue without it or return to the choices.</p>}</> : <div className="t-notice"><strong>Video not recorded yet.</strong><p>The recording must be a screen recording of the live MYGSIS website narrated by Chief in the assistant's own voice — not Kemar's voice and not a clone of Kemar. No stand-in video, generated UI, or cloned-Kemar audio is used.</p></div>}
       <div className="t-choice">
         {videoOnly ? <button className="t-primary" onClick={finish}>{hasQuiz ? 'Continue to practice quiz' : 'Continue to end of practice'}</button> : <button className="t-primary" onClick={startLive}>Skip to live walkthrough</button>}
         <button onClick={() => { setPlaying(false); setPhase('choice'); }}>Back to choices</button>
