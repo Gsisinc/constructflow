@@ -1652,7 +1652,7 @@ const SEED_COURSES = [
     "brand": "GSIS Internal",
     "link": "",
     "cost": "internal",
-    "notes": "Interactive internal practice; not an external credential or enrollment.",
+    "notes": "GSIS-authored live dashboard tour: section-by-section, button-by-button, with jump-to and two modes (silent live prompts, or video when recorded). Video not recorded yet. Practice does not change official progress.",
     "kind": "interactive"
   },
   {
@@ -1661,7 +1661,7 @@ const SEED_COURSES = [
     "brand": "GSIS Internal",
     "link": "",
     "cost": "internal",
-    "notes": "Interactive internal practice; not an external credential or enrollment.",
+    "notes": "Interactive internal practice; not an external credential or enrollment. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive"
   },
   {
@@ -1670,7 +1670,7 @@ const SEED_COURSES = [
     "brand": "GSIS Internal",
     "link": "",
     "cost": "internal",
-    "notes": "Interactive internal practice; not an external credential or enrollment.",
+    "notes": "Interactive internal practice; not an external credential or enrollment. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive"
   },
   {
@@ -1679,7 +1679,7 @@ const SEED_COURSES = [
     "brand": "GSIS Internal",
     "link": "",
     "cost": "internal",
-    "notes": "Interactive internal practice; not an external credential or enrollment.",
+    "notes": "Interactive internal practice; not an external credential or enrollment. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive"
   },
   {
@@ -1688,7 +1688,7 @@ const SEED_COURSES = [
     "brand": "GSIS Internal",
     "link": "",
     "cost": "internal",
-    "notes": "Interactive internal practice; not an external credential or enrollment.",
+    "notes": "Interactive internal practice; not an external credential or enrollment. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive"
   },
   {
@@ -1697,7 +1697,7 @@ const SEED_COURSES = [
     "brand": "GSIS Internal",
     "link": "",
     "cost": "internal",
-    "notes": "Interactive internal practice; not an external credential or enrollment.",
+    "notes": "Interactive internal practice; not an external credential or enrollment. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive"
   },
   {
@@ -1706,7 +1706,7 @@ const SEED_COURSES = [
     "brand": "GSIS Internal",
     "link": "",
     "cost": "internal",
-    "notes": "Interactive internal practice; not an external credential or enrollment.",
+    "notes": "Interactive internal practice; not an external credential or enrollment. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive"
   },
   {
@@ -1715,7 +1715,7 @@ const SEED_COURSES = [
     "brand": "GSIS Internal",
     "link": "",
     "cost": "internal",
-    "notes": "Interactive internal practice; not an external credential or enrollment.",
+    "notes": "Interactive internal practice; not an external credential or enrollment. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive"
   },
   {
@@ -1761,7 +1761,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-FIRE-ITM",
@@ -1770,7 +1770,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-FIRE-SERVICE",
@@ -1779,7 +1779,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-FIRE-PROGRAMMING",
@@ -1788,7 +1788,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-AERIAL-SOP-PROGRESS",
@@ -1797,7 +1797,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-AERIAL-SOP-ORTHO",
@@ -1806,7 +1806,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-AERIAL-SOP-3D",
@@ -1815,7 +1815,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-AERIAL-SOP-STOCKPILE",
@@ -1824,7 +1824,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-AERIAL-SOP-INSPECTIONS",
@@ -1833,7 +1833,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-AERIAL-SOP-ASBUILT",
@@ -1842,7 +1842,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   },
   {
     "course_id": "CRS-AERIAL-SOP-REALESTATE",
@@ -1851,7 +1851,7 @@ const SEED_COURSES = [
     "link": "",
     "cost": "internal",
     "kind": "interactive",
-    "notes": "GSIS-authored internal practice; not enrollment or an external credential."
+    "notes": "GSIS-authored internal practice; not enrollment or an external credential. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available."
   }
 ];
 
@@ -1861,7 +1861,7 @@ const LV_SOP_COURSES = [
     "title": "CCTV — Video surveillance workflow",
     "brand": "GSIS Internal",
     "cost": "internal",
-    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules.",
+    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive",
     "path_id": "PATH-CCTV",
     "link": ""
@@ -1871,7 +1871,7 @@ const LV_SOP_COURSES = [
     "title": "AC — Access control workflow",
     "brand": "GSIS Internal",
     "cost": "internal",
-    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules.",
+    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive",
     "path_id": "PATH-ACCESS",
     "link": ""
@@ -1881,7 +1881,7 @@ const LV_SOP_COURSES = [
     "title": "AV — Audio-visual workflow",
     "brand": "GSIS Internal",
     "cost": "internal",
-    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules.",
+    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive",
     "path_id": "PATH-AV",
     "link": ""
@@ -1891,7 +1891,7 @@ const LV_SOP_COURSES = [
     "title": "NW — Networking / Wi-Fi workflow",
     "brand": "GSIS Internal",
     "cost": "internal",
-    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules.",
+    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive",
     "path_id": "PATH-NET",
     "link": ""
@@ -1901,7 +1901,7 @@ const LV_SOP_COURSES = [
     "title": "SC — Structured cabling workflow",
     "brand": "GSIS Internal",
     "cost": "internal",
-    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules.",
+    "notes": "Documented project-specific workflow. Preserve all ASSUMED, VERIFY and INPUT NEEDED qualifications; not universal design rules. Upcoming only: a fuller internal domain workflow course is being written separately and is not part of this Training pass. Existing practice remains available.",
     "kind": "interactive",
     "path_id": "PATH-CABLING",
     "link": ""
@@ -1909,111 +1909,1383 @@ const LV_SOP_COURSES = [
 ];
 
 const PRACTICE = {
-  "CRS-MYGSIS-CORE": {
+  "CRS-MYGSIS-CORE":   {
     "course_id": "CRS-MYGSIS-CORE",
     "title": "MYGSIS • Everyone’s operating workflow",
+    "video_url": "",
     "steps": [
       {
-        "title": "1. Start with your live workspace",
-        "body": "Open Dashboard in the left sidebar. Confirm you are in the correct organization/login before opening job information. The office sidebar includes Schedule, Ops Dashboard, Resource Board, Bids, Leads, Contractor Directory, Estimates, Rate Card, Projects, Documents, Training and Billing. Visibility depends on your login. If your sidebar shows Chats, that is team chat; no Chats URL is assumed here.",
-        "task": "Identify your division and the job/task you are permitted to review.",
+        "title": "1. Open Dashboard",
+        "body": "Open Dashboard from the sidebar or this verified live link. The page heading is Company Overview. Start here, the first sidebar destination. This entire tour is look-only: do not create, save, send, delete, export, upload, import, assign, generate, edit, or change account views. Never open named records or detail cards. Counts and values are live and will change. Sidebar visibility depends on your login. Use Next in this player after each observation; LIVE prompts have no voice.",
+        "task": "Open only the Dashboard sidebar destination if available, then look at Company Overview.",
         "open_path": "/Dashboard",
-        "open_label": "Dashboard"
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Company Overview"
       },
       {
-        "title": "2. Locate your bid",
-        "body": "In the left sidebar under Sales & Estimating, open Bids. Use “Search by title, client, or agency...” to find a bid you can already see and open it. Select Overview and read the scope. Do not change Status or award a real bid during practice.",
-        "task": "Identify the bid and one missing scope item in the practice notes.",
+        "title": "2. Greeting and date",
+        "body": "The Dashboard shows a time-of-day greeting, for example GOOD AFTERNOON, and the current date; it may include your name. Neither a particular name nor a particular date is required.",
+        "task": "Look above Company Overview for the live greeting and date.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Company Overview"
+      },
+      {
+        "title": "3. Sidebar navigation",
+        "body": "The sidebar includes Search... with ⌘K, Quick Access, and a user block. Lower down it groups SALES & ESTIMATING, BILLING, PROCUREMENT and ADMIN. Its footer includes Settings, Support and an organization block. Support points to Service Desk; do not change settings or account details.",
+        "task": "Look at the sidebar in visual order; do not enter personal information or open another area yet.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Quick Access"
+      },
+      {
+        "title": "4. Time range",
+        "body": "7D, 30D, QTD and YTD are the visible range toggles. Their alternate contents were not clicked and remain MISSING; do not assume a particular range result.",
+        "task": "Look at the four range labels without switching them.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "7D"
+      },
+      {
+        "title": "5. Dashboard actions",
+        "body": "Export and New Bid are visible actions. Export was not clicked: its actual result is MISSING. New Bid is a creation control, not part of practice.",
+        "task": "Look at Export and New Bid; do not click either.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Export"
+      },
+      {
+        "title": "6. Bid and pipeline indicators",
+        "body": "Active Bids and Pipeline Value are look-only KPI cards. Read the live labels and values, not fixed example totals.",
+        "task": "Look at Active Bids in the live app without changing anything.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Active Bids"
+      },
+      {
+        "title": "7. Contract and billing indicators",
+        "body": "Contract Value and Billed to Date are look-only KPI cards; their money values change with live data.",
+        "task": "Look at Contract Value in the live app without changing anything.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Contract Value"
+      },
+      {
+        "title": "8. Outstanding and margin",
+        "body": "Outstanding and Avg Margin complete the verified KPI labels. Treat all values as live.",
+        "task": "Look at Outstanding in the live app without changing anything.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Outstanding"
+      },
+      {
+        "title": "9. Bid Pipeline section",
+        "body": "Look over Bid Pipeline as a section of Company Overview. This tour does not open bid cards or detail records.",
+        "task": "Look at Bid Pipeline in the live app without changing anything.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Bid Pipeline"
+      },
+      {
+        "title": "10. Open board link",
+        "body": "Open board is a verified link label. Its destination was not followed and remains MISSING; do not infer a detail URL.",
+        "task": "Locate Open board without following it.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Open board"
+      },
+      {
+        "title": "11. Billing / SOV section",
+        "body": "Billing / SOV is the visible dashboard section label. Look at its live summary without opening records.",
+        "task": "Look at Billing / SOV in the live app without changing anything.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Billing / SOV"
+      },
+      {
+        "title": "12. Details link",
+        "body": "Details is a verified link label. Its destination and contents were not opened and remain MISSING.",
+        "task": "Locate Details without following it.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Details"
+      },
+      {
+        "title": "13. Active Projects section",
+        "body": "Active Projects is a dashboard section. Read its summary only; do not open a named project.",
+        "task": "Look at Active Projects in the live app without changing anything.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Active Projects"
+      },
+      {
+        "title": "14. All projects link",
+        "body": "All projects is visible. Its click destination was not inventoried and remains MISSING; the Projects sidebar link is verified separately.",
+        "task": "Look at All projects without following it.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "All projects"
+      },
+      {
+        "title": "15. Recent Activity",
+        "body": "Recent Activity appears lower on the page. Observe the section without opening activity records.",
+        "task": "Scroll to Recent Activity and look at the visible section.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Recent Activity"
+      },
+      {
+        "title": "16. Crew Snapshot",
+        "body": "Crew Snapshot is another below-fold section. Any staffing information shown is live.",
+        "task": "Scroll to Crew Snapshot and look only.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Crew Snapshot"
+      },
+      {
+        "title": "17. Upcoming section",
+        "body": "Upcoming is a verified section heading. Its entries can change; no named entry is part of this tour.",
+        "task": "Scroll to Upcoming without opening an entry.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Upcoming"
+      },
+      {
+        "title": "18. Resource board link",
+        "body": "Resource board is a visible link. Its click destination was not followed and remains MISSING; use the verified Resource Board sidebar destination later.",
+        "task": "Locate Resource board without following it.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Resource board"
+      },
+      {
+        "title": "19. Operations section",
+        "body": "Operations contains the visible cards All Jobs, Retention Held, Cost vs Budget and DualTrack Red Flags. Read these live summary labels; do not open job records.",
+        "task": "Look at Operations in the live app without changing anything.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Operations"
+      },
+      {
+        "title": "20. Open Purchase Orders",
+        "body": "Open Purchase Orders is the section heading. Open POs and Upcoming Milestones are the verified card labels; totals and entries are live.",
+        "task": "Look at Open Purchase Orders in the live app without changing anything.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Open Purchase Orders"
+      },
+      {
+        "title": "21. Purchase order links",
+        "body": "All POs and View all are visible links. Their destinations were not followed and remain MISSING.",
+        "task": "Look at both link labels without opening them.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "All POs"
+      },
+      {
+        "title": "22. Owner Action Items",
+        "body": "Owner Action Items is the verified section heading. Do not change an item or open a named record.",
+        "task": "Look at Owner Action Items in the live app without changing anything.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Owner Action Items"
+      },
+      {
+        "title": "23. Action item status filters",
+        "body": "Open, In Progress, Waiting and Done are the visible action-item filters. Their counts are live. Alternate filter contents were not clicked and remain MISSING.",
+        "task": "Look at all four status labels; do not change items.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Open"
+      },
+      {
+        "title": "24. Add-ins across pages",
+        "body": "Add-ins appears here and on other inventoried pages. What it opens was not inventoried and is MISSING; no function is assumed.",
+        "task": "Look at Add-ins without opening it, then use Next to continue to Schedule.",
+        "open_path": "/Dashboard",
+        "open_label": "Dashboard",
+        "area": "Dashboard",
+        "spotlight": "Add-ins"
+      },
+      {
+        "title": "25. Open Schedule",
+        "body": "Open Schedule from the sidebar or this verified live link. The page heading is Project Calendar. The month/year below the heading is a live period label, not a permanent month.",
+        "task": "Open only the Schedule sidebar destination if available, then look at Project Calendar.",
+        "open_path": "/Calendar",
+        "open_label": "Schedule",
+        "area": "Schedule",
+        "spotlight": "Project Calendar"
+      },
+      {
+        "title": "26. Calendar views",
+        "body": "Day, Week, Month and Year form the segmented view control. Their interiors were not clicked and are MISSING.",
+        "task": "Look at each view label without switching views.",
+        "open_path": "/Calendar",
+        "open_label": "Schedule",
+        "area": "Schedule",
+        "spotlight": "Day"
+      },
+      {
+        "title": "27. Calendar creation action",
+        "body": "Add Event is a creation control. Practice does not add calendar events.",
+        "task": "Look at Add Event without clicking it.",
+        "open_path": "/Calendar",
+        "open_label": "Schedule",
+        "area": "Schedule",
+        "spotlight": "Add Event"
+      },
+      {
+        "title": "28. Unnamed calendar icons",
+        "body": "Two icon buttons were visible but unlabeled: MISSING accessible names. Do not call them Previous or Next or guess their behavior.",
+        "task": "Locate the two unnamed icons without clicking them.",
+        "open_path": "/Calendar",
+        "open_label": "Schedule",
+        "area": "Schedule",
+        "spotlight": "Project Calendar"
+      },
+      {
+        "title": "29. Today control",
+        "body": "Today is a verified control label. Its clicked result was not inventoried and is MISSING.",
+        "task": "Look at Today and the live calendar period without changing the view.",
+        "open_path": "/Calendar",
+        "open_label": "Schedule",
+        "area": "Schedule",
+        "spotlight": "Today"
+      },
+      {
+        "title": "30. Open Ops Dashboard",
+        "body": "Open Ops Dashboard from the sidebar or this verified live link. The page heading is Ops Dashboard. ",
+        "task": "Open only the Ops Dashboard sidebar destination if available, then look at Ops Dashboard.",
+        "open_path": "/OpsDashboard",
+        "open_label": "Ops Dashboard",
+        "area": "Ops Dashboard",
+        "spotlight": "Ops Dashboard"
+      },
+      {
+        "title": "31. Project totals",
+        "body": "Projects Completed and Active Projects are live summary cards, not fixed totals.",
+        "task": "Look at Projects Completed in the live app without changing anything.",
+        "open_path": "/OpsDashboard",
+        "open_label": "Ops Dashboard",
+        "area": "Ops Dashboard",
+        "spotlight": "Projects Completed"
+      },
+      {
+        "title": "32. Monthly completions",
+        "body": "Completions This Month is a live card tied to the current month.",
+        "task": "Look at Completions This Month in the live app without changing anything.",
+        "open_path": "/OpsDashboard",
+        "open_label": "Ops Dashboard",
+        "area": "Ops Dashboard",
+        "spotlight": "Completions This Month"
+      },
+      {
+        "title": "33. Mileage summary",
+        "body": "Total Mileage is the verified mileage card. Its current value may change.",
+        "task": "Look at Total Mileage in the live app without changing anything.",
+        "open_path": "/OpsDashboard",
+        "open_label": "Ops Dashboard",
+        "area": "Ops Dashboard",
+        "spotlight": "Total Mileage"
+      },
+      {
+        "title": "34. Project progress",
+        "body": "Progress per Project is a verified section. Observe it without opening named projects.",
+        "task": "Look at Progress per Project in the live app without changing anything.",
+        "open_path": "/OpsDashboard",
+        "open_label": "Ops Dashboard",
+        "area": "Ops Dashboard",
+        "spotlight": "Progress per Project"
+      },
+      {
+        "title": "35. Daily log completions",
+        "body": "Completions (Daily Logs) by Month is a verified section; read the live month-based display.",
+        "task": "Look at Completions (Daily Logs) by Month in the live app without changing anything.",
+        "open_path": "/OpsDashboard",
+        "open_label": "Ops Dashboard",
+        "area": "Ops Dashboard",
+        "spotlight": "Completions (Daily Logs) by Month"
+      },
+      {
+        "title": "36. Phase comparison",
+        "body": "Targets vs Actual (Phases) is the verified comparison section. No modification control was inventoried here.",
+        "task": "Look at Targets vs Actual (Phases) in the live app without changing anything.",
+        "open_path": "/OpsDashboard",
+        "open_label": "Ops Dashboard",
+        "area": "Ops Dashboard",
+        "spotlight": "Targets vs Actual (Phases)"
+      },
+      {
+        "title": "37. Open Resource Board",
+        "body": "Open Resource Board from the sidebar or this verified live link. The page heading is Resource Allocation. ",
+        "task": "Open only the Resource Board sidebar destination if available, then look at Resource Allocation.",
+        "open_path": "/ResourceBoard",
+        "open_label": "Resource Board",
+        "area": "Resource Board",
+        "spotlight": "Resource Allocation"
+      },
+      {
+        "title": "38. Allocation headings",
+        "body": "Allocation board and Resource Board are verified headings. Observe the current board without opening bookings.",
+        "task": "Look at Allocation board in the live app without changing anything.",
+        "open_path": "/ResourceBoard",
+        "open_label": "Resource Board",
+        "area": "Resource Board",
+        "spotlight": "Allocation board"
+      },
+      {
+        "title": "39. Resource view selector",
+        "body": "Day, Week and Month are visible view labels. Their interiors were not clicked and remain MISSING.",
+        "task": "Look at the view labels without switching views.",
+        "open_path": "/ResourceBoard",
+        "open_label": "Resource Board",
+        "area": "Resource Board",
+        "spotlight": "Day"
+      },
+      {
+        "title": "40. Resource period controls",
+        "body": "Previous and Next are labeled controls here. A date input and a FIELD · WEEK OF period label are visible; the week changes. The date input has a MISSING captured accessible name.",
+        "task": "Look at Previous, Next, the date input and current period without navigating or entering a date.",
+        "open_path": "/ResourceBoard",
+        "open_label": "Resource Board",
+        "area": "Resource Board",
+        "spotlight": "Previous"
+      },
+      {
+        "title": "41. Assignment action",
+        "body": "Assign is a creation control on the board. Do not assign resources during this tour.",
+        "task": "Look at Assign without clicking it.",
+        "open_path": "/ResourceBoard",
+        "open_label": "Resource Board",
+        "area": "Resource Board",
+        "spotlight": "Assign"
+      },
+      {
+        "title": "42. Suggested fixes",
+        "body": "Suggested fixes is a verified heading. Auto-resolve modifies bookings and must not be used in practice.",
+        "task": "Look at Suggested fixes and Auto-resolve without applying anything.",
+        "open_path": "/ResourceBoard",
+        "open_label": "Resource Board",
+        "area": "Resource Board",
+        "spotlight": "Suggested fixes"
+      },
+      {
+        "title": "43. Open Chats",
+        "body": "Open Chats from the sidebar or this verified live link. The page heading is Team Chats. Do not open a named room, create a room, change a name, type a message or send anything.",
+        "task": "Open only the Chats sidebar destination if available, then look at Team Chats.",
+        "open_path": "/SupportChannels",
+        "open_label": "Chats",
+        "area": "Chats",
+        "spotlight": "Team Chats"
+      },
+      {
+        "title": "44. Chat identity control",
+        "body": "Set your name is visible. This tour does not change your chat identity.",
+        "task": "Look at Set your name without using it.",
+        "open_path": "/SupportChannels",
+        "open_label": "Chats",
+        "area": "Chats",
+        "spotlight": "Set your name"
+      },
+      {
+        "title": "45. Chat creation controls",
+        "body": "New message and New room are visible creation controls.",
+        "task": "Look at both labels without clicking them.",
+        "open_path": "/SupportChannels",
+        "open_label": "Chats",
+        "area": "Chats",
+        "spotlight": "New message"
+      },
+      {
+        "title": "46. Project room section",
+        "body": "PROJECT ROOMS is the section heading. A room list may appear; room and detail contents were not opened and are MISSING.",
+        "task": "Look at the section heading only; do not select a specific room.",
+        "open_path": "/SupportChannels",
+        "open_label": "Chats",
+        "area": "Chats",
+        "spotlight": "PROJECT ROOMS"
+      },
+      {
+        "title": "47. Message entry",
+        "body": "The message box placeholder begins Message #…; its complete room-specific text was not captured and is MISSING. Do not invent a room name.",
+        "task": "Look at the message box without typing.",
+        "open_path": "/SupportChannels",
+        "open_label": "Chats",
+        "area": "Chats",
+        "spotlight": "Team Chats"
+      },
+      {
+        "title": "48. Send control",
+        "body": "Send is visible but must not be used. Practice never sends chat messages.",
+        "task": "Look at Send without clicking it.",
+        "open_path": "/SupportChannels",
+        "open_label": "Chats",
+        "area": "Chats",
+        "spotlight": "Send"
+      },
+      {
+        "title": "49. Open Bids",
+        "body": "Open Bids under SALES & ESTIMATING from the sidebar or this verified live link. The page heading is Bid Pipeline. The page eyebrow is SALES. Bid cards and detail tabs were not opened and are MISSING; stay on the index.",
+        "task": "Open only the Bids sidebar destination if available, then look at Bid Pipeline.",
         "open_path": "/Bids",
-        "open_label": "Bids"
+        "open_label": "Bids",
+        "area": "Bids",
+        "spotlight": "Bid Pipeline"
       },
       {
-        "title": "3. Read the source documents",
-        "body": "Open Bids, open the same visible bid, then select Documents. Under Uploaded Documents, use View on an available document. Read the relevant scope, specifications and addenda. If no documents exist, record MISSING instead of inventing quantities.",
-        "task": "Find the current source revision and a scope reference.",
+        "title": "50. Bid search and filters",
+        "body": "Filter bids… is the search placeholder, with accessible label Search bids. Filters is visible; its opened contents were not inventoried and are MISSING.",
+        "task": "Look at the search and Filters without opening records or changing the page.",
         "open_path": "/Bids",
-        "open_label": "Bids"
+        "open_label": "Bids",
+        "area": "Bids",
+        "spotlight": "Filters"
       },
       {
-        "title": "4. Trace a drawing to quantities",
-        "body": "Open Bids, open your visible bid and select Drawings. Compare its sheets with Drawing Analysis, then select BOQ. Read Description, Qty, Unit and Category. AI output must be checked against the source sheets; do not run or apply a takeoff merely to pass practice.",
-        "task": "Compare one available quantity with its sheet; record unresolved differences.",
+        "title": "51. New Bid action",
+        "body": "New Bid creates a bid. This is a label-recognition step only.",
+        "task": "Look at New Bid without clicking it.",
         "open_path": "/Bids",
-        "open_label": "Bids"
+        "open_label": "Bids",
+        "area": "Bids",
+        "spotlight": "New Bid"
       },
       {
-        "title": "5. Review the estimate without sending",
-        "body": "Open Bids, open the same record and select Estimate. Read Estimate Details, Labor, Materials & Line Items and Notes. Compare the source quantities and costs. Do not use Send to Client, Send RFQ or change bid Status during practice.",
-        "task": "Record a cost-source question for the estimator.",
+        "title": "52. Bid division tabs",
+        "body": "All trades, Fire alarm, Low-voltage, Drone and Software are the verified division tabs. Their alternate contents were not clicked and remain MISSING.",
+        "task": "Look at all five labels without changing tabs.",
         "open_path": "/Bids",
-        "open_label": "Bids"
+        "open_label": "Bids",
+        "area": "Bids",
+        "spotlight": "All trades"
       },
       {
-        "title": "6. Locate your project",
-        "body": "Open Projects in the left sidebar. Use “Search projects...” and open a record you can already see. Confirm the job before opening its tabs. Use an authorized training record for any practice edits; if none is available, inspect without saving and note the blocker.",
-        "task": "Identify the correct project without creating a new job.",
+        "title": "53. Bid folder tabs",
+        "body": "Verified folder labels include All, Unfiled, Fire Alarm and Low Voltage. Counts are live; alternate folder contents are MISSING because they were not opened.",
+        "task": "Look at the folder labels without opening cards.",
+        "open_path": "/Bids",
+        "open_label": "Bids",
+        "area": "Bids",
+        "spotlight": "Unfiled"
+      },
+      {
+        "title": "54. Bid statistics",
+        "body": "Open Pipeline, Weighted Value, Win Rate · 90d and Avg Days to Award are the verified stat cards. Values and rates are live.",
+        "task": "Look at Open Pipeline in the live app without changing anything.",
+        "open_path": "/Bids",
+        "open_label": "Bids",
+        "area": "Bids",
+        "spotlight": "Open Pipeline"
+      },
+      {
+        "title": "55. Bid board stages",
+        "body": "New, Bidding, Submitted and Won are the visible board columns. Do not move or open a bid.",
+        "task": "Look across the four stage headings in order.",
+        "open_path": "/Bids",
+        "open_label": "Bids",
+        "area": "Bids",
+        "spotlight": "Bidding"
+      },
+      {
+        "title": "56. Bid card actions",
+        "body": "Move to folder selects and Add bid buttons appear on the board. They change or create data; do not use them.",
+        "task": "Look at Move to folder and Add bid without opening a card or changing a selection.",
+        "open_path": "/Bids",
+        "open_label": "Bids",
+        "area": "Bids",
+        "spotlight": "Move to folder"
+      },
+      {
+        "title": "57. Open Leads",
+        "body": "Open Leads under SALES & ESTIMATING from the sidebar or this verified live link. The page heading is Leads. List state changes with live data. Lead records and detail tabs were not opened and remain MISSING.",
+        "task": "Open only the Leads sidebar destination if available, then look at Leads.",
+        "open_path": "/Leads",
+        "open_label": "Leads",
+        "area": "Leads",
+        "spotlight": "Leads"
+      },
+      {
+        "title": "58. Lead creation",
+        "body": "New Lead is a creation control; no lead is created in this tour.",
+        "task": "Look at New Lead without clicking it.",
+        "open_path": "/Leads",
+        "open_label": "Leads",
+        "area": "Leads",
+        "spotlight": "New Lead"
+      },
+      {
+        "title": "59. Lead search",
+        "body": "Search leads… is the verified search placeholder. Observe the input without searching for or opening a named lead.",
+        "task": "Look at Search leads… in the live app without changing anything.",
+        "open_path": "/Leads",
+        "open_label": "Leads",
+        "area": "Leads",
+        "spotlight": "Search leads…"
+      },
+      {
+        "title": "60. Lead stages",
+        "body": "The stage dropdown labels are All Stages, new, contacted, qualified, proposal sent, negotiating, won and lost. Filtered results were not opened and are MISSING.",
+        "task": "Look at the stage control; do not change a lead or stage.",
+        "open_path": "/Leads",
+        "open_label": "Leads",
+        "area": "Leads",
+        "spotlight": "All Stages"
+      },
+      {
+        "title": "61. Open Contractor Directory",
+        "body": "Open Contractor Directory under SALES & ESTIMATING from the sidebar or this verified live link. The page heading is Contractor Directory. ",
+        "task": "Open only the Contractor Directory sidebar destination if available, then look at Contractor Directory.",
+        "open_path": "/ContractorDirectory",
+        "open_label": "Contractor Directory",
+        "area": "Contractor Directory",
+        "spotlight": "Contractor Directory"
+      },
+      {
+        "title": "62. Directory write actions",
+        "body": "Import CSV is an upload control and Add Contractor creates a directory entry. Neither belongs in look-only practice.",
+        "task": "Look at Import CSV and Add Contractor without clicking them.",
+        "open_path": "/ContractorDirectory",
+        "open_label": "Contractor Directory",
+        "area": "Contractor Directory",
+        "spotlight": "Import CSV"
+      },
+      {
+        "title": "63. Directory search and filters",
+        "body": "Filters and Search name or license… are visible. The opened Filters contents were not inventoried and remain MISSING.",
+        "task": "Look at Filters and the search input without searching for a named record.",
+        "open_path": "/ContractorDirectory",
+        "open_label": "Contractor Directory",
+        "area": "Contractor Directory",
+        "spotlight": "Filters"
+      },
+      {
+        "title": "64. Region filter",
+        "body": "Verified Region choices are All Regions, Bay Area, Sacramento, North State, Wine Country, Sierra and Other. Filtered results remain MISSING because they were not opened.",
+        "task": "Look at the Region control without changing it.",
+        "open_path": "/ContractorDirectory",
+        "open_label": "Contractor Directory",
+        "area": "Contractor Directory",
+        "spotlight": "All Regions"
+      },
+      {
+        "title": "65. County filter",
+        "body": "All Counties is verified, and county names were seen from Alameda onward. The complete county list is MISSING; do not invent the rest.",
+        "task": "Look at the County control without assuming a complete option list.",
+        "open_path": "/ContractorDirectory",
+        "open_label": "Contractor Directory",
+        "area": "Contractor Directory",
+        "spotlight": "All Counties"
+      },
+      {
+        "title": "66. Directory division filter",
+        "body": "All Divisions includes fire alarm, low voltage, drone, software and other. These are verified labels; filtered results were not opened and are MISSING.",
+        "task": "Look at the division filter without changing it.",
+        "open_path": "/ContractorDirectory",
+        "open_label": "Contractor Directory",
+        "area": "Contractor Directory",
+        "spotlight": "All Divisions"
+      },
+      {
+        "title": "67. Incomplete directory groups",
+        "body": "Fire Marshals was visible. The next group was cut off, and remaining directory groups are MISSING; no completed label or behavior is assumed.",
+        "task": "Look only at the verified Fire Marshals label; skip unverified groups.",
+        "open_path": "/ContractorDirectory",
+        "open_label": "Contractor Directory",
+        "area": "Contractor Directory",
+        "spotlight": "Fire Marshals"
+      },
+      {
+        "title": "68. Open Estimates",
+        "body": "Open Estimates under SALES & ESTIMATING from the sidebar or this verified live link. The page heading is Estimates. ",
+        "task": "Open only the Estimates sidebar destination if available, then look at Estimates.",
+        "open_path": "/Estimates",
+        "open_label": "Estimates",
+        "area": "Estimates",
+        "spotlight": "Estimates"
+      },
+      {
+        "title": "69. Estimate creation",
+        "body": "New Estimate is a creation control.",
+        "task": "Look at New Estimate without clicking it.",
+        "open_path": "/Estimates",
+        "open_label": "Estimates",
+        "area": "Estimates",
+        "spotlight": "New Estimate"
+      },
+      {
+        "title": "70. Estimate summaries",
+        "body": "Total Estimates, Current Value, Drafts and Submitted are verified stat cards. Counts and values are live.",
+        "task": "Look at Total Estimates in the live app without changing anything.",
+        "open_path": "/Estimates",
+        "open_label": "Estimates",
+        "area": "Estimates",
+        "spotlight": "Total Estimates"
+      },
+      {
+        "title": "71. Estimate search",
+        "body": "Search… and Filters are visible. The opened filter panel was not inventoried and remains MISSING.",
+        "task": "Look at the search input and Filters without changing anything.",
+        "open_path": "/Estimates",
+        "open_label": "Estimates",
+        "area": "Estimates",
+        "spotlight": "Search…"
+      },
+      {
+        "title": "72. Estimate filter selectors",
+        "body": "All Projects, All Bids, All Divisions, All Statuses and All Owners are the verified filter dropdown labels. Alternate filtered results remain MISSING.",
+        "task": "Look across the five selectors without selecting records.",
+        "open_path": "/Estimates",
+        "open_label": "Estimates",
+        "area": "Estimates",
+        "spotlight": "All Projects"
+      },
+      {
+        "title": "73. Estimate record links",
+        "body": "Record cards show Open or Open bid. Record URLs, detail tabs and clicked contents were not verified and are MISSING.",
+        "task": "Look at the labels only; do not open an estimate or bid.",
+        "open_path": "/Estimates",
+        "open_label": "Estimates",
+        "area": "Estimates",
+        "spotlight": "Open bid"
+      },
+      {
+        "title": "74. Open Rate Card",
+        "body": "Open Rate Card under SALES & ESTIMATING from the sidebar or this verified live link. The page heading is Rate Card. ",
+        "task": "Open only the Rate Card sidebar destination if available, then look at Rate Card.",
+        "open_path": "/RateCard",
+        "open_label": "Rate Card",
+        "area": "Rate Card",
+        "spotlight": "Rate Card"
+      },
+      {
+        "title": "75. Rate creation",
+        "body": "Add Rate is a creation control.",
+        "task": "Look at Add Rate without clicking it.",
+        "open_path": "/RateCard",
+        "open_label": "Rate Card",
+        "area": "Rate Card",
+        "spotlight": "Add Rate"
+      },
+      {
+        "title": "76. Rates search",
+        "body": "Rates is a section with Search items…. Look at its live content without entering or editing a rate.",
+        "task": "Look at Rates in the live app without changing anything.",
+        "open_path": "/RateCard",
+        "open_label": "Rate Card",
+        "area": "Rate Card",
+        "spotlight": "Rates"
+      },
+      {
+        "title": "77. Rate categories",
+        "body": "Verified category labels are All Categories, labor, material, equipment, subcontractor and other. Filtered contents were not opened and are MISSING.",
+        "task": "Look at the category dropdown without changing it.",
+        "open_path": "/RateCard",
+        "open_label": "Rate Card",
+        "area": "Rate Card",
+        "spotlight": "All Categories"
+      },
+      {
+        "title": "78. Rate divisions",
+        "body": "The division dropdown includes All Divisions, fire alarm, low voltage, drone, software and other. Filtered contents were not opened and remain MISSING.",
+        "task": "Look at the division dropdown without changing it.",
+        "open_path": "/RateCard",
+        "open_label": "Rate Card",
+        "area": "Rate Card",
+        "spotlight": "All Divisions"
+      },
+      {
+        "title": "79. Rate standards sections",
+        "body": "General and Company Standards (Floors) are verified sections. Their live contents can change; do not assume General is always empty.",
+        "task": "Look at General, then Company Standards (Floors), without editing values.",
+        "open_path": "/RateCard",
+        "open_label": "Rate Card",
+        "area": "Rate Card",
+        "spotlight": "Company Standards (Floors)"
+      },
+      {
+        "title": "80. Open Projects",
+        "body": "Open Projects under SALES & ESTIMATING from the sidebar or this verified live link. The page heading is Projects. ",
+        "task": "Open only the Projects sidebar destination if available, then look at Projects.",
         "open_path": "/Projects",
-        "open_label": "Projects"
+        "open_label": "Projects",
+        "area": "Projects",
+        "spotlight": "Projects"
       },
       {
-        "title": "7. Prepare the dispatch evidence",
-        "body": "Open Projects, open the chosen visible project and select Ops / Field Docs. Click New Ops Doc. In New Ops / Field Doc, choose the appropriate Type, enter Title *, Linked Phase and Notes, and select approved File attachments (stored privately). Notes must identify visit scope, source drawings, site access, safety and delivery proof. If delivery is not confirmed, write DO NOT ROLL and escalate. Click Create only on an authorized training record; otherwise Cancel. Verify any saved title and attachments in Ops / Field Docs.",
-        "task": "Prepare a packet from real evidence or explicitly list MISSING items; never claim a delivery or visit occurred.",
+        "title": "81. Project creation",
+        "body": "New Project is a creation control.",
+        "task": "Look at New Project without clicking it.",
         "open_path": "/Projects",
-        "open_label": "Projects"
+        "open_label": "Projects",
+        "area": "Projects",
+        "spotlight": "New Project"
       },
       {
-        "title": "8. Keep Outlook filing separate",
-        "body": "Open Documents in MYGSIS to locate the related job evidence with Search name… and All Projects. Partner/vendor email filing is an Outlook rule, not a MYGSIS screen: in Outlook, file the thread in that partner/vendor’s own folder and sort/tag it by job, division/domain, topic and date. MYGSIS does not autofile mail. Do not send mail during practice.",
-        "task": "Identify the correct job document here and the partner/vendor folder needed in Outlook; no mail is sent by this player.",
+        "title": "82. Project search and status",
+        "body": "Search projects... and All Status are verified controls. Counts are live and are not part of the permanent label. Filtered results were not opened and are MISSING.",
+        "task": "Look at the search and status controls without opening project cards.",
+        "open_path": "/Projects",
+        "open_label": "Projects",
+        "area": "Projects",
+        "spotlight": "All Status"
+      },
+      {
+        "title": "83. Unnamed project controls",
+        "body": "Two icon buttons were visible but unlabeled: MISSING accessible names and behavior. Project cards, detail tabs and record URLs were not opened and are MISSING.",
+        "task": "Look at the unnamed icons without clicking; do not guess a view-toggle function or open a project.",
+        "open_path": "/Projects",
+        "open_label": "Projects",
+        "area": "Projects",
+        "spotlight": "Projects"
+      },
+      {
+        "title": "84. Open Documents",
+        "body": "Open Documents under SALES & ESTIMATING from the sidebar or this verified live link. The page heading is Documents. ",
+        "task": "Open only the Documents sidebar destination if available, then look at Documents.",
         "open_path": "/Documents",
-        "open_label": "Documents"
+        "open_label": "Documents",
+        "area": "Documents",
+        "spotlight": "Documents"
       },
       {
-        "title": "9. Reconcile billing evidence",
-        "body": "Open Billing in the left sidebar under Billing. Use Search project or client… to find the project. Read Contract, Billed, Retention Held, Outstanding and Status. Compare them with the approved scope and project evidence; do not generate an invoice or payment merely for practice.",
-        "task": "Record one evidence discrepancy or confirm the figures you actually checked.",
-        "open_path": "/Billing",
-        "open_label": "Billing"
+        "title": "85. Document creation",
+        "body": "Add Document is a creation control; do not create or upload documents in this tour.",
+        "task": "Look at Add Document without clicking it.",
+        "open_path": "/Documents",
+        "open_label": "Documents",
+        "area": "Documents",
+        "spotlight": "Add Document"
       },
       {
-        "title": "10. Return to required training",
-        "body": "Open Training in the left sidebar. In Catalog, locate MYGSIS and Safety, which are required for everyone across Fire, Low Voltage, GSIS Aerial and Software. If your login shows My Training, compare its assigned courses and official status. Manufacturer courses remain external link-outs; do not enroll. Assignment is not enrollment and practice never changes official progress.",
-        "task": "Return to this player and take the practice quiz; do not mark a real assignment complete.",
+        "title": "86. Document search and Filters",
+        "body": "Search name… and Filters are visible. Opened Filters contents were not inventoried and are MISSING.",
+        "task": "Look at the two controls without opening a document.",
+        "open_path": "/Documents",
+        "open_label": "Documents",
+        "area": "Documents",
+        "spotlight": "Filters"
+      },
+      {
+        "title": "87. Document project selector",
+        "body": "All Projects is verified. A second dropdown was visible but its label is MISSING; do not guess its purpose.",
+        "task": "Look at All Projects and recognize the unnamed dropdown without changing either.",
+        "open_path": "/Documents",
+        "open_label": "Documents",
+        "area": "Documents",
+        "spotlight": "All Projects"
+      },
+      {
+        "title": "88. Document date inputs",
+        "body": "Two date inputs were visible; their captured accessible names and exact date roles are MISSING.",
+        "task": "Look at the two inputs without entering dates or guessing start/end labels.",
+        "open_path": "/Documents",
+        "open_label": "Documents",
+        "area": "Documents",
+        "spotlight": "Documents"
+      },
+      {
+        "title": "89. Document group controls",
+        "body": "Project group headers show Open and unnamed icon buttons. Icon names, document detail tabs and record URLs are MISSING.",
+        "task": "Look at the Open label without opening a group or record; skip unnamed icons.",
+        "open_path": "/Documents",
+        "open_label": "Documents",
+        "area": "Documents",
+        "spotlight": "Open"
+      },
+      {
+        "title": "90. Open Training",
+        "body": "Open Training under SALES & ESTIMATING from the sidebar or this verified live link. The page heading is Training. The eyebrow reads MYGSIS · LEARN / PRACTICE / VERIFY. Assignment is not enrollment. Internal practice never changes official training progress.",
+        "task": "Open only the Training sidebar destination if available, then look at Training.",
         "open_path": "/TrainingManagement",
-        "open_label": "Training"
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Training"
+      },
+      {
+        "title": "91. Training view controls",
+        "body": "Catalog, Assign, Technicians and Progress are visible controls. Assign, Technicians and Progress interiors were not clicked and remain MISSING.",
+        "task": "Look at all four controls without switching views or assigning anyone.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Catalog"
+      },
+      {
+        "title": "92. Required for everyone",
+        "body": "The four verified titles are MYGSIS • Everyone's operating workflow; Safety • Cal/OSHA orientation; Safety • Job-hazard analysis; Safety • First-aid readiness. These form the Required for everyone section.",
+        "task": "Look at Required for everyone in the live app without changing anything.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Required for everyone"
+      },
+      {
+        "title": "93. Practice entry controls",
+        "body": "Start practice appears beside required courses. You already used a practice entry to reach this player. Do not start another course from inside this tour. Practice does not change official progress.",
+        "task": "Look at the Start practice labels only; do not click them.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Start practice"
+      },
+      {
+        "title": "94. Catalog sections",
+        "body": "Browse the catalog includes Manufacturer training, GSIS SOP / workflow, System Designer • Design to submittal, Fire Alarm Design • FireCode walkthrough and Low Voltage Design • FireCode walkthrough. These labels do not verify every linked course control. FireCode has no Demo mode.",
+        "task": "Look at the catalog headings without launching another course.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Browse the catalog"
+      },
+      {
+        "title": "95. Manufacturer link-outs",
+        "body": "Manufacturer training remains external link-out. This tour does not change manufacturer cards, gates or their kemar@gsistech.com copy-login, and does not enroll anyone. Do not copy credentials or open external training during this MYGSIS tour.",
+        "task": "Look at the Manufacturer training heading only; leave its cards and links unchanged.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Manufacturer training"
+      },
+      {
+        "title": "96. Training divisions",
+        "body": "The four division filters are Fire, Low Voltage, GSIS Aerial and Software. Alternate filter contents were not opened and remain MISSING.",
+        "task": "Look at all four division labels without changing filters.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Fire"
+      },
+      {
+        "title": "97. Training domains",
+        "body": "Design, ITM, Installation, Service and Programming are the verified domain filters. Alternate results were not opened and remain MISSING.",
+        "task": "Look at the five domain labels without opening another course.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Design"
+      },
+      {
+        "title": "98. Assignment and practice boundary",
+        "body": "Assignment is not enrollment. Internal practice never changes official training progress; finishing this player is not official completion. Progress view interiors remain MISSING.",
+        "task": "Keep this player open and continue to Billing without using Assign or changing progress.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Progress"
+      },
+      {
+        "title": "99. Open Billing",
+        "body": "Open Billing under BILLING from the sidebar or this verified live link. The page heading is Billing. ",
+        "task": "Open only the Billing sidebar destination if available, then look at Billing.",
+        "open_path": "/Billing",
+        "open_label": "Billing",
+        "area": "Billing",
+        "spotlight": "Billing"
+      },
+      {
+        "title": "100. Billing search and filter",
+        "body": "Search project or client… and All are verified controls. Filtered results were not opened and remain MISSING.",
+        "task": "Look at the search and All filter without opening a project.",
+        "open_path": "/Billing",
+        "open_label": "Billing",
+        "area": "Billing",
+        "spotlight": "All"
+      },
+      {
+        "title": "101. Billing summaries",
+        "body": "Total Contract Value, Billed to Date, Outstanding and Retention Held are verified summary cards. All money values are live.",
+        "task": "Look at Total Contract Value in the live app without changing anything.",
+        "open_path": "/Billing",
+        "open_label": "Billing",
+        "area": "Billing",
+        "spotlight": "Total Contract Value"
+      },
+      {
+        "title": "102. Project Billing table",
+        "body": "Project Billing has Project, Contract, Billed, Retention Held, Outstanding and Status columns. Row counts are live.",
+        "task": "Look across the column headings only; do not open a named project or change billing.",
+        "open_path": "/Billing",
+        "open_label": "Billing",
+        "area": "Billing",
+        "spotlight": "Project Billing"
+      },
+      {
+        "title": "103. Open WIP Report",
+        "body": "Open WIP Report under BILLING from the sidebar or this verified live link. The page heading is WIP Report. ",
+        "task": "Open only the WIP Report sidebar destination if available, then look at WIP Report.",
+        "open_path": "/WIPReport",
+        "open_label": "WIP Report",
+        "area": "WIP Report",
+        "spotlight": "WIP Report"
+      },
+      {
+        "title": "104. WIP summary cards",
+        "body": "TOTAL CONTRACT, COST TO DATE, EARNED REVENUE, GROSS BILLED and OVER/(UNDER) BILLING are verified cards. Values are live; this tour does not calculate or modify them.",
+        "task": "Look at TOTAL CONTRACT in the live app without changing anything.",
+        "open_path": "/WIPReport",
+        "open_label": "WIP Report",
+        "area": "WIP Report",
+        "spotlight": "TOTAL CONTRACT"
+      },
+      {
+        "title": "105. Per Project table",
+        "body": "Per Project has Project, Contract, Cost to Date, % Complete, Earned, Gross Billed, Over/(Under) and EAC columns. Counts and values change.",
+        "task": "Look across the headings without opening project records.",
+        "open_path": "/WIPReport",
+        "open_label": "WIP Report",
+        "area": "WIP Report",
+        "spotlight": "Per Project"
+      },
+      {
+        "title": "106. Open Suppliers",
+        "body": "If your login shows Suppliers under PROCUREMENT, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. The subtitle is Vendor & material supplier master.",
+        "task": "Open only the Suppliers sidebar destination if available, then look at Suppliers.",
+        "open_path": "/Suppliers",
+        "open_label": "Suppliers",
+        "area": "Suppliers",
+        "spotlight": "Suppliers"
+      },
+      {
+        "title": "107. Supplier creation",
+        "body": "If your login shows Add Supplier, it creates a supplier entry.",
+        "task": "Look at Add Supplier without clicking it; skip if hidden.",
+        "open_path": "/Suppliers",
+        "open_label": "Suppliers",
+        "area": "Suppliers",
+        "spotlight": "Add Supplier"
+      },
+      {
+        "title": "108. Supplier search and status",
+        "body": "If visible, Search suppliers… and the status labels All Statuses, Active and Inactive are verified. Filtered results were not opened and remain MISSING.",
+        "task": "Look at the search and status control without changing them.",
+        "open_path": "/Suppliers",
+        "open_label": "Suppliers",
+        "area": "Suppliers",
+        "spotlight": "All Statuses"
+      },
+      {
+        "title": "109. Supplier editing action",
+        "body": "If supplier rows are visible, Edit appears on each row. This tour does not edit a supplier.",
+        "task": "Look at Edit without clicking it or opening a named supplier.",
+        "open_path": "/Suppliers",
+        "open_label": "Suppliers",
+        "area": "Suppliers",
+        "spotlight": "Edit"
+      },
+      {
+        "title": "110. Open Purchase Orders",
+        "body": "If your login shows Purchase Orders under PROCUREMENT, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. ",
+        "task": "Open only the Purchase Orders sidebar destination if available, then look at Purchase Orders.",
+        "open_path": "/PurchaseOrders",
+        "open_label": "Purchase Orders",
+        "area": "Purchase Orders",
+        "spotlight": "Purchase Orders"
+      },
+      {
+        "title": "111. Purchase order write actions",
+        "body": "If visible, Upload and Create are the verified actions. Uploading or creating a purchase order is not part of practice.",
+        "task": "Look at Upload and Create without clicking either.",
+        "open_path": "/PurchaseOrders",
+        "open_label": "Purchase Orders",
+        "area": "Purchase Orders",
+        "spotlight": "Upload"
+      },
+      {
+        "title": "112. Purchase order value",
+        "body": "If visible, Total PO Value is the verified summary card; its value is live.",
+        "task": "Look at Total PO Value in the live app without changing anything.",
+        "open_path": "/PurchaseOrders",
+        "open_label": "Purchase Orders",
+        "area": "Purchase Orders",
+        "spotlight": "Total PO Value"
+      },
+      {
+        "title": "113. Purchase order table",
+        "body": "If visible, table columns are PO Number, Vendor, Date, Total, Status and Actions. Row-action icons were unlabeled: MISSING accessible names and behavior.",
+        "task": "Look across the headings; do not open rows or click unnamed actions.",
+        "open_path": "/PurchaseOrders",
+        "open_label": "Purchase Orders",
+        "area": "Purchase Orders",
+        "spotlight": "PO Number"
+      },
+      {
+        "title": "114. Open Settings",
+        "body": "If your login shows Settings under ADMIN, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. ",
+        "task": "Open only the Settings sidebar destination if available, then look at Settings.",
+        "open_path": "/Settings",
+        "open_label": "Settings",
+        "area": "Settings",
+        "spotlight": "Settings"
+      },
+      {
+        "title": "115. Settings tabs",
+        "body": "If visible, the tabs are Company Profile, White Label & Branding and Preferences. Only Company Profile contents were inventoried. White Label & Branding and Preferences interiors are MISSING.",
+        "task": "Look at the tab labels without changing tabs or settings.",
+        "open_path": "/Settings",
+        "open_label": "Settings",
+        "area": "Settings",
+        "spotlight": "Company Profile"
+      },
+      {
+        "title": "116. Workspace controls",
+        "body": "If visible, Use Tech Portal switches account view; Use full admin workspace was also seen, but its clicked result is MISSING.",
+        "task": "Look at both labels without switching workspaces.",
+        "open_path": "/Settings",
+        "open_label": "Settings",
+        "area": "Settings",
+        "spotlight": "Use Tech Portal"
+      },
+      {
+        "title": "117. Company fields",
+        "body": "If visible, fields have placeholders Acme Construction, 123 Main St, City, State 12345, (555) 123-4567 and https://example.com. Field labels were not captured and are MISSING; placeholders are not your company details.",
+        "task": "Look at the field layout only; do not enter or copy private contact data.",
+        "open_path": "/Settings",
+        "open_label": "Settings",
+        "area": "Settings",
+        "spotlight": "Company Profile"
+      },
+      {
+        "title": "118. Save Settings control",
+        "body": "If visible, Save Settings is a write control.",
+        "task": "Look at Save Settings without clicking it.",
+        "open_path": "/Settings",
+        "open_label": "Settings",
+        "area": "Settings",
+        "spotlight": "Save Settings"
+      },
+      {
+        "title": "119. Delete Account control",
+        "body": "If visible, Delete Account is a destructive control, never a practice action.",
+        "task": "Look at Delete Account without clicking it.",
+        "open_path": "/Settings",
+        "open_label": "Settings",
+        "area": "Settings",
+        "spotlight": "Delete Account"
+      },
+      {
+        "title": "120. Open Role Permissions",
+        "body": "If your login shows Role Permissions under ADMIN, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. ",
+        "task": "Open only the Role Permissions sidebar destination if available, then look at Role & Permissions Matrix.",
+        "open_path": "/RolePermissions",
+        "open_label": "Role Permissions",
+        "area": "Role Permissions",
+        "spotlight": "Role & Permissions Matrix"
+      },
+      {
+        "title": "121. Permission matrix roles",
+        "body": "If visible, the grid is Module × View/Create/Edit/Delete/Approve/Export, with roles Owner and Admin. Other roles may appear below but their labels are MISSING from this inventory.",
+        "task": "Look at the grid headings and verified roles without toggling checkboxes.",
+        "open_path": "/RolePermissions",
+        "open_label": "Role Permissions",
+        "area": "Role Permissions",
+        "spotlight": "Module"
+      },
+      {
+        "title": "122. Permission modules",
+        "body": "If visible, verified modules are Bids, Projects, Documents, Budget & Financials, Team & Directory, AI Agents and Settings.",
+        "task": "Look down the verified module labels without changing permissions.",
+        "open_path": "/RolePermissions",
+        "open_label": "Role Permissions",
+        "area": "Role Permissions",
+        "spotlight": "Budget & Financials"
+      },
+      {
+        "title": "123. Save matrix control",
+        "body": "If visible, Save matrix writes permission changes.",
+        "task": "Look at Save matrix without clicking it.",
+        "open_path": "/RolePermissions",
+        "open_label": "Role Permissions",
+        "area": "Role Permissions",
+        "spotlight": "Save matrix"
+      },
+      {
+        "title": "124. Open User Approvals",
+        "body": "If your login shows User Approvals under ADMIN, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. The application state is live and can change; do not assume there will always be no pending applications. No controls were inventoried. If your login shows additional controls, their labels and behavior are MISSING from this inventory; do not act on applications.",
+        "task": "Open only the User Approvals sidebar destination if available, then look at User Approvals.",
+        "open_path": "/UserApprovals",
+        "open_label": "User Approvals",
+        "area": "User Approvals",
+        "spotlight": "User Approvals"
+      },
+      {
+        "title": "125. Open AI Agents",
+        "body": "If your login shows AI Agents under ADMIN, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. ",
+        "task": "Open only the AI Agents sidebar destination if available, then look at AI Agents Hub.",
+        "open_path": "/AIAgents",
+        "open_label": "AI Agents",
+        "area": "AI Agents",
+        "spotlight": "AI Agents Hub"
+      },
+      {
+        "title": "126. Agent types",
+        "body": "If visible, Voice agent and Custom agents are verified controls. Their opened contents were not inventoried and remain MISSING. This LIVE training player uses on-screen prompts only, not voice.",
+        "task": "Look at the labels without starting an agent or voice session.",
+        "open_path": "/AIAgents",
+        "open_label": "AI Agents",
+        "area": "AI Agents",
+        "spotlight": "Voice agent"
+      },
+      {
+        "title": "127. AI service choices",
+        "body": "If visible, ALL AI SERVICES and DeepSeek are headings; service buttons are DeepSeek, ChatGPT, Grok, Claude and Manus AMS. Emoji prefixes may appear. Their launched screens are MISSING from this inventory.",
+        "task": "Look at the service labels without launching a service.",
+        "open_path": "/AIAgents",
+        "open_label": "AI Agents",
+        "area": "AI Agents",
+        "spotlight": "ALL AI SERVICES"
+      },
+      {
+        "title": "128. New-window control",
+        "body": "If visible, Open in new window is a verified label. Its launched destination was not inventoried and remains MISSING.",
+        "task": "Look at the label without opening a window.",
+        "open_path": "/AIAgents",
+        "open_label": "AI Agents",
+        "area": "AI Agents",
+        "spotlight": "Open in new window"
+      },
+      {
+        "title": "129. Unnamed agent icons",
+        "body": "If visible, unnamed icons have MISSING accessible names and behavior. Do not invent actions for them.",
+        "task": "Look only; do not click unnamed icons.",
+        "open_path": "/AIAgents",
+        "open_label": "AI Agents",
+        "area": "AI Agents",
+        "spotlight": "AI Agents Hub"
+      },
+      {
+        "title": "130. Open Alerts",
+        "body": "If your login shows Alerts under ADMIN, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. ",
+        "task": "Open only the Alerts sidebar destination if available, then look at Alert Settings.",
+        "open_path": "/AlertSettings",
+        "open_label": "Alerts",
+        "area": "Alerts",
+        "spotlight": "Alert Settings"
+      },
+      {
+        "title": "131. Threshold section",
+        "body": "If visible, Alert Thresholds is a verified section. Its live state can change; do not assume thresholds are always absent.",
+        "task": "Look at Alert Thresholds in the live app without changing anything.",
+        "open_path": "/AlertSettings",
+        "open_label": "Alerts",
+        "area": "Alerts",
+        "spotlight": "Alert Thresholds"
+      },
+      {
+        "title": "132. Default threshold creation",
+        "body": "If visible, Create Default Thresholds is a creation control.",
+        "task": "Look at Create Default Thresholds without clicking it.",
+        "open_path": "/AlertSettings",
+        "open_label": "Alerts",
+        "area": "Alerts",
+        "spotlight": "Create Default Thresholds"
+      },
+      {
+        "title": "133. Dismissed alerts",
+        "body": "If visible, Dismissed Alerts is a verified section. Counts are live. Do not dismiss or change alerts.",
+        "task": "Look at Dismissed Alerts in the live app without changing anything.",
+        "open_path": "/AlertSettings",
+        "open_label": "Alerts",
+        "area": "Alerts",
+        "spotlight": "Dismissed Alerts"
+      },
+      {
+        "title": "134. Open Templates",
+        "body": "If your login shows Templates under ADMIN, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. ",
+        "task": "Open only the Templates sidebar destination if available, then look at Template Library.",
+        "open_path": "/TemplateLibrary",
+        "open_label": "Templates",
+        "area": "Templates",
+        "spotlight": "Template Library"
+      },
+      {
+        "title": "135. Template category tabs",
+        "body": "If visible, verified tabs in order are Contracts, Bid Forms, Safety Checklists, Punch Lists, Schedules, Equipment Logs, RFI Forms, Submittals, Daily Logs, Change Orders, Closeout and Inspection Reports. All tab interiors were not clicked and remain MISSING.",
+        "task": "Look across all twelve tab labels without switching tabs or assuming their contents.",
+        "open_path": "/TemplateLibrary",
+        "open_label": "Templates",
+        "area": "Templates",
+        "spotlight": "Contracts"
+      },
+      {
+        "title": "136. Template generation",
+        "body": "If visible, Generate 1000+ Templates is the exact button label, not a verified count of available templates. It creates data.",
+        "task": "Look at the label without generating anything.",
+        "open_path": "/TemplateLibrary",
+        "open_label": "Templates",
+        "area": "Templates",
+        "spotlight": "Generate 1000+ Templates"
+      },
+      {
+        "title": "137. Template creation",
+        "body": "If visible, New Template is a creation control.",
+        "task": "Look at New Template without clicking it.",
+        "open_path": "/TemplateLibrary",
+        "open_label": "Templates",
+        "area": "Templates",
+        "spotlight": "New Template"
+      },
+      {
+        "title": "138. Template search",
+        "body": "If visible, Search templates... is the verified search placeholder.",
+        "task": "Look at the search input without opening a named template.",
+        "open_path": "/TemplateLibrary",
+        "open_label": "Templates",
+        "area": "Templates",
+        "spotlight": "Search templates..."
+      },
+      {
+        "title": "139. Template card actions",
+        "body": "If visible, per-card View and Copy are verified labels. Copy creates data; View contents were not opened and are MISSING.",
+        "task": "Look at View and Copy without opening or copying a card.",
+        "open_path": "/TemplateLibrary",
+        "open_label": "Templates",
+        "area": "Templates",
+        "spotlight": "View"
+      },
+      {
+        "title": "140. Unnamed template icons",
+        "body": "If visible, template icons were unnamed: MISSING accessible names and behavior.",
+        "task": "Look only; skip the unnamed icons.",
+        "open_path": "/TemplateLibrary",
+        "open_label": "Templates",
+        "area": "Templates",
+        "spotlight": "Template Library"
+      },
+      {
+        "title": "141. Open Audit Trail",
+        "body": "If your login shows Audit Trail under ADMIN, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. ",
+        "task": "Open only the Audit Trail sidebar destination if available, then look at Audit Trail.",
+        "open_path": "/AuditTrail",
+        "open_label": "Audit Trail",
+        "area": "Audit Trail",
+        "spotlight": "Audit Trail"
+      },
+      {
+        "title": "142. Audit verification state",
+        "body": "Hash chain verified was visible during inventory. Audit event state is live and may change; do not assume there are always no events.",
+        "task": "If visible, look at the verification text and current event state without changing anything.",
+        "open_path": "/AuditTrail",
+        "open_label": "Audit Trail",
+        "area": "Audit Trail",
+        "spotlight": "Hash chain verified"
+      },
+      {
+        "title": "143. Audit exports",
+        "body": "If visible, Export CSV and Export JSONL are download controls.",
+        "task": "Look at both labels without exporting or downloading anything.",
+        "open_path": "/AuditTrail",
+        "open_label": "Audit Trail",
+        "area": "Audit Trail",
+        "spotlight": "Export CSV"
+      },
+      {
+        "title": "144. Open Service Desk",
+        "body": "If your login shows Service Desk under ADMIN, open that sidebar destination or its verified live link. If hidden, skip this area; do not change your access. ",
+        "task": "Open only the Service Desk sidebar destination if available, then look at Advanced Service Desk.",
+        "open_path": "/ServiceDesk",
+        "open_label": "Service Desk",
+        "area": "Service Desk",
+        "spotlight": "Advanced Service Desk"
+      },
+      {
+        "title": "145. Service desk tabs",
+        "body": "If visible, Ticket Queue and Create Ticket are verified tabs. Create Ticket interior was not clicked and remains MISSING.",
+        "task": "Look at both tab labels; do not switch to Create Ticket or create a ticket.",
+        "open_path": "/ServiceDesk",
+        "open_label": "Service Desk",
+        "area": "Service Desk",
+        "spotlight": "Ticket Queue"
+      },
+      {
+        "title": "146. Ticket summary cards",
+        "body": "If visible, Total Tickets, Open, Critical Open and SLA Breached are verified cards. Counts are live.",
+        "task": "Look at Total Tickets in the live app without changing anything.",
+        "open_path": "/ServiceDesk",
+        "open_label": "Service Desk",
+        "area": "Service Desk",
+        "spotlight": "Total Tickets"
+      },
+      {
+        "title": "147. Dispatch Queue",
+        "body": "If visible, Dispatch Queue is a verified section. Its live rows and empty state can change; do not open a named ticket.",
+        "task": "Look at Dispatch Queue in the live app without changing anything.",
+        "open_path": "/ServiceDesk",
+        "open_label": "Service Desk",
+        "area": "Service Desk",
+        "spotlight": "Dispatch Queue"
+      },
+      {
+        "title": "148. Dispatch filters",
+        "body": "If visible, Status and Priority are the verified filter labels. Opened option lists and filtered results were not inventoried and remain MISSING.",
+        "task": "Look at both dropdowns without changing filters or tickets.",
+        "open_path": "/ServiceDesk",
+        "open_label": "Service Desk",
+        "area": "Service Desk",
+        "spotlight": "Status"
+      },
+      {
+        "title": "149. Return for the quiz",
+        "body": "Return to Training using the sidebar or the verified live link, then return to this already-open player for the quiz. Assignment is not enrollment. Practice never changes official training progress. No official completion, enrollment, message, export or record change is part of this tour. Use the player’s Jump-to menu for future area refreshers; hidden areas depend on your login.",
+        "task": "Return to this player and answer the three quiz questions. Do not start another course.",
+        "open_path": "/TrainingManagement",
+        "open_label": "Training",
+        "area": "Training",
+        "spotlight": "Training"
       }
     ],
     "quiz": [
       {
-        "question": "Where do you find bid quantities?",
-        "choices": [
-          "Open Bids, an accessible record, then BOQ; verify against Drawings.",
-          "Open a Procurement tab inside Bid Detail.",
-          "Open a guessed project-id URL."
-        ],
-        "answer": 0
-      },
-      {
-        "question": "Where are partner/vendor emails filed?",
-        "choices": [
-          "In that partner/vendor’s own Outlook folder; MYGSIS does not autofile mail.",
-          "MYGSIS automatically files every vendor message.",
-          "Send the thread to a random folder."
-        ],
-        "answer": 0
-      },
-      {
         "question": "Does finishing this practice mark official completion?",
+        "answer": 0,
         "choices": [
           "No. Practice does not change official progress; assignment is not enrollment.",
-          "Yes, the player completes CourseAssignment records.",
-          "Yes, manufacturer enrollment is automatic."
-        ],
-        "answer": 0
+          "Yes. Finishing practice automatically marks official completion.",
+          "Yes, if someone assigned the course before you practiced."
+        ]
+      },
+      {
+        "question": "How should you use New Bid, Create, Save, Send, Upload and similar buttons during this tour?",
+        "answer": 0,
+        "choices": [
+          "Look at the verified labels only. Do not create, save, send, export or upload during practice.",
+          "Try each action once with a sample record so the tour can verify it.",
+          "Use the buttons normally, then delete any records you created."
+        ]
+      },
+      {
+        "question": "How do you open Schedule in the live app?",
+        "answer": 0,
+        "choices": [
+          "Use Schedule in the sidebar (it opens Project Calendar) or the verified live link; do not guess a URL.",
+          "Guess a /Schedule URL from the sidebar label.",
+          "Open a named project card and search its detail tabs for Schedule."
+        ]
       }
     ],
-    "source": "Live office sidebar verified 2026-11-06 (provided inventory); /workspace/mygsis/src/pages and related components (local source inspection, not a new live-browser test).",
+    "source": "Live signed-in MYGSIS inventory 2026-11-06 at https://mygsis.com (Dashboard and every sidebar index page). Greeting pattern and date are live. Detail tabs and some view-tab interiors were not opened and remain MISSING.",
     "author": "GSIS-authored live-software walkthrough"
   },
   "CRS-ADMIN-DESIGNER": {
@@ -4720,100 +5992,902 @@ const PRACTICE = {
   },
   "CRS-FIRE-DESIGN": {
     "course_id": "CRS-FIRE-DESIGN",
-    "title": "FireCode • Demo walkthrough",
+    "title": "Fire Alarm Design • FireCode walkthrough",
+    "video_url": "",
     "steps": [
       {
-        "title": "1. Sign in, then open Systems dashboard",
-        "body": "Open FireCode at the live link. If you are not already signed in, the page shows Welcome to FireCode Architect and Sign in to continue. The sign-in controls are Continue with Google, Email, Password, Sign in, Forgot password?, and Need an account? Sign up. Sign in with your authorized FireCode account. Do not use Forgot password? or Sign up during practice unless you were given an account. After you are signed in, confirm the heading Systems dashboard and the Welcome back greeting (the live app may add your name). FireCode is separate software, not a MYGSIS tab.",
-        "task": "If you see the sign-in page, sign in with your authorized account, then confirm the Systems dashboard heading. If you cannot sign in, stop and report MISSING.",
+        "title": "1. Understand the practice boundary",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Assumptions: no later deployment match is assumed. Missing information: post-creation live verification, upload-to-create runtime, rendered submittal dialog and PDF viewer evidence. No Demo mode exists. Live mode uses silent on-screen prompts only; video mode is optional and independent, with video not recorded yet. The empty video slot awaits real-site screen recordings narrated by Kemar in his own voice; no generated footage or cloned voice. Practice does not write official MYGSIS completion. Creating/uploading in FireCode writes real data in the same live account as real jobs. This is software orientation, not code approval or permission to sign/seal.",
+        "task": "Read the safety boundary. If you lack an authorized practice blueprint and permission to create practice data, stop before upload or creation.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
-        "open_label": "FireCode"
+        "open_label": "FireCode",
+        "area": "Sign in",
+        "spotlight": "Welcome to FireCode Architect"
       },
       {
-        "title": "2. Read the Systems dashboard without opening jobs",
-        "body": "On Systems dashboard, the subtext is: Pick a discipline to open its project workspace, or start a new project. Use Projects in the sidebar to browse everything by system type. The sidebar lists SYSTEMS Designer; under SYSTEMS: Dashboard, Projects, and Project setup; under DISCIPLINES: Fire alarm, Access control, Video surveillance, Audio visual, Structured cabling, and Networking & wireless. A red + New project button is at the top right. A Fire alarm discipline card is present and shows 23 device types. Look only. Do not open the Fire alarm card (that opens a live project list), do not open Projects, and do not click + New project.",
-        "task": "Confirm the Systems dashboard heading, Welcome back greeting, sidebar groups, and + New project button without clicking them or opening a discipline card.",
+        "title": "2. Choose your assigned sign-in route",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. The login also shows Sign in to continue. Use Continue with Google only with your assigned account, or the Email and Password fields for your assigned email account. Do not create an account or use Forgot password? or Need an account? Sign up without account instructions.",
+        "task": "Identify the assigned login method; enter credentials yourself only in the actual app, never in training notes.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
-        "open_label": "FireCode"
+        "open_label": "FireCode",
+        "area": "Sign in",
+        "spotlight": "Continue with Google"
       },
       {
-        "title": "3. Isolated demo context is MISSING",
-        "body": "As of this signed-in check, there is no Demo mode on the live app. The words demo, practice, sandbox, and sample do not appear on the Systems dashboard, Fire alarm Projects list, Project setup, or New project form. There is no isolated practice context. Project names that include TEST or E2E still sit in the same account as real client jobs. Nothing separates practice from live work.",
-        "task": "Treat isolated demo context as MISSING. Do not look for a Demo mode control that is not there, and do not treat a TEST or E2E name as a sandbox.",
+        "title": "3. Finish assigned sign-in",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. For the email route, Sign in submits the Email and Password fields. If already signed in, continue without signing out.",
+        "task": "Use Sign in for your assigned email route if needed, then confirm Systems dashboard appears.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
-        "open_label": "FireCode"
+        "open_label": "FireCode",
+        "area": "Sign in",
+        "spotlight": "Sign in"
       },
       {
-        "title": "4. Do not open Projects or named job cards",
-        "body": "Do not open Projects in the sidebar and do not open any named job cards. Opening them is live client work. If that list were opened, it is headed Fire alarm projects, with the subtext: Floor plans and layouts for this discipline. Open a card to work in the designer, or start a new project. Practice must stay off that list.",
-        "task": "Stay on Systems dashboard. Do not open Projects and do not open any named job card.",
+        "title": "4. Orient on the landing page",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Welcome back is a generic greeting; the app may add a name. This landing page is also branded SYSTEMS Designer.",
+        "task": "Find Systems dashboard and Welcome back. Stay on the landing page; do not open existing job cards.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
-        "open_label": "FireCode"
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Systems dashboard"
       },
       {
-        "title": "5. New project labels exist — do not create a project",
-        "body": "The live New project screen uses the URL pattern /project/new?discipline=fire_alarm and the heading New project. Those labels are listed so you can recognize the screen, not as an instruction to open it. Do not click + New project during practice, and do not create or save a project. Creating would write into the same live account as real jobs.",
-        "task": "Do not open New project and do not create or save a project.",
+        "title": "5. Read sidebar groups without browsing jobs",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. SYSTEMS groups Dashboard, Projects and Project setup; DISCIPLINES groups the system areas. Projects is an existing-job browser, not the practice entry.",
+        "task": "Read the groups top to bottom without opening Projects or any named job. Use the new-project entry later.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
-        "open_label": "FireCode"
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "SYSTEMS"
       },
       {
-        "title": "6. Upload blueprint labels exist — do not upload",
-        "body": "On the live New project screen, the upload section is titled Start from a blueprint (auto-fill) and has a red Upload blueprint button. The helper text is: Upload your plan set — single sheet or full multi-sheet PDF (or an image). We read the title block and cover sheet and fill in the project details below. You can edit anything after. Do not click Upload blueprint. Uploading would write into the same live account as real jobs.",
-        "task": "Recognize the Upload blueprint label only. Do not click it and do not upload a file.",
+        "title": "6. Recognize Fire alarm",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This live discipline card identifies fire-alarm design work. Opening it can lead to a live project list, so this step is look-only. The other live discipline names are Access control, Video surveillance, Audio visual, Structured cabling and Networking & wireless; those cards are look-only here too.",
+        "task": "Locate Fire alarm; do not open its project list. Continue to the red + New project entry instead.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
-        "open_label": "FireCode"
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Fire alarm"
       },
       {
-        "title": "7. New project fields exist — do not fill or submit",
-        "body": "On the live New project screen, the required-info banner lists Project name, Address, Occupancy group, Adopted code edition, and AHJ / code official contact. The form shows Project Name (required), Address (required), Primary discipline (required), Owner Name, Installer / integrator, AHJ / code official contact (required), Jurisdiction (AHJ), and a Building has smoke control checkbox. Other visible buttons are Use TBD, Preview Code Analysis, and Fill 5 required fields; those were seen only and were not clicked. Do not fill, submit, or save this form.",
-        "task": "Do not fill or submit the New project form. Use only controls that are actually visible if you already see this screen, and stop rather than completing it.",
+        "title": "7. Start a separate practice project",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Use the live-verified red + New project button, not an existing card. After clicking, /project/new?discipline=fire_alarm is the only live-verified new-project URL pattern, mentioned for recognition only. Training links intentionally open only the app root.",
+        "task": "Click the red + New project button and confirm you are creating a new record, not editing an existing job.",
         "open_path": "https://observant-fire-code-flow.base44.app/",
-        "open_label": "FireCode"
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "New project"
       },
       {
-        "title": "8. Stop — this is not a passed design",
-        "body": "Plans, Floor Plan, Calculations, Simulation, Riser Diagram, Save, and Export PDF were not seen as controls on this check (they may appear inside the designer). Do not invent those labels or assume they are present. Use only controls that are actually visible, and do not treat any result as a passed design. Isolated demo context is MISSING, so practice stops here: do not open named client projects, do not click Upload blueprint, and do not create or save a project. Return to Training in the original MYGSIS tab for the practice quiz; official progress is unchanged.",
-        "task": "Stop without creating, uploading, or opening a job. Record that isolated demo context is MISSING and that this practice is not a passed design.",
+        "title": "8. Locate blueprint intake",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This intake reads a title block and cover sheet to populate editable project details. It accepts a single sheet or multi-sheet PDF, or an image. Auto-fill is not verified design correctness.",
+        "task": "Open the new-project intake and find Start from a blueprint (auto-fill).",
         "open_path": "https://observant-fire-code-flow.base44.app/",
-        "open_label": "FireCode"
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Start from a blueprint (auto-fill)"
+      },
+      {
+        "title": "9. Upload authorized practice material only",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. The red Upload blueprint button uploads into the live account. Use only a practice blueprint you are authorized to upload. Do not upload GSIS client plan sets or use a real client name or address. MISSING: upload → completed new-project runtime validation; the author has not tested an upload or created a record.",
+        "task": "Only with permission, select an authorized practice blueprint using Upload blueprint. Otherwise stop here; do not improvise a real-client test.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Upload blueprint"
+      },
+      {
+        "title": "10. Review the auto-filled intake",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Review Project name, Address, Occupancy group, Adopted code edition and AHJ / code official contact in the intake. These live-verified labels describe extracted data that may need correction.",
+        "task": "Read each extracted value in that order; replace any client identity with approved fictional practice data before continuing.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Project name"
+      },
+      {
+        "title": "11. Name the practice record",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This is the required project-name field, distinct from the intake Project name label. Use an unambiguous practice name, never a real client name.",
+        "task": "Review Project Name* and use an approved fictional practice name.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Project Name*"
+      },
+      {
+        "title": "12. Check the practice location",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. The required address is real project data when saved. Do not enter a real client address or assume the blueprint extraction is safe.",
+        "task": "Use only an approved fictional practice location; stop if you cannot meet required fields without real client details.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Address*"
+      },
+      {
+        "title": "13. Set the intended discipline",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Set the primary discipline to Fire alarm for this practice. Check the visible selection rather than relying only on a route.",
+        "task": "Select the intended visible discipline in Primary discipline*. If it is unavailable, record MISSING and stop instead of choosing a substitute.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Primary discipline*"
+      },
+      {
+        "title": "14. Review owner information",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Owner Name records owner information for the new project. Only approved fictional practice data belongs in this exercise.",
+        "task": "Review Owner Name without copying a client identity.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Owner Name"
+      },
+      {
+        "title": "15. Review installer information",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Installer / integrator records the responsible organization. Do not imply a practice record is a commissioned installation or alter shared company defaults.",
+        "task": "Review Installer / integrator and use only approved practice details.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Installer / integrator"
+      },
+      {
+        "title": "16. Review the code-official contact",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This required field records the code-official contact; it is not an AHJ submission or approval action.",
+        "task": "Review the required contact field. Do not enter a real person’s contact details for practice; stop if approved fictional data is insufficient.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "AHJ / code official contact*"
+      },
+      {
+        "title": "17. Check jurisdiction",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Jurisdiction (AHJ) establishes the project context. Adopted code edition and Occupancy group also need review; auto-fill does not validate the design.",
+        "task": "Review the visible jurisdiction, code edition and occupancy data against the authorized practice brief, not invented code requirements.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Jurisdiction (AHJ)"
+      },
+      {
+        "title": "18. Inspect smoke-control and unknown-owner handling",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Building has smoke control is a verified form control, not proof a building has that system. Use TBD is also live-verified; use it only where the form offers it for unknown practice owner information.",
+        "task": "Review the smoke-control state without guessing. Locate Use TBD only in its actual form context; do not use it to bypass unrelated required fields.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Building has smoke control"
+      },
+      {
+        "title": "19. Preview setup analysis",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Preview Code Analysis requests the setup analysis. Fill 5 required fields was the verified incomplete-state label; its count may change as the form changes. An analysis preview is not approval.",
+        "task": "Review remaining required fields, then use Preview Code Analysis if available. Do not bypass validation.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Preview Code Analysis"
+      },
+      {
+        "title": "20. Create only the authorized new record",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source indicates this active submit state creates a project and opens its designer. It has not been end-to-end live tested. This is a real FireCode write, not a demo and not official MYGSIS completion.",
+        "task": "Only if the exact control is visible, the form is valid and practice-data creation is authorized, use Save & Open Designer. Otherwise record MISSING and stop.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Save & Open Designer"
+      },
+      {
+        "title": "21. Inspect the new-project canvas",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. This tab is the plan canvas. Use only the newly created practice record, never an existing job.",
+        "task": "Look for Floor Plan in your own newly created project and inspect it without opening another project.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Floor Plan"
+      },
+      {
+        "title": "22. Review imported sheets",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Plans organizes imported pages. Floor Plans and Floor Plan → are source-and-screen labels in this area. Review the authorized practice sheets before layout.",
+        "task": "If visible, open Plans and inspect the imported pages; stop with MISSING if required controls are absent.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Plans"
+      },
+      {
+        "title": "23. Check sheet-assignment availability",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source describes Assign Sheet, Sheet name, Floor / Area, Plan Type and Assign. These are source-only conditional controls, not a verified current runtime. Assigning changes practice project data.",
+        "task": "Only if these exact controls actually appear, review and assign the practice sheet to the intended floor/type. If absent, record MISSING and stop; do not invent sheet-assignment controls.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Assign Sheet"
+      },
+      {
+        "title": "24. Return to scale review",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Return to Floor Plan before layout. Set Scale establishes drawing scale; Verify Scale is a separate evidenced toolbar label. A blueprint image alone does not establish trustworthy dimensions.",
+        "task": "If visible, inspect Set Scale and Verify Scale against a known dimension on the authorized practice blueprint. Stop rather than guess a scale.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Set Scale"
+      },
+      {
+        "title": "25. Inspect layout tools",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Select selects objects; Pan moves the view; Draw Room and Polygon Room outline rooms; Wire draws connections; Delete removes selected content. Availability is discipline-dependent and these controls can change real project data.",
+        "task": "Read these exact labels in visual order in your new project. Do not delete, wire or place anything on existing records; stop with MISSING if a needed control is absent.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Tools"
+      },
+      {
+        "title": "26. Inspect the discipline device palette",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Inspect only the palette for Fire alarm. Source+screen examples include Smoke Detector, Heat Detector, Manual Pull Station and Horn/Strobe. These are look-for labels, not an automatic code-compliant placement instruction.",
+        "task": "If Place Device is visible, read only the palette for your selected discipline. Make any authorized practice placements only in your own new record; do not invent absent device types.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Place Device"
+      },
+      {
+        "title": "27. Review document outputs",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Documents leads to Documents & deliverables. It separates report, layout and package actions. Do not grant permissions, share, apply stamps or upload additional client documents for this exercise.",
+        "task": "If visible, open Documents and locate Documents & deliverables without changing permissions or shared defaults.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Documents"
+      },
+      {
+        "title": "28. Recognize simulation boundaries",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Simulation is an application tab, not Demo mode. Source+screen shows Initiating devices and Notification & emergency functions, with Silence notification and Reset system. These describe the software model, not permission to operate a real alarm system.",
+        "task": "If visible, open Simulation in the new practice record and inspect the model controls without operating any real alarm system.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Simulation"
+      },
+      {
+        "title": "29. Recognize riser boundaries",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. The evidenced heading FIRE ALARM RISER DIAGRAM is a diagram heading, not a Generate button. Review the practice connectivity; no automatic acceptance is implied.",
+        "task": "If visible, open Riser Diagram and inspect the practice diagram, without inventing a generation control.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Riser Diagram"
+      },
+      {
+        "title": "30. Review calculation evidence",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Calculations & Reports contains Battery, NAC Loading, Wiring, Device Schedule and Sequence in source/screenshot order. Inspect each captioned area; software results require qualified review and are not an engineering accuracy audit.",
+        "task": "If visible, open Calculations and identify only applicable evidenced sections. Record unsupported discipline-specific analysis as MISSING and stop that branch.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Calculations"
+      },
+      {
+        "title": "31. Save with the real-data boundary",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Save persists the new project. Saved is an evidenced status, not a button or official MYGSIS training completion.",
+        "task": "Only for your authorized new practice record, use the visible Save control and inspect its status. Never save changes to someone else’s project.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Save"
+      },
+      {
+        "title": "32. Distinguish the design report",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Export PDF is the NFPA design report action, not Floor plan layout and not Full submittal package. Do not call a design report a construction drawing package.",
+        "task": "Locate Export PDF if visible and read its report context; this step does not require exporting or signing anything.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Export PDF"
+      },
+      {
+        "title": "33. Distinguish layout from package",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. In Documents & deliverables, Floor plan layout is separate from Full submittal package. The latter is a source entry to the current submittal flow. Neither means automatic AHJ submission.",
+        "task": "If visible, locate the layout action, then Full submittal package. Do not conflate them with Export PDF.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Floor plan layout"
+      },
+      {
+        "title": "34. Enter the current source-traced submittal flow",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. The bottom-toolbar Submittal PDF is SOURCE+SCREEN; the newer top-bar occurrence is SOURCE-ONLY. Current source sequence: Submittal PDF → Construction Drawing Submittal → Generate Construction Drawings → Submittal details → Skip (preview) / Generate official (gated). This sequence was not live-reverified after new-project creation. Do not use an older standalone modal as this flow.",
+        "task": "Only if present on your own new practice record, inspect Submittal PDF. Stop at the first absent target; do not use an existing job to find it.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Submittal PDF"
+      },
+      {
+        "title": "35. Check the current package dialog",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. MISSING: rendered Construction Drawing Submittal dialog evidence. Source mounts SubmittalPackage, not the older standalone wizard. Inspect only after the exact dialog is visible.",
+        "task": "Look for this exact dialog heading; unless it actually appears, record MISSING and stop.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Construction Drawing Submittal"
+      },
+      {
+        "title": "36. Review template and editing context",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source shows Drawing standard / template, then Visual Editor, Company & Logo, Project Info and Revisions & Index. These are source-only labels. Use only an actually visible, appropriate practice template; do not invent template choices.",
+        "task": "Read the actual visible labels in that order if present. Do not alter shared company defaults or upload a logo for this exercise.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Drawing standard / template"
+      },
+      {
+        "title": "37. Inspect drawing sheets",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source describes Sheets, Page, Drag Modules, Sheet Properties and Selected Module. These editing areas are not a verified PDF viewer. Do not delete pages/modules as a training requirement.",
+        "task": "If the exact labels are visible, inspect the practice sheet structure only; otherwise record MISSING and stop.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Sheets"
+      },
+      {
+        "title": "38. Inspect project and revision metadata",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source Project Info includes Prepared By, Checked By, Project Manager, Project Number, Submittal Date and Scope of Work; Revisions & Index organizes the index. Real author, checker, seal and company-default data must not be invented for practice.",
+        "task": "Review visible metadata using approved practice data only. Do not impersonate a qualified checker or fill a real signature.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Project Info"
+      },
+      {
+        "title": "39. Locate the current generation action",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source says this opens Submittal details. Generation can download a PDF and persist metadata, company defaults and submittal history; it is not a harmless training-completion action. Inspect the exact label before deciding whether authorized practice generation is appropriate.",
+        "task": "Only if visible and authorized for your new practice record, open Generate Construction Drawings to review the details gate; do not generate an official package.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Generate Construction Drawings"
+      },
+      {
+        "title": "40. Inspect required submittal details",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source says missing project details must be resolved from project setup. Color mode, AHJ requires a PE seal box and Signature are source-only settings; their existence does not establish a valid seal or AHJ acceptance.",
+        "task": "If this exact dialog is actually visible, read its required details. Do not add a signature, stamp or professional credential for practice. Otherwise mark MISSING and stop.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Submittal details"
+      },
+      {
+        "title": "41. Understand the preview branch",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source says Skip (preview) produces a PREVIEW stamped not for submission. It may still persist generation metadata/history. MISSING: rendered PDF preview / preview viewer controls; no viewer workflow is invented.",
+        "task": "Identify the preview branch only if visible. Generate a practice preview only with explicit permission for those real-data writes; otherwise stop without generating.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Skip (preview)"
+      },
+      {
+        "title": "42. Understand the gated official branch",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source says Generate official is disabled until required details exist. This is not official MYGSIS completion. MISSING: automatic AHJ submit / approval / submittal stamp action. Do not assume a PE box or signature selector supplies a valid seal. Do not generate official documents in this practice.",
+        "task": "Read the gate if visible and stop before Generate official; record absent controls as MISSING, never bypass them.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Generate official"
+      },
+      {
+        "title": "43. Close the evidence-bounded refresher",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Practice does not write official MYGSIS completion; FireCode creation and saves remain real data. MISSING throughout this course: current live post-creation designer verification; upload-to-completed-new-project runtime; rendered current submittal dialog; PDF preview/viewer; automatic AHJ approval/stamp. Demo mode is absent, not a hidden destination. Any absent source-only or source/screen target remains MISSING. The current submittal sequence is source-only, not promised current live behavior.",
+        "task": "Keep your MISSING notes, stop blocked branches, and use the course jump-to areas for a refresher without opening existing jobs. Video remains optional and not recorded yet.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Systems dashboard"
       }
     ],
     "quiz": [
       {
-        "question": "Is there a Demo mode or isolated practice context on the live FireCode app?",
+        "question": "Does this FireCode walkthrough use Demo mode?",
         "choices": [
-          "No. As of this check there is no Demo mode; isolated demo context is MISSING. Do not create, upload, or open named jobs.",
-          "Yes, any TEST or E2E project name is a safe sandbox.",
-          "Yes, open a named client project to practice."
+          "No. No Demo mode exists; authorized practice creates real FireCode data.",
+          "Yes, Simulation makes all data temporary.",
+          "Yes, opening a job card starts Demo mode."
         ],
         "answer": 0
       },
       {
-        "question": "What should you do with New project and Upload blueprint?",
+        "question": "How should you begin fire-alarm practice?",
         "choices": [
-          "Recognize those live labels only. Do not click Upload blueprint and do not create or save a project, because that writes into the same account as real jobs.",
-          "Upload a practice blueprint so the form auto-fills.",
-          "Click + New project and save a sample job."
+          "Use red + New project, then Upload blueprint with authorized practice material only.",
+          "Open a named client job to reuse its plans.",
+          "Upload a GSIS client plan set without permission."
         ],
         "answer": 0
       },
       {
-        "question": "Does finishing this practice mark official completion?",
+        "question": "Does finishing this practice mark official MYGSIS completion?",
         "choices": [
-          "No. Practice does not change official progress; assignment is not enrollment.",
-          "Yes, the player completes CourseAssignment records.",
-          "Yes, manufacturer enrollment is automatic."
+          "No. Practice does not write official MYGSIS completion; FireCode records are still real data.",
+          "Yes, Save marks official MYGSIS completion.",
+          "Yes, Generate official is the training completion button."
         ],
         "answer": 0
       }
     ],
-    "source": "Live FireCode Architect signed-in check 2026-11-06 at https://observant-fire-code-flow.base44.app/ (Systems dashboard labels, no Demo mode, Fire alarm projects headings, New project / Upload blueprint labels and form fields). Unsigned-in login page verified 2026-11-06: Welcome to FireCode Architect; Sign in to continue; Continue with Google; Email; Password; Sign in; Forgot password?; Need an account? Sign up. Designer controls Plans, Floor Plan, Calculations, Simulation, Riser Diagram, Save, and Export PDF were not seen and remain unverified.",
+    "source": "FIRECODE-DESIGN-LABELS-2026-11-06.md: supplied live signed-in check 2026-11-06 (America/Los_Angeles, PST) for login, Systems dashboard and New project (section 1); FireCode UI source and designer chrome screenshots for later screens (sections 4–13, 16, 19). Later screens were not re-verified live on a newly created project. Current SubmittalPackage flow is source-traced only, not the older standalone modal. Assumptions: none about deployment matching source. Missing information is called out in steps. SW training support for FA and LV; compliance check: this is UI training, not engineering approval, a permit, a professional seal or AHJ acceptance.",
+    "author": "GSIS-authored live-software walkthrough"
+  },
+  "CRS-LV-DESIGN": {
+    "course_id": "CRS-LV-DESIGN",
+    "title": "Low Voltage Design • FireCode walkthrough",
+    "video_url": "",
+    "steps": [
+      {
+        "title": "1. Understand the practice boundary",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Assumptions: no later deployment match is assumed. Missing information: post-creation live verification, upload-to-create runtime, rendered submittal dialog and PDF viewer evidence. No Demo mode exists. Live mode uses silent on-screen prompts only; video mode is optional and independent, with video not recorded yet. The empty video slot awaits real-site screen recordings narrated by Kemar in his own voice; no generated footage or cloned voice. Practice does not write official MYGSIS completion. Creating/uploading in FireCode writes real data in the same live account as real jobs. This is software orientation, not code approval or permission to sign/seal.",
+        "task": "Read the safety boundary. If you lack an authorized practice blueprint and permission to create practice data, stop before upload or creation.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Sign in",
+        "spotlight": "Welcome to FireCode Architect"
+      },
+      {
+        "title": "2. Choose your assigned sign-in route",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. The login also shows Sign in to continue. Use Continue with Google only with your assigned account, or the Email and Password fields for your assigned email account. Do not create an account or use Forgot password? or Need an account? Sign up without account instructions.",
+        "task": "Identify the assigned login method; enter credentials yourself only in the actual app, never in training notes.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Sign in",
+        "spotlight": "Continue with Google"
+      },
+      {
+        "title": "3. Finish assigned sign-in",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. For the email route, Sign in submits the Email and Password fields. If already signed in, continue without signing out.",
+        "task": "Use Sign in for your assigned email route if needed, then confirm Systems dashboard appears.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Sign in",
+        "spotlight": "Sign in"
+      },
+      {
+        "title": "4. Orient on the landing page",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Welcome back is a generic greeting; the app may add a name. This landing page is also branded SYSTEMS Designer.",
+        "task": "Find Systems dashboard and Welcome back. Stay on the landing page; do not open existing job cards.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Systems dashboard"
+      },
+      {
+        "title": "5. Read sidebar groups without browsing jobs",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. SYSTEMS groups Dashboard, Projects and Project setup; DISCIPLINES groups the system areas. Projects is an existing-job browser, not the practice entry.",
+        "task": "Read the groups top to bottom without opening Projects or any named job. Use the new-project entry later.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "SYSTEMS"
+      },
+      {
+        "title": "6. Recognize Access control",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This live discipline card identifies controlled-door/access-system work. Opening it can lead to a live project list, so this step is look-only.",
+        "task": "Locate Access control; do not open its project list. Continue to the red + New project entry instead.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Access control"
+      },
+      {
+        "title": "7. Recognize Video surveillance",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This live discipline card identifies camera and recording-system work. Opening it can lead to a live project list, so this step is look-only.",
+        "task": "Locate Video surveillance; do not open its project list. Continue to the red + New project entry instead.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Video surveillance"
+      },
+      {
+        "title": "8. Recognize Audio visual",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This live discipline card identifies audio/video system work. Opening it can lead to a live project list, so this step is look-only.",
+        "task": "Locate Audio visual; do not open its project list. Continue to the red + New project entry instead.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Audio visual"
+      },
+      {
+        "title": "9. Recognize Structured cabling",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This live discipline card identifies cabling-system work. Opening it can lead to a live project list, so this step is look-only. MISSING: the exact current Structured cabling query slug; do not invent one or substitute the older combined low_voltage ID.",
+        "task": "Locate Structured cabling; do not open its project list. Continue to the red + New project entry instead.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Structured cabling"
+      },
+      {
+        "title": "10. Recognize Networking & wireless",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This live discipline card identifies network and wireless-system work. Opening it can lead to a live project list, so this step is look-only. MISSING: its distinct current setup/workspace evidence and exact query slug. The visible name does not verify a later networking-specific designer.",
+        "task": "Locate Networking & wireless; do not open its project list. Continue to the red + New project entry instead.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Networking & wireless"
+      },
+      {
+        "title": "11. Start a separate practice project",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Use the live-verified red + New project button, not an existing card. Do not type guessed LV query URLs. Use the visible new-project form and Primary discipline*.",
+        "task": "Click the red + New project button and confirm you are creating a new record, not editing an existing job.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "New project"
+      },
+      {
+        "title": "12. Locate blueprint intake",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This intake reads a title block and cover sheet to populate editable project details. It accepts a single sheet or multi-sheet PDF, or an image. Auto-fill is not verified design correctness.",
+        "task": "Open the new-project intake and find Start from a blueprint (auto-fill).",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Start from a blueprint (auto-fill)"
+      },
+      {
+        "title": "13. Upload authorized practice material only",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. The red Upload blueprint button uploads into the live account. Use only a practice blueprint you are authorized to upload. Do not upload GSIS client plan sets or use a real client name or address. MISSING: upload → completed new-project runtime validation; the author has not tested an upload or created a record.",
+        "task": "Only with permission, select an authorized practice blueprint using Upload blueprint. Otherwise stop here; do not improvise a real-client test.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Upload blueprint"
+      },
+      {
+        "title": "14. Review the auto-filled intake",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Review Project name, Address, Occupancy group, Adopted code edition and AHJ / code official contact in the intake. These live-verified labels describe extracted data that may need correction.",
+        "task": "Read each extracted value in that order; replace any client identity with approved fictional practice data before continuing.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Project name"
+      },
+      {
+        "title": "15. Name the practice record",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This is the required project-name field, distinct from the intake Project name label. Use an unambiguous practice name, never a real client name.",
+        "task": "Review Project Name* and use an approved fictional practice name.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Project Name*"
+      },
+      {
+        "title": "16. Check the practice location",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. The required address is real project data when saved. Do not enter a real client address or assume the blueprint extraction is safe.",
+        "task": "Use only an approved fictional practice location; stop if you cannot meet required fields without real client details.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Address*"
+      },
+      {
+        "title": "17. Set the intended discipline",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Set this live-verified form field to the LV discipline you are practicing: Access control, Video surveillance, Audio visual, Structured cabling or Networking & wireless. Their visible card names are confirmed; availability of each current form option must be checked on screen. access_control, video_surveillance and audio_visual are SOURCE-ONLY IDs, not re-verified live URLs. Structured cabling and Networking & wireless slugs remain MISSING. Do not guess a route.",
+        "task": "Select the intended visible discipline in Primary discipline*. If it is unavailable, record MISSING and stop instead of choosing a substitute.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Primary discipline*"
+      },
+      {
+        "title": "18. Review owner information",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Owner Name records owner information for the new project. Only approved fictional practice data belongs in this exercise.",
+        "task": "Review Owner Name without copying a client identity.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Owner Name"
+      },
+      {
+        "title": "19. Review installer information",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Installer / integrator records the responsible organization. Do not imply a practice record is a commissioned installation or alter shared company defaults.",
+        "task": "Review Installer / integrator and use only approved practice details.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Installer / integrator"
+      },
+      {
+        "title": "20. Review the code-official contact",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. This required field records the code-official contact; it is not an AHJ submission or approval action.",
+        "task": "Review the required contact field. Do not enter a real person’s contact details for practice; stop if approved fictional data is insufficient.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "AHJ / code official contact*"
+      },
+      {
+        "title": "21. Check jurisdiction",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Jurisdiction (AHJ) establishes the project context. Adopted code edition and Occupancy group also need review; auto-fill does not validate the design.",
+        "task": "Review the visible jurisdiction, code edition and occupancy data against the authorized practice brief, not invented code requirements.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Jurisdiction (AHJ)"
+      },
+      {
+        "title": "22. Inspect smoke-control and unknown-owner handling",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Building has smoke control is a verified form control, not proof a building has that system. Use TBD is also live-verified; use it only where the form offers it for unknown practice owner information.",
+        "task": "Review the smoke-control state without guessing. Locate Use TBD only in its actual form context; do not use it to bypass unrelated required fields.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Building has smoke control"
+      },
+      {
+        "title": "23. Preview setup analysis",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Preview Code Analysis requests the setup analysis. Fill 5 required fields was the verified incomplete-state label; its count may change as the form changes. An analysis preview is not approval.",
+        "task": "Review remaining required fields, then use Preview Code Analysis if available. Do not bypass validation.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Preview Code Analysis"
+      },
+      {
+        "title": "24. Check discipline-specific setup evidence",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Older source describes Access control — design basis, Video surveillance — design basis, Audio visual — design basis and Structured cabling — design basis. These are not confirmed current form sections. MISSING: a distinct Networking & wireless setup/workspace. Do not substitute fire-alarm defaults for LV requirements.",
+        "task": "Look only for the design-basis section matching your selected discipline. Treat it as MISSING unless seen; if absent, stop this branch.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Access control — design basis"
+      },
+      {
+        "title": "25. Create only the authorized new record",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source indicates this active submit state creates a project and opens its designer. It has not been end-to-end live tested. This is a real FireCode write, not a demo and not official MYGSIS completion.",
+        "task": "Only if the exact control is visible, the form is valid and practice-data creation is authorized, use Save & Open Designer. Otherwise record MISSING and stop.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "New project",
+        "spotlight": "Save & Open Designer"
+      },
+      {
+        "title": "26. Inspect the new-project canvas",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. This tab is the plan canvas. The screenshots show fire-workflow chrome, not a freshly verified LV workspace; do not assume every fire tool exists for your discipline.",
+        "task": "Look for Floor Plan in your own newly created project and inspect it without opening another project.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Floor Plan"
+      },
+      {
+        "title": "27. Review imported sheets",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Plans organizes imported pages. Floor Plans and Floor Plan → are source-and-screen labels in this area. Review the authorized practice sheets before layout.",
+        "task": "If visible, open Plans and inspect the imported pages; stop with MISSING if required controls are absent.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Plans"
+      },
+      {
+        "title": "28. Check sheet-assignment availability",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source describes Assign Sheet, Sheet name, Floor / Area, Plan Type and Assign. These are source-only conditional controls, not a verified current runtime. Assigning changes practice project data.",
+        "task": "Only if these exact controls actually appear, review and assign the practice sheet to the intended floor/type. If absent, record MISSING and stop; do not invent sheet-assignment controls.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Assign Sheet"
+      },
+      {
+        "title": "29. Return to scale review",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Return to Floor Plan before layout. Set Scale establishes drawing scale; Verify Scale is a separate evidenced toolbar label. A blueprint image alone does not establish trustworthy dimensions.",
+        "task": "If visible, inspect Set Scale and Verify Scale against a known dimension on the authorized practice blueprint. Stop rather than guess a scale.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Set Scale"
+      },
+      {
+        "title": "30. Inspect layout tools",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Select selects objects; Pan moves the view; Draw Room and Polygon Room outline rooms; Wire draws connections; Delete removes selected content. Availability is discipline-dependent and these controls can change real project data.",
+        "task": "Read these exact labels in visual order in your new project. Do not delete, wire or place anything on existing records; stop with MISSING if a needed control is absent.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Tools"
+      },
+      {
+        "title": "31. Inspect the discipline device palette",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. The palette is discipline-dependent. Older source lists Access Controller and Card Reader for access, Dome Camera and NVR / Recorder for video, Display and DSP / Processor for AV, and Patch Panel and Wireless AP in an older combined cabling configuration. These individual LV palette labels are SOURCE-ONLY, not confirmed current controls or networking-specific evidence. Treat each as MISSING unless actually visible. Fire-only Auto-Place Devices (this floor), Auto-Place All Floors + Risers and Auto-assign circuits are not promised LV actions; LV equivalents are MISSING.",
+        "task": "If Place Device is visible, read only the palette for your selected discipline. Make any authorized practice placements only in your own new record; do not invent absent device types.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Place Device"
+      },
+      {
+        "title": "32. Review document outputs",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Documents leads to Documents & deliverables. It separates report, layout and package actions. Do not grant permissions, share, apply stamps or upload additional client documents for this exercise.",
+        "task": "If visible, open Documents and locate Documents & deliverables without changing permissions or shared defaults.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Documents"
+      },
+      {
+        "title": "33. Recognize simulation boundaries",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. The evidenced simulation content comes from FireAlarmSimulation, including fire notification controls. An LV simulation equivalent is MISSING; the top-bar label alone does not verify LV functionality. Do not use fire simulation controls as an LV lesson.",
+        "task": "Look for the tab only. Record LV-specific simulation as MISSING unless the actual new LV project verifies it; stop this branch rather than invent an equivalent.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Simulation"
+      },
+      {
+        "title": "34. Recognize riser boundaries",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. The evidenced diagram heading is FIRE ALARM RISER DIAGRAM; an LV riser/one-line equivalent is MISSING. Do not claim this proves an LV design output.",
+        "task": "Look for the tab only; record an unsupported LV diagram as MISSING and stop this branch.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Riser Diagram"
+      },
+      {
+        "title": "35. Review calculation evidence",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. The evidenced calculations include Battery, NAC Loading, Wiring, Device Schedule and Sequence in a fire-oriented Calculations & Reports panel. LV-specific calculation coverage is MISSING; do not treat fire NAC/battery calculations as verified LV analysis.",
+        "task": "If visible, open Calculations and identify only applicable evidenced sections. Record unsupported discipline-specific analysis as MISSING and stop that branch.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Calculations"
+      },
+      {
+        "title": "36. Save with the real-data boundary",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Save persists the new project. Saved is an evidenced status, not a button or official MYGSIS training completion.",
+        "task": "Only for your authorized new practice record, use the visible Save control and inspect its status. Never save changes to someone else’s project.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Save"
+      },
+      {
+        "title": "37. Distinguish the design report",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. Export PDF is the NFPA design report action, not Floor plan layout and not Full submittal package. An appropriate LV report equivalent is MISSING; do not label the fire report an LV deliverable.",
+        "task": "Locate Export PDF if visible and read its report context; this step does not require exporting or signing anything.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Export PDF"
+      },
+      {
+        "title": "38. Distinguish layout from package",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. In Documents & deliverables, Floor plan layout is separate from Full submittal package. The latter is a source entry to the current submittal flow. Neither means automatic AHJ submission.",
+        "task": "If visible, locate the layout action, then Full submittal package. Do not conflate them with Export PDF.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Designer",
+        "spotlight": "Floor plan layout"
+      },
+      {
+        "title": "39. Enter the current source-traced submittal flow",
+        "body": "SOURCE+SCREEN / UNVERIFIED-LIVE: FireCode UI source and designer chrome screenshots, not a fresh live check of a newly created project. After you create a new project, look for this control. If it is absent, record MISSING and stop this flow rather than inventing a substitute. The bottom-toolbar Submittal PDF is SOURCE+SCREEN; the newer top-bar occurrence is SOURCE-ONLY. Current source sequence: Submittal PDF → Construction Drawing Submittal → Generate Construction Drawings → Submittal details → Skip (preview) / Generate official (gated). This sequence was not live-reverified after new-project creation. LV-specific package templates/output are MISSING; the source package is fire-oriented. Do not promise an LV package or choose a fire template as an LV substitute.",
+        "task": "Only if present on your own new practice record, inspect Submittal PDF. Stop at the first absent target; do not use an existing job to find it.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Submittal PDF"
+      },
+      {
+        "title": "40. Check the current package dialog",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. MISSING: rendered Construction Drawing Submittal dialog evidence. Source mounts SubmittalPackage, not the older standalone wizard. This is source-traced fire-package orientation only; LV applicability remains MISSING.",
+        "task": "Look for this exact dialog heading; unless it actually appears, record MISSING and stop.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Construction Drawing Submittal"
+      },
+      {
+        "title": "41. Review template and editing context",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source shows Drawing standard / template, then Visual Editor, Company & Logo, Project Info and Revisions & Index. These are source-only labels. No verified LV template is provided; do not assume a fire template is suitable.",
+        "task": "Read the actual visible labels in that order if present. Do not alter shared company defaults or upload a logo for this exercise.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Drawing standard / template"
+      },
+      {
+        "title": "42. Inspect drawing sheets",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source describes Sheets, Page, Drag Modules, Sheet Properties and Selected Module. These editing areas are not a verified PDF viewer. Do not delete pages/modules as a training requirement.",
+        "task": "If the exact labels are visible, inspect the practice sheet structure only; otherwise record MISSING and stop.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Sheets"
+      },
+      {
+        "title": "43. Inspect project and revision metadata",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source Project Info includes Prepared By, Checked By, Project Manager, Project Number, Submittal Date and Scope of Work; Revisions & Index organizes the index. Real author, checker, seal and company-default data must not be invented for practice.",
+        "task": "Review visible metadata using approved practice data only. Do not impersonate a qualified checker or fill a real signature.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Project Info"
+      },
+      {
+        "title": "44. Locate the current generation action",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source says this opens Submittal details. Generation can download a PDF and persist metadata, company defaults and submittal history; it is not a harmless training-completion action. LV output support is MISSING; stop rather than generate a fire set for an LV discipline.",
+        "task": "Locate only if present; stop here while LV package applicability is MISSING.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Generate Construction Drawings"
+      },
+      {
+        "title": "45. Inspect required submittal details",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source says missing project details must be resolved from project setup. Color mode, AHJ requires a PE seal box and Signature are source-only settings; their existence does not establish a valid seal or AHJ acceptance.",
+        "task": "If this exact dialog is actually visible, read its required details. Do not add a signature, stamp or professional credential for practice. Otherwise mark MISSING and stop.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Submittal details"
+      },
+      {
+        "title": "46. Understand the preview branch",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source says Skip (preview) produces a PREVIEW stamped not for submission. It may still persist generation metadata/history. MISSING: rendered PDF preview / preview viewer controls; no viewer workflow is invented.",
+        "task": "Identify the preview branch only if visible. Generate a practice preview only with explicit permission for those real-data writes; otherwise stop without generating.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Skip (preview)"
+      },
+      {
+        "title": "47. Understand the gated official branch",
+        "body": "SOURCE-ONLY / UNVERIFIED-LIVE: this label is in FireCode UI source, not confirmed visible in the current live app. Treat it as MISSING unless you actually see it after creating your own new project; if absent, record MISSING and stop this flow. Source says Generate official is disabled until required details exist. This is not official MYGSIS completion. MISSING: automatic AHJ submit / approval / submittal stamp action. Do not assume a PE box or signature selector supplies a valid seal. Do not generate official documents in this practice.",
+        "task": "Read the gate if visible and stop before Generate official; record absent controls as MISSING, never bypass them.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Submittal",
+        "spotlight": "Generate official"
+      },
+      {
+        "title": "48. Close the evidence-bounded refresher",
+        "body": "LIVE-VERIFIED 2026-11-06 (PST), from the supplied signed-in check. Practice does not write official MYGSIS completion; FireCode creation and saves remain real data. MISSING throughout this course: current live post-creation designer verification; upload-to-completed-new-project runtime; rendered current submittal dialog; PDF preview/viewer; automatic AHJ approval/stamp. Demo mode is absent, not a hidden destination. Also MISSING: Structured cabling and Networking & wireless current slugs; distinct Networking & wireless setup/workspace; LV-specific simulation, riser, calculations, report and submittal-template/output verification. Any absent source-only or source/screen target remains MISSING.",
+        "task": "Keep your MISSING notes, stop blocked branches, and use the course jump-to areas for a refresher without opening existing jobs. Video remains optional and not recorded yet.",
+        "open_path": "https://observant-fire-code-flow.base44.app/",
+        "open_label": "FireCode",
+        "area": "Systems dashboard",
+        "spotlight": "Systems dashboard"
+      }
+    ],
+    "quiz": [
+      {
+        "question": "Does this FireCode walkthrough use Demo mode?",
+        "choices": [
+          "No. No Demo mode exists; authorized practice creates real FireCode data.",
+          "Yes, Simulation makes all data temporary.",
+          "Yes, opening a job card starts Demo mode."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "How should you begin an LV discipline exercise?",
+        "choices": [
+          "Use red + New project and the visible Primary discipline* field; Structured cabling and Networking & wireless slugs are MISSING.",
+          "Open an existing named job and replace its data.",
+          "Invent a query URL for the desired LV discipline."
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Does finishing this practice mark official MYGSIS completion?",
+        "choices": [
+          "No. Practice does not write official MYGSIS completion; FireCode records are still real data.",
+          "Yes, Save marks official MYGSIS completion.",
+          "Yes, Generate official is the training completion button."
+        ],
+        "answer": 0
+      }
+    ],
+    "source": "FIRECODE-DESIGN-LABELS-2026-11-06.md: supplied live signed-in check 2026-11-06 (America/Los_Angeles, PST) for login, Systems dashboard and New project (section 1); FireCode UI source and designer chrome screenshots for later screens (sections 4–13, 16, 19). Later screens were not re-verified live on a newly created project. Current SubmittalPackage flow is source-traced only, not the older standalone modal. Assumptions: none about deployment matching source. Missing information is called out in steps. SW training support for FA and LV; compliance check: this is UI training, not engineering approval, a permit, a professional seal or AHJ acceptance.",
     "author": "GSIS-authored live-software walkthrough"
   }
 };
 
-// Display/assignment mapping corrections; add the internal FireCode demo to the existing Fire Design path.
+// Display/assignment mapping corrections; add Fire Alarm Design and Low Voltage Design FireCode walkthroughs to the matching division paths.
 const ACCESS_MOTO = new Set(['CRS-MOTO-032', 'CRS-MOTO-033', 'CRS-MOTO-034', 'CRS-MOTO-035', 'CRS-MOTO-036', 'CRS-MOTO-037', 'CRS-MOTO-045', 'CRS-MOTO-047']);
 const PATHS = SOURCE_PATHS.filter(p => !p.path_id.includes('CSLB')).map(p => ({
   ...p,
@@ -4822,14 +6896,20 @@ const PATHS = SOURCE_PATHS.filter(p => !p.path_id.includes('CSLB')).map(p => ({
     ...(p.path_id === 'PATH-ACCESS' ? [...ACCESS_MOTO] : []),
     ...LV_SOP_COURSES.filter(c => c.path_id === p.path_id).map(c => c.course_id),
     ...(p.division === 'Fire' && p.domain === 'Design' ? ['CRS-FIRE-DESIGN'] : []),
+    ...((p.division === 'Low Voltage' && ['PATH-CCTV','PATH-ACCESS','PATH-AV','PATH-NET','PATH-CABLING'].includes(p.path_id)) ? ['CRS-LV-DESIGN'] : []),
   ])],
 }));
 const FIRE_DESIGN_COURSE = {
-  course_id: 'CRS-FIRE-DESIGN', title: 'FireCode • Demo walkthrough', brand: 'GSIS Internal',
+  course_id: 'CRS-FIRE-DESIGN', title: 'Fire Alarm Design • FireCode walkthrough', brand: 'GSIS Internal',
   link: '', cost: 'internal', kind: 'interactive',
-  notes: 'GSIS-authored captioned walkthrough of live FireCode. As of the 2026-11-06 signed-in check there is no Demo mode and no isolated practice context. Look-only: do not open named jobs, do not click Upload blueprint, and do not create or save a project. Not design approval or enrollment.',
+  notes: 'GSIS-authored live FireCode walkthrough: start a new practice project with red + New project and Upload blueprint, then follow the create-submittal flow. Two modes: silent live prompts, or video when recorded. Video not recorded yet. No Demo mode. Do not open named client jobs. Use only an authorized practice blueprint. Practice does not change official progress.',
 };
-const CATALOG = [...SEED_COURSES, ...LV_SOP_COURSES, FIRE_DESIGN_COURSE];
+const LV_DESIGN_COURSE = {
+  course_id: 'CRS-LV-DESIGN', title: 'Low Voltage Design • FireCode walkthrough', brand: 'GSIS Internal',
+  link: '', cost: 'internal', kind: 'interactive',
+  notes: 'GSIS-authored live FireCode walkthrough for Access control, Video surveillance, Audio visual, Structured cabling, and Networking & wireless. Two modes: silent live prompts, or video when recorded. Video not recorded yet. No Demo mode. Do not open named client jobs. Structured cabling and Networking & wireless URL slugs are MISSING. Practice does not change official progress.',
+};
+const CATALOG = [...SEED_COURSES, ...LV_SOP_COURSES, FIRE_DESIGN_COURSE, LV_DESIGN_COURSE];
 const COURSE_BY_ID = Object.fromEntries(CATALOG.map(c => [c.course_id, c]));
 const LOGIN_EMAIL = 'kemar@gsistech.com';
 const emailKey = email => String(email || '').trim().toLowerCase();
@@ -4838,7 +6918,7 @@ const isInternal = c => !!PRACTICE[c.course_id] || c.kind === 'interactive' || c
 const isGated = c => c.cost === 'paid' || c.cost === 'partner';
 const safeURL = value => /^https?:\/\//i.test(value || '') ? value : null;
 
-const WALKTHROUGH_PAGES = new Set(['Dashboard', 'Calendar', 'OpsDashboard', 'ResourceBoard', 'Bids', 'Leads', 'ContractorDirectory', 'Estimates', 'RateCard', 'Projects', 'Documents', 'TrainingManagement', 'Billing', 'Suppliers', 'PurchaseOrders']);
+const WALKTHROUGH_PAGES = new Set(['Dashboard', 'Calendar', 'OpsDashboard', 'ResourceBoard', 'Bids', 'Leads', 'ContractorDirectory', 'Estimates', 'RateCard', 'Projects', 'Documents', 'TrainingManagement', 'Billing', 'Suppliers', 'PurchaseOrders', 'SupportChannels', 'WIPReport', 'Settings', 'RolePermissions', 'UserApprovals', 'AIAgents', 'AlertSettings', 'TemplateLibrary', 'AuditTrail', 'ServiceDesk']);
 function walkthroughURL(value) {
   if (typeof value !== 'string') return null;
   const raw = value.startsWith('/') && !value.startsWith('//') ? `https://mygsis.com${value}` : value;
@@ -4850,6 +6930,18 @@ function walkthroughURL(value) {
     if (candidate === 'https://observant-fire-code-flow.base44.app/') return candidate;
     if (!/^https?:\/\/mygsis\.com\/[A-Za-z]+$/.test(candidate) || url.hostname !== 'mygsis.com' || !WALKTHROUGH_PAGES.has(url.pathname.slice(1))) return null;
     return `https://mygsis.com${url.pathname}`;
+  } catch { return null; }
+}
+
+// A missing/unsafe URL is an empty recording slot, never a stand-in video.
+function safeVideoURL(value) {
+  if (typeof value !== 'string' || !/^https:\/\//i.test(value.trim())) return null;
+  try {
+    const url = new URL(value.trim());
+    // Reject explicit ports too (URL normalizes the default :443 away).
+    const authority = value.trim().split('/')[2];
+    if (url.protocol !== 'https:' || !url.hostname || url.username || url.password || url.port || authority.includes(':')) return null;
+    return url.href;
   } catch { return null; }
 }
 
@@ -4904,6 +6996,18 @@ const STYLES = `
 .gsis-training .t-overlay{border-left:4px solid var(--tg)}.gsis-training .t-small{font-size:12px}
 @media(min-width:640px){.gsis-training{padding:24px}.gsis-training .t-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gsis-training .t-tabs{display:flex;flex-wrap:wrap}.gsis-training .t-tabs>button{min-width:130px}.gsis-training .t-chip{flex:0 1 auto}.gsis-training .t-assign{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}}
 @media(min-width:1100px){.gsis-training .t-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.gsis-training .t-hero{padding:28px}}
+.gsis-training .t-choice{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+.gsis-training .t-choice button{min-height:44px;padding:16px}
+.gsis-training .t-live-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.gsis-training .t-live-stage{position:relative;min-height:280px;height:52dvh;max-height:660px;border:1px solid #bccbdd;border-radius:10px;overflow:hidden;background:#fff;isolation:isolate}
+.gsis-training .t-live-frame{display:block;width:100%;height:100%;border:0;background:#fff}
+.gsis-training .t-spotlight{position:absolute;z-index:2;pointer-events:none;border:3px solid #C9A227;border-radius:6px;box-shadow:0 0 0 9999px #0B1F3Abd}
+.gsis-training .t-jump{display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-weight:700;color:#0B1F3A}
+.gsis-training .t-jump select{font:inherit;min-height:44px;max-width:100%;border:1px solid #bccbdd;border-radius:8px;padding:8px;background:white;color:#0B1F3A}
+.gsis-training .t-jump select:focus-visible{outline:3px solid #C9A227;outline-offset:2px}
+.gsis-training .t-recording{display:block;width:100%;max-height:60dvh;background:#0B1F3A;border-radius:10px}
+@media(min-width:900px){.gsis-training .t-live-layout{grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr)}.gsis-training .t-choice{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
 `;
 
 export default function TrainingManagement({ view } = {}) {
@@ -5076,8 +7180,8 @@ export default function TrainingManagement({ view } = {}) {
       <footer className="t-section t-muted">Documented catalog snapshot · No enrollment, payment, password storage or automated manufacturer completion tracking.</footer>
     </main>
     <Dialog open={!!practiceId} onOpenChange={open => { if (!open) setPracticeId(null); }}>
-      <DialogContent className="gsis-training w-[calc(100vw-24px)] max-w-3xl max-h-[90dvh] overflow-y-auto p-4 sm:p-6">
-        <DialogHeader><DialogTitle>{practiceId ? COURSE_BY_ID[practiceId]?.title : 'Internal practice'}</DialogTitle><DialogDescription>Captioned live-app walkthrough. The player does not change official progress; actions in the live tab may save real data.</DialogDescription></DialogHeader>
+      <DialogContent className="gsis-training w-[calc(100vw-16px)] max-w-[min(1280px,calc(100vw-16px))] max-h-[90dvh] overflow-y-auto p-4 sm:p-6">
+        <DialogHeader><DialogTitle>{practiceId ? COURSE_BY_ID[practiceId]?.title : 'Internal practice'}</DialogTitle><DialogDescription>Watch a real screen recording when available and/or follow the live spotlight walkthrough. The player does not change official progress; live-tab or iframe actions may save real data.</DialogDescription></DialogHeader>
         {practiceId && <PracticePlayer key={practiceId} course={PRACTICE[practiceId]} />}
       </DialogContent>
     </Dialog>
@@ -5211,8 +7315,89 @@ function AssignPanel({ org, user, technicians, assignments, storedCourses, reads
   </section>;
 }
 
+// Live DOM inspection only: no clicks, form fills, persistence or official writes.
+function LiveSpotlight({ url, target }) {
+  const frame = useRef(null);
+  const [box, setBox] = useState(null);
+  const [status, setStatus] = useState('MISSING: Waiting for the live screen.');
+  const [unavailable, setUnavailable] = useState(false);
+  useEffect(() => {
+    let stopped = false;
+    let blocked = false;
+    let lastTarget = null;
+    let detach = () => {};
+    let attachedDoc = null;
+    const normalize = value => String(value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    const missing = text => { setBox(null); setStatus(`MISSING: ${text}`); };
+    const fail = text => { blocked = true; missing(text); setUnavailable(true); };
+    const inspect = () => {
+      if (stopped || blocked) return;
+      try {
+        const iframe = frame.current;
+        const doc = iframe?.contentDocument;
+        if (!doc || !iframe?.contentWindow) { fail('Live screen cannot be inspected. Use the new-tab live link and caption.'); return; }
+        if (doc.URL === 'about:blank') return;
+        // A redirect must not turn the preview into an unverified destination.
+        const current = new URL(doc.URL);
+        if (current.origin !== 'https://mygsis.com' || !walkthroughURL(current.href) || /\/(TrainingManagement|TechnicianTraining)\/?$/.test(current.pathname)) {
+          fail('This destination cannot be spotlighted here. Use the new-tab live link and caption.'); return;
+        }
+        const text = doc.body?.innerText || '';
+        if (/\b(sign[ -]?in|log[ -]?in|continue with google)\b/i.test(text) || /(?:^|\n)\s*welcome[!.,]?\s*(?:\n|$)/i.test(text) || doc.querySelector('input[type="password"]')) {
+          fail('Sign-in screen detected. No sign-in controls are used. Open the live app in a new tab.'); return;
+        }
+        if (attachedDoc !== doc) {
+          detach(); attachedDoc = doc;
+          doc.addEventListener('scroll', inspect, true);
+          iframe.contentWindow.addEventListener('resize', inspect);
+          detach = () => { doc.removeEventListener('scroll', inspect, true); try { iframe.contentWindow?.removeEventListener('resize', inspect); } catch { /* A redirected frame may no longer be accessible. */ } };
+        }
+        const wanted = normalize(target);
+        if (!wanted) { missing('No target label is documented for this step.'); return; }
+        const candidates = [...doc.querySelectorAll('button,a,nav li,[role="navigation"] li,[role="tab"],[role="menuitem"],h1,h2,h3,h4,h5,h6,[aria-label]')].filter(el => {
+          const r = el.getBoundingClientRect();
+          const style = iframe.contentWindow.getComputedStyle(el);
+          return r.width > 0 && r.height > 0 && style.visibility !== 'hidden' && style.display !== 'none' && !el.closest('[hidden],[aria-hidden="true"]');
+        });
+        const labels = el => {
+          const labelled = (el.getAttribute('aria-labelledby') || '').split(/\s+/).map(id => doc.getElementById(id)?.textContent || '').join(' ');
+          return [el.getAttribute('aria-label'), labelled, el.innerText].map(normalize).filter(Boolean);
+        };
+        const found = candidates.find(el => labels(el).some(label => label === wanted)) || candidates.find(el => labels(el).some(label => label.includes(wanted)));
+        if (!found) { missing(`Highlight target “${target}” is not visible on this screen. Follow the caption; no guessed highlight is drawn.`); return; }
+        if (lastTarget !== found) { lastTarget = found; found.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }); }
+        const rect = found.getBoundingClientRect();
+        // These are already iframe viewport coordinates. Never subtract the parent's frame rect.
+        const left = Math.max(0, rect.left), top = Math.max(0, rect.top);
+        const right = Math.min(iframe.clientWidth, rect.right), bottom = Math.min(iframe.clientHeight, rect.bottom);
+        if (right <= left || bottom <= top) { missing(`Highlight target “${target}” is outside the visible screen.`); return; }
+        setBox({ left, top, width: right - left, height: bottom - top });
+        setStatus(`Highlighted: ${target}. Read the caption, then choose Next.`);
+      } catch { fail('Cross-origin or restricted live screen. Use the new-tab live link and caption.'); }
+    };
+    setBox(null); setUnavailable(false); setStatus('MISSING: Waiting for the live screen.');
+    const timer = window.setInterval(inspect, 750);
+    const timeout = window.setTimeout(() => {
+      if (!attachedDoc) fail('Live preview did not become available. Use the new-tab live link and caption.');
+    }, 12000);
+    frame.current?.addEventListener('load', inspect);
+    const element = frame.current;
+    return () => { stopped = true; window.clearInterval(timer); window.clearTimeout(timeout); element?.removeEventListener('load', inspect); detach(); };
+  }, [url, target]);
+  return <section aria-label="Live app spotlight">
+    {!unavailable && <div className="t-live-stage">
+      <iframe ref={frame} className="t-live-frame" src={url} title={`Live MYGSIS — ${target || 'walkthrough'}`} referrerPolicy="same-origin" />
+      {box && <div className="t-spotlight" style={box} aria-hidden="true" />}
+    </div>}
+    <p className="t-notice" role="status">{status}</p>
+  </section>;
+}
+
 // This player has NO base44 calls, mutations, persistence or official-status callbacks.
 function PracticePlayer({ course }) {
+  const [phase, setPhase] = useState('choice');
+  const [videoOnly, setVideoOnly] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [notes, setNotes] = useState({});
   const [answers, setAnswers] = useState({});
@@ -5221,38 +7406,70 @@ function PracticePlayer({ course }) {
   const steps = course?.steps || [];
   const quiz = course?.quiz || [];
   const hasQuiz = quiz.length > 0;
-  const onQuiz = stepIndex === steps.length && hasQuiz;
-  const step = steps[stepIndex];
+  const onQuiz = phase === 'quiz';
+  const step = phase === 'live' ? steps[stepIndex] : null;
   const openURL = walkthroughURL(step?.open_path);
+  const videoURL = safeVideoURL(course?.video_url);
+  const target = step?.spotlight || step?.open_label || step?.title || '';
+  const areaName = item => item.area || item.open_label || 'Walkthrough';
+  const areas = [];
+  steps.forEach((item, index) => { const name = areaName(item); if (!areas.some(([area]) => area === name)) areas.push([name, index]); });
+  const canFrame = !!openURL && openURL.startsWith('https://mygsis.com/') && !/\/(TrainingManagement|TechnicianTraining)\/?$/.test(new URL(openURL).pathname) && typeof window !== 'undefined' && window.location.origin === 'https://mygsis.com';
   const score = quiz.filter((q, i) => answers[i] === q.answer).length;
   const allAnswered = quiz.every((_, i) => Number.isInteger(answers[i]));
+  const finish = () => { setPlaying(false); setPhase(hasQuiz ? 'quiz' : 'end'); };
+  const goTo = index => { setPlaying(false); setStepIndex(index); setPhase('live'); };
+  const startLive = () => { setPlaying(false); setPhase(steps.length ? 'live' : hasQuiz ? 'quiz' : 'end'); };
+  const chooseVideo = only => { setPlaying(false); setVideoOnly(only); setVideoError(false); setPhase('video'); };
+  const afterVideo = () => videoOnly ? finish() : startLive();
   useEffect(() => {
-    if (!playing || !step) return;
+    if (!playing || !step || phase !== 'live') return;
     const timer = window.setTimeout(() => {
       if (stepIndex < steps.length - 1) setStepIndex(i => i + 1);
-      else { setPlaying(false); if (hasQuiz) setStepIndex(steps.length); }
+      else { setPlaying(false); setPhase(hasQuiz ? 'quiz' : 'end'); }
     }, 8000);
     return () => window.clearTimeout(timer);
-  }, [playing, stepIndex, steps.length, hasQuiz, step]);
-  const goTo = index => { setPlaying(false); setStepIndex(index); };
-  return <section className="t-stack" aria-label="Captioned interactive walkthrough">
-    <p className="t-notice">These captioned steps walk through live MYGSIS (or the named live app). Complete the action in the opened tab; this player does not change official progress. Assignment is not enrollment. Do not award a real bid, send mail, purchase or enroll in manufacturer courses during practice. Only edit an authorized training record; live-tab actions can save real data. Internal orientation is not certification or authority to perform regulated work.</p>
-    <p className="t-muted">Interactive video = these visible captions and live-app prompts, not a recording or generated UI. Play auto-advances every 8 seconds; pause before doing an action in the live tab. Notes remain local and unsaved.</p>
-    <div className="t-actions"><button type="button" className="t-primary" aria-pressed={playing} disabled={!step} onClick={() => setPlaying(p => !p)}>{playing ? 'Pause' : 'Play walkthrough'}</button><span role="status">{playing ? 'Playing captions · 8 seconds per step' : 'Paused · follow at your own pace'}</span></div>
-    <p className="t-notice" aria-live="polite">{onQuiz ? 'Practice quiz' : `Step ${stepIndex + 1} of ${steps.length}`}</p>
-    {step && <article className="t-card" aria-label={`Step ${stepIndex + 1} caption`}>
-      <h2>{step.title}</h2><div className="t-pre">{step.body}</div>
-      {openURL ? <div className="t-actions t-section"><a className="t-button t-primary" href={openURL} target="_blank" rel="noopener noreferrer" onClick={() => setPlaying(false)}>Open {step.open_label || 'this screen'} in live app ↗</a></div> : <p className="t-notice">No verified live-screen link is available for this step. Do not guess a URL.</p>}
-      {step.task && <div className="t-notice"><strong>Live-screen task / caption prompt</strong><p>{step.task}</p><label>Practice notes (not saved)<textarea value={notes[stepIndex] || ''} onFocus={() => setPlaying(false)} onChange={e => setNotes({ ...notes, [stepIndex]: e.target.value })} /></label></div>}
-    </article>}
+  }, [playing, phase, stepIndex, steps.length, hasQuiz, step]);
+  return <section className="t-stack" aria-label="Video and live spotlight practice">
+    <p className="t-notice">These captioned steps walk through live MYGSIS (or the named live app). This player does not change official progress. Assignment is not enrollment. Do not award a real bid, send mail, purchase or enroll in manufacturer courses during practice. Only edit an authorized training record; live-tab and iframe actions can save real data. Internal orientation is not certification or authority to perform regulated work.</p>
+    <p className="t-muted">Watch a real screen recording when Kemar has recorded it with his own narration, and/or follow the live spotlight walkthrough. No generated UI or AI voice is used. Play auto-advances live captions every 8 seconds; pause before any live action. Notes remain local and unsaved.</p>
+    {phase === 'choice' && <section className="t-card"><h2>Choose how to practice</h2><p>Live mode: silent on-screen prompts, spotlight and Next — no voice or spoken narration. Video mode: a real screen recording with Kemar’s own recorded narration, when available.</p><div className="t-choice">
+      <button onClick={() => chooseVideo(false)}>Watch video first</button>
+      <button className="t-primary" onClick={startLive}>Skip to live walkthrough</button>
+      <button onClick={() => chooseVideo(true)}>Watch video only</button>
+    </div></section>}
+    {phase === 'video' && <section className="t-card"><h2>Video mode — recorded walkthrough</h2>
+      {videoURL ? <><video className="t-recording" controls src={videoURL} onEnded={afterVideo} onError={() => setVideoError(true)} /><p className="t-muted">Real course recording. Playback does not change official progress.</p>{videoError && <p role="status" className="t-notice">The recording could not be played. You can continue without it or return to the choices.</p>}</> : <div className="t-notice"><strong>Video not recorded yet.</strong><p>The recording must be a screen recording of the live MYGSIS website with Kemar’s own narration. No stand-in video, generated UI, or synthesized audio is used.</p></div>}
+      <div className="t-choice">
+        {videoOnly ? <button className="t-primary" onClick={finish}>{hasQuiz ? 'Continue to practice quiz' : 'Continue to end of practice'}</button> : <button className="t-primary" onClick={startLive}>Skip to live walkthrough</button>}
+        <button onClick={() => { setPlaying(false); setPhase('choice'); }}>Back to choices</button>
+      </div>
+    </section>}
+    {phase === 'live' && <>
+      <div><h2>Live mode — silent spotlight walkthrough</h2><p className="t-muted">On-screen prompts only. No voice, automatic spoken narration or speech synthesis. Use Next to advance to the next widget or section.</p></div>
+      <label className="t-jump">Jump to<select value={step ? areaName(step) : ''} onChange={e => { const area = areas.find(([name]) => name === e.target.value); if (area) goTo(area[1]); }}>{areas.map(([name, index]) => <option key={name} value={name}>{name}</option>)}</select></label>
+      <div className="t-row"><button type="button" className="t-primary" aria-pressed={playing} disabled={!step} onClick={() => setPlaying(p => !p)}>{playing ? 'Pause' : 'Play walkthrough'}</button><span role="status">{playing ? 'Playing captions · 8 seconds per step' : 'Paused · follow at your own pace'}</span></div>
+      <p className="t-notice" aria-live="polite">Step {stepIndex + 1} of {steps.length}</p>
+      {step && <div className={canFrame ? 't-live-layout' : ''}>
+        {canFrame && <LiveSpotlight key={openURL} url={openURL} target={target} />}
+        <article className="t-card" aria-label={`Step ${stepIndex + 1} caption`}>
+          <h2>{step.title}</h2><div className="t-pre">{step.body}</div>
+          {!canFrame && <p className="t-notice">MISSING: In-player spotlight unavailable for this screen. Training pages are not embedded; cross-origin screens use the new-tab link and caption only.</p>}
+          {openURL ? <div className="t-actions t-section"><a className="t-button t-primary" href={openURL} target="_blank" rel="noopener noreferrer" onClick={() => setPlaying(false)}>Open {step.open_label || 'this screen'} in live app ↗</a></div> : <p className="t-notice">No verified live-screen link is available for this step. Do not guess a URL.</p>}
+          {step.task && <div className="t-notice"><strong>Live-screen task / caption prompt</strong><p>{step.task}</p><label>Practice notes (not saved)<textarea value={notes[stepIndex] || ''} onFocus={() => setPlaying(false)} onChange={e => setNotes({ ...notes, [stepIndex]: e.target.value })} /></label></div>}
+          <div className="t-row"><button disabled={stepIndex === 0} onClick={() => goTo(Math.max(0, stepIndex - 1))}>Back</button><button className="t-primary" onClick={() => stepIndex < steps.length - 1 ? goTo(stepIndex + 1) : finish()}>{hasQuiz && stepIndex === steps.length - 1 ? 'Next: practice quiz' : 'Next'}</button></div>
+        </article>
+      </div>}
+    </>}
     {onQuiz && <section className="t-card">
       <h2>Practice quiz</h2>
       {quiz.map((q, i) => <fieldset key={i} className="t-quiz"><legend>{i + 1}. {q.question}</legend>{q.choices.map((choice, j) => <label className="t-check" key={j}><input type="radio" name={`practice-${course.course_id}-${i}`} checked={answers[i] === j} onChange={() => { setAnswers({ ...answers, [i]: j }); setChecked(false); }} /><span>{choice}</span></label>)}</fieldset>)}
       <button className="t-primary" disabled={!allAnswered} onClick={() => setChecked(true)}>Check practice answers</button>
       {checked && <p className="t-notice" role="status">Practice score: {score} / {quiz.length}. {score === quiz.length ? 'Practice finished.' : 'Review the source steps and try again.'} Official training progress is unchanged.</p>}
+      <div className="t-row t-section">{steps.length > 0 && <button onClick={() => goTo(steps.length - 1)}>Back to walkthrough</button>}<button onClick={() => setPhase('choice')}>Back to choices</button></div>
     </section>}
-    {!hasQuiz && stepIndex === steps.length - 1 && <p className="t-notice">End of practice. Official progress is unchanged.</p>}
-    <div className="t-actions"><button disabled={stepIndex === 0} onClick={() => goTo(Math.max(0, stepIndex - 1))}>Back</button><button className="t-primary" disabled={stepIndex >= steps.length - (hasQuiz ? 0 : 1)} onClick={() => goTo(stepIndex + 1)}>{hasQuiz && stepIndex === steps.length - 1 ? 'Next: practice quiz' : 'Next'}</button></div>
+    {phase === 'end' && <section className="t-card"><p className="t-notice">End of practice. Official progress is unchanged.</p><button onClick={() => setPhase('choice')}>Back to choices</button></section>}
+    {phase === 'live' && <button onClick={() => { setPlaying(false); setPhase('choice'); }}>Back to choices</button>}
     {course?.source && <p className="t-source">Documented source: {course.source}</p>}
   </section>;
 }
