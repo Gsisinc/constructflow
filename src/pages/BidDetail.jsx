@@ -68,6 +68,7 @@ const EDIT_FIELDS = [
   { key: 'agency', label: 'Agency' },
   { key: 'location', label: 'Location' },
   { key: 'source', label: 'Source' },
+  { key: 'division', label: 'Division', select: [{ value: 'fire_alarm', label: 'Fire Alarm' }, { value: 'low_voltage', label: 'Low Voltage' }, { value: 'drone', label: 'Drone' }, { value: 'software', label: 'Software' }, { value: 'other', label: 'Other' }] },
   { key: 'folder', label: 'Folder', select: BID_FOLDER_OPTIONS },
   { key: 'notes', label: 'Notes', multiline: true },
 ];
@@ -421,7 +422,7 @@ export default function BidDetail() {
                 <Label htmlFor={`edit-${key}`}>{label}</Label>
                 {select ? (
                   <select id={`edit-${key}`} className="w-full min-h-[44px] rounded-md border border-input bg-background px-3 text-sm" value={editForm[key] ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))}>
-                    <option value="">Unfiled</option>
+                    <option value="">{key === 'folder' ? 'Unfiled' : '— Select —'}</option>
                     {select.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 ) : multiline ? (
