@@ -144,6 +144,41 @@
     "notes": {
       "type": "string"
     },
+    "phase_breakdown": {
+      "type": "array",
+      "description": "Estimate phase breakdown rows (added 2026-11-17, Kemar approved)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "number"
+          },
+          "phase_name": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "labor_hours": {
+            "type": "number"
+          },
+          "crew": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "ai_analysis": {
       "type": "object",
       "properties": {
