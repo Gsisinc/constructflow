@@ -1241,7 +1241,7 @@ function BidOverviewPanel({ bid, documents = [], statusColors = {} }) {
         </CardContent>
       </Card>
 
-      {/* Estimate (internal) */}
+      <div className="lg:col-span-3 order-last"><BidPhaseBreakdown bid={bid} /></div>{/* Estimate (internal) */}
       <Card className="rounded-xl border-border border-t-4 border-t-[hsl(var(--brand-gold,43_67%_47%))]">
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2"><Calculator className="h-4 w-4 text-primary" />Estimate <Badge variant="outline" className="text-[10px]"><Lock className="h-3 w-3 mr-1" />Internal</Badge></CardTitle>
@@ -1319,5 +1319,84 @@ function BidOverviewPanel({ bid, documents = [], statusColors = {} }) {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// ---- Estimate Phase Breakdown (Kemar YES 2026-11-17 8:57 AM PT) ----
+const PB_FIELDS = ['phase_name', 'scope', 'start_date', 'end_date', 'labor_hours', 'crew', 'notes'];
+function BidPhaseBreakdown({ bid }) {
+  const queryClient = useQueryClient();
+  const [rows, setRows] = useState([]);
+  const [dirty, setDirty] = useState(false);
+  useEffect(() => {
+    if (dirty) return;
+    const src = Array.isArray(bid?.phase_breakdown) ? [...bid.phase_breakdown] : [];
+    src.sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0));
+    setRows(src.map((r) => ({ ...r })));
+  }, [bid?.id, bid?.phase_breakdown]);
+  const saveMutation = useMutation({
+    mutationFn: (data) => base44.entities.BidOpportunity.update(bid.id, data),
+    onSuccess: async () => {
+      setDirty(false);
+      await queryClient.invalidateQueries({ queryKey: ['bid', bid.id] });
+      toast.success('Phase breakdown saved');
+    },
+    onError: (e) => toast.error('Save failed: ' + (e.message || ''))
+  });
+  const update = (i, key, val) => { setRows((rs) => rs.map((r, j) => (j === i ? { ...r, [key]: val } : r))); setDirty(true); };
+  const move = (i, d) => {
+    const j = i + d;
+    if (j < 0 || j >= rows.length) return;
+    setRows((rs) => { const n = [...rs]; [n[i], n[j]] = [n[j], n[i]]; return n; });
+    setDirty(true);
+  };
+  const addRow = () => { setRows((rs) => [...rs, { phase_name: '', scope: '', start_date: '', end_date: '', labor_hours: '', crew: '', notes: '' }]); setDirty(true); };
+  const save = () => {
+    const out = rows.map((r, i) => {
+      const o = { order: i + 1 };
+      PB_FIELDS.forEach((k) => {
+        const v = r?.[k];
+        if (v === '' || v === null || v === undefined) return;
+        if (k === 'labor_hours') { const n = Number(v); if (!Number.isNaN(n)) o[k] = n; return; }
+        o[k] = v;
+      });
+      return o;
+    });
+    saveMutation.mutate({ phase_breakdown: out });
+  };
+  const totalHours = rows.reduce((s, r) => s + (Number(r?.labor_hours) || 0), 0);
+  const cell = 'w-full min-h-[44px]';
+  return (
+    <Card className="mt-4">
+      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
+        <CardTitle className="text-base">Estimate Phase Breakdown</CardTitle>
+        <span className="text-sm text-slate-600">Total labor: <b>{totalHours.toLocaleString()}</b> hrs</span>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {rows.length === 0 && <p className="text-sm text-slate-500">No phases yet. Add the estimate phases (e.g. P0-P10, PM).</p>}
+        {rows.map((r, i) => (
+          <div key={i} className="rounded-lg border border-slate-200 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-500 w-6">{i + 1}</span>
+              <Input aria-label="Phase name" placeholder="Phase name" className={cell} value={r.phase_name ?? ''} onChange={(e) => update(i, 'phase_name', e.target.value)} />
+              <Button type="button" variant="outline" size="sm" className="min-h-[44px]" aria-label="Move up" disabled={i === 0} onClick={() => move(i, -1)}>&#8593;</Button>
+              <Button type="button" variant="outline" size="sm" className="min-h-[44px]" aria-label="Move down" disabled={i === rows.length - 1} onClick={() => move(i, 1)}>&#8595;</Button>
+            </div>
+            <Textarea aria-label="Scope" placeholder="Description / scope" rows={2} className="w-full" value={r.scope ?? ''} onChange={(e) => update(i, 'scope', e.target.value)} />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div><Label className="text-xs">Start</Label><Input type="date" className={cell} value={r.start_date ?? ''} onChange={(e) => update(i, 'start_date', e.target.value)} /></div>
+              <div><Label className="text-xs">End</Label><Input type="date" className={cell} value={r.end_date ?? ''} onChange={(e) => update(i, 'end_date', e.target.value)} /></div>
+              <div><Label className="text-xs">Labor hours (Ops)</Label><Input type="number" inputMode="decimal" min="0" className={cell} value={r.labor_hours ?? ''} onChange={(e) => update(i, 'labor_hours', e.target.value)} /></div>
+              <div><Label className="text-xs">Crew</Label><Input className={cell} value={r.crew ?? ''} onChange={(e) => update(i, 'crew', e.target.value)} /></div>
+            </div>
+            <Textarea aria-label="Notes" placeholder="Notes" rows={2} className="w-full" value={r.notes ?? ''} onChange={(e) => update(i, 'notes', e.target.value)} />
+          </div>
+        ))}
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" className="min-h-[44px]" onClick={addRow}>+ Add phase</Button>
+          <Button type="button" className="min-h-[44px]" disabled={!dirty || saveMutation.isPending} onClick={save}>{saveMutation.isPending ? 'Savingâ€¦' : 'Save phases'}</Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
