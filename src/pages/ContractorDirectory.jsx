@@ -14,14 +14,14 @@ import { useAuth } from '@/lib/AuthContext';
 
 // Division tags exist in two stored formats: ["fire_alarm","low_voltage"] and ["fire_alarm|low_voltage"].
 // Normalise both so filters and badges work the same for every record.
-const DIV_ALIASES = { fire_marshals: 'fire_marshal', fire_alarm_companies: 'fire_alarm_company', electrical_companies: 'electrical_company' };
+const DIV_ALIASES = { fire_marshals: 'fire_marshal', fire_alarm_companies: 'fire_alarm_company', electrical_companies: 'electrical_company', fire_protection_engineers: 'fire_protection_engineer' };
 const canonDiv = (x) => { const k = String(x).trim().toLowerCase().replace(/[\s-]+/g, '_'); return DIV_ALIASES[k] || k; };
 const normDivs = (v) => Array.from(new Set((Array.isArray(v) ? v : []).flatMap(x => String(x).split('|')).map(canonDiv).filter(Boolean)));
-const divLabel = (d) => ({ fire_marshal: 'Fire Marshals', fire_alarm_company: 'Fire Alarm Companies', electrical_company: 'Electrical Companies' }[d] || String(d).replace(/_/g, ' '));
+const divLabel = (d) => ({ fire_marshal: 'Fire Marshals', fire_alarm_company: 'Fire Alarm Companies', electrical_company: 'Electrical Companies', fire_protection_engineer: 'Fire Protection Engineers' }[d] || String(d).replace(/_/g, ' '));
 
 const COUNTIES = ['Alameda', 'Contra Costa', 'El Dorado', 'Marin', 'Napa', 'Placer', 'Sacramento', 'San Francisco', 'San Mateo', 'Santa Clara', 'Solano', 'Sonoma', 'Yolo', 'Yuba', 'Butte', 'Shasta', 'Humboldt', 'Mendocino', 'Other'];
 const REGIONS = ['Bay Area', 'Sacramento', 'North State', 'Wine Country', 'Sierra', 'Other'];
-const DIVISIONS = ['fire_alarm', 'low_voltage', 'drone', 'software', 'other', 'fire_marshal', 'fire_alarm_company', 'electrical_company'];
+const DIVISIONS = ['fire_alarm', 'low_voltage', 'drone', 'software', 'other', 'fire_marshal', 'fire_alarm_company', 'electrical_company', 'fire_protection_engineer'];
 const STATUSES = ['active', 'prospect', 'do_not_use', 'inactive'];
 const statusColor = { active: 'bg-green-100 text-green-700', prospect: 'bg-blue-100 text-blue-700', do_not_use: 'bg-red-100 text-red-700', inactive: 'bg-slate-100 text-slate-600' };
 
