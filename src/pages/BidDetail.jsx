@@ -1380,7 +1380,7 @@ function BidPhaseBreakdown({ bid }) {
               <span className="text-xs font-semibold text-slate-500 w-6">{i + 1}</span>
               <Input aria-label="Phase name" placeholder="Phase name" className={cell} value={r.phase_name ?? ''} onChange={(e) => update(i, 'phase_name', e.target.value)} />
               <Button type="button" variant="outline" size="sm" className="min-h-[44px]" aria-label="Move up" disabled={i === 0} onClick={() => move(i, -1)}>&#8593;</Button>
-              <Button type="button" variant="outline" size="sm" className="min-h-[44px]" aria-label="Move down" disabled={i === rows.length - 1} onClick={() => move(i, 1)}>&#8595;</Button>
+              <Button type="button" variant="outline" size="sm" className="min-h-[44px]" aria-label="Move down" disabled={i === rows.length - 1} onClick={() => move(i, 1)}>&#8595;</Button><Button type="button" variant="outline" size="sm" className="min-h-[44px] text-red-600 border-red-200" aria-label="Delete phase" title="Delete phase" onClick={() => { if (window.confirm('Delete phase ' + (i + 1) + (r.phase_name ? ' (' + r.phase_name + ')' : '') + '? It is removed when you press Save phases.')) { setRows((rs) => rs.filter((_, j) => j !== i)); setDirty(true); } }}>&#10005;</Button>
             </div>
             <Textarea aria-label="Scope" placeholder="Description / scope" rows={2} className="w-full" value={r.scope ?? ''} onChange={(e) => update(i, 'scope', e.target.value)} />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
