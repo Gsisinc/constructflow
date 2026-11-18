@@ -59,6 +59,10 @@
           },
           "supplier_name": {
             "type": "string"
+          },
+          "phase": {
+            "type": "string",
+            "description": "Bid phase this line's materials count toward (CustomPhase display name). Internal only: not used by totals or the customer PDF. Added 2026-11-18"
           }
         }
       }
