@@ -34,7 +34,7 @@ export const GSIS_LOGO_SIZE = { width: 240, height: 229 };
 
 export const GSIS_COMPANY = {
   name: 'Golden State Integrated Systems',
-  license: 'CA License #1150625 (C7, C10)',
+  license: 'CSLB License #1150625 (C-7)',
   address: '601 Brannan Island Road, Isleton, CA 95641',
   phone: '209-200-1073',
   web: 'gsistech.com',
@@ -42,6 +42,7 @@ export const GSIS_COMPANY = {
 
 export const NAVY = [11, 31, 58];      // #0B1F3A
 export const NAVY_700 = [22, 51, 92];  // #16335C
+export const NAVY_TEXT = [31, 58, 95]; // #1F3A5F
 export const GOLD = [201, 162, 39];    // #C9A227
 
 export const DEFAULT_TERMS = [
@@ -169,7 +170,7 @@ export function buildEstimatePdf(JsPDF, { estimate = {}, bid = {}, logoDataUrl, 
       doc.setFont('helvetica', 'bold'); doc.setFontSize(15);
       doc.text(GSIS_COMPANY.name, x, 38);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-      doc.setTextColor(...GOLD);
+      doc.setTextColor(255, 255, 255);
       doc.text(GSIS_COMPANY.license, x, 53);
       doc.setTextColor(220, 226, 235);
       doc.text(`${GSIS_COMPANY.address}`, x, 66);
@@ -178,7 +179,7 @@ export function buildEstimatePdf(JsPDF, { estimate = {}, bid = {}, logoDataUrl, 
       doc.setFont('helvetica', 'bold'); doc.setFontSize(24);
       doc.text('ESTIMATE', W - M, 46, { align: 'right' });
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-      doc.setTextColor(...GOLD);
+      doc.setTextColor(255, 255, 255);
       doc.text(estNo, W - M, 62, { align: 'right' });
     } else {
       doc.setTextColor(255, 255, 255);
@@ -193,7 +194,7 @@ export function buildEstimatePdf(JsPDF, { estimate = {}, bid = {}, logoDataUrl, 
   let y = 128;
   const proj = bid.title || bid.project_name || estimate.project_name || 'Project';
   const cust = bid.client_name || bid.agency || bid.gc_name || 'Customer';
-  doc.setTextColor(...GOLD); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+  doc.setTextColor(...NAVY_TEXT); doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
   doc.text('PREPARED FOR', M, y);
   doc.text('PROJECT', M + 190, y);
   doc.text('ESTIMATE DETAILS', W - M - 150, y);
@@ -269,7 +270,7 @@ export function buildEstimatePdf(JsPDF, { estimate = {}, bid = {}, logoDataUrl, 
   doc.setFillColor(...GOLD); doc.rect(tx, y, 4, 30, 'F');
   doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
   doc.text('TOTAL', tx + 14, y + 19.5);
-  doc.setTextColor(...GOLD); doc.setFontSize(13);
+  doc.setTextColor(255, 255, 255); doc.setFontSize(13);
   doc.text(fmtMoney(total), W - M - 10, y + 20, { align: 'right' });
   y += 52;
 
@@ -1165,22 +1166,22 @@ export function EstimatePreview({ estimate, bid }) {
           <div className="rounded-md bg-white p-1"><img src={GSIS_LOGO_DATA_URL} alt="GSIS" className="h-14 w-14 object-contain" /></div>
           <div>
             <p className="text-[15px] font-bold text-white">{GSIS_COMPANY.name}</p>
-            <p className="text-[#C9A227]">{GSIS_COMPANY.license}</p>
+            <p className="text-white">{GSIS_COMPANY.license}</p>
             <p className="text-slate-300">{GSIS_COMPANY.address}</p>
             <p className="text-slate-300">{GSIS_COMPANY.phone} | {GSIS_COMPANY.web}</p>
           </div>
         </div>
         <div className="text-right">
           <p className="text-2xl font-bold text-white">ESTIMATE</p>
-          <p className="text-[#C9A227]">{estimateNumber(estimate, bid)}</p>
+          <p className="text-white">{estimateNumber(estimate, bid)}</p>
         </div>
       </div>
       <div className="h-1 bg-[#C9A227]" />
       <div className="px-6 py-5 space-y-5">
         <div className="grid grid-cols-3 gap-4">
-          <div><p className="text-[9px] font-bold uppercase text-[#C9A227] dark:text-[#7A5F0F]">Prepared for</p><p className="font-bold text-[12px]">{bid.client_name || bid.agency || bid.gc_name || 'Customer'}</p></div>
-          <div><p className="text-[9px] font-bold uppercase text-[#C9A227] dark:text-[#7A5F0F]">Project</p><p className="font-bold text-[12px]">{bid.title || bid.project_name || 'Project'}</p>{bid.location && <p className="text-slate-500">{bid.location}</p>}</div>
-          <div><p className="text-[9px] font-bold uppercase text-[#C9A227] dark:text-[#7A5F0F]">Estimate details</p>
+          <div><p className="text-[9px] font-bold uppercase text-[#1F3A5F]">Prepared for</p><p className="font-bold text-[12px]">{bid.client_name || bid.agency || bid.gc_name || 'Customer'}</p></div>
+          <div><p className="text-[9px] font-bold uppercase text-[#1F3A5F]">Project</p><p className="font-bold text-[12px]">{bid.title || bid.project_name || 'Project'}</p>{bid.location && <p className="text-slate-500">{bid.location}</p>}</div>
+          <div><p className="text-[9px] font-bold uppercase text-[#1F3A5F]">Estimate details</p>
             <p className="flex justify-between"><span className="text-slate-500">Date</span><span>{fmtDateLong(new Date())}</span></p>
             <p className="flex justify-between"><span className="text-slate-500">Valid for</span><span>30 days</span></p>
           </div>
@@ -1201,7 +1202,7 @@ export function EstimatePreview({ estimate, bid }) {
         <div className="ml-auto w-56 space-y-1">
           <p className="flex justify-between px-2"><span className="text-slate-500">Subtotal</span><span>{fmtMoney(subtotal)}</span></p>
           <p className="flex justify-between px-2"><span className="text-slate-500">Sales tax</span><span className="text-slate-500">Not included</span></p>
-          <p className="flex justify-between border-l-4 border-[#C9A227] bg-[#0B1F3A] px-3 py-2 font-bold text-white"><span>TOTAL</span><span className="text-[13px] text-[#C9A227]">{fmtMoney(total)}</span></p>
+          <p className="flex justify-between border-l-4 border-[#C9A227] bg-[#0B1F3A] px-3 py-2 font-bold text-white"><span>TOTAL</span><span className="text-[13px] text-white">{fmtMoney(total)}</span></p>
         </div>
         {notes.length > 0 && (
           <div><p className="font-bold">Notes</p><div className="mb-1 h-0.5 w-10 bg-[#C9A227]" /><ul className="list-disc ml-4 text-slate-600">{notes.map((n, i) => <li key={i}>{n}</li>)}</ul></div>
