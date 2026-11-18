@@ -50,6 +50,12 @@ function phTaskHours(t = {}) {
 function phHasChildren(task, tasks = []) {
   return !!task?.id && (tasks || []).some((x) => x && x.parent_requirement_id === task.id);
 }
+// FIX 2026-11-18 11:00: Base44 silently drops fields an entity schema does not declare. If we SENT a parent_requirement_id
+// and the saved record came back WITHOUT it, the sub-task link was not stored (PhaseRequirement schema lacks the field).
+function phLinkLost(sent, saved) {
+  return !!(sent && sent.parent_requirement_id) && !!saved && typeof saved === 'object' && saved.parent_requirement_id !== sent.parent_requirement_id;
+}
+const PH_LINK_LOST_MSG = 'Sub-task saved but NOT linked to its parent: the PhaseRequirement schema has no parent_requirement_id field yet. Hours still count it as its own task.';
 // Hours a task stands for in the roll-up: its own hours if it is a leaf, else the sum of its sub-tasks (recursively, cycle-safe).
 function phTreeHours(task, tasks = [], seen = new Set()) {
   if (!task || seen.has(task.id)) return 0;
@@ -767,6 +773,7 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle, files =
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const req = await base44.entities.PhaseRequirement.create(data);
+      if (phLinkLost(data, req)) toast.error(PH_LINK_LOST_MSG); // FIX 11:00: additive warning only
       // Create a folder only for main requirements (not sub-requirements)
       if (!data.parent_requirement_id) {
         await base44.entities.PhaseFile.create({
@@ -812,7 +819,8 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle, files =
 
   const updateRequirementMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.PhaseRequirement.update(id, data),
-    onSuccess: () => {
+    onSuccess: (saved, vars) => {
+      if (phLinkLost(vars?.data, saved)) toast.error(PH_LINK_LOST_MSG); // FIX 11:00: additive warning only
       queryClient.invalidateQueries({ queryKey: ['phaseRequirements'] });
     }
   });
@@ -1740,6 +1748,7 @@ const GS5_CSS = `
 .gs5p .g-thrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;flex:1 1 100%;width:100%;align-items:end}
 .gs5p .g-tedit .g-thrs label{display:flex;flex-direction:column;align-items:stretch;gap:4px;white-space:nowrap;font-size:12px}
 .gs5p .g-tedit .g-thrs input.g-in{flex:none;width:100%;min-width:0}
+@media(max-width:767px){.gs5p .g-thrs{grid-template-columns:repeat(2,minmax(0,1fr))}.gs5p .g-tedit .g-thrs label{min-width:0;white-space:normal}.gs5p .g-thrs>button{grid-column:1 / -1}}
 :is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-task{--ac:#6EA0FF}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-file{--ac:#3CCBB4}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-note{--ac:#A992FF}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-bud{--ac:#E2B93B}
 :is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-grp{color:#8193B0}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-grp.sep{border-color:rgba(148,178,226,.16)}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .neg{color:#FF6B6B}
 .gs5p .g-dis{opacity:.6;cursor:not-allowed}
