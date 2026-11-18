@@ -212,8 +212,8 @@ function mailtoDraftHref({ to = '', subject = '', body = '' }) {
 const GSIS = {
   name: 'Golden State Integrated Systems',
   short: 'GSIS',
-  license: 'CA License #1150625',
-  classes: 'C7 Low Voltage · C10 Electrical',
+  license: 'CSLB License #1150625 (C-7)',
+  classes: 'C-7 Low Voltage',
   address: '601 Brannan Island Road, Isleton, CA 95641',
   phone: '209-200-1073',
   web: 'gsistech.com',
@@ -258,7 +258,7 @@ function GSISLetterhead({ docTitle, docNo, docDate }) {
         <div className="flex-1">
           <div className="text-lg font-bold text-navy-900 leading-tight">{GSIS.name}</div>
           <div className="text-[11px] text-slate-600 leading-snug">
-            {GSIS.license} ({GSIS.classes})<br />
+            {GSIS.license} · {GSIS.classes}<br />
             {GSIS.address} · {GSIS.phone} · {GSIS.web}{GSIS.email ? ` · ${GSIS.email}` : ''}
           </div>
         </div>
@@ -313,7 +313,7 @@ function DocumentPreview({ open, onOpenChange, title, filename, email, children,
   const href = mailtoDraftHref({
     to: email?.to || '',
     subject: email?.subject || title,
-    body: (email?.body || '') + '\n\n(Attach the PDF downloaded from MyGSIS before sending.)\n\nKemar McKenzie\nGolden State Integrated Systems · CA License #1150625\n209-200-1073 · gsistech.com',
+    body: (email?.body || '') + '\n\n(Attach the PDF downloaded from MyGSIS before sending.)\n\nKemar McKenzie\nGolden State Integrated Systems · CSLB License #1150625 (C-7)\n209-200-1073 · gsistech.com',
   });
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
