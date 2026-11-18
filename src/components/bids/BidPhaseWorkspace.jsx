@@ -15,13 +15,18 @@ const seededBids = new Set();
 // Mirror a bid's project_id-scoped phase entities by treating bid.id as the
 // project_id while the bid is open. On conversion these same records are
 // re-pointed to the real project id (see bidConversion.js) — nothing is recreated.
-const divisionToProjectType = (d) => ({
-  fire_alarm: 'fire_alarm_new_construction',
-  low_voltage: 'low_voltage_structured_cabling',
-  drone: 'other',
-  software: 'other',
-  other: 'other',
-}[d] || 'other');
+// B-SEED 2026-11-18 (Kemar): phases follow the bid's trade. Fire Alarm bids get
+// Fire Alarm phases, Low Voltage bids get Low Voltage phases. Accepts the stored
+// value or its label ("Fire Alarm"). Unknown/blank Division returns null so the
+// tab never seeds a guessed template.
+const divisionToProjectType = (d) => {
+  const k = String(d || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+  if (!k) return null;
+  if (k === 'fa' || k.startsWith('fire')) return 'fire_alarm_new_construction';
+  if (k === 'lv' || k.startsWith('low_volt')) return 'low_voltage_structured_cabling';
+  if (k === 'drone' || k === 'software' || k === 'other') return 'other';
+  return null;
+};
 
 export default function BidPhaseWorkspace({ bid, organizationId }) {
   const qc = useQueryClient();
@@ -48,6 +53,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
   // The Phases 12 stages / 3 phases auto-seed themselves inside DualTrackTracker.
   useEffect(() => {
     if (seeding || !bidId || !phasesFetched) return;
+    if (!projectType) return; // B-SEED: never seed while the bid's Division is unset
     if (customPhases.length > 0) return;
     if (seededBids.has(bidId)) return;
     seededBids.add(bidId);
@@ -101,7 +107,30 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
     });
   };
 
+  // B-SEED: flag phases that came from the other trade's template (e.g. Low
+  // Voltage phases on a Fire Alarm bid). Read-only warning; nothing is changed.
+  const tradePhaseNames = (t) => new Set((getPhaseTemplate(t) || []).map((p) => p.phase));
+  const otherTrade = projectType === 'fire_alarm_new_construction' ? 'low_voltage_structured_cabling'
+    : projectType === 'low_voltage_structured_cabling' ? 'fire_alarm_new_construction' : null;
+  const ownNames = projectType ? tradePhaseNames(projectType) : new Set();
+  const otherNames = otherTrade ? tradePhaseNames(otherTrade) : new Set();
+  const phaseList = Array.isArray(customPhases) ? customPhases : [];
+  const wrongTradePhases = phaseList.filter((p) => otherNames.has(p.phase_name) && !ownNames.has(p.phase_name));
+  const divisionLabel = projectType === 'fire_alarm_new_construction' ? 'Fire Alarm'
+    : projectType === 'low_voltage_structured_cabling' ? 'Low Voltage' : '';
+
   return (
+    <div className="space-y-4">
+    {!projectType && phaseList.length === 0 && (
+      <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+        Set this bid's Division (Overview, Edit details) to load its phases. Fire Alarm bids get Fire Alarm phases; Low Voltage bids get Low Voltage phases.
+      </div>
+    )}
+    {wrongTradePhases.length > 0 && (
+      <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-900">
+        {wrongTradePhases.length} phase(s) on this bid belong to a different trade than its Division ({divisionLabel}). Nothing was changed automatically. Once they are removed, {divisionLabel} phases load the next time this tab opens.
+      </div>
+    )}
     <Tabs defaultValue="tracker" className="w-full">
       <TabsList className="w-full sm:w-auto justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1 bg-muted rounded-lg">
         <TabsTrigger value="tracker" className="flex-shrink-0">Phases/Stages</TabsTrigger>
@@ -138,5 +167,6 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
         onOpenChange={setShowGateChecklist}
       />
     </Tabs>
+    </div>
   );
 }
