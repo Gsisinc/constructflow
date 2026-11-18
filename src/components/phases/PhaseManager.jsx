@@ -23,9 +23,123 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import PhaseBudgetManager from '../budget/PhaseBudgetManager';
 
+// ==== PHASE-HOURS START (pure JS, no React; inlined because the Base44 editor cannot add files; extracted by tests/phaseHours.test.mjs) ====
+// TASK-HOURS 2026-11-18 (Kemar 8:38 AM; details per Chief 8:40 AM). Phase/job hours are the SUM of task hours, never the other way round.
+// Rates and markup are kept as separate named values:
+const MATERIAL_MARKUP = 1.30; // phase materials sell = materials cost x 1.30 (Kemar standing rule)
+const LABOR_COST_RATE = null; // labor COST rate: not stored in MYGSIS yet, so it is NOT used in phase $ (kept separate from the sell rate on purpose)
+// Labor SELL rate is not a constant: bid = latest BidEstimate.labor_rate, project = Project.labor_rate (both from the Rate Card).
+const phNum = (v) => { if (v === null || v === undefined || v === '') return null; const n = Number(v); return Number.isFinite(n) ? n : null; };
+const phRound2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+// Case/space-insensitive phase-name key; '_' counts as a space so a phase key like "rough_in" matches "Rough In".
+const phNorm = (s) => String(s ?? '').toLowerCase().replace(/[_\s]+/g, ' ').trim();
+// qty x hours/unit, or null when either is blank.
+function phCalcTaskHours(quantity, hoursPerUnit) {
+  const q = phNum(quantity), h = phNum(hoursPerUnit);
+  return q !== null && h !== null ? phRound2(q * h) : null;
+}
+// Hours a task contributes: a typed (manual) task_hours wins; otherwise qty x hrs/unit; otherwise any stored task_hours; else 0.
+function phTaskHours(t = {}) {
+  const typed = phNum(t.task_hours);
+  if (t.task_hours_manual && typed !== null) return typed;
+  const calc = phCalcTaskHours(t.quantity, t.hours_per_unit);
+  if (calc !== null) return calc;
+  return typed !== null ? typed : 0;
+}
+// Leaf rule (Kemar 11/18 9:08 AM): a task that has sub-tasks contributes ONLY its sub-tasks' hours; its own task_hours is ignored in roll-up.
+function phHasChildren(task, tasks = []) {
+  return !!task?.id && (tasks || []).some((x) => x && x.parent_requirement_id === task.id);
+}
+// Hours a task stands for in the roll-up: its own hours if it is a leaf, else the sum of its sub-tasks (recursively, cycle-safe).
+function phTreeHours(task, tasks = [], seen = new Set()) {
+  if (!task || seen.has(task.id)) return 0;
+  seen.add(task.id);
+  const kids = (tasks || []).filter((x) => x && task.id && x.parent_requirement_id === task.id);
+  if (!kids.length) return phTaskHours(task);
+  return phRound2(kids.reduce((s, k) => s + phTreeHours(k, tasks, seen), 0));
+}
+// Phase hours = sum of LEAF task hours in the phase (tasks whose phase_name is the phase key and that have no sub-tasks).
+function phPhaseHours(tasks = [], phaseKey) {
+  const all = tasks || [];
+  return phRound2(all.filter((t) => t && t.phase_name === phaseKey && !phHasChildren(t, all)).reduce((s, t) => s + phTaskHours(t), 0));
+}
+// Job hours = sum of phase hours.
+function phJobHours(phaseHoursList = []) {
+  return phRound2((phaseHoursList || []).reduce((s, h) => s + (Number(h) || 0), 0));
+}
+// Does a stored phase name (estimate line tag / breakdown row / ProjectMaterial.phase_name) refer to this CustomPhase?
+function phNameMatches(name, phase = {}) {
+  const n = phNorm(name);
+  return !!n && (n === phNorm(phase.display_name) || n === phNorm(phase.phase_name));
+}
+// Same cost rule as EstimateEditor lineCost(): total_cost if set, else qty x unit_cost.
+function phLineCost(li = {}) {
+  const t = phNum(li.total_cost);
+  if (t) return t;
+  return (phNum(li.quantity) || 0) * (phNum(li.unit_cost) || 0);
+}
+// Materials tagged to a phase. Estimate lines use `phase`; ProjectMaterial uses `phase_name`.
+// Only 'cost' lines count (pricing_type 'dollar' is already a sell price, so marking it up again would double count); they are counted in skippedDollar.
+function phPhaseMaterials(lines = [], phase = {}) {
+  let cost = 0, count = 0, skippedDollar = 0;
+  (lines || []).forEach((li) => {
+    if (!li) return;
+    const tag = li.phase ?? li.phase_name;
+    if (!phNameMatches(tag, phase)) return;
+    if (li.pricing_type === 'dollar') { skippedDollar += 1; return; }
+    cost += phLineCost(li); count += 1;
+  });
+  return { cost: phRound2(cost), sell: phRound2(cost * MATERIAL_MARKUP), count, skippedDollar };
+}
+// Phase $ = hours x labor SELL rate + materials cost x MATERIAL_MARKUP. Labor $ / total are null when no sell rate is set.
+function phPhaseMoney({ hours = 0, sellRate = null, materialsCost = 0 } = {}) {
+  const rate = phNum(sellRate);
+  const laborSell = rate !== null && rate > 0 ? phRound2((Number(hours) || 0) * rate) : null;
+  const materialsSell = phRound2((Number(materialsCost) || 0) * MATERIAL_MARKUP);
+  return { laborSell, materialsCost: phRound2(materialsCost), materialsSell, total: laborSell !== null ? phRound2(laborSell + materialsSell) : null };
+}
+// Same pick as EstimateEditor pickLatest(): highest version, then newest updated/created date.
+function phPickLatestEstimate(list = []) {
+  return [...(list || [])].sort((a, b) =>
+    (b.version || 0) - (a.version || 0) ||
+    String(b.updated_date || b.created_date || '').localeCompare(String(a.updated_date || a.created_date || ''))
+  )[0] || null;
+}
+// Plan for "Update estimate phase hours from tasks". Writes ONLY labor_hours on rows matched 1:1; every other row field is kept.
+// rows = BidOpportunity.phase_breakdown; phases = visible CustomPhases; hoursByKey = { [phase_name]: task hours }.
+// Left unchanged and listed: rows with no matching phase (unmatched), rows matching 2+ phases or sharing a phase with another row
+// (ambiguous), and rows whose phase has 0 task hours so far (zeroKept, so Ops' current number is not wiped before tasks are entered).
+function phPlanBreakdownSync(rows = [], phases = [], hoursByKey = {}) {
+  const src = Array.isArray(rows) ? rows : [];
+  const rowMatches = src.map((r) => (phases || []).filter((p) => phNameMatches(r?.phase_name, p)));
+  const hits = {};
+  rowMatches.forEach((m) => { if (m.length === 1) hits[m[0].phase_name] = (hits[m[0].phase_name] || 0) + 1; });
+  const changes = [], unmatched = [], ambiguous = [], zeroKept = [];
+  const out = src.map((r, i) => {
+    const m = rowMatches[i];
+    const old = phNum(r?.labor_hours);
+    const base = { index: i, phase_name: r?.phase_name || '', old };
+    if (m.length === 0) { unmatched.push(base); return r; }
+    if (m.length > 1 || hits[m[0].phase_name] > 1) { ambiguous.push(base); return r; }
+    const next = phRound2(hoursByKey[m[0].phase_name] || 0);
+    if (next === 0) { zeroKept.push(base); return r; }
+    changes.push({ ...base, phase_key: m[0].phase_name, phase_label: m[0].display_name || m[0].phase_name, next, diff: phRound2(next - (old || 0)) });
+    return { ...r, labor_hours: next };
+  });
+  const touched = new Set(rowMatches.flat().map((p) => p.phase_name));
+  const phasesNotInBreakdown = (phases || [])
+    .filter((p) => !touched.has(p.phase_name))
+    .map((p) => ({ phase_name: p.phase_name, label: p.display_name || p.phase_name, hours: phRound2(hoursByKey[p.phase_name] || 0) }));
+  const oldTotal = phRound2(src.reduce((s, r) => s + (phNum(r?.labor_hours) || 0), 0));
+  const newTotal = phRound2(out.reduce((s, r) => s + (phNum(r?.labor_hours) || 0), 0));
+  return { rows: out, changes, unmatched, ambiguous, zeroKept, phasesNotInBreakdown, oldTotal, newTotal, variance: phRound2(newTotal - oldTotal) };
+}
+// ==== PHASE-HOURS END ====
+
 // phases-v2 (2026-10-17): VISUAL-ONLY restyle to phases-cost-progress_v5. Every query/mutation/handler is byte-identical to the base;
 // new reads are pure additions (marked). `project` is a new optional display-only prop (Contract value card).
-export default function PhaseManager({ projectId, currentPhase, project }) {
+// TASK-HOURS 2026-11-18: `bid` is a new optional prop (bid Phases/Stages > Gates passes it); project pages pass `project` as before.
+export default function PhaseManager({ projectId, currentPhase, project, bid }) {
   const queryClient = useQueryClient();
 
   const { data: customPhases = [] } = useQuery({
@@ -269,6 +383,72 @@ export default function PhaseManager({ projectId, currentPhase, project }) {
   const V5Miss = () => <span className="g-miss">—<b>No data yet</b></span>;
   const phaseBudgetTotal = v5Budgets.reduce((s, b) => s + (v5Num(b.budgeted_amount) || 0), 0);
 
+  // ===== TASK-HOURS 2026-11-18 (Kemar 8:38 AM): PURE ADDITIONS. Phase hours = sum of task hours (read-only);
+  // phase $ = hours x labor SELL rate + phase materials cost x MATERIAL_MARKUP. Every query/mutation above is unchanged. =====
+  const phIsBid = !project && !!bid?.id; // bid Phases/Stages > Gates: projectId is the bid id
+  // NEW read (addition): the bid's estimates, same filter as EstimateEditor. Key sits under ['bidEstimates', bidId] so estimate saves refresh it.
+  const { data: phEstimates = [] } = useQuery({
+    queryKey: ['bidEstimates', projectId, '__phase'],
+    queryFn: async () => { const r = await base44.entities.BidEstimate.filter({ bid_opportunity_id: projectId }); return Array.isArray(r) ? r : r?.items || []; },
+    enabled: !!projectId && phIsBid
+  });
+  // NEW read (addition): the project's materials, same filter as the Materials tab. Key sits under ['projectMaterials', projectId] so its saves refresh it.
+  const { data: phMaterials = [] } = useQuery({
+    queryKey: ['projectMaterials', projectId, '__phase'],
+    queryFn: async () => { const r = await base44.entities.ProjectMaterial.filter({ project_id: projectId }); return Array.isArray(r) ? r : r?.items || []; },
+    enabled: !!projectId && !!project
+  });
+  const phEstimate = phIsBid ? phPickLatestEstimate(phEstimates) : null;
+  const phSellRate = phIsBid ? phNum(phEstimate?.labor_rate) : phNum(project?.labor_rate);
+  const phRateSrc = phIsBid ? 'from the estimate' : 'from the project';
+  const phLines = phIsBid ? (Array.isArray(phEstimate?.line_items) ? phEstimate.line_items : []) : phMaterials;
+  const phVisible = customPhases.filter(cp => !cp.is_hidden);
+  const phPlan = {};
+  phVisible.forEach((cp) => {
+    const hours = phPhaseHours(v5AllReqs, cp.phase_name);
+    const mats = phPhaseMaterials(phLines, cp);
+    phPlan[cp.phase_name] = { hours, mats, money: phPhaseMoney({ hours, sellRate: phSellRate, materialsCost: mats.cost }) };
+  });
+  const phJob = phJobHours(Object.values(phPlan).map(p => p.hours));
+  const phJobMoney = Object.values(phPlan).reduce((a, p) => ({
+    labor: a.labor + (p.money.laborSell || 0), matCost: a.matCost + p.money.materialsCost, matSell: a.matSell + p.money.materialsSell, skipped: a.skipped + p.mats.skippedDollar,
+  }), { labor: 0, matCost: 0, matSell: 0, skipped: 0 });
+  const phHrs = (h) => (Number(h) || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  const phHoursByKey = Object.fromEntries(Object.entries(phPlan).map(([k, p]) => [k, p.hours]));
+  // "Update estimate phase hours from tasks" (bid only): confirm dialog, then a partial BidOpportunity.update of phase_breakdown ONLY.
+  const [phSync, setPhSync] = useState(null); // { loading } | { error } | { plan, sourceRows }
+  const phReadBreakdown = async () => {
+    const r = await base44.entities.BidOpportunity.filter({ id: projectId });
+    const b = (Array.isArray(r) ? r : r?.items || [])[0];
+    return Array.isArray(b?.phase_breakdown) ? b.phase_breakdown : [];
+  };
+  const phOpenSync = async () => {
+    setPhSync({ loading: true });
+    try {
+      const rows = await phReadBreakdown();
+      setPhSync({ plan: phPlanBreakdownSync(rows, phVisible, phHoursByKey), sourceRows: rows });
+    } catch (e) {
+      setPhSync({ error: e?.message || 'Could not read the estimate phase breakdown.' });
+    }
+  };
+  const phSyncMutation = useMutation({
+    mutationFn: async () => {
+      // Re-read right before writing; stop if the breakdown changed since the dialog opened (never overwrite someone else's save).
+      const fresh = await phReadBreakdown();
+      if (JSON.stringify(fresh) !== JSON.stringify(phSync?.sourceRows || [])) throw new Error('The estimate phase breakdown changed since this opened. Close and open it again.');
+      const plan = phPlanBreakdownSync(fresh, phVisible, phHoursByKey);
+      // Entered by: Developer (task-hours sync). Writes ONLY phase_breakdown; BidEstimate.labor_hours and every price are untouched.
+      await base44.entities.BidOpportunity.update(projectId, { phase_breakdown: plan.rows });
+      return plan;
+    },
+    onSuccess: (plan) => {
+      queryClient.invalidateQueries({ queryKey: ['bid', projectId] });
+      setPhSync(null);
+      toast.success(`Estimate phase hours updated from tasks (${plan.changes.length} phase${plan.changes.length === 1 ? '' : 's'})`);
+    },
+    onError: (e) => toast.error('Update failed: ' + (e?.message || ''))
+  });
+
   return (
     <div className="gs5p">
       <style>{GS5_CSS}</style>
@@ -281,6 +461,49 @@ export default function PhaseManager({ projectId, currentPhase, project }) {
           <p className="g-p g-muted">Total budget hours: {v5Num(project.labor_hours) ? `${v5Num(project.labor_hours).toFixed(2)} (from the bid estimate)` : 'No data yet'}.</p>
         </div>
       )}
+
+      {/* TASK-HOURS 2026-11-18: job plan, read-only (hours = sum of task hours). Internal only. */}
+      <div className="g-card">
+        <div className="g-st" style={{ flexWrap: 'wrap', gap: 8 }}>
+          <span>Plan hours &amp; phase $</span>
+          {phIsBid && <button className="g-btn o" onClick={phOpenSync} disabled={!!phSync?.loading}>Update estimate phase hours from tasks</button>}
+        </div>
+        <p className="g-p" style={{ margin: '8px 0' }}>Job hours (sum of phases): <b>{phHrs(phJob)}</b> hrs · Labor sell rate: {phSellRate ? <b>{v5Money(phSellRate)}/hr</b> : <V5Miss />} <span className="g-muted">({phRateSrc})</span></p>
+        <p className="g-p g-muted" style={{ margin: '8px 0' }}>Labor {phSellRate ? <b>{v5Money(phJobMoney.labor)}</b> : '—'} · Materials cost {v5Money(phJobMoney.matCost)} · Materials @{MATERIAL_MARKUP.toFixed(2)} {v5Money(phJobMoney.matSell)} · Plan total {phSellRate ? <b>{v5Money(phJobMoney.labor + phJobMoney.matSell)}</b> : '—'}{phJobMoney.skipped > 0 ? ` · ${phJobMoney.skipped} dollar (sell) line(s) not marked up` : ''}</p>
+        <p className="g-p g-muted" style={{ margin: '8px 0 0' }}>Hours come from each task (qty × hrs/unit, or a typed value). Plan $ is internal; the estimate total and client price do not change.</p>
+      </div>
+
+      <Dialog open={!!phSync} onOpenChange={(o) => { if (!o && !phSyncMutation.isPending) setPhSync(null); }}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Update estimate phase hours from tasks</DialogTitle></DialogHeader>
+          {phSync?.loading && <p className="text-sm text-slate-500">Reading the estimate phase breakdown…</p>}
+          {phSync?.error && <p className="text-sm text-red-600">{phSync.error}</p>}
+          {phSync?.plan && (
+            <div className="space-y-3 text-sm">
+              {phSync.plan.changes.length === 0 ? <p>No breakdown row matches a phase that has task hours. Nothing will change.</p> : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead><tr className="text-left text-slate-500"><th className="py-1 pr-2">Phase</th><th className="py-1 pr-2 text-right">Old hrs</th><th className="py-1 pr-2 text-right">Task hrs</th><th className="py-1 text-right">Change</th></tr></thead>
+                    <tbody>{phSync.plan.changes.map(c => (
+                      <tr key={c.index} className="border-t border-slate-200"><td className="py-1 pr-2 break-words">{c.phase_name}</td><td className="py-1 pr-2 text-right tabular-nums">{c.old === null ? '—' : phHrs(c.old)}</td><td className="py-1 pr-2 text-right tabular-nums">{phHrs(c.next)}</td><td className={cn('py-1 text-right tabular-nums', c.diff < 0 && 'text-red-600')}>{c.diff > 0 ? '+' : ''}{phHrs(c.diff)}</td></tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+              )}
+              <p>Old total <b>{phHrs(phSync.plan.oldTotal)}</b> hrs → new total <b>{phHrs(phSync.plan.newTotal)}</b> hrs · variance <b className={phSync.plan.variance < 0 ? 'text-red-600' : ''}>{phSync.plan.variance > 0 ? '+' : ''}{phHrs(phSync.plan.variance)}</b> hrs</p>
+              {phSync.plan.zeroKept.length > 0 && <p className="text-slate-600">Kept as is (phase has no task hours yet): {phSync.plan.zeroKept.map(x => x.phase_name).join(', ')}</p>}
+              {phSync.plan.unmatched.length > 0 && <p className="text-amber-700">Left unchanged (no phase with this name): {phSync.plan.unmatched.map(x => x.phase_name || '(blank)').join(', ')}</p>}
+              {phSync.plan.ambiguous.length > 0 && <p className="text-amber-700">Left unchanged (name matches more than one phase or row): {phSync.plan.ambiguous.map(x => x.phase_name).join(', ')}</p>}
+              {phSync.plan.phasesNotInBreakdown.some(x => x.hours > 0) && <p className="text-amber-700">Phases with task hours but no breakdown row (not carried): {phSync.plan.phasesNotInBreakdown.filter(x => x.hours > 0).map(x => `${x.label} (${phHrs(x.hours)} hrs)`).join(', ')}</p>}
+              <p className="rounded-md border border-amber-300 bg-amber-50 p-2 text-amber-900">Client price is not changed; Sales/Accounting reprice. Only the Estimate Phase Breakdown labor hours are updated. The estimate's labor hours and every price stay as they are.</p>
+              <div className="flex flex-wrap justify-end gap-2">
+                <Button variant="outline" onClick={() => setPhSync(null)} disabled={phSyncMutation.isPending}>Cancel</Button>
+                <Button onClick={() => phSyncMutation.mutate()} disabled={phSyncMutation.isPending || phSync.plan.changes.length === 0}>{phSyncMutation.isPending ? 'Updating…' : `Update ${phSync.plan.changes.length} phase${phSync.plan.changes.length === 1 ? '' : 's'}`}</Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <div className="g-toolbar">
         <span className="g-muted">Click a phase to open its Task, Files, Notes and Budget.</span>
@@ -361,7 +584,11 @@ export default function PhaseManager({ projectId, currentPhase, project }) {
         const progress = pp ? pp : reqs.length ? Math.round((done / reqs.length) * 100) : null;
         const b = open && budget ? budget : v5Budgets.find(x => x.phase_name === phase.value);
         const co = v5COs.filter(c => c.phase_name === phase.value && c.status === 'approved').reduce((s, c) => s + c.cost_impact, 0);
-        const budgeted = b && v5Num(b.budgeted_amount) ? v5Num(b.budgeted_amount) : null; // no PhaseBudget row / 0 => '—'
+        const manualBudgeted = b && v5Num(b.budgeted_amount) ? v5Num(b.budgeted_amount) : null; // no PhaseBudget row / 0 => plan $ below, else '—'
+        // TASK-HOURS: computed plan for this phase (hours = sum of its task hours). A Budget-tab amount (PhaseBudget) still wins when entered.
+        const plan = phPlan[phase.value] || { hours: 0, mats: { cost: 0, sell: 0, count: 0, skippedDollar: 0 }, money: phPhaseMoney({}) };
+        const budgeted = manualBudgeted !== null ? manualBudgeted : (plan.money.total ? plan.money.total : null);
+        const budgetSrc = manualBudgeted !== null ? 'budget' : budgeted !== null ? 'plan' : null;
         const used = v5Spent + v5Committed + co;
         const costPct = budgeted ? used / budgeted * 100 : null;
         const mainCount = reqs.filter(r => !r.parent_requirement_id).length;
@@ -396,13 +623,14 @@ export default function PhaseManager({ projectId, currentPhase, project }) {
               </span>
             </div>
             <div className="g-muted">{dates || <>Dates: <V5Miss /></>} · SOV <V5Miss /> · Crew: <V5Miss /></div>
+            <div className="g-muted">Plan $: labor {plan.money.laborSell !== null ? <b>{v5Money(plan.money.laborSell)}</b> : '—'} ({phHrs(plan.hours)} hrs × {phSellRate ? `${v5Money(phSellRate)}/hr` : 'no rate'}) · materials cost {v5Money(plan.money.materialsCost)} · materials @{MATERIAL_MARKUP.toFixed(2)} {v5Money(plan.money.materialsSell)} · phase total {plan.money.total !== null ? <b>{v5Money(plan.money.total)}</b> : '—'}{plan.mats.skippedDollar > 0 ? ` · ${plan.mats.skippedDollar} dollar line(s) not marked up` : ''}</div>
             <div className="g-bars">
               <div>
-                <div className="g-muted">Cost: spent {v5Money(v5Spent)} + committed {v5Money(v5Committed)} + CO {v5Money(co)} = <b>{v5Money(used)}</b> of budgeted {budgeted !== null ? <b>{v5Money(budgeted)}</b> : <b>—</b>}{budgeted !== null && <> · remaining <b className={budgeted - used < 0 ? 'neg' : ''}>{v5Money(budgeted - used)}</b> ({costPct.toFixed(1)}% used)</>}</div>
+                <div className="g-muted">Cost: spent {v5Money(v5Spent)} + committed {v5Money(v5Committed)} + CO {v5Money(co)} = <b>{v5Money(used)}</b> of budgeted {budgeted !== null ? <b>{v5Money(budgeted)}</b> : <b>—</b>}{budgetSrc === 'plan' ? ' (plan)' : ''}{budgeted !== null && <> · remaining <b className={budgeted - used < 0 ? 'neg' : ''}>{v5Money(budgeted - used)}</b> ({costPct.toFixed(1)}% used)</>}</div>
                 <div className={cn('g-bar', costPct === null && 'empty', costPct > 100 && 'over')}>{costPct !== null && <i style={{ width: `${Math.min(100, Math.max(0, costPct))}%` }} />}</div>
               </div>
               <div>
-                <div className="g-muted">Progress {progress !== null ? <b>{progress}%</b> : <V5Miss />}{reqs.length ? ` (${done}/${reqs.length} tasks)` : ''} · Budget hrs: <V5Miss /></div>
+                <div className="g-muted">Progress {progress !== null ? <b>{progress}%</b> : <V5Miss />}{reqs.length ? ` (${done}/${reqs.length} tasks)` : ''} · Budget hrs: <b title="Sum of this phase's task hours (read-only)">{phHrs(plan.hours)}</b></div>
                 <div className={cn('g-bar', progress === null && 'empty')}>{progress !== null && <i style={{ width: `${Math.min(100, Math.max(0, progress))}%` }} />}</div>
               </div>
             </div>
@@ -451,7 +679,7 @@ export default function PhaseManager({ projectId, currentPhase, project }) {
                     </TabsContent>
                   </Tabs>
                 )}
-                {cp && <V5EditPhase cp={cp} updatePhaseMutation={updatePhaseMutation} />}
+                {cp && <V5EditPhase cp={cp} updatePhaseMutation={updatePhaseMutation} planHrs={plan.hours} />}
               </div>
             )}
           </div>
@@ -462,7 +690,7 @@ export default function PhaseManager({ projectId, currentPhase, project }) {
 }
 
 // v5 inline "Edit phase" form. Saves through the SAME updatePhaseMutation (CustomPhase.update) and the same field rules as handleSavePhase.
-function V5EditPhase({ cp, updatePhaseMutation }) {
+function V5EditPhase({ cp, updatePhaseMutation, planHrs = 0 }) {
   const init = () => ({ display_name: cp.display_name || '', icon: cp.icon || '📌', order: cp.order ?? '', is_hidden: !!cp.is_hidden, start_date: cp.start_date ? String(cp.start_date).slice(0, 10) : '', end_date: cp.end_date ? String(cp.end_date).slice(0, 10) : '', status: cp.status || 'not_started', progress_percent: cp.progress_percent ?? '' });
   const [f, setF] = useState(init);
   const [editOpen, setEditOpen] = useState(true); // visual only: Cancel/Save close the panel, "Edit phase" reopens it
@@ -509,7 +737,7 @@ function V5EditPhase({ cp, updatePhaseMutation }) {
         <label className="g-muted">Status<select className="g-in" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>
           <option value="not_started">Not started</option><option value="in_progress">In progress</option><option value="completed">Completed</option>{f.status === 'locked' && <option value="locked">Locked</option>}
         </select></label>
-        <label className="g-muted" title="Coming soon">Budget hrs<input className="g-in" disabled placeholder="— No data yet" /></label>
+        <label className="g-muted" title="Sum of this phase's task hours (read-only)">Budget hrs<input className="g-in" readOnly disabled value={Number(planHrs || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })} /></label>
         <label className="g-muted" title="Coming soon">Actual hrs<input className="g-in" disabled placeholder="— No data yet" /></label>
         <label className="g-muted">% complete<input className="g-in" type="number" min="0" max="100" placeholder="— No data yet" value={f.progress_percent} onChange={(e) => setF({ ...f, progress_percent: e.target.value })} /></label>
       </div>
@@ -663,11 +891,25 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle, files =
     setV5NewText('');
   };
   const [v5EditReq, setV5EditReq] = useState(null); // { id, requirement_text, is_mandatory, done }
-  const v5Edit = (req) => setV5EditReq({ id: req.id, requirement_text: req.requirement_text || '', is_mandatory: !!req.is_mandatory, done: req.status === 'completed' });
+  // TASK-HOURS 2026-11-18: the edit row also carries quantity, unit, hours_per_unit, task_hours (+ task_hours_manual) and owner.
+  const v5Str = (v) => (v === null || v === undefined ? '' : String(v));
+  const v5Edit = (req) => setV5EditReq({ id: req.id, requirement_text: req.requirement_text || '', is_mandatory: !!req.is_mandatory, done: req.status === 'completed',
+    quantity: v5Str(req.quantity), unit: req.unit || '', hours_per_unit: v5Str(req.hours_per_unit), task_hours: v5Str(req.task_hours), task_hours_manual: !!req.task_hours_manual, owner: req.owner || '' });
+  // Task hours shown while editing: the typed value when manual, else qty x hrs/unit.
+  const v5EditHours = (f) => (f.task_hours_manual ? f.task_hours : v5Str(phCalcTaskHours(f.quantity, f.hours_per_unit)));
+  // Only the hour/owner fields that actually changed are written (same PhaseRequirement.update as the text edit).
+  const v5HoursPatch = (req) => {
+    const f = v5EditReq;
+    const manual = !!f.task_hours_manual && phNum(f.task_hours) !== null;
+    const next = { quantity: phNum(f.quantity), unit: (f.unit || '').trim() || null, hours_per_unit: phNum(f.hours_per_unit), task_hours_manual: manual, task_hours: manual ? phNum(f.task_hours) : phCalcTaskHours(f.quantity, f.hours_per_unit), owner: (f.owner || '').trim() || null };
+    const cur = { quantity: phNum(req.quantity), unit: req.unit || null, hours_per_unit: phNum(req.hours_per_unit), task_hours_manual: !!req.task_hours_manual, task_hours: phNum(req.task_hours), owner: req.owner || null };
+    return Object.fromEntries(Object.entries(next).filter(([k, v]) => v !== cur[k]));
+  };
   const v5SaveEdit = (req) => {
     const t = v5EditReq.requirement_text.trim(); if (!t) return;
-    if (t !== req.requirement_text || v5EditReq.is_mandatory !== !!req.is_mandatory) {
-      updateRequirementMutation.mutate({ id: req.id, data: { requirement_text: t, is_mandatory: v5EditReq.is_mandatory } });
+    const hp = v5HoursPatch(req);
+    if (t !== req.requirement_text || v5EditReq.is_mandatory !== !!req.is_mandatory || Object.keys(hp).length) {
+      updateRequirementMutation.mutate({ id: req.id, data: { requirement_text: t, is_mandatory: v5EditReq.is_mandatory, ...hp } });
     }
     if (v5EditReq.done !== (req.status === 'completed')) onToggle.mutate({ id: req.id, completed: v5EditReq.done }); // same toggle as the checkbox (sets completed_date)
     setV5EditReq(null);
@@ -682,6 +924,14 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle, files =
           <span className={cn('tx', req.status === 'completed' && 'done')}>
             {req.requirement_text}
             {req.is_mandatory && <span className="g-badge" style={{ marginLeft: 6 }}>Mandatory</span>}
+            {(phHasChildren(req, requirements) || phNum(req.quantity) !== null || phNum(req.hours_per_unit) !== null || phNum(req.task_hours) !== null || req.owner) && (
+              <span className="g-muted" style={{ display: 'block' }}>
+                {phHasChildren(req, requirements)
+                  ? <><b>{phTreeHours(req, requirements).toLocaleString('en-US', { maximumFractionDigits: 2 })} hrs</b> · hours from sub-tasks</>
+                  : <>{phNum(req.quantity) !== null ? `${req.quantity} ${req.unit || ''}${phNum(req.hours_per_unit) !== null ? ` × ${req.hours_per_unit} hrs/unit` : ''} · ` : ''}<b>{phTaskHours(req).toLocaleString('en-US', { maximumFractionDigits: 2 })} hrs</b>{req.task_hours_manual ? ' (typed)' : ''}</>}
+                {req.owner ? ` · Owner: ${req.owner}` : ''}
+              </span>
+            )}
             {req.completed_date && <span className="g-muted" style={{ display: 'block' }}>Completed {format(new Date(req.completed_date), 'MMM d, yyyy')}</span>}
           </span>
           <button className={cn('g-clip', fl.length > 0 && 'has')} onClick={() => v5ToggleFiles(req)} aria-expanded={fOpen}>📎 {fl.length} {fOpen ? '▾' : '▸'}</button>
@@ -705,6 +955,15 @@ function RequirementsTab({ projectId, phaseName, requirements, onToggle, files =
             <select className="g-in" aria-label="Status" value={v5EditReq.done ? 'completed' : 'pending'} onChange={(e) => setV5EditReq({ ...v5EditReq, done: e.target.value === 'completed' })}>
               <option value="pending">Pending</option><option value="completed">Completed</option>
             </select>
+            <div className="g-thrs">
+              <label className="g-muted">Qty<input className="g-in" type="number" inputMode="decimal" min="0" step="any" aria-label="Quantity" value={v5EditReq.quantity} onChange={(e) => setV5EditReq({ ...v5EditReq, quantity: e.target.value })} /></label>
+              <label className="g-muted">Unit<input className="g-in" aria-label="Unit" placeholder="ea" value={v5EditReq.unit} onChange={(e) => setV5EditReq({ ...v5EditReq, unit: e.target.value })} /></label>
+              <label className="g-muted">Hrs / unit<input className="g-in" type="number" inputMode="decimal" min="0" step="any" aria-label="Hours per unit" value={v5EditReq.hours_per_unit} onChange={(e) => setV5EditReq({ ...v5EditReq, hours_per_unit: e.target.value })} /></label>
+              <label className="g-muted">Task hrs{v5EditReq.task_hours_manual ? ' (typed)' : ''}<input className="g-in" type="number" inputMode="decimal" min="0" step="any" aria-label="Task hours" value={v5EditHours(v5EditReq)} onChange={(e) => setV5EditReq({ ...v5EditReq, task_hours: e.target.value, task_hours_manual: e.target.value !== '' })} /></label>
+              <label className="g-muted">Owner<input className="g-in" aria-label="Owner" placeholder="Who does it" value={v5EditReq.owner} onChange={(e) => setV5EditReq({ ...v5EditReq, owner: e.target.value })} /></label>
+              {v5EditReq.task_hours_manual && <button type="button" className="g-btn o" title="Use qty × hrs/unit again" onClick={() => setV5EditReq({ ...v5EditReq, task_hours: '', task_hours_manual: false })}>↺ Reset to calc</button>}
+              {phHasChildren(req, requirements) && <span className="g-muted" style={{ gridColumn: '1 / -1' }}>This task has sub-tasks: hours from sub-tasks are counted, its own task hrs are not.</span>}
+            </div>
             <button className="g-btn" disabled={!v5EditReq.requirement_text.trim()} onClick={() => v5SaveEdit(req)}>Save</button>
             <button className="g-btn o" onClick={() => setV5EditReq(null)}>Cancel</button>
           </div>
@@ -1478,6 +1737,9 @@ const GS5_CSS = `
 .gs5p .g-tedit{gap:8px;align-items:center;flex-wrap:wrap}.gs5p .g-tedit label{display:inline-flex;gap:6px;align-items:center;white-space:nowrap}.gs5p .g-tedit input.g-in{flex:1 1 220px;width:auto}.gs5p .g-tedit select.g-in{width:140px}
 .gs5p .g-emo{display:flex;align-items:center}
 .gs5p .neg{color:#B42318}
+.gs5p .g-thrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;flex:1 1 100%;width:100%;align-items:end}
+.gs5p .g-tedit .g-thrs label{display:flex;flex-direction:column;align-items:stretch;gap:4px;white-space:nowrap;font-size:12px}
+.gs5p .g-tedit .g-thrs input.g-in{flex:none;width:100%;min-width:0}
 :is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-task{--ac:#6EA0FF}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-file{--ac:#3CCBB4}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-note{--ac:#A992FF}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .t-bud{--ac:#E2B93B}
 :is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-grp{color:#8193B0}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .g-grp.sep{border-color:rgba(148,178,226,.16)}:is(html.dark,html.theme-dark,html[data-theme=dark]):not(.theme-light):not(.light) .gs5p .neg{color:#FF6B6B}
 .gs5p .g-dis{opacity:.6;cursor:not-allowed}
