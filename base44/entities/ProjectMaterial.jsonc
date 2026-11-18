@@ -40,6 +40,10 @@
     "created_by": {
       "type": "string",
       "description": "User who added the material"
+    },
+    "phase_name": {
+      "type": "string",
+      "description": "Project phase this material counts toward (carried from the estimate line's phase at Convert to Project). Added 2026-11-18"
     }
   },
   "required": [
