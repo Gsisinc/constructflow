@@ -78,7 +78,12 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
   const phaseEntities = ['CustomPhase', 'PhaseGate', 'PhaseRequirement', 'PhaseFile', 'PhaseNote', 'DualTrackStage'];
   for (const e of phaseEntities) {
     try {
-      await base44Client.entities[e].updateMany({ project_id: bid.id }, { $set: { project_id: project.id } });
+      // Re-pointing keeps every field, incl. TASK-HOURS quantity/unit/hours_per_unit/task_hours/task_hours_manual/owner on PhaseRequirement.
+      // updateMany works in batches of 500 and reports has_more; repeat so a bid with 500+ records carries over in full.
+      let res = await base44Client.entities[e].updateMany({ project_id: bid.id }, { $set: { project_id: project.id } });
+      for (let guard = 0; res && res.has_more && guard < 50; guard++) {
+        res = await base44Client.entities[e].updateMany({ project_id: bid.id }, { $set: { project_id: project.id } });
+      }
     } catch (err) {
       console.warn('phase carry-over failed for', e, err);
     }
@@ -169,6 +174,8 @@ export async function convertBidToProject({ base44Client, bid, organizationId })
         unit: li.unit || 'ea',
         unit_cost: Number(li.unit_cost) || 0,
         category: 'material',
+        // TASK-HOURS 2026-11-18: carry the estimate line's phase tag (cost lines only; a 'dollar' line is already a sell price and is not marked up).
+        ...(li.phase && li.pricing_type !== 'dollar' ? { phase_name: li.phase } : {}),
         notes: 'From estimate at bid conversion (B14-9). Entered by: Sales',
       });
     }
