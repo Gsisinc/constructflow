@@ -153,7 +153,7 @@ export default function BidPhaseWorkspace({ bid, organizationId }) {
             onViewGate={(gate) => { setSelectedGate(gate); setShowGateChecklist(true); }}
             onPhaseChange={() => {}}
           />
-          <PhaseManager projectId={bidId} currentPhase={customPhases[0]?.phase_name || 'preconstruction'} />
+          <PhaseManager projectId={bidId} currentPhase={customPhases[0]?.phase_name || 'preconstruction'} bid={bid} />
         </div>
       </TabsContent>
 
