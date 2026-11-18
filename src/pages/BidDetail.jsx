@@ -651,7 +651,7 @@ function procCalculateTotals(formData) {
   return calculateTotals();
 }
 
-const PROC_SIGNATURE = 'Thank you,\n\nKemar McKenzie, President/CEO\nGolden State Integrated Systems | CA License #1150625 (C7, C10)\n601 Brannan Island Road, Isleton, CA 95641 | 209-200-1073 | gsistech.com | {{GSIS_EMAIL}}';
+const PROC_SIGNATURE = 'Thank you,\n\nKemar McKenzie, President/CEO\nGolden State Integrated Systems | CSLB License #1150625 (C-7)\n601 Brannan Island Road, Isleton, CA 95641 | 209-200-1073 | gsistech.com | {{GSIS_EMAIL}}';
 const PROC_TAP = 'min-h-[44px] md:min-h-0';
 const PROC_FIELD = 'h-9 w-full rounded-md border border-border bg-background text-foreground text-sm px-2';
 
