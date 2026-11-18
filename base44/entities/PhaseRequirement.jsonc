@@ -25,6 +25,31 @@
         "completed"
       ],
       "default": "pending"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Task quantity (e.g. devices, LF). Added 2026-11-18 (Kemar 8:38 AM)"
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit for quantity (ea, LF, dev...). Added 2026-11-18"
+    },
+    "hours_per_unit": {
+      "type": "number",
+      "description": "Labor hours per unit. Added 2026-11-18"
+    },
+    "task_hours": {
+      "type": "number",
+      "description": "Task hours. Defaults to quantity x hours_per_unit; a typed value is kept when task_hours_manual is true. Phase/job hours are the sum of these. Added 2026-11-18"
+    },
+    "task_hours_manual": {
+      "type": "boolean",
+      "default": false,
+      "description": "true = task_hours was typed by a user and is not recalculated from quantity x hours_per_unit. Added 2026-11-18"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Who owns/does the task (free text). Added 2026-11-18"
     }
   },
   "required": [
