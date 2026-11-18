@@ -515,6 +515,14 @@ function EstimateForm({ estimate, seed, bid, bidTitle, organizationId, isEditing
     estimate ? { ...estimate, line_items: Array.isArray(estimate.line_items) ? estimate.line_items : [] } : newEstimate(standards, seed)
   ));
   const [showCosts, setShowCosts] = useState(true);
+  // TASK-HOURS 2026-11-18 NEW read (addition): the bid's phases for the line "Phase" picker. Same key + filter as BidPhaseWorkspace (shared cache).
+  const phBidId = bid?.id || estimate?.bid_opportunity_id;
+  const { data: phBidPhases = [] } = useQuery({
+    queryKey: ['customPhases', phBidId],
+    queryFn: () => base44.entities.CustomPhase.filter({ project_id: phBidId }, 'order'),
+    enabled: !!phBidId
+  });
+  const phaseOptions = [...new Set((Array.isArray(phBidPhases) ? phBidPhases : []).filter((p) => p && !p.is_hidden).map((p) => p.display_name || p.phase_name).filter(Boolean))];
 
   // Keep the form in sync if the same record is refetched while not editing.
   useEffect(() => {
@@ -679,7 +687,7 @@ function EstimateForm({ estimate, seed, bid, bidTitle, organizationId, isEditing
           )}
         </CardHeader>
         <CardContent className="space-y-3">
-          <LinesTable lines={lines} editable={editable} onChange={updateLineItem} onRemove={removeLineItem} />
+          <LinesTable lines={lines} editable={editable} onChange={updateLineItem} onRemove={removeLineItem} phaseOptions={phaseOptions} />
           {editable && <QuickAddLine onAdd={addLine} />}
           {!editable && lines.length === 0 && (
             <p className="text-center py-4 text-muted-foreground text-sm">No lines yet. Click Edit, then Add line.</p>
@@ -819,7 +827,7 @@ function EstimateForm({ estimate, seed, bid, bidTitle, organizationId, isEditing
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border-t border-border max-h-[calc(92vh-120px)]">
             <div className="overflow-y-auto p-4 space-y-3 border-r border-border max-h-[calc(92vh-120px)]">
               <MarginStrip t={t} band={band} hasDollarLines={hasDollarLines} compact />
-              <LinesTable lines={lines} editable onChange={(i, f, v) => { if (!isEditing) onEdit(); updateLineItem(i, f, v); }} onRemove={(i) => { if (!isEditing) onEdit(); removeLineItem(i); }} compact />
+              <LinesTable lines={lines} editable onChange={(i, f, v) => { if (!isEditing) onEdit(); updateLineItem(i, f, v); }} onRemove={(i) => { if (!isEditing) onEdit(); removeLineItem(i); }} compact phaseOptions={phaseOptions} />
               <QuickAddLine onAdd={(l) => { if (!isEditing) onEdit(); addLine(l); }} />
               <RunningTotals t={t} />
               <div className="flex gap-2 justify-end pt-2">
@@ -887,7 +895,18 @@ function MarginStrip({ t, band, hasDollarLines, compact }) {
   );
 }
 
-function LinesTable({ lines, editable, onChange, onRemove, compact }) {
+function LinesTable({ lines, editable, onChange, onRemove, compact, phaseOptions = [] }) {
+  // TASK-HOURS 2026-11-18: additive `phase` tag per line (a bid phase name). Internal only: totals and the customer PDF never read it.
+  const showPhase = phaseOptions.length > 0 || lines.some((l) => l && l.phase);
+  const phaseSelect = (item, idx, cls) => {
+    const opts = !item.phase || phaseOptions.includes(item.phase) ? phaseOptions : [...phaseOptions, item.phase];
+    return (
+      <select value={item.phase || ''} onChange={(e) => onChange(idx, 'phase', e.target.value)} disabled={!editable} aria-label="Phase" className={cls} title="Phase this line's materials count toward (Phases/Stages > Gates plan $). Internal only.">
+        <option value="">No phase</option>
+        {opts.map((p) => <option key={p} value={p}>{p}{phaseOptions.includes(p) ? '' : ' (not a current phase)'}</option>)}
+      </select>
+    );
+  };
   if (!lines.length) {
     return editable ? <p className="text-sm text-muted-foreground py-2">No lines yet. Use the row below to add your first line.</p> : null;
   }
@@ -946,6 +965,12 @@ function LinesTable({ lines, editable, onChange, onRemove, compact }) {
               <p className="font-semibold tabular-nums text-foreground">{fmtMoney(parseFloat(item.total_cost) || 0)}</p>
             </div>
           </div>
+          {showPhase && (
+            <label className="block">
+              <span className="mb-1 block text-xs text-muted-foreground">Phase</span>
+              {phaseSelect(item, idx, 'h-9 w-full min-w-0 rounded-md border border-border bg-background text-sm text-foreground px-2')}
+            </label>
+          )}
           {(!compact || item.category) && (
             <div className="flex items-center gap-2">
               {!compact && (
@@ -980,6 +1005,7 @@ function LinesTable({ lines, editable, onChange, onRemove, compact }) {
             <th className="text-right font-semibold px-2 py-2 w-24">Unit cost</th>
             <th className="text-right font-semibold px-2 py-2 w-24">Cost</th>
             {!compact && <th className="text-left font-semibold px-2 py-2 w-32">Type</th>}
+            {!compact && showPhase && <th className="text-left font-semibold px-2 py-2 w-40">Phase</th>}
             {editable && <th className="w-9" />}
           </tr>
         </thead>
@@ -1024,6 +1050,9 @@ function LinesTable({ lines, editable, onChange, onRemove, compact }) {
                     <option value="dollar">Dollar (sell)</option>
                   </select>
                 </td>
+              )}
+              {!compact && showPhase && (
+                <td className="px-2 py-1.5">{phaseSelect(item, idx, 'h-9 w-full rounded-md border border-border bg-background text-sm px-2')}</td>
               )}
               {editable && (
                 <td className="px-1 py-1.5">
